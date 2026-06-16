@@ -81,7 +81,7 @@ seed commands.
 
 ## VI. Automated Quality Gates
 
-Every pull request to `develop` or `main` MUST pass the applicable subset of:
+Every pull request to `development` or `main` MUST pass the applicable subset of:
 
 - control-plane package hygiene checks,
 - formatting,
