@@ -58,6 +58,9 @@ jobs:
       - name: Install Vale
         run: go install github.com/errata-ai/vale/v3/cmd/vale@latest
 
+      - name: Install Lychee
+        run: cargo install lychee --version 0.23.0 --locked
+
       - name: Lint skills
         run: npm run skills:lint
 
