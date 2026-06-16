@@ -1,10 +1,14 @@
 extends: existence
-message: "Avoid vague qualifier '%s' unless it is tied to measurable evidence."
-level: suggestion
+message: "Qualify '%s' with concrete evidence, scope, threshold, or source."
+level: warning
 ignorecase: true
 tokens:
-  - very
+  - best-in-class
+  - comprehensive
+  - robust
   - simply
+  - substantial
+  - very
   - obviously
   - clearly
   - basically

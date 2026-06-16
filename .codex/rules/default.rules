@@ -173,20 +173,20 @@ prefix_rule(
 
 prefix_rule(
     pattern = ["git", "commit"],
-    decision = "prompt",
-    justification = "Commit creation is allowed only after all required checks pass and the user policy allows it.",
+    decision = "allow",
+    justification = "Commit creation is allowed in this repo after local validation and explicit user instruction to finalize work.",
 )
 
 prefix_rule(
     pattern = ["git", "push"],
-    decision = "prompt",
-    justification = "Repository mutation requires explicit approval.",
+    decision = "allow",
+    justification = "Push is allowed in this repo after local validation and explicit user instruction to update the live PR branch.",
 )
 
 prefix_rule(
     pattern = ["gh", "pr"],
-    decision = "prompt",
-    justification = "GitHub PR operations affect review state or remote metadata.",
+    decision = "allow",
+    justification = "PR inspection and metadata updates are part of the normal finalization workflow for this control-plane repo.",
 )
 
 prefix_rule(
