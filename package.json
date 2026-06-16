@@ -13,6 +13,7 @@
     "graph:build": "mkdir -p reports/validation/logs && uvx --from code-review-graph code-review-graph build 2>&1 | tee reports/validation/logs/code-review-graph-build.log",
     "graph:status": "mkdir -p reports/validation/logs && uvx --from code-review-graph code-review-graph status 2>&1 | tee reports/validation/logs/code-review-graph-status.log",
     "graph:review": "mkdir -p reports/validation/logs && { uvx --from code-review-graph code-review-graph build && uvx --from code-review-graph code-review-graph status; } 2>&1 | tee reports/validation/logs/code-review-graph-review.log",
+    "astgrep:scan": "npm exec -- ast-grep scan",
     "taskmaster:validate": "npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'",
     "deps:tree": "npm ls --all",
     "workflow:lint": "actionlint && zizmor .",

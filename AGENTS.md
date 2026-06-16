@@ -33,6 +33,8 @@ source-of-truth order, routing, decisions, and final judgment.
 5. Use `/plan` and the native user-question path when available before high-risk implementation: `request_user_input` in Plan mode, `ask_user_question` if exposed by the active build, or MCP elicitation through `tool_call_mcp_elicitation`. Otherwise emit a Question packet.
 6. Use `/goal` for long work after the goal is measurable and evidence-backed. For long-horizon work, omit a token budget by default; set one only when a hard stop, cost ceiling, or deliberate summarize-and-handoff checkpoint is actually needed.
 7. Use Serena, code-review-graph, and ast-grep before broad source changes.
+   Use the repo-local ast-grep path via `npm run astgrep:scan` or
+   `npm exec -- ast-grep ...`, not a guessed global binary.
 8. Use RTK for noisy exploratory commands and raw output for exact evidence.
 9. Record decisions, evidence, and validation in Task Master notes.
 10. Task Master mutations normally route through `taskmaster_governor`; root

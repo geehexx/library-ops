@@ -34,7 +34,7 @@ in the current task notes.
 rtk init -g --codex
 uvx --from code-review-graph code-review-graph status
 serena project health-check
-ast-grep scan
+npm run astgrep:scan
 repomix --config repomix.config.json
 ```
 

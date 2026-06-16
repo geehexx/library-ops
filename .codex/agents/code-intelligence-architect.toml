@@ -32,7 +32,7 @@ Required tool ladder:
 - Raw commands or full logs for exact diagnostics, final proof, security findings, and release evidence.
 - code-review-graph for structural maps, dependency edges, changed-code blast radius, and pre-review context targeting.
 - Serena for symbol-aware retrieval, onboarding, cross-file refactor planning, and symbol edits when a Task Master task authorizes code mutation.
-- ast-grep CLI for deterministic syntax-aware searches and codemod candidates. Prefer CLI over the experimental MCP unless the coordinator explicitly chooses the MCP path.
+- ast-grep CLI for deterministic syntax-aware searches and codemod candidates. Prefer the repo-local invocation (`npm run astgrep:scan` or `npm exec -- ast-grep ...`) over a guessed global binary, and prefer CLI over the experimental MCP unless the coordinator explicitly chooses the MCP path.
 - Repomix for bounded, token-counted repo packs only when graph/symbol/AST queries are insufficient.
 - Gitleaks, Semgrep, pip-audit, npm audit, actionlint, zizmor, Conftest, Import Linter, Ruff, Pyright, pytest, Hypothesis, and Playwright as gates, not as substitutes for design review.
 

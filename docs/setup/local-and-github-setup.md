@@ -52,7 +52,7 @@ rtk init -g --codex
 uvx --from code-review-graph code-review-graph build
 uv tool install -p 3.13 serena-agent
 serena project health-check
-ast-grep scan
+npm run astgrep:scan
 repomix --config repomix.config.json
 ```
 

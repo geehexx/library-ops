@@ -13,7 +13,8 @@ posture for Library Ops.
 - Task Master MCP runs on the custom minimal set
   `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd`,
   while heavier graph analysis, regeneration, and mutation stay on the CLI;
-- use Serena, code-review-graph, and ast-grep before broad source edits.
+- use Serena, code-review-graph, and repo-local ast-grep before broad source
+  edits;
 - For Python and Django changes, treat Pyright as the first static check on the touched scope before wider pytest or gate runs.
 
 ## Required verification
