@@ -111,8 +111,8 @@ other MCP-capable agents by keeping source-of-truth artifacts portable:
 
 Agents MUST use Context7 or equivalent current documentation for framework/API
 usage when implementation details are uncertain. Agents MAY use Exa or equivalent
-web research for current external evidence. Figma MCP MAY be used for mockups,
-but Markdown wireframes remain the repo-local design source.
+web research for current external evidence. Markdown wireframes remain the
+repo-local design source.
 
 Agent-operating context SHOULD live in AGENTS, skills, Codex config, or
 repo-local references instead of being recreated under human-facing docs.
@@ -156,9 +156,9 @@ Commands SHOULD support `--dry-run`, `--limit`, and `--refresh` where practical.
 
 ## XI. Design Before Implementation
 
-Core user flows SHOULD have repo-local wireframes before UI implementation. Figma
-artifacts MAY be created from those wireframes, but the application MUST remain
-implementable without relying on private Figma access.
+Core user flows SHOULD have repo-local wireframes before UI implementation. The
+application MUST remain implementable without relying on private external design
+tool access.
 
 ## XII. Evidence, Research, and Claim Calibration
 
@@ -181,7 +181,7 @@ run or a repository-specific benchmark artifact. "Installed" is not evidence of
 
 ## XIII. Connector and MCP Truthfulness
 
-Agents MUST NOT claim to have used Exa, Context7, Figma, Task Master MCP, or any
+Agents MUST NOT claim to have used Exa, Context7, Task Master MCP, or any
 other connector unless the session actually exposed and used that connector.
 When a connector is unavailable, agents SHOULD use available official sources and
 record that limitation. Repo configuration MAY prepare Codex to use MCPs later,

@@ -21,7 +21,6 @@ Promptfoo is the primary Library Ops control-plane and AI-behavior evaluation sy
 - canonical, derived, and operator-local artifact classes;
 - Task Master `.taskmaster/config.json` local-only posture;
 - committed derived Task Master graph posture for `.taskmaster/tasks/tasks.json`;
-- Figma remote MCP OAuth posture through `codex mcp login figma`;
 - local-export exclusions for `.env*`, `.mcp.json`, OAuth tokens, provider keys, caches, generated corpora, and previous archives;
 - direct-tool verification language for current repo state.
 

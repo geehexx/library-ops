@@ -29,8 +29,8 @@ shared evidence bundles.
   inverted check-in/check-out wording.
 - Work, edition, copy, and loan remain distinct domain concepts.
 - Roles and quality evidence matter as much as feature count.
-- Promptfoo, Task Master, Spec Kit, Serena, code-review-graph, Context7, Exa,
-  and Figma each have narrow, evidence-backed roles.
+- Promptfoo, Task Master, Spec Kit, Serena, code-review-graph, Context7, and
+  Exa each have narrow, evidence-backed roles.
 
 ## Superseded context
 

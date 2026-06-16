@@ -7,24 +7,27 @@
 
 ## Context
 
-The demo needs credible UI/UX evidence while remaining implementable without private design-tool access. Figma can improve visual exploration, but Markdown wireframes and accessibility notes must remain available to Codex and reviewers.
+The demo needs credible UI/UX evidence while remaining implementable without
+private design-tool access. The current external design-tool seat available to
+this repo is view-only, so it is not a reliable writable implementation lane.
 
 ## Decision
 
-`docs/design/wireframes.md` is the repo-local design source of truth. Figma MCP is required in the selected toolchain when design extraction is needed and credentials are configured, but private Figma files, tokens, and non-repo state do not become product source of truth. Any Figma-derived decision that affects implementation must be mirrored into repo docs.
+`docs/design/wireframes.md` is the repo-local design source of truth. Private
+design tools do not form part of the committed control-plane baseline, and
+implementation decisions must be represented in repo-local docs and tests.
 
 ## Alternatives considered
 
 | Alternative | Benefit | Rejected or adapted because |
 |---|---|---|
-| Figma only | Rich visuals | Private/unavailable to many agents and reviewers. |
-| Markdown only | Always accessible | Less useful for polished design exploration. |
+| External design tool only | Rich visuals | Private or non-writable to many agents and reviewers. |
+| Markdown only | Always accessible | Chosen because repo-local authority matters more than a secondary visual system in this branch. |
 | No wireframes | Fastest | Increases UI rework and weakens evaluator confidence. |
 
 ## Consequences
 
-- Codex can implement UI flows without Figma access.
-- Figma remains useful for visual polish and design tokens.
+- Codex can implement UI flows without external design-tool access.
 - Accessibility and empty/error states are documented before implementation.
 
 ## Validation

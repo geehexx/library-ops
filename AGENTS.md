@@ -93,7 +93,7 @@ The coordinator decides whether to ask the user, continue safe partial work, or 
 
 ## Required selected stack
 
-Implementation environments must provide Codex CLI, Task Master, RTK, Serena, code-review-graph, ast-grep, Repomix, Context7 MCP, Exa MCP, Task Master MCP, Figma MCP for design tasks, Promptfoo, Playwright, Schemathesis, mutmut, Vale, cspell, lychee, alex, agent-skills-lint, Gitleaks, Semgrep, Bandit, pip-audit, actionlint, zizmor, Conftest, CycloneDX, Import Linter, Ruff, Pyright, pytest, and Hypothesis.
+Implementation environments must provide Codex CLI, Task Master, RTK, Serena, code-review-graph, ast-grep, Repomix, Context7 MCP, Exa MCP, Task Master MCP, Promptfoo, Playwright, Schemathesis, mutmut, Vale, cspell, lychee, alex, agent-skills-lint, Gitleaks, Semgrep, Bandit, pip-audit, actionlint, zizmor, Conftest, CycloneDX, Import Linter, Ruff, Pyright, pytest, and Hypothesis.
 
 Run:
 

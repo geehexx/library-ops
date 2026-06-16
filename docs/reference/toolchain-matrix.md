@@ -12,7 +12,7 @@ The selected implementation environment treats the configured tools as required.
 | code-review-graph | Graph/blast-radius review, with repo-preferred `uvx` or npm wrapper invocation. |
 | ast-grep | Deterministic AST rules/codemods. |
 | Repomix | Bounded repo snapshots. |
-| Context7/Exa/Figma MCP | Docs, research, design task context. |
+| Context7/Exa MCP | Docs and research context. |
 | Promptfoo | Eval and red-team gate, invoked as a pinned external CLI. |
 | Vale/cspell/lychee/alex | Documentation quality. |
 | Import Linter/Ruff/Pyright/pytest/Hypothesis/Playwright/Schemathesis/mutmut | Code and behavior quality, primarily through `uv run`. |

@@ -10,8 +10,8 @@ updated: 2026-06-14
 ## Purpose
 
 This plan defines the low-fidelity mockup set for the Library Ops evaluator
-flow. It is repo-local so implementation can proceed without private Figma
-access, and it can be mirrored into Figma when local OAuth is available.
+flow. It is repo-local so implementation can proceed without private design-tool
+access.
 
 ## Frames
 
@@ -24,21 +24,6 @@ access, and it can be mirrored into Figma when local OAuth is available.
 | Circulation panel | Exercise checkout, return, renew, overdue feedback, and transactional errors. | Success, copy unavailable, member blocked, validation error. |
 | Admin/librarian dashboard | Summarize collection, active loans, overdue items, imports, and quality evidence. | Normal, import running, import failed, no seed data. |
 | AI metadata review | Keep AI assistance human-reviewed and provenance-backed. | Suggestions available, rejected suggestion, provider unavailable. |
-
-## Figma Handoff
-
-Preferred local flow:
-
-```bash
-codex mcp add figma --url https://mcp.figma.com/mcp
-codex mcp login figma
-codex mcp list
-```
-
-When the Figma MCP is authenticated, create low-fidelity desktop-first frames from
-the table above and mirror all implementation decisions back into
-`docs/design/wireframes.md`. Do not store Figma URLs, OAuth tokens, session
-state, or private file IDs in the repository.
 
 ## Implementation Constraints
 
@@ -54,4 +39,5 @@ state, or private file IDs in the repository.
 - Wireframes cover all PRD evaluator workflows.
 - Each frame has a clear purpose, primary action, empty state, error state, and
   accessibility note.
-- Figma or wireframe dogfooding result is summarized in Task Master notes or a temporary local report, not committed as durable repo truth.
+- Wireframe dogfooding result is summarized in Task Master notes or a temporary
+  local report, not committed as durable repo truth.

@@ -18,7 +18,6 @@ The selected implementation-environment stack is required:
 | Agent harness | Codex CLI/App project config | Primary implementation surface. |
 | Docs/research MCP | Context7 and Exa | Current API docs, web research, examples, and counterfactual evidence. |
 | Task execution MCP/tool | taskmaster-ai / task-master | PRD parsing, task graph, complexity analysis, execution notes. |
-| Design MCP | Figma | Task-scoped design extraction when credentials are configured; repo docs stay canonical. |
 | Shell-output optimization | RTK | Compress noisy shell output before it enters context. |
 | Structural graph | code-review-graph | Local graph, blast-radius, review context, dependency map. |
 | Symbolic code intelligence | Serena | Symbol-aware retrieval/refactor planning via MCP. |
@@ -27,11 +26,11 @@ The selected implementation-environment stack is required:
 | Skill validation | custom validator plus agent-skills-lint when available | Validate Codex skill schema, collisions, and skill context quality. |
 | Security/quality | Gitleaks, Semgrep, pip-audit, npm audit, actionlint, zizmor, Conftest | Left-shift gates for secrets, SAST, dependency risk, workflow risk, and policy. |
 
-The project config declares Context7, Exa, Task Master, Figma, code-review-graph, and Serena MCP servers. Context7, Exa, Task Master, code-review-graph, and Serena are startup-required in implementation environments. Figma is configured but task-scoped optional because OAuth state is operator-local and private Figma files must not block source review. ast-grep remains a required CLI rather than a default MCP because the official MCP server is experimental and duplicates safer deterministic CLI usage. Remote/cloud code-indexing and paid services are deferred until the user approves credentials, code-export boundaries, cost, and retention.
+The project config declares Context7, Exa, Task Master, code-review-graph, and Serena MCP servers. Context7, Exa, Task Master, code-review-graph, and Serena are startup-required in implementation environments. ast-grep remains a required CLI rather than a default MCP because the official MCP server is experimental and duplicates safer deterministic CLI usage. Remote/cloud code-indexing and paid services are deferred until the user approves credentials, code-export boundaries, cost, and retention.
 
 RTK may filter noisy command output, but final evidence requires raw output/full logs for ambiguous failures, security results, release evidence, and exact diagnostics.
 Provider and OAuth setup must use official local commands such as
-`codex mcp login figma` and `task-master models --setup`; agents must stop and
+`task-master models --setup`; agents must stop and
 ask the user to run those commands when interactive login is required.
 
 ## Alternatives considered

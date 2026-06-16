@@ -14,7 +14,7 @@ Follow these save-location rules every time:
 
 ## Tool priority
 
-- Prefer tool-specific screenshot capabilities when available (for example: a Figma MCP/skill for Figma files, or Playwright/agent-browser tools for browsers and Electron apps).
+- Prefer tool-specific screenshot capabilities when available (for example: a design-tool screenshot path when one is actually in use, or Playwright/agent-browser tools for browsers and Electron apps).
 - Use this skill when explicitly asked, for whole-system desktop captures, or when a tool-specific capture cannot get what you need.
 - Otherwise, treat this skill as the default for desktop apps without a better-integrated capture tool.
 
@@ -132,7 +132,7 @@ bash <path-to-skill>/scripts/ensure_macos_permissions.sh && \
 python3 <path-to-skill>/scripts/take_screenshot.py --app "<App>" --mode temp
 ```
 
-- "The design from Figma is not matching what is implemented": use a Figma MCP/skill to capture the design first, then capture the running app with this skill (typically to temp) and compare the raw screenshots before any manipulation.
+- "The design is not matching what is implemented": capture the design reference first, then capture the running app with this skill (typically to temp) and compare the raw screenshots before any manipulation.
 
 ### Multi-display behavior
 

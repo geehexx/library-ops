@@ -1,23 +1,22 @@
 ---
 id: DESIGN-WIREFRAMES-001
-title: Library Ops Wireframes and Figma Handoff
+title: Library Ops Wireframes and Design Handoff
 status: accepted
 source_of_truth: repo-local-design
 related_prd: .taskmaster/docs/prd.md
 ---
 
-# Library Ops Wireframes and Figma Handoff
+# Library Ops Wireframes and Design Handoff
 
 ## Purpose
 
 This file is the repo-local design source for the first implementation pass. It
-keeps the UI implementable without private Figma access while still giving Figma
-MCP enough structure to generate mockups quickly.
+keeps the UI implementable without private external design-tool access.
 
 Use `docs/design/evaluator-design-handoff.md` for the durable evaluator-facing
 screen/state matrix, role/action matrix, accessibility contract, and design token
-fallback that must remain available without Figma access.
-Use `docs/design/mockup-plan.md` for the low-fidelity Figma-or-Markdown mockup
+fallback that must remain available without private design-tool access.
+Use `docs/design/mockup-plan.md` for the low-fidelity mockup
 execution plan and acceptance checks.
 
 The design target is a polished but restrained engineering-manager interview
@@ -47,7 +46,7 @@ forms, and no unnecessary visual complexity.
   confirmation panel, toast/alert region.
 - Color usage: keep semantic states obvious: available, on-loan, overdue,
   archived, destructive action. Define exact colors during implementation or in
-  Figma; do not hard-code design tokens here.
+  external design tools; do not hard-code design tokens here.
 - Tone: clear, operational, not whimsical.
 
 ## Screen map
@@ -339,40 +338,9 @@ Implementation notes:
 - Persist provenance if suggestions are applied.
 - Do not generate availability or copy state.
 
-## Figma MCP prompts
-
-### Whole-app flow prompt
-
-```text
-Create a desktop-first Figma mockup for Library Ops, a Django/HTMX mini library
-management system. Include frames for landing, login, dashboard, catalog search,
-book detail, create/edit book, checkout modal, return modal, loans page, and AI
-metadata review. Use a pragmatic engineering-demo aesthetic, accessible form
-states, role-aware actions for Admin/Librarian/Member, and compact dashboard
-cards. Keep components simple enough to implement with Django templates, HTMX,
-and Tailwind-style utility classes.
-```
-
-### Catalog search prompt
-
-```text
-Design the Library Ops catalog search screen. It must support exact ISBN/barcode
-search, keyword full-text search, semantic search toggle, facets, result match
-explanations, availability badges, and role-aware actions. Include empty, loading,
-and error states. Optimize for evaluator clarity over visual novelty.
-```
-
-### Circulation prompt
-
-```text
-Design checkout and return modal flows for a librarian. Show patron selection,
-due date, copy status, transactional error handling, success refresh behavior,
-and keyboard-accessible modal states.
-```
-
 ## Implementation extraction checklist
 
-When extracting from Figma or Markdown into implementation, capture:
+When extracting wireframes or implementation notes into code, capture:
 
 - route name;
 - template name;
@@ -383,41 +351,8 @@ When extracting from Figma or Markdown into implementation, capture:
 - empty/error/loading states;
 - Playwright assertions.
 
-## Figma MCP implementation brief
+## Design authority rules
 
-When Figma MCP is available, the design agent SHOULD create a low-fidelity but
-implementation-ready file from this brief instead of inventing a new product.
-
-### Suggested Figma prompt
-
-```text
-Create a clean, professional web app design for "Library Ops", a mini library
-management system interview demo. Use the repository wireframes as the source of
-truth. Prioritize clarity, keyboard accessibility, strong empty states, and a
-trustworthy engineering-management feel.
-
-Create frames for:
-1. Public landing page
-2. Login / role selection demo helper
-3. Dashboard
-4. Catalog search with facets and exact/keyword/vector match badges
-5. Book detail with edition, copies, provenance, and allowed actions
-6. Add/edit catalog record form
-7. Checkout modal
-8. Return confirmation
-9. Loans dashboard
-10. AI metadata suggestion review
-
-Use a restrained neutral palette, clear spacing, strong typographic hierarchy,
-visible focus states, and components that can be implemented with Django
-templates, HTMX, and accessible HTML. Do not introduce flows that are not in the
-PRD.
-```
-
-### Extraction rules
-
-- Treat Figma as a design aid, not the source of product truth.
+- Treat these repo-local wireframes as the design source of truth.
 - Record any design change that affects behavior in the PRD or Task Master task.
-- Do not require private Figma access to implement the app.
-- Export only screenshots or documented measurements needed for implementation;
-  never commit private Figma tokens.
+- Do not require external design-tool access to implement the app.

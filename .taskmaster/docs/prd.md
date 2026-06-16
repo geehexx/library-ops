@@ -26,7 +26,7 @@ last_reviewed: 2026-06-12
 - [11. Data Model](#11-data-model)
 - [12. Search and AI Design](#12-search-and-ai-design)
 - [13. Seed Data and Demo Corpus](#13-seed-data-and-demo-corpus)
-- [14. UX, Accessibility, and Figma Workflow](#14-ux-accessibility-and-figma-workflow)
+- [14. UX and Accessibility Workflow](#14-ux-and-accessibility-workflow)
 - [15. Agent System and MCP Workflow](#15-agent-system-and-mcp-workflow)
 - [16. CI/CD, Branching, and Release Governance](#16-cicd-branching-and-release-governance)
 - [17. Security and Privacy](#17-security-and-privacy)
@@ -72,7 +72,7 @@ than a real integrated library system, but it should demonstrate mature engineer
 - hybrid search that respects exact library identifiers;
 - clear test and CI gates;
 - deployable Python/Django implementation;
-- agent-compatible implementation workflow using Codex, Task Master, Spec Kit, Context7, Exa, Figma, RTK, and governed code-intelligence tooling.
+- agent-compatible implementation workflow using Codex, Task Master, Spec Kit, Context7, Exa, RTK, and governed code-intelligence tooling.
 
 The project is not judged only by feature volume. It is judged by whether an evaluator can see that the
 work was decomposed, governed, implemented, tested, and shipped in a disciplined way.
@@ -194,7 +194,7 @@ The project uses formal standards selectively. The goal is disciplined structure
 | Agent context optimization | RTK + code-intelligence ladder | Noisy-output reduction, graph/symbol/AST planning, raw evidence preservation. |
 | Decisioning | Socratic decision framework | User tie-back, alternatives, counterfactual evidence, validation, rollback, and clear pause rules. |
 | Evidence discipline | Research register + ADRs | Current-source verification and explicit assumptions. |
-| Design-to-code | Repo wireframes + Figma MCP | Repo-local implementation source with Figma-backed design extraction for design tasks. |
+| Design-to-code | Repo wireframes | Repo-local implementation source without private design-tool dependence. |
 
 ## 4. Socratic Analysis and Ambiguity Log
 
@@ -284,11 +284,13 @@ hosted embeddings as an optional extension.
 
 **Reasoning:** These accounts exist only in seeded demo data and can be reset. Real secrets remain prohibited.
 
-### Q11. Should Figma be mandatory?
+### Q11. Should a private design tool be mandatory?
 
-**Decision:** The repo MUST contain implementation-ready wireframes and the selected toolchain MUST support Figma MCP for design tasks. Figma files do not replace repo-local wireframes as implementation source of truth.
+**Decision:** The repo MUST contain implementation-ready wireframes. Private
+design tools do not form part of the committed implementation baseline.
 
-**Reasoning:** A private design artifact must not block source review, but Figma MCP is part of the required agent stack for design handoff when credentials are configured. Important design decisions must be mirrored back into repo docs.
+**Reasoning:** A private design artifact must not block source review or
+implementation. Important design decisions must be mirrored back into repo docs.
 
 ### Q12. How do we prevent agent drift?
 
@@ -305,7 +307,7 @@ to a task should be rejected or converted into a PRD/task update first.
 
 ### Q14. Which code-intelligence/MCP tools are required?
 
-**Decision:** The selected local implementation stack is required: code-review-graph for graph/blast-radius review, Serena for symbol-level retrieval/refactor planning, ast-grep for deterministic structural search, Repomix for bounded repo packs, Context7 and Exa for research, Task Master MCP/CLI for execution, and Figma MCP for design tasks.
+**Decision:** The selected local implementation stack is required: code-review-graph for graph/blast-radius review, Serena for symbol-level retrieval/refactor planning, ast-grep for deterministic structural search, Repomix for bounded repo packs, Context7 and Exa for research, and Task Master MCP/CLI for execution.
 
 **Reasoning:** The user clarified that these should not remain vague optional add-ons. Alternatives were examined across smaller dedicated tools, larger hosted platforms, and raw/manual workflows. The project chooses local-first tools by default and defers hosted/cloud code-indexing, paid dashboards, and broader context layers until an explicit user decision.
 
@@ -357,14 +359,14 @@ Create a reproducible, agent-friendly project foundation.
 
 #### Feature: C1.F4 Agent, MCP, and context baseline
 
-- **Description:** Configure Codex, Task Master, Spec Kit, Context7, Exa, Figma MCP, RTK-aware operating rules, and bounded context budgets.
+- **Description:** Configure Codex, Task Master, Spec Kit, Context7, Exa, RTK-aware operating rules, and bounded context budgets.
 - **Inputs:** `.codex/config.toml`, `AGENTS.md`, skills, MCP credentials in local environment only.
 - **Outputs:** Agent-compatible project workspace with secrets excluded and main-agent context contract set to 1M.
 - **Behavior:** Agents can research current docs, inspect Task Master tasks, use design context, optimize noisy shell output with RTK, and preserve raw evidence.
 - **Acceptance criteria:**
   - MCP examples document required local authentication.
   - No real MCP keys are committed.
-  - Figma MCP is configured for design tasks; repo wireframes remain the non-private implementation source.
+  - Repo wireframes remain the non-private implementation source.
   - `default_permissions` and root context settings remain root-scoped in `.codex/config.toml`.
   - Main agent context contract is documented and validated as `1,000,000` tokens.
   - Subagent context budgets are bounded and recursive fan-out remains disabled.
@@ -1158,7 +1160,7 @@ Library Ops Web Application
         +-- GitHub repository / CI
         +-- Render or equivalent Django host
         +-- PostgreSQL with pgvector
-        +-- Optional Figma MCP for design workflow
+        +-- Repo-local wireframes for design workflow
         +-- Optional OpenAI/hosted AI for metadata suggestions
         +-- Open Library and Project Gutenberg metadata sources
 ```
@@ -1454,7 +1456,7 @@ For a recognizable 1,000-record demo corpus, prefer records that have:
 - cover image candidate;
 - high source quality.
 
-## 14. UX, Accessibility, and Figma Workflow
+## 14. UX and Accessibility Workflow
 
 ### 14.1 Product Screens
 
@@ -1489,17 +1491,11 @@ The MVP UI includes:
 - Modals follow accessible dialog behavior.
 - Color is not the only indication of status.
 
-### 14.4 Figma Workflow
+### 14.4 Wireframe Workflow
 
-The repo includes `docs/design/wireframes.md` as the portable design source. For Figma-backed design work:
-
-1. connect Figma MCP with Codex;
-2. generate or inspect the Figma file from the wireframe prompt;
-3. extract design context for selected frames;
-4. implement Django templates/HTMX from extracted tokens/components;
-5. keep the wireframe doc updated with final design decisions.
-
-Figma MCP is required for design tasks that use Figma. Private Figma state is not a substitute for repo-local wireframes.
+The repo includes `docs/design/wireframes.md` as the portable design source.
+Implementation should proceed from that repo-local authority rather than from a
+private design-tool workflow.
 
 ## 15. Agent System and MCP Workflow
 
@@ -1515,7 +1511,7 @@ Figma MCP is required for design tasks that use Figma. Private Figma state is no
 - Reviewer: correctness/security/traceability.
 - Search architect: search and relevance.
 - Seed data engineer: corpus/provenance.
-- UX design architect: wireframes, Figma prompts, design-to-template mapping.
+- UX design architect: wireframes and design-to-template mapping.
 - DevOps release manager: CI/CD/release/deploy.
 
 ### 15.2 MCPs
@@ -1525,7 +1521,6 @@ Figma MCP is required for design tasks that use Figma. Private Figma state is no
 | Task Master | Yes | task graph, dependencies, task notes/status |
 | Context7 | Yes | current version-specific library docs |
 | Exa | Yes | current research/search beyond local docs |
-| Figma | Task-scoped yes | create/read design files and extract design context for design tasks |
 | code-review-graph | Yes | structural map and blast-radius review context |
 | Serena | Yes | symbol-level project context and refactor planning |
 
@@ -1550,12 +1545,11 @@ Code-intelligence tools are not all MCPs and are governed separately:
 - Use code graph/symbol/AST/repo-pack tools only according to `.codex/references/context-and-tooling-strategy.md`.
 - Use Context7 before using framework/library APIs that may have changed.
 - Use Exa for current external research or examples.
-- Use Figma MCP only for design artifacts and design-to-code context.
 - Do not store secrets in Task Master metadata, PRD, README, or MCP config.
 
 ### 15.4 Connector Truthfulness
 
-The repository configures Exa, Context7, Figma, Task Master, code-review-graph, and Serena MCPs, but configured access is not the
+The repository configures Exa, Context7, Task Master, code-review-graph, and Serena MCPs, but configured access is not the
 same as actual usage. Agents MUST record direct connector usage in Task Master notes or the evidence
 register. If a connector is unavailable in a session, agents MUST say so and use available official sources.
 
@@ -1567,8 +1561,6 @@ register. If a connector is unavailable in a session, agents MUST say so and use
   `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd` by
   default, and keep heavier analysis, expansion, and model-tuning operations on
   the pinned CLI.
-- Figma MCP is required for Figma-backed design tasks; repo wireframes remain the fallback implementation source when credentials are unavailable.
-- When using Figma MCP with Codex, prefer the remote endpoint and local OAuth through `codex mcp login figma`; do not commit or copy raw Figma tokens into project files.
 - code-review-graph and Serena are selected project MCPs; new MCP servers beyond the selected stack require explicit user approval and local trust review.
 
 ## 16. CI/CD, Branching, and Release Governance
@@ -1776,7 +1768,7 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 | ADR-0003 | Search, AI assistance, and data provenance: exact + FTS + vector baseline, AI suggestions reviewed, deterministic seed import. | Accepted |
 | ADR-0004 | Agent toolchain, MCP, and context optimization: required Codex/RTK/code-review-graph/Serena/ast-grep/Repomix stack. | Accepted |
 | ADR-0005 | Delivery, quality, security, and release governance: CI, branches, quality gates, security, release, deployment. | Accepted |
-| ADR-0006 | Design and UX workflow: repo-local wireframes plus Figma-assisted design handoff. | Accepted |
+| ADR-0006 | Design and UX workflow: repo-local wireframes as the design authority. | Accepted |
 | ADR-0007 | Agent skills and meta-system governance: skills, hooks, context, and tool access are validated implementation surface. | Accepted |
 
 ## 21. Risk Register
@@ -1792,7 +1784,6 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 | Search overengineered | Medium | Medium | Baseline exact + FTS first | Defer vectors/BM25 |
 | ParadeDB unavailable on deployment | Low | High | Optional adapter only | Use standard FTS |
 | Public data licensing confusion | Medium | Medium | Store provenance and license notes; use official dumps/catalogs | Use synthetic seed records |
-| Figma MCP credentials unavailable | Low | Medium | Markdown wireframes remain repo source | Implement from wireframes and record credential limitation |
 | Free hosting limits | Medium | Medium | Keep corpus small; document local fallback | Provide local demo only if needed |
 | File upload security | Medium | Medium | Validate size/type/decode; limit uploads | External cover URLs only |
 | CI ignores real failures while bootstrap incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until bootstrap exists |
@@ -1853,7 +1844,6 @@ Exa, or web research before making version-sensitive implementation changes.
 | S20 | Import Linter docs: https://import-linter.readthedocs.io/ | Architecture import constraints. |
 | S21 | Render Django docs: https://render.com/docs/deploy-django | Deployment path. |
 | S22 | GitHub protected branches docs: https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches | Branch protection and required checks. |
-| S23 | Figma MCP docs: https://developers.figma.com/docs/figma-mcp-server/ | Design context and write-to-canvas workflows. |
 | S24 | Context7 docs: https://github.com/upstash/context7 and Exa MCP docs: https://exa.ai/docs/reference/exa-mcp | Agent research/documentation MCPs. |
 | S25 | WCAG overview: https://www.w3.org/WAI/standards-guidelines/wcag/ | Accessibility baseline. |
 | S26 | OWASP ASVS/SAMM: https://owasp.org/www-project-application-security-verification-standard/ and https://owaspsamm.org/ | Security verification and SDLC framing. |
@@ -1863,7 +1853,6 @@ Exa, or web research before making version-sensitive implementation changes.
 | S30 | Playwright docs: https://playwright.dev/ | Browser E2E testing. |
 | S31 | OpenAI Codex MCP docs: https://developers.openai.com/codex/mcp | Codex MCP configuration and connector setup. |
 | S32 | OpenAI Codex config/models docs: https://developers.openai.com/codex/config and https://developers.openai.com/codex/models | Project-scoped config and model selection. |
-| S33 | Figma Codex MCP setup: https://help.figma.com/hc/en-us/articles/39888629089175-Codex-and-Figma-Set-up-the-MCP-server | Codex-specific Figma MCP setup and design context. |
 | S34 | GitHub Actions docs: https://docs.github.com/actions | CI/CD workflow automation. |
 | S35 | Conventional Commits: https://www.conventionalcommits.org/en/v1.0.0/ | Commit structure and release automation alignment. |
 
@@ -1896,16 +1885,15 @@ The updated control-plane package preserved the prior strategic decisions:
 - protected-branch, PR, CI, Conventional Commits, and SemVer workflow.
 
 The updated control-plane package added repo-local wireframes, UX design skill/agent, runbook, deterministic-seed ADR,
-Figma MCP path, evidence register, and context-drift review. It removed committed `.pytest_cache` artifacts.
+evidence register, and context-drift review. It removed committed `.pytest_cache` artifacts.
 
 ### 24.3 Connector Verification Policy
 
-Exa, Context7, Figma MCP, and Task Master MCP are intended implementation tools, but claims about their use
+Exa, Context7, and Task Master MCP are intended implementation tools, but claims about their use
 must be evidence-based. During implementation:
 
 - Context7 SHOULD be used for version-specific framework/API documentation.
 - Exa SHOULD be used for broad current research and ecosystem examples.
-- Figma MCP is required for Figma-backed design work when authenticated.
 - Task Master MCP/CLI MUST be used for task graph execution in implementation environments.
 - Any direct connector usage SHOULD be recorded in Task Master notes, the PRD source register, or an ADR when the decision is durable.
 
@@ -1922,7 +1910,7 @@ If a review session lacks direct connector access, the agent MUST say so rather 
 | Governance | Spec Kit constitution | Enforceable principles before implementation | Plain ADRs alone are less process-oriented |
 | Agent | Codex with MCP config | Repo-local agent config and MCP-capable workflow | Claude Code/Cursor/Windsurf should remain compatible |
 | Research | Context7 + Exa | Versioned docs plus broader current research | Official web research fallback when connectors unavailable |
-| Design | Repo wireframes + Figma MCP | Portable source plus required design-task extraction path | Private Figma files must not become the only source |
+| Design | Repo wireframes | Portable source and implementation authority | Private design-tool state must not become the only source |
 | Search | Exact IDs + Postgres FTS + pgvector | Correct library identifier behavior plus semantic discovery | ParadeDB/BM25 optional behind adapter |
 | Seed data | Django management commands | Reproducible, refreshable, auditable seed process | Fixtures only for tests/small examples |
 | Command-output optimization | RTK | User-accepted optimization for noisy shell output | Raw reruns/full logs remain required for evidence |
@@ -1943,7 +1931,7 @@ A release is not evaluator-ready until the repo can show:
 - research register showing material evidence and assumptions;
 - context-drift review for major revisions;
 - runbook for local setup, deployment, seed refresh, smoke tests, and rollback;
-- wireframes or Figma-derived screenshots for key flows;
+- wireframes or implementation screenshots for key flows;
 - CI results and test commands;
 - release tag and changelog when release automation exists.
 
@@ -1970,4 +1958,4 @@ As of this PRD revision:
 - **Verified:** standards/tooling/deployment claims recorded in the source register and research register.
 - **Mechanically verified:** control-plane package archive hygiene and Markdown/Python static checks.
 - **Planned but not implemented:** Django app, database models, search services, seed importers, API, and deployment.
-- **Implementation-time checks required:** selected PostgreSQL host extension support, ParadeDB availability, Figma MCP authentication for design tasks, final Codex model availability/cost policy, strict required-tooling check, and actual Task Master-generated task graph quality.
+- **Implementation-time checks required:** selected PostgreSQL host extension support, ParadeDB availability, final Codex model availability/cost policy, strict required-tooling check, and actual Task Master-generated task graph quality.

@@ -85,8 +85,8 @@
       {
         "id": 2,
         "title": "Configure Core Quality and Agent Tooling",
-        "description": "Configure static analysis, testing, and agent-specific tools for predictable development. This includes Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint, and the agent stack like Codex, Task Master, Spec Kit, Context7, Exa, Figma MCP, RTK, code-review-graph, Serena, ast-grep, and Repomix.",
-        "details": "This task aligns with Capability C1.F3, C1.F4, and C1.F5. Configure `pyproject.toml` for Ruff, Pyright (strict defaults), pytest (with Hypothesis), Import Linter (for module boundaries once apps exist), coverage, pip-audit, and markdownlint. For agent tooling, set up `.codex/config.toml`, `AGENTS.md`, and relevant skills to enable Context7, Exa, Figma MCP, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix. Ensure no real MCP keys are committed and the project permission profile stays on the current workspace-scoped model. Validate with direct-tool commands rather than custom readiness scripts.",
+        "description": "Configure static analysis, testing, and agent-specific tools for predictable development. This includes Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint, and the agent stack like Codex, Task Master, Spec Kit, Context7, Exa, RTK, code-review-graph, Serena, ast-grep, and Repomix.",
+        "details": "This task aligns with Capability C1.F3, C1.F4, and C1.F5. Configure `pyproject.toml` for Ruff, Pyright (strict defaults), pytest (with Hypothesis), Import Linter (for module boundaries once apps exist), coverage, pip-audit, and markdownlint. For agent tooling, set up `.codex/config.toml`, `AGENTS.md`, and relevant skills to enable Context7, Exa, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix. Ensure no real MCP keys are committed and the project permission profile stays on the current workspace-scoped model. Validate with direct-tool commands rather than custom readiness scripts.",
         "testStrategy": "Verify that Ruff (format/lint), Pyright (strict defaults), and Import Linter (once apps exist) run successfully. Confirm `codex doctor --summary --ascii --no-color`, `npm run skills:lint`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` validate the current agent/tooling setup. Execute MCP examples to ensure required local authentication for agents is documented and functional without committing secrets.",
         "priority": "high",
         "dependencies": [
@@ -141,7 +141,7 @@
           {
             "id": 5,
             "title": "Integrate Advanced Agent Capabilities and Implement Tooling Validation Script",
-            "description": "Configure advanced agent capabilities, including Context7, Exa, Figma MCP, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix, within the existing agent configuration and validate them through the direct-tool workflow.",
+            "description": "Configure advanced agent capabilities, including Context7, Exa, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix, within the existing agent configuration and validate them through the direct-tool workflow.",
             "dependencies": [
               4
             ],

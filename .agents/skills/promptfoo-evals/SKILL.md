@@ -33,7 +33,7 @@ npm run eval:validate
 npm run eval:smoke
 ```
 
-Use this lane for source-of-truth wording, artifact taxonomy, no-secret policies, Task Master local-only config, and Codex/Figma auth handling.
+Use this lane for source-of-truth wording, artifact taxonomy, no-secret policies, Task Master local-only config, and Codex auth handling.
 
 ## Provider-backed semantic lane
 

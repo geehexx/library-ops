@@ -42,8 +42,6 @@ Only use these when the local Codex install is missing an MCP entry:
 codex mcp add context7 -- node node_modules/@upstash/context7-mcp/dist/index.js --transport stdio
 codex mcp add exa --url 'https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa'
 codex mcp add taskmaster-ai -- npx --yes --package task-master-ai@0.43.1 task-master-ai
-codex mcp add figma --url https://mcp.figma.com/mcp
-codex mcp login figma
 npx --yes --package task-master-ai@0.43.1 -c 'task-master models --setup'
 ```
 

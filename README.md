@@ -104,14 +104,6 @@ uv tool install -p 3.13 serena-agent
 codex doctor --summary --ascii --no-color
 ```
 
-Figma uses local OAuth when needed:
-
-```bash
-codex mcp add figma --url https://mcp.figma.com/mcp || true
-codex mcp login figma
-codex mcp list
-```
-
 Task Master runtime setup is local-only:
 
 ```bash

@@ -18,7 +18,7 @@ The project makes consequential choices through explicit questions, alternatives
 | Required selected stack | User intent and project docs require the tool/process in real implementation environments. Missing local installation is an environment issue. |
 | Accepted | Explicitly approved or already captured in an ADR/PRD. |
 | Recommended default | Good default after alternatives review, reversible, and low risk. |
-| Task-scoped required | Required when that task type is active, such as Figma MCP for Figma-backed design work. |
+| Task-scoped required | Required when that task type is active and there is current proof the tool is operational in this repo context. |
 | Benchmark candidate | Promising, but needs a benchmark or task-specific proof before adoption. |
 | Deferred | Not adopted without a new user decision. |
 | Rejected for now | Mismatch with project scope or constraints. |

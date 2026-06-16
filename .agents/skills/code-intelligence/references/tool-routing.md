@@ -9,7 +9,7 @@ Library Ops control-plane work.
    `.taskmaster/docs/prd.md`, `specs/001-core/*`, and current Task Master state.
 2. Local tool evidence: raw shell output, Serena, code-review-graph, ast-grep,
    RTK, Repomix, and validator results.
-3. Primary upstream docs for Codex, Task Master, Figma MCP, Promptfoo, and
+3. Primary upstream docs for Codex, Task Master, Promptfoo, and
    package managers.
 4. Exa/web/community sources only for discovery or counter-evidence, with
    confidence labels.

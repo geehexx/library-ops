@@ -9,7 +9,7 @@ related_prd: ../.taskmaster/docs/prd.md
 # Evaluator Design Handoff
 
 This companion to `docs/design/wireframes.md` records evaluator-visible UI
-requirements that must not depend on private Figma state.
+requirements that must not depend on private external design-tool state.
 
 ## Missing Product Surfaces
 
@@ -135,7 +135,7 @@ API tests remain authoritative.
 
 ## Design Token Fallback
 
-Figma-generated tokens are advisory until mirrored here.
+Externally-derived design tokens are advisory until mirrored here.
 
 | Token | Value |
 |---|---|
@@ -158,8 +158,9 @@ Responsive behavior:
   groups;
 - action bars wrap rather than overflowing.
 
-## Figma Handoff Rule
+## Design Handoff Rule
 
-Figma OAuth is operator-local. A Figma frame can improve polish, but an
+External design-tool access is operator-local. Additional visual exploration can
+improve polish, but an
 implementation-affecting decision is accepted only after it is reflected in
 `docs/design/wireframes.md`, this file, the PRD, or a Task Master task note.

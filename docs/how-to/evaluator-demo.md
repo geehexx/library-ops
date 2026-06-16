@@ -18,4 +18,4 @@ An evaluator should be able to answer these questions quickly:
 
 ## Required visible blockers
 
-Do not bury blockers in long prose. If Task Master, Figma, or provider-backed Promptfoo could not complete, surface that immediately in the current summary of repo state and the related Task Master notes.
+Do not bury blockers in long prose. If Task Master or provider-backed Promptfoo could not complete, surface that immediately in the current summary of repo state and the related Task Master notes.

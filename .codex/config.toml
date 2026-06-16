@@ -87,10 +87,6 @@ config_file = "agents/devops-release-manager.toml"
 description = "Runs explicit safe commands and summarizes output, preferring RTK for noisy output."
 config_file = "agents/command-runner.toml"
 
-[agents.spark_command_runner]
-description = "Experimental Spark specialist for bounded command summaries, low-risk scans, and community-source cleanup after a working-lane smoke."
-config_file = "agents/spark-command-runner.toml"
-
 [agents.planning_orchestrator]
 description = "Read-mostly lead planner that pushes work into bounded direct-specialist packets instead of letting the root absorb broad implementation by default."
 config_file = "agents/planning-orchestrator.toml"
@@ -103,10 +99,6 @@ config_file = "agents/context-gatherer.toml"
 description = "Read-only current-source researcher for official docs, Exa discovery, and skeptical community-signal cleanup."
 config_file = "agents/docs-researcher.toml"
 
-[agents.spark_summarizer]
-description = "Experimental Spark specialist for noisy-source cleanup and long-output condensation after a working-lane smoke."
-config_file = "agents/spark-summarizer.toml"
-
 [agents.retrospective_analyst]
 description = "Summarizes sessions and proposes process improvements without editing files directly."
 config_file = "agents/retrospective-analyst.toml"
@@ -116,7 +108,7 @@ description = "Audits and improves the skills catalog for naming, triggers, rich
 config_file = "agents/skills-maintenance.toml"
 
 [agents.ux_design_architect]
-description = "Owns wireframes, Figma MCP usage, UI flow quality, accessibility notes, and design-to-implementation handoff."
+description = "Owns repo-local wireframes, UI flow quality, accessibility notes, and design-to-implementation handoff."
 config_file = "agents/ux-design-architect.toml"
 
 [permissions.workspace]
@@ -148,7 +140,6 @@ glob_scan_max_depth = 5
 enabled = true
 
 [permissions.workspace.network.domains]
-"mcp.figma.com" = "allow"
 "api.openai.com" = "allow"
 "mcp.context7.com" = "allow"
 "mcp.exa.ai" = "allow"
@@ -225,18 +216,6 @@ tool_timeout_sec = 60
 
 [mcp_servers.taskmaster-ai.env]
 TASK_MASTER_TOOLS = "get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd"
-
-[mcp_servers.figma]
-url = "https://mcp.figma.com/mcp"
-# Authenticate locally with `codex mcp add figma --url https://mcp.figma.com/mcp`
-# and `codex mcp login figma`. Do not commit Figma bearer tokens in project config.
-# If write access is unavailable in a given session, treat repo-local wireframes,
-# the canonical PRD, and AGENTS/skill guidance as the implementation authority
-# rather than inventing a second design truth.
-required = false
-default_tools_approval_mode = "prompt"
-startup_timeout_sec = 20
-tool_timeout_sec = 60
 
 [mcp_servers.code-review-graph]
 command = "code-review-graph"

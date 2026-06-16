@@ -45,7 +45,6 @@ This file is the compact summary, not a second operating manual.
 
 - Root default: `gpt-5.4`
 - Read-heavy planning/research specialists: `gpt-5.4-mini`
-- Spark micro-workers: `gpt-5.3-codex-spark` when explicitly invoked
 - Fan-out cap: `agents.max_depth = 1`, `agents.max_threads = 8`
 - Root stays the only interactive coordinator
 - Specialists are called directly by the root unless a later validator-backed
@@ -55,9 +54,9 @@ Recursive fan-out is not the active default. `agents.max_depth = 1` keeps the
 control plane aligned with the current proven workflow and with current Codex
 guidance. ADR-0008 owns the guardrails for any future experiment that raises
 that cap again. Read-heavy planning and research stays on `gpt-5.4-mini`.
-Spark-named agents may still be useful for bounded text-only summaries or
-community-source cleanup, but raw commands remain authoritative for final
-validation evidence.
+Raw commands remain authoritative for final validation evidence. Any future
+micro-worker lane must be proven before it returns to the committed default
+control plane.
 
 Goal budgeting is separate. For long-horizon `/goal` work, omit goal token
 budgets by default and use measurable completion criteria instead.
@@ -68,7 +67,6 @@ Project MCPs are declared in `.codex/config.toml`:
 
 ```text
 required: context7, exa, taskmaster-ai, code-review-graph, serena
-task-scoped optional: figma
 ```
 
 Codex supports project-scoped `.codex/config.toml`, STDIO servers, Streamable
@@ -76,12 +74,6 @@ HTTP servers, bearer-token/OAuth auth, `required`, `enabled_tools`, and tool
 approval controls. This project uses those controls to keep the selected
 toolchain visible to agents and to restrict the graph MCP to approved
 review/graph tools.
-
-Figma is configured for design tasks but is not a global startup blocker because
-OAuth state is operator-local and may not propagate to subagents or new sessions.
-If a Figma-backed design task needs the connector and auth is missing, the agent
-must ask the user to run `codex mcp login figma` in the active environment and
-wait for confirmation.
 
 The project `workspace` permission profile is the single filesystem policy
 source. It grants repo and temp writes, denies repo-owned environment,

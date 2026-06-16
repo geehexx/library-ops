@@ -45,14 +45,9 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  required := {"context7", "exa", "taskmaster-ai", "figma", "code-review-graph", "serena"}
+  required := {"context7", "exa", "taskmaster-ai", "code-review-graph", "serena"}
   configured := {name | input.mcp_servers[name]}
   missing := required - configured
   count(missing) > 0
   msg := sprintf("Missing required MCP server(s): %v", [missing])
-}
-
-deny contains msg if {
-  input.mcp_servers.figma.required != false
-  msg := "Figma MCP must remain task-scoped optional."
 }

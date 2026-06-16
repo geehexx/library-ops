@@ -2,9 +2,3 @@ interface:
   display_name: "UX Design"
   short_description: "Design and verify repo-grounded UX workflows"
   default_prompt: "Use $ux-design to refine Library Ops wireframes, evaluator flows, accessibility notes, and design handoff work with repo-grounded evidence."
-
-dependencies:
-  tools:
-    - type: "mcp"
-      value: "figma"
-      description: "Figma MCP server for design extraction and write-back tasks when authenticated"
