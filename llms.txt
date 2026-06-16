@@ -1,0 +1,3 @@
+# Library Ops Codex Control Plane
+
+Start with README.md, AGENTS.md, .taskmaster/README.md, and docs/agent-system/clarification-and-goals.md.

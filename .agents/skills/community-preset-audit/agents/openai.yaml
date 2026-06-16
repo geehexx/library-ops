@@ -1,0 +1,10 @@
+interface:
+  display_name: "Preset Audit"
+  short_description: "Review community presets before adopting them"
+  default_prompt: "Use $community-preset-audit to review this Spec Kit preset source, decide whether to install or adapt it, and record the real risks and fit."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "exa"
+      description: "Exa MCP server for current-source preset and ecosystem research"

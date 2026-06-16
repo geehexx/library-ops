@@ -1,0 +1,19 @@
+interface:
+  display_name: "Code Intelligence"
+  short_description: "Route repo analysis to the right local tools"
+  default_prompt: "Use $code-intelligence to plan the most efficient Library Ops retrieval path across Serena, code-review-graph, ast-grep, RTK, and raw validation commands."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "serena"
+      description: "Serena MCP server for symbol-aware retrieval and refactor planning"
+    - type: "mcp"
+      value: "code-review-graph"
+      description: "code-review-graph MCP server for blast radius and structural context"
+    - type: "mcp"
+      value: "context7"
+      description: "Context7 MCP server for current library and API documentation"
+    - type: "mcp"
+      value: "exa"
+      description: "Exa MCP server for current-source discovery and counter-evidence"

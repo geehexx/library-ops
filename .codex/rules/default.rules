@@ -1,0 +1,260 @@
+# Project-local Codex command rules. Loaded only when the project .codex layer is trusted.
+
+prefix_rule(
+    pattern = ["uv", "sync"],
+    decision = "allow",
+    justification = "Required project dependency sync; cache writes are covered by the workspace permission profile.",
+    match = ["uv sync --all-groups"],
+)
+
+prefix_rule(
+    pattern = ["uv", "lock", "--check"],
+    decision = "allow",
+    justification = "Read-only uv lockfile consistency check.",
+)
+
+prefix_rule(
+    pattern = ["uv", "run"],
+    decision = "allow",
+    justification = "Grouped repo-managed Python quality and Django commands run through the project environment.",
+    match = [
+        "uv run pytest",
+        "uv run pytest tests/property",
+        "uv run ruff check .",
+        "uv run ruff format --check .",
+        "uv run pyright",
+        "uv run lint-imports",
+        "uv run python manage.py check",
+        "uv run python manage.py makemigrations --check --dry-run",
+        "uv run pip-audit --progress-spinner off",
+    ],
+)
+
+prefix_rule(
+    pattern = ["uv", "run", "--project"],
+    decision = "allow",
+    justification = "Codex lifecycle hooks run through the repo-managed uv Python environment from the git root.",
+    match = [
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
+    ],
+)
+
+prefix_rule(
+    pattern = ["uv", "tool", "install"],
+    decision = "prompt",
+    justification = "Installing user-local tools mutates the operator environment; prompt once and then record the installed version.",
+    match = [
+        "uv tool install -p 3.13 serena-agent",
+    ],
+)
+
+prefix_rule(
+    pattern = ["uvx", "--from"],
+    decision = "allow",
+    justification = "Repo-invoked ephemeral tool execution for code-review-graph and semgrep avoids unnecessary persistent global installs.",
+    match = [
+        "uvx --from code-review-graph code-review-graph --version",
+        "uvx --from code-review-graph code-review-graph build",
+        "uvx --from code-review-graph code-review-graph status",
+        "uvx --from semgrep semgrep --version",
+        "uvx --from semgrep semgrep scan --config .semgrep.yml",
+        "uvx --from git+https://github.com/github/spec-kit.git specify --version",
+        "uvx --from git+https://github.com/github/spec-kit.git@v0.10.2 specify --version",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", "ci"],
+    decision = "allow",
+    justification = "Required deterministic npm install from package-lock; node_modules remains uncommitted.",
+)
+
+prefix_rule(
+    pattern = ["npm", "install", "--package-lock-only"],
+    decision = "allow",
+    justification = "Required lockfile-only repair after package.json dependency changes.",
+)
+
+prefix_rule(
+    pattern = ["npm", "audit"],
+    decision = "allow",
+    justification = "Required npm dependency vulnerability gate.",
+    match = ["npm audit --audit-level=moderate"],
+)
+
+prefix_rule(
+    pattern = ["npm", "run"],
+    decision = "allow",
+    justification = "Required package.json validation scripts for docs, skills, evals, and aggregate gates.",
+    match = [
+        "npm run verify:all",
+        "npm run verify:core",
+        "npm run deps:tree",
+        "npm run markdownlint",
+        "npm run docs:quality:offline",
+        "npm run docs:quality",
+        "npm run docs:style",
+        "npm run docs:spell",
+        "npm run docs:links",
+        "npm run docs:inclusive",
+        "npm run skills:lint",
+        "npm run skills:audit",
+        "npm run eval:validate",
+        "npm run eval:smoke",
+        "npm run eval:ci",
+        "npm run eval:provider:local",
+        "npm run evals:meta",
+        "npm run taskmaster:validate",
+        "npm run checks:precommit",
+        "npm run release:check",
+        "npm run workflow:lint",
+        "npm run policy:check",
+        "npm run security:scan",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npm", "exec", "--", "ast-grep"],
+    decision = "allow",
+    justification = "Required repo-local ast-grep structural checks through locked npm dependency.",
+)
+
+prefix_rule(
+    pattern = ["./node_modules/.bin/ast-grep"],
+    decision = "allow",
+    justification = "Required exact repo-local ast-grep evidence without relying on a global binary.",
+)
+
+prefix_rule(
+    pattern = ["git", "status"],
+    decision = "allow",
+    justification = "Read-only git inspection.",
+)
+
+prefix_rule(
+    pattern = ["git", "diff"],
+    decision = "allow",
+    justification = "Read-only git inspection.",
+)
+
+prefix_rule(
+    pattern = ["git", "branch", "--show-current"],
+    decision = "allow",
+    justification = "Read-only branch inspection.",
+)
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "allow",
+    justification = "Commit creation is allowed in this repo after local validation and explicit user instruction to finalize work.",
+)
+
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "allow",
+    justification = "Push is allowed in this repo after local validation and explicit user instruction to update the live PR branch.",
+)
+
+prefix_rule(
+    pattern = ["gh", "pr"],
+    decision = "allow",
+    justification = "PR inspection and metadata updates are part of the normal finalization workflow for this control-plane repo.",
+)
+
+prefix_rule(
+    pattern = ["git", "reset", "--hard"],
+    decision = "forbidden",
+    justification = "Destructive worktree operation. Ask the user for explicit manual action instead.",
+)
+
+prefix_rule(
+    pattern = ["rm", "-rf"],
+    decision = "forbidden",
+    justification = "Destructive filesystem operation. Use targeted edits instead.",
+)
+
+prefix_rule(
+    pattern = ["codex", "doctor"],
+    decision = "allow",
+    justification = "Read-only Codex installation, config, auth, MCP, and reachability diagnostics.",
+)
+
+prefix_rule(
+    pattern = ["codex", "features", "list"],
+    decision = "allow",
+    justification = "Read-only Codex feature verification.",
+)
+
+prefix_rule(
+    pattern = ["codex", "mcp", "list"],
+    decision = "allow",
+    justification = "Read-only MCP configuration/status inspection.",
+)
+
+prefix_rule(
+    pattern = ["codex", "mcp", "login"],
+    decision = "prompt",
+    justification = "OAuth setup is user-local auth state and must be explicitly approved; never copy raw tokens into project files.",
+)
+
+prefix_rule(
+    pattern = ["codex", "mcp", "add"],
+    decision = "prompt",
+    justification = "Adding new MCP servers beyond the required project set changes trust and tool surface; prompt for user approval.",
+)
+
+prefix_rule(
+    pattern = ["rtk", "init"],
+    decision = "prompt",
+    justification = "RTK is required in implementation environments; initialization mutates local shell/agent behavior and must be user-confirmed.",
+)
+
+prefix_rule(
+    pattern = ["rtk"],
+    decision = "allow",
+    justification = "Accepted project shell-output optimization wrapper. Raw reruns remain required for audit-critical evidence.",
+)
+
+prefix_rule(
+    pattern = ["direnv", "allow"],
+    decision = "prompt",
+    justification = "Trusts the repository .envrc for local shell loading; prompt because it changes direnv state.",
+)
+
+prefix_rule(
+    pattern = ["code-review-graph"],
+    decision = "allow",
+    justification = "Required graph tool; workspace/cache writes are covered by the permission profile.",
+    match = [
+        "code-review-graph --version",
+        "code-review-graph build",
+        "code-review-graph status",
+        "code-review-graph serve --tools query_graph_tool,semantic_search_nodes_tool,detect_changes_tool,get_review_context_tool",
+    ],
+)
+
+prefix_rule(
+    pattern = ["serena"],
+    decision = "allow",
+    justification = "Required semantic code tool; Serena state/log writes are covered by the permission profile.",
+    match = [
+        "serena --version",
+        "serena start-mcp-server --project-from-cwd --context=codex",
+    ],
+)
+
+prefix_rule(
+    pattern = ["repomix"],
+    decision = "allow",
+    justification = "Required repository-packing tool. Allow bounded snapshots using the repo-local repomix.config.json excludes.",
+)
+
+prefix_rule(
+    pattern = ["npx", "--no-install", "repomix"],
+    decision = "allow",
+    justification = "Runs the locked repo-local Repomix package for handoff packaging.",
+)

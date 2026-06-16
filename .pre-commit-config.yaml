@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: no-direct-protected-branch-commit
+        name: prevent commits directly on main/development
+        entry: bash -lc 'branch="$(git rev-parse --abbrev-ref HEAD)"; case "$branch" in main|development) echo "direct commits to $branch are blocked"; exit 1;; *) exit 0;; esac'
+        language: system
+        pass_filenames: false
+      - id: repo-fast-hygiene
+        name: run fast repo hygiene aggregate
+        entry: npm run checks:precommit
+        language: system
+        pass_filenames: false

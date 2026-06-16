@@ -1,0 +1,236 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Project-local Codex configuration. Root-scoped keys MUST stay before any table.
+# Credentials remain in user-local environment variables; the selected local MCP/tool stack is declared here.
+model = "gpt-5.4"
+model_context_window = 1000000
+model_auto_compact_token_limit = 850000
+model_reasoning_effort = "medium"
+model_verbosity = "low"
+review_model = "gpt-5.4"
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+default_permissions = "workspace"
+project_root_markers = [".git", ".taskmaster", ".specify"]
+project_doc_fallback_filenames = []
+project_doc_max_bytes = 98304
+web_search = "live"
+
+[features]
+hooks = true
+enable_request_compression = true
+multi_agent = true
+goals = true
+tool_call_mcp_elicitation = true
+
+# Root coordinator plus direct specialists. The root remains the only
+# interactive coordinator; recursion is disabled by default until a later
+# validator-backed experiment proves deeper fan-out is worth it.
+[agents]
+max_threads = 8
+max_depth = 1
+job_max_runtime_seconds = 1800
+
+[agents.coordinator]
+description = "Coordinates source-of-truth alignment, Task Master sequencing, Spec Kit governance, decision gates, and final judgment."
+config_file = "agents/coordinator.toml"
+
+[agents.prd_architect]
+description = "Designs and edits the canonical Task Master PRD and PRD-to-task decomposition."
+config_file = "agents/prd-architect.toml"
+
+[agents.taskmaster_governor]
+description = "Maintains Task Master tasks, dependencies, notes, and task status."
+config_file = "agents/taskmaster-governor.toml"
+
+[agents.speckit_governor]
+description = "Maintains Spec Kit constitution, preset alignment, and spec/plan/task consistency."
+config_file = "agents/speckit-governor.toml"
+
+[agents.researcher]
+description = "Read-only researcher using primary sources, Context7, and Exa for current docs, standards, and examples."
+config_file = "agents/researcher.toml"
+
+[agents.code_intelligence_architect]
+description = "Plans and verifies RTK, code graph, symbol, AST, MCP, and context-window optimization."
+config_file = "agents/code-intelligence-architect.toml"
+
+[agents.implementer]
+description = "Bounded implementation agent for one Task Master task or subtask."
+config_file = "agents/implementer.toml"
+
+[agents.reviewer]
+description = "Read-only reviewer focused on correctness, security, tests, traceability, and architecture boundaries."
+config_file = "agents/reviewer.toml"
+
+[agents.qa_engineer]
+description = "Designs and verifies unit, integration, property-based, E2E, accessibility, and quality gates."
+config_file = "agents/qa-engineer.toml"
+
+[agents.security_architect]
+description = "Reviews threat model, RBAC, MCP trust, secret handling, dependencies, and security ADRs."
+config_file = "agents/security-architect.toml"
+
+[agents.search_architect]
+description = "Owns exact, FTS, BM25, pgvector, and ranking/fusion design."
+config_file = "agents/search-architect.toml"
+
+[agents.seed_data_engineer]
+description = "Owns public-domain corpus import, seed commands, provenance, and demo data refresh."
+config_file = "agents/seed-data-engineer.toml"
+
+[agents.devops_release_manager]
+description = "Owns CI/CD, branch protections, SemVer, releases, deployment, and runbooks."
+config_file = "agents/devops-release-manager.toml"
+
+[agents.command_runner]
+description = "Runs explicit safe commands and summarizes output, preferring RTK for noisy output."
+config_file = "agents/command-runner.toml"
+
+[agents.planning_orchestrator]
+description = "Read-mostly lead planner that pushes work into bounded direct-specialist packets instead of letting the root absorb broad implementation by default."
+config_file = "agents/planning-orchestrator.toml"
+
+[agents.context_gatherer]
+description = "Read-only repo and source-map collector for source-of-truth, code graph, Serena, ast-grep, and file evidence."
+config_file = "agents/context-gatherer.toml"
+
+[agents.docs_researcher]
+description = "Read-only current-source researcher for official docs, Exa discovery, and skeptical community-signal cleanup."
+config_file = "agents/docs-researcher.toml"
+
+[agents.retrospective_analyst]
+description = "Summarizes sessions and proposes process improvements without editing files directly."
+config_file = "agents/retrospective-analyst.toml"
+
+[agents.skills_maintenance]
+description = "Audits and improves the skills catalog for naming, triggers, rich skill metadata, progressive disclosure, and references."
+config_file = "agents/skills-maintenance.toml"
+
+[agents.ux_design_architect]
+description = "Owns repo-local wireframes, UI flow quality, accessibility notes, and design-to-implementation handoff."
+config_file = "agents/ux-design-architect.toml"
+
+[permissions.workspace]
+description = "Workspace editing with repo secrets denied; external cache/network access uses explicit approval."
+extends = ":workspace"
+
+[permissions.workspace.filesystem]
+glob_scan_max_depth = 5
+":slash_tmp" = "write"
+":tmpdir" = "write"
+
+[permissions.workspace.filesystem.":workspace_roots"]
+"." = "write"
+".env" = "deny"
+".envrc" = "deny"
+".env.*" = "deny"
+".credentials/**" = "deny"
+".secrets/**" = "deny"
+"credentials/**" = "deny"
+"secrets/**" = "deny"
+"config/credentials/**" = "deny"
+"config/secrets/**" = "deny"
+".git/**" = "read"
+".taskmaster/state.json" = "deny"
+".codex/**" = "write"
+".agents/**" = "write"
+
+[permissions.workspace.network]
+enabled = true
+
+[permissions.workspace.network.domains]
+"api.openai.com" = "allow"
+"mcp.context7.com" = "allow"
+"mcp.exa.ai" = "allow"
+"registry.npmjs.org" = "allow"
+"pypi.org" = "allow"
+"files.pythonhosted.org" = "allow"
+"github.com" = "allow"
+"objects.githubusercontent.com" = "allow"
+"raw.githubusercontent.com" = "allow"
+"developers.openai.com" = "allow"
+"docs.task-master.dev" = "allow"
+"github.github.com" = "allow"
+"docs.djangoproject.com" = "allow"
+"django-ninja.dev" = "allow"
+"www.postgresql.org" = "allow"
+"docs.astral.sh" = "allow"
+"playwright.dev" = "allow"
+"docs.github.com" = "allow"
+"render.com" = "allow"
+"www.rtk-ai.app" = "allow"
+"code-review-graph.com" = "allow"
+"modelcontextprotocol.io" = "allow"
+"ast-grep.github.io" = "allow"
+"repomix.com" = "allow"
+"oraios.github.io" = "allow"
+"tree-sitter.github.io" = "allow"
+"semgrep.dev" = "allow"
+"docs.zizmor.sh" = "allow"
+"www.conftest.dev" = "allow"
+"cyclonedx.org" = "allow"
+"mutmut.readthedocs.io" = "allow"
+"schemathesis.readthedocs.io" = "allow"
+"alexjs.com" = "allow"
+"lychee.cli.rs" = "allow"
+"cspell.org" = "allow"
+"vale.sh" = "allow"
+"martinfowler.com" = "allow"
+"c4model.com" = "allow"
+"arc42.org" = "allow"
+"diataxis.fr" = "allow"
+"www.promptfoo.dev" = "allow"
+
+[permissions.command-runner]
+description = "Workspace command execution without broad network; filesystem policy is inherited."
+extends = ":workspace"
+
+[permissions.command-runner.network]
+enabled = false
+
+[mcp_servers.context7]
+command = "node"
+args = ["node_modules/@upstash/context7-mcp/dist/index.js", "--transport", "stdio"]
+env_vars = ["CONTEXT7_API_KEY"]
+required = true
+default_tools_approval_mode = "prompt"
+startup_timeout_sec = 20
+tool_timeout_sec = 45
+
+[mcp_servers.exa]
+url = "https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa"
+required = true
+enabled_tools = ["web_search_exa", "web_fetch_exa"]
+default_tools_approval_mode = "prompt"
+startup_timeout_sec = 20
+tool_timeout_sec = 45
+
+[mcp_servers.taskmaster-ai]
+command = "npx"
+args = ["--yes", "--package", "task-master-ai@0.43.1", "task-master-ai"]
+required = true
+default_tools_approval_mode = "prompt"
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.taskmaster-ai.env]
+TASK_MASTER_TOOLS = "get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd"
+
+[mcp_servers.code-review-graph]
+command = "code-review-graph"
+args = ["serve", "--tools", "query_graph_tool,semantic_search_nodes_tool,detect_changes_tool,get_review_context_tool"]
+required = true
+enabled_tools = ["query_graph_tool", "semantic_search_nodes_tool", "detect_changes_tool", "get_review_context_tool"]
+default_tools_approval_mode = "prompt"
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.serena]
+enabled = true
+command = "serena"
+args = ["start-mcp-server", "--project-from-cwd", "--context=codex"]
+required = true
+default_tools_approval_mode = "prompt"
+startup_timeout_sec = 30
+tool_timeout_sec = 90

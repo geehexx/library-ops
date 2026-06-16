@@ -1,0 +1,20 @@
+extends: existence
+message: "Qualify '%s' with concrete evidence, scope, threshold, or source."
+level: warning
+ignorecase: true
+tokens:
+  - best-in-class
+  - comprehensive
+  - easy
+  - easily
+  - optimal
+  - robust
+  - seamless
+  - simply
+  - state of the art
+  - straightforward
+  - substantial
+  - very
+  - obviously
+  - clearly
+  - basically

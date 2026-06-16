@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skills Maintenance"
+  short_description: "Audit and enrich the repo skill catalog"
+  default_prompt: "Use $skills-maintenance to audit the Library Ops skill catalog for naming, trigger quality, metadata richness, references, and overlap with upstream Codex skills."
