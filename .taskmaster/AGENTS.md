@@ -10,7 +10,15 @@
 - Task Master work in this repo assumes Context7, Exa, Serena, and
   code-review-graph are available as companion tools for current docs, current
   research, symbol retrieval, and repo-alignment checks.
-- `TASK_MASTER_TOOLS=standard` is the active default for Library Ops because
-  graph repair and regeneration require more than the lean/core read path.
+- The active Task Master MCP surface is a custom minimal set:
+  `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd`.
+- Heavy graph operations such as complexity analysis, expansion, bulk task
+  creation/removal, and file generation route through the pinned CLI instead of
+  the MCP surface to keep interactive context leaner while preserving full
+  functionality.
+- The committed example runtime profile is local-first:
+  `qwen2.5-coder:7b-instruct` as main/research and `qwen3:latest` as fallback.
+  Use remote providers only as explicit rescue lanes when the local path cannot
+  prove the required operation.
 - Subagent task blockers must be recorded as Escalation packets.
 - Do not mark tasks done while a Question packet remains unanswered.

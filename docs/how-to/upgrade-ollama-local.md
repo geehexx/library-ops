@@ -72,7 +72,7 @@ Interpretation rules:
 Run all of these before changing repo-local model choices:
 
 ```bash
-curl -sS http://127.0.0.1:11434/api/generate -d '{"model":"deepseek-r1:7b","prompt":"Return JSON only: {\"ok\":true}","stream":false}'
+curl -sS http://127.0.0.1:11434/api/generate -d '{"model":"qwen2.5-coder:7b-instruct","prompt":"Return JSON only: {\"ok\":true}","stream":false}'
 curl -sS http://127.0.0.1:11434/api/ps | python3 -m json.tool
 journalctl -u ollama -n 120 --no-pager | rg -i 'gpu|cuda|cpu model buffer|cpu compute buffer|load failed|runner started'
 ```
@@ -90,10 +90,11 @@ npm run eval:provider:local
 - `deepcoder:1.5b` completes but still produces low-quality graph analysis.
 - `qwen3.5:0.8b` fits comfortably but breaks structured-output reliability for Task
   Master.
-- `deepseek-r1:7b` is the best local reasoning candidate tested so far.
-- A custom `deepseek-r1` 16k-context variant removed prompt truncation, but it
-  was still too slow and schema-unstable to replace the current primary
-  provider lane.
-- `gemini-2.5-flash` is currently the best proven Task Master graph provider on
-  this machine/account, with local `deepseek-r1:7b` kept as the optimization
-  fallback track.
+- `qwen2.5-coder:7b-instruct` is the best proven local Task Master lane so far
+  for bounded PRD parsing on this machine.
+- `qwen3:latest` is the strongest already-proven local structured-output
+  fallback candidate.
+- DeepSeek variants are no longer the preferred local planning lane because the
+  proven Qwen path is both cleaner and more reliable here.
+- Remote providers such as `gemini-2.5-flash` remain rescue options, not the
+  committed default local profile.

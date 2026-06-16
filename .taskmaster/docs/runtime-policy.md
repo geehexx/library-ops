@@ -39,18 +39,36 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
 2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact.
 3. Generated tasks must still be reconciled against `specs/001-core/tasks.md`
    and the active ADR set before implementation.
+4. `.taskmaster/docs/phases/*.md` are derived PRD slices for local-model
+   regeneration and benchmarking only; they do not replace the canonical PRD.
 
 ## Active MCP and companion-tool posture
 
-- `TASK_MASTER_TOOLS=standard` is the active default for Library Ops.
+- `TASK_MASTER_TOOLS=get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd`
+  is the active default for Library Ops.
 - We deliberately do **not** use `core`/`lean` as the repo default because the
-  current control-plane workflow routinely needs:
+  repo needs `parse_prd` inside the interactive loop, and we deliberately do
+  **not** use `standard` as the repo default because the remaining standard
+  tools are better handled through explicit CLI runs when their outputs are
+  larger, slower, or more mutation-heavy.
+- Keep in MCP:
+  - `get_tasks`
+  - `next_task`
+  - `get_task`
+  - `set_task_status`
+  - `update_subtask`
+  - `parse_prd`
+- Keep on CLI:
   - `analyze_project_complexity`
   - `complexity_report`
+  - `expand_task`
   - `expand_all`
   - `add_task`
   - `add_subtask`
   - `remove_task`
+  - `generate`
+  - `models`
+  - `research`
 - Treat Task Master as one part of a larger graph-governance tool bundle:
   - Context7 for version-specific framework/provider docs
   - Exa for broader current research and counter-evidence
@@ -65,29 +83,31 @@ working directory via `.codex/config.toml`; using its `activate_project` tool is
 
 ## Recommended local profiles
 
-### Profile A: recommended working graph-management profile
+### Profile A: proven low-memory local generation profile
 
-Use this when you need Task Master graph operations to work reliably on the
-current machine and current account state:
+Use this when you need a bounded Task Master generation path that works locally
+on the current machine without depending on a remote provider:
 
 ```json
 {
   "models": {
     "main": {
-      "provider": "gemini-cli",
-      "modelId": "gemini-2.5-flash",
+      "provider": "ollama",
+      "modelId": "qwen2.5-coder:7b-instruct",
       "maxTokens": 64000,
-      "temperature": 0.1
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
     },
     "research": {
-      "provider": "gemini-cli",
-      "modelId": "gemini-2.5-flash",
-      "maxTokens": 128000,
-      "temperature": 0.1
+      "provider": "ollama",
+      "modelId": "qwen2.5-coder:7b-instruct",
+      "maxTokens": 64000,
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
     },
     "fallback": {
       "provider": "ollama",
-      "modelId": "deepseek-r1:7b",
+      "modelId": "qwen3:latest",
       "maxTokens": 64000,
       "temperature": 0.1,
       "baseURL": "http://127.0.0.1:11434/api"
@@ -112,38 +132,47 @@ Evidence behind this recommendation:
   live graph;
 - local `deepcoder:1.5b` completed but still produced incorrect task identity;
 - local `qwen3.5:0.8b` generated malformed JSON for the Task Master schema path;
-- local `deepseek-r1:7b` can run on this class of hardware, but on the current
-  Task Master structured-output path it still needed a fallback rescue;
-- `gemini-2.5-flash` produced the first correct Task 3 analysis on this machine
-  and account state;
-- `codex-cli` fallback models `gpt-5.4-mini` and `gpt-5.2-codex` were both
-  rejected by the current installed Codex/account combination.
+- local `qwen2.5-coder:7b-instruct` passed the repository-specific structured
+  benchmark in both default and `/no_think` variants;
+- local `qwen2.5-coder:7b-instruct` also completed a real
+  `task-master parse-prd` run against
+  `.taskmaster/docs/phases/phase-0-governance-and-foundation.md`, producing 4
+  tasks in about 44 seconds with Ollama as the provider;
+- local `qwen3:latest` passed the same repository-specific structured benchmark
+  in both default and `/no_think` variants and is the strongest already-proven
+  local fallback candidate for bounded structured generation;
+- local `deepseek-r1:7b` and tool-calling derivatives remained weaker and
+  noisier on the same structured Task Master planning rubric than the Qwen lane.
 
-### Profile B: local-first experimental optimization track
+### Profile B: qwen3-first structured planning track
 
-Use this when you want to improve the local Ollama lane rather than default to
-the proven Gemini path:
+Use this when the task benefits from Qwen3's hybrid thinking/tool behavior and
+you are willing to trade more CPU/RAM pressure for a richer local structured
+planning pass:
 
 ```json
 {
   "models": {
     "main": {
       "provider": "ollama",
-      "modelId": "deepseek-r1:7b",
+      "modelId": "qwen3:latest",
       "maxTokens": 64000,
-      "temperature": 0.1
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
     },
     "research": {
       "provider": "ollama",
-      "modelId": "deepseek-r1:7b",
+      "modelId": "qwen3:latest",
       "maxTokens": 64000,
-      "temperature": 0.1
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
     },
     "fallback": {
-      "provider": "gemini-cli",
-      "modelId": "gemini-2.5-flash",
+      "provider": "ollama",
+      "modelId": "qwen2.5-coder:7b-instruct",
       "maxTokens": 64000,
-      "temperature": 0.1
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
     }
   },
   "global": {
@@ -160,21 +189,25 @@ the proven Gemini path:
 Use this profile with an explicit optimization process:
 
 1. keep only one Ollama model resident at a time;
-2. lower context before blaming the model;
-3. use default Q4_K_M variants before heavier quantizations;
-4. benchmark structured-output tasks, not just chat quality;
-5. if the local model violates JSON/schema constraints, let Gemini Flash rescue
-   the run and treat the local lane as still unproven.
+2. avoid parallel heavy commands because current failure pressure is CPU/RAM as
+   much as VRAM;
+3. lower context before blaming the model;
+4. use default Q4_K_M variants before heavier quantizations;
+5. benchmark structured-output tasks and bounded Task Master operations, not
+   just chat quality;
+6. if the active local model violates JSON/schema constraints, fall back to the
+   other proven Qwen local model before escalating off-box.
 
 Observed on this machine:
 
-- the stock `deepseek-r1:7b` 4k context path fit in memory but truncated a
-  ~14k-token Task Master prompt to 4096 tokens before answering;
-- a custom 16k-context `deepseek-r1` variant removed truncation and still fit
-  by moving more weights and KV cache to CPU, but the run took nearly three
-  minutes and still failed the Task Master structured-output schema;
-- the remaining blocker is therefore not only memory pressure. It is also
-  structured-output reliability under the Task Master prompt shape.
+- `qwen2.5-coder:7b-instruct` is currently the strongest practical local Task
+  Master path because it has both structured-benchmark proof and real bounded
+  `parse-prd` proof on this machine;
+- `qwen3:latest` is slower and heavier on prompt handling, but it remains a
+  high-quality local fallback with strong structured-output behavior;
+- the earlier DeepSeek variants demonstrated that the remaining local blocker is
+  not only VRAM pressure. CPU/RAM pressure and structured-output reliability
+  under the Task Master prompt shape both matter.
 
 ## Ollama optimization process for this machine
 
@@ -182,20 +215,23 @@ Current observed machine facts:
 
 - GPU: RTX 4050 Laptop GPU with about 6 GiB VRAM
 - System RAM headroom can be tight when other work is running
-- multiple concurrently resident models materially increase VRAM pressure
+- multiple concurrently resident models materially increase both VRAM pressure
+  and host RAM/CPU pressure
 
 Follow this process before declaring a local model unusable:
 
 1. ensure only one model is loaded: use `ollama ps` and `ollama stop <model>`;
-2. prefer `OLLAMA_MAX_LOADED_MODELS=1` and `OLLAMA_NUM_PARALLEL=1` when sharing
-   VRAM with other workloads;
-3. if needed, reduce `num_ctx` from 4096 to 2048 in a custom Modelfile or
+2. prefer strictly serial model tests and avoid overlapping benchmarking or
+   generation runs;
+3. prefer `OLLAMA_MAX_LOADED_MODELS=1` and `OLLAMA_NUM_PARALLEL=1` when sharing
+   the machine with other workloads;
+4. if needed, reduce `num_ctx` from 4096 to 2048 in a custom Modelfile or
    request options before concluding the model does not fit;
-4. stay on Q4_K_M unless you have proven VRAM headroom for a higher-precision
+5. stay on Q4_K_M unless you have proven headroom for a higher-precision
    variant;
-5. benchmark the exact Task Master operation you care about: complexity
+6. benchmark the exact Task Master operation you care about: complexity
    analysis, expansion, or PRD parsing;
-6. inspect `ollama ps` after the run to verify the GPU/CPU split rather than
+7. inspect `ollama ps` after the run to verify the GPU/CPU split rather than
    guessing.
 
 ## Current provider findings
@@ -206,17 +242,18 @@ Follow this process before declaring a local model unusable:
   analysis.
 - `qwen3.5:0.8b`: fit comfortably, but produced malformed JSON for the Task
   Master structured-output path.
-- `qwen2.5-coder:7b-instruct`: hit VRAM OOM under current shared-load
-  conditions; retry only after serializing model residency and, if needed,
-  lowering context.
-- `deepseek-r1:7b`: promising local reasoning candidate; keep optimizing and
-  benchmarking it, but do not yet treat it as the sole reliable graph lane.
+- `qwen2.5-coder:7b-instruct`: best proven local Task Master CLI lane so far
+  for bounded PRD parsing on this machine.
+- `qwen3:latest`: best already-proven local structured-output fallback, and the
+  next candidate to test for a heavier end-to-end Task Master operation.
+- `deepseek-r1:7b`: can run, but it is no longer the preferred local planning
+  lane because the Qwen models have stronger current evidence on this machine.
 - custom `deepseek-r1` 16k variants can remove prompt truncation, but on the
-  current Task Master structured-output path they are still slower and not yet
-  schema-reliable enough to replace Gemini Flash.
+  current Task Master structured-output path they are slower and less reliable
+  than the proven Qwen lane.
 - `gemini-2.5-pro`: rate-limited on the current account.
-- `gemini-2.5-flash`: currently the best proven Task Master graph-management
-  lane on this machine/account.
+- `gemini-2.5-flash`: useful off-box rescue lane when local providers cannot
+  prove the needed operation, but no longer the committed default profile.
 - `codex-cli gpt-5.4-mini`: rejected because the installed Codex CLI is too old
   for that model.
 - `codex-cli gpt-5.2-codex`: rejected on the current ChatGPT-backed account.
@@ -230,6 +267,39 @@ npx --yes --package task-master-ai@0.43.1 -c 'task-master models'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master next'
 ```
+
+## MCP versus CLI routing
+
+Use MCP for:
+
+- task inspection during interactive runs;
+- next-task lookup;
+- task status updates;
+- durable subtask notes;
+- PRD parsing when the result is being actively reviewed in the same session.
+
+Use CLI for:
+
+- complexity analysis and reports;
+- expansion work;
+- graph regeneration experiments;
+- bulk task mutations;
+- model/provider tuning;
+- any operation where you want raw stdout preserved as evidence.
+
+## Phase-based local regeneration
+
+When a local model is not yet reliable enough for the full canonical PRD,
+prefer bounded phase PRDs:
+
+- `phase-0-governance-and-foundation.md`
+- `phase-1-bootstrap-domain-rbac.md`
+- `phase-2-core-assignment-features.md`
+- `phase-3-bonus-quality-features.md`
+- `phase-4-deployment-and-demo.md`
+
+This keeps the canonical PRD intact while giving local providers smaller,
+phase-aligned generation targets.
 
 Use `models --setup` to repair local config. Do not edit `.taskmaster/state.json`
 manually.

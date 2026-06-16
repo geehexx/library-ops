@@ -8,8 +8,9 @@ posture for Library Ops.
 - root coordinator plus direct specialists by default;
 - `agents.max_depth = 1` unless explicitly re-enabled with evidence;
 - `gpt-5.4` for root synthesis and `gpt-5.4-mini` for read-heavy specialist work;
-- Task Master MCP runs on `TASK_MASTER_TOOLS=standard` because the repo needs
-  graph analysis, regeneration, and mutation, not just lean/core reads;
+- Task Master MCP runs on the custom minimal set
+  `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd`,
+  while heavier graph analysis, regeneration, and mutation stay on the CLI;
 - use Serena, code-review-graph, and ast-grep before broad source edits.
 
 ## Required verification

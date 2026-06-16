@@ -29,9 +29,18 @@ This repo does not use Task Master in isolation. Pair it with:
 
 ## Library Ops MCP posture
 
-- Active `TASK_MASTER_TOOLS` mode is `standard`, not `core`, because the repo
-  routinely needs complexity analysis, graph expansion, task creation/removal,
-  and regeneration in addition to the lean/core read path.
+- Active `TASK_MASTER_TOOLS` mode is a custom minimal set:
+  `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd`.
+- Keep these in MCP because they are the high-frequency interactive operations:
+  graph inspection, next-task lookup, status changes, durable notes, and PRD
+  parsing when the result needs to stay in the interactive loop.
+- Route heavier or noisier Task Master operations through the CLI:
+  `analyze-complexity`, `complexity-report`, `expand`, `expand --all`,
+  `add_task`, `add_subtask`, `remove_task`, `generate`, and model tuning.
+- The current committed local-first runtime profile uses
+  `qwen2.5-coder:7b-instruct` as main/research and `qwen3:latest` as fallback.
+  Prefer proving bounded local operations first, then escalate to a remote
+  rescue provider only when the local lane cannot satisfy the required task.
 - If a Task Master operation depends on current framework or provider behavior,
   fetch the current docs first instead of letting the model improvise.
 

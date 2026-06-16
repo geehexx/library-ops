@@ -1563,8 +1563,10 @@ register. If a connector is unavailable in a session, agents MUST say so and use
 
 - Commit examples, not real secrets.
 - Keep API keys in user-local config or environment variables.
-- Use `TASK_MASTER_TOOLS=standard` for the project MCP by default, or a narrower
-  approved tool set when context overhead matters.
+- Use the custom Task Master MCP set
+  `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd` by
+  default, and keep heavier analysis, expansion, and model-tuning operations on
+  the pinned CLI.
 - Figma MCP is required for Figma-backed design tasks; repo wireframes remain the fallback implementation source when credentials are unavailable.
 - When using Figma MCP with Codex, prefer the remote endpoint and local OAuth through `codex mcp login figma`; do not commit or copy raw Figma tokens into project files.
 - code-review-graph and Serena are selected project MCPs; new MCP servers beyond the selected stack require explicit user approval and local trust review.
