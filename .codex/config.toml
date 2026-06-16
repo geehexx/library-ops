@@ -230,6 +230,9 @@ TASK_MASTER_TOOLS = "get_tasks,next_task,get_task,set_task_status,update_subtask
 url = "https://mcp.figma.com/mcp"
 # Authenticate locally with `codex mcp add figma --url https://mcp.figma.com/mcp`
 # and `codex mcp login figma`. Do not commit Figma bearer tokens in project config.
+# If write access is unavailable in a given session, treat repo-local wireframes,
+# the canonical PRD, and AGENTS/skill guidance as the implementation authority
+# rather than inventing a second design truth.
 required = false
 default_tools_approval_mode = "prompt"
 startup_timeout_sec = 20

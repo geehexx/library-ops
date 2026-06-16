@@ -1,13 +1,6 @@
 # Project-local Codex command rules. Loaded only when the project .codex layer is trusted.
 
 prefix_rule(
-    pattern = ["uv", "run", "pytest"],
-    decision = "allow",
-    justification = "Project test command.",
-    match = ["uv run pytest", "uv run pytest tests/property"],
-)
-
-prefix_rule(
     pattern = ["uv", "sync"],
     decision = "allow",
     justification = "Required project dependency sync; cache writes are covered by the workspace permission profile.",
@@ -21,31 +14,19 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["uv", "run", "ruff"],
+    pattern = ["uv", "run"],
     decision = "allow",
-    justification = "Project lint/format command.",
-    match = ["uv run ruff check .", "uv run ruff format --check ."],
-)
-
-prefix_rule(
-    pattern = ["uv", "run", "pyright"],
-    decision = "allow",
-    justification = "Project typecheck command.",
-    match = ["uv run pyright"],
-)
-
-prefix_rule(
-    pattern = ["uv", "run", "lint-imports"],
-    decision = "allow",
-    justification = "Project import architecture check.",
-)
-
-prefix_rule(
-    pattern = ["uv", "run", "python"],
-    decision = "allow",
-    justification = "Required project Python commands and Django checks.",
+    justification = "Grouped repo-managed Python quality and Django commands run through the project environment.",
     match = [
+        "uv run pytest",
+        "uv run pytest tests/property",
+        "uv run ruff check .",
+        "uv run ruff format --check .",
+        "uv run pyright",
+        "uv run lint-imports",
         "uv run python manage.py check",
+        "uv run python manage.py makemigrations --check --dry-run",
+        "uv run pip-audit --progress-spinner off",
     ],
 )
 
@@ -60,13 +41,6 @@ prefix_rule(
         "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
         "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
     ],
-)
-
-prefix_rule(
-    pattern = ["uv", "run", "pip-audit"],
-    decision = "allow",
-    justification = "Required Python dependency vulnerability gate.",
-    match = ["uv run pip-audit --progress-spinner off"],
 )
 
 prefix_rule(
@@ -129,11 +103,14 @@ prefix_rule(
         "npm run docs:links",
         "npm run docs:inclusive",
         "npm run skills:lint",
+        "npm run skills:audit",
         "npm run eval:validate",
         "npm run eval:smoke",
         "npm run eval:ci",
         "npm run eval:provider:local",
         "npm run evals:meta",
+        "npm run taskmaster:validate",
+        "npm run checks:precommit",
         "npm run release:check",
         "npm run workflow:lint",
         "npm run policy:check",

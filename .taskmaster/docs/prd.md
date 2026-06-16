@@ -1929,7 +1929,7 @@ If a review session lacks direct connector access, the agent MUST say so rather 
 | Code intelligence | code-review-graph + Serena + ast-grep + bounded Repomix | Graph, symbol, AST, and context packaging without replacing source review | New MCPs/broad context layers require approval |
 | Decisioning | Socratic decision framework | Prevents guessing and unexamined tool adoption | Pause and ask for trust/cost/scope decisions |
 | Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after bootstrap exists |
-| Deployment | Render + managed PostgreSQL | Straightforward Django deployment path | Fly/Railway/Heroku/container host if Render limits apply |
+| Deployment | Render + managed PostgreSQL | Familiar Django deployment path with a small operational surface | Fly/Railway/Heroku/container host if Render limits apply |
 | SDLC | GitHub Actions + protected branches + Conventional Commits + SemVer | Visible, enforceable solo-project governance | Merge queue optional and likely excessive for solo demo |
 
 ### 24.5 Documentation Evidence Package
