@@ -15,7 +15,7 @@ npm run verify:core
 ```
 
 Use `npm run checks:precommit` for the fastest local hygiene loop, `npm run
-verify:core` for the comprehensive local loop, and `npm run verify:all` when
+verify:core` for the full local loop, and `npm run verify:all` when
 you want the same loop plus the full security aggregate.
 
 ## 2. Verify Codex and MCP state

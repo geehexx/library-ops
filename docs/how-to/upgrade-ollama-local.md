@@ -15,9 +15,8 @@ Run this upgrade when all of these are true:
 - the current Ollama version is behind the current stable line
 - a larger or newer local model is blocked by runtime behavior rather than missing auth
 
-If the current local checks already succeed for `qwen3.5:0.8b` Promptfoo review
-or `qwen2.5-coder:3b` Task Master generation, treat the upgrade as an
-optimization step rather than an immediate requirement.
+If the current local checks already succeed for the active provider lane, treat
+the upgrade as an optimization step rather than an immediate requirement.
 
 ## Official update shape
 
@@ -52,17 +51,49 @@ ollama ps
 
 ## Required verification
 
+Check the current scheduler and memory state before changing anything:
+
+```bash
+ollama ps
+free -h
+nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader,nounits
+journalctl -u ollama -n 120 --no-pager | rg -i 'evicting a model|truncating input prompt|total memory|kv cache|compute buffer|load request'
+```
+
+Interpretation rules:
+
+- If multiple models are resident, clear them before benchmarking a new Task
+  Master lane.
+- If the logs show `truncating input prompt`, the configured context is too
+  small for the current workload.
+- If the logs show large CPU model/KV buffers, the model fits only by CPU
+  offload and the tradeoff is speed rather than correctness.
+
 Run all of these before changing repo-local model choices:
 
 ```bash
-curl -sS http://127.0.0.1:11434/api/generate -d '{"model":"qwen2.5-coder:3b","prompt":"Return JSON only: {\"ok\":true}","stream":false}'
+curl -sS http://127.0.0.1:11434/api/generate -d '{"model":"deepseek-r1:7b","prompt":"Return JSON only: {\"ok\":true}","stream":false}'
 curl -sS http://127.0.0.1:11434/api/ps | python3 -m json.tool
 journalctl -u ollama -n 120 --no-pager | rg -i 'gpu|cuda|cpu model buffer|cpu compute buffer|load failed|runner started'
 ```
 
-Then rerun the local workflow that motivated the upgrade, for example:
+Then rerun the exact local workflow that motivated the upgrade, for example:
 
 ```bash
-npx --yes --package task-master-ai@0.43.1 -c 'task-master expand --id=7'
+npx --yes --package task-master-ai@0.43.1 -c 'task-master analyze-complexity --threshold=7'
 npm run eval:provider:local
 ```
+
+## Current Library Ops findings
+
+- `qwen2.5-coder:3b` is cheap but too weak for reliable Task Master graph work.
+- `deepcoder:1.5b` completes but still produces low-quality graph analysis.
+- `qwen3.5:0.8b` fits comfortably but breaks structured-output reliability for Task
+  Master.
+- `deepseek-r1:7b` is the best local reasoning candidate tested so far.
+- A custom `deepseek-r1` 16k-context variant removed prompt truncation, but it
+  was still too slow and schema-unstable to replace the current primary
+  provider lane.
+- `gemini-2.5-flash` is currently the best proven Task Master graph provider on
+  this machine/account, with local `deepseek-r1:7b` kept as the optimization
+  fallback track.

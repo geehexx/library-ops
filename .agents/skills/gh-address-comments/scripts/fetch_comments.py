@@ -93,6 +93,18 @@ query(
 
 
 def _run(cmd: list[str], stdin: str | None = None) -> str:
+    """Run a GitHub CLI command and return stdout.
+
+    Args:
+        cmd: Command and arguments to execute.
+        stdin: Optional stdin payload to pass to the process.
+
+    Returns:
+        The command stdout.
+
+    Raises:
+        RuntimeError: If the command exits non-zero.
+    """
     p = subprocess.run(cmd, input=stdin, capture_output=True, text=True)
     if p.returncode != 0:
         raise RuntimeError(f"Command failed: {' '.join(cmd)}\n{p.stderr}")
@@ -100,6 +112,18 @@ def _run(cmd: list[str], stdin: str | None = None) -> str:
 
 
 def _run_json(cmd: list[str], stdin: str | None = None) -> dict[str, Any]:
+    """Run a command and parse its JSON response.
+
+    Args:
+        cmd: Command and arguments to execute.
+        stdin: Optional stdin payload to pass to the process.
+
+    Returns:
+        Parsed JSON output.
+
+    Raises:
+        RuntimeError: If the command output is not valid JSON.
+    """
     out = _run(cmd, stdin=stdin)
     try:
         return json.loads(out)
@@ -108,6 +132,7 @@ def _run_json(cmd: list[str], stdin: str | None = None) -> dict[str, Any]:
 
 
 def _ensure_gh_authenticated() -> None:
+    """Fail fast when the GitHub CLI is not authenticated."""
     try:
         _run(["gh", "auth", "status"])
     except RuntimeError:
@@ -118,18 +143,38 @@ def _ensure_gh_authenticated() -> None:
 
 
 def gh_pr_view_json(fields: str) -> dict[str, Any]:
-    # fields is a comma-separated list like: "number,headRepositoryOwner,headRepository"
+    """Fetch PR JSON for the current branch association.
+
+    Args:
+        fields: Comma-separated `gh pr view --json` fields.
+
+    Returns:
+        Parsed GitHub CLI JSON payload.
+    """
     return _run_json(["gh", "pr", "view", "--json", fields])
 
 
+def gh_repo_view_json(fields: str) -> dict[str, Any]:
+    """Fetch repository JSON for the current checkout.
+
+    Args:
+        fields: Comma-separated `gh repo view --json` fields.
+
+    Returns:
+        Parsed GitHub CLI JSON payload.
+    """
+    return _run_json(["gh", "repo", "view", "--json", fields])
+
+
 def get_current_pr_ref() -> tuple[str, str, int]:
+    """Resolve the current PR number and base repository slug.
+
+    Returns:
+        A tuple of repository owner, repository name, and PR number.
     """
-    Resolve the PR for the current branch (whatever gh considers associated).
-    Works for cross-repo PRs too, by reading head repository owner/name.
-    """
-    pr = gh_pr_view_json("number,headRepositoryOwner,headRepository")
-    owner = pr["headRepositoryOwner"]["login"]
-    repo = pr["headRepository"]["name"]
+    pr = gh_pr_view_json("number")
+    repository = gh_repo_view_json("nameWithOwner")
+    owner, repo = str(repository["nameWithOwner"]).split("/", maxsplit=1)
     number = int(pr["number"])
     return owner, repo, number
 
@@ -170,9 +215,26 @@ def gh_api_graphql(
 
 
 def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
+    """Fetch all issue comments, reviews, and review threads for a PR.
+
+    Args:
+        owner: Repository owner.
+        repo: Repository name.
+        number: Pull request number.
+
+    Returns:
+        A structured payload containing PR metadata, issue comments, reviews,
+        and review threads.
+
+    Raises:
+        RuntimeError: If the GitHub GraphQL response contains API errors.
+    """
     conversation_comments: list[dict[str, Any]] = []
     reviews: list[dict[str, Any]] = []
     review_threads: list[dict[str, Any]] = []
+    seen_comment_ids: set[str] = set()
+    seen_review_ids: set[str] = set()
+    seen_thread_ids: set[str] = set()
 
     comments_cursor: str | None = None
     reviews_cursor: str | None = None
@@ -208,9 +270,9 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
         r = pr["reviews"]
         t = pr["reviewThreads"]
 
-        conversation_comments.extend(c.get("nodes") or [])
-        reviews.extend(r.get("nodes") or [])
-        review_threads.extend(t.get("nodes") or [])
+        extend_unique(conversation_comments, seen_comment_ids, c.get("nodes") or [])
+        extend_unique(reviews, seen_review_ids, r.get("nodes") or [])
+        extend_unique(review_threads, seen_thread_ids, t.get("nodes") or [])
 
         comments_cursor = c["pageInfo"]["endCursor"] if c["pageInfo"]["hasNextPage"] else None
         reviews_cursor = r["pageInfo"]["endCursor"] if r["pageInfo"]["hasNextPage"] else None
@@ -228,7 +290,26 @@ def fetch_all(owner: str, repo: str, number: int) -> dict[str, Any]:
     }
 
 
+def extend_unique(
+    target: list[dict[str, Any]], seen: set[str], nodes: list[dict[str, Any]]
+) -> None:
+    """Append nodes whose IDs have not been seen yet.
+
+    Args:
+        target: Target list receiving unique nodes.
+        seen: Set of already-seen node IDs.
+        nodes: Candidate nodes from the latest page.
+    """
+    for node in nodes:
+        node_id = str(node.get("id") or "")
+        if not node_id or node_id in seen:
+            continue
+        seen.add(node_id)
+        target.append(node)
+
+
 def main() -> None:
+    """Print the full PR conversation payload as formatted JSON."""
     _ensure_gh_authenticated()
     owner, repo, number = get_current_pr_ref()
     result = fetch_all(owner, repo, number)

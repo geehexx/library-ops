@@ -7,7 +7,7 @@
 
 ## Context
 
-The repository must demonstrate best-in-class delivery discipline without hiding behind verbose custom code. The project is a showcase, so the quality gates are part of the product evidence.
+The repository must demonstrate disciplined delivery without hiding behind verbose custom code. The project is a showcase, so the quality gates are part of the product evidence.
 
 ## Decision
 

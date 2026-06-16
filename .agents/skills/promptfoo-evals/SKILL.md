@@ -9,7 +9,7 @@ description: Use when authoring, expanding, validating, running, or triaging Pro
 
 Use this skill to turn Library Ops control-plane and product-agent behavior into repeatable Promptfoo suites.
 
-Read `references/README.md` for the lane breakdown, assertion preferences, and
+Read `references/lane-guide.md` for the lane breakdown, assertion preferences, and
 reporting conventions that accompany this skill.
 
 When evaluation work needs live browser automation or reproducible UI-flow

@@ -29,7 +29,7 @@ source-of-truth order, routing, decisions, and final judgment.
    validate the Task Master graph after coordinator/subagent setup is verified.
 2. Check `git status`.
 3. Confirm whether the change is meta/control-plane, product-code, or both; split commits accordingly.
-4. Perform skill discovery before substantial work: check the repo-local and installed skill catalog, load the relevant skill(s), and prefer explicit skill workflows over ad hoc repeated prompting. Use `clarify-and-goal` when ambiguity exists.
+4. Perform skill discovery before broad work: check the repo-local and installed skill catalog, load the relevant skill(s), and prefer explicit skill workflows over ad hoc repeated prompting. Use `clarify-and-goal` when ambiguity exists.
 5. Use `/plan` and the native user-question path when available before high-risk implementation: `request_user_input` in Plan mode, `ask_user_question` if exposed by the active build, or MCP elicitation through `tool_call_mcp_elicitation`. Otherwise emit a Question packet.
 6. Use `/goal` for long work after the goal is measurable and evidence-backed. For long-horizon work, omit a token budget by default; set one only when a hard stop, cost ceiling, or deliberate summarize-and-handoff checkpoint is actually needed.
 7. Use Serena, code-review-graph, and ast-grep before broad source changes.
@@ -38,8 +38,8 @@ source-of-truth order, routing, decisions, and final judgment.
 10. Task Master mutations normally route through `taskmaster_governor`; root
     may read Task Master directly and may write only with an explicit note
     explaining why the governor path was not used.
-11. Two-level orchestration means root plus direct specialists unless an ADR and
-    validator change explicitly enable deeper recursion.
+11. Root plus direct specialists is the default orchestration posture unless an
+    ADR and validator explicitly re-enable deeper recursion.
 
 Do not rely on per-agent `skills.config` overrides as if they make a skill
 always loaded for one subagent. Treat skill selection as a discovery and
@@ -104,7 +104,7 @@ npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 
 ## Decision rules
 
-Use `docs/decisioning/socratic-decision-framework.md` and `docs/agent-system/clarification-and-goals.md` for material choices. Do not pause merely because a required local tool needs to be configured or smoke-tested. Do pause before adding vendors, exporting source to cloud tools, changing project scope, or performing irreversible git/GitHub actions.
+Use `docs/decisioning/socratic-decision-framework.md` and `.codex/references/clarification-and-goals.md` for material choices. Do not pause merely because a required local tool needs to be configured or smoke-tested. Do pause before adding vendors, exporting source to cloud tools, changing project scope, or performing irreversible git/GitHub actions.
 
 ## Architecture rules
 
@@ -116,6 +116,8 @@ Use the hybrid architecture approach in `docs/architecture/architecture-approach
 npm run skills:lint
 npm run skills:audit
 npm run docs:quality
+npm run docstrings:coverage
+npm run docstrings:lint
 npm run eval:validate
 uv run ruff format --check .
 uv run ruff check .

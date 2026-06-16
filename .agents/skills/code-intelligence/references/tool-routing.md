@@ -1,4 +1,4 @@
-# Code intelligence references
+# Code intelligence tool routing
 
 Use this reference when the coordinator needs exact tool-selection evidence for
 Library Ops control-plane work.

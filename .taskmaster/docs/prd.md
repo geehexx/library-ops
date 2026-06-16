@@ -309,7 +309,7 @@ to a task should be rejected or converted into a PRD/task update first.
 
 **Reasoning:** The user clarified that these should not remain vague optional add-ons. Alternatives were examined across smaller dedicated tools, larger hosted platforms, and raw/manual workflows. The project chooses local-first tools by default and defers hosted/cloud code-indexing, paid dashboards, and broader context layers until an explicit user decision.
 
-**Acceptance impact:** `.codex/config.toml`, skills, hooks, docs, and validation scripts declare the selected stack. Strict tooling verification fails in implementation environments when required tools are missing. Details live in `docs/agent-system/context-and-tooling-strategy.md`, `docs/reference/context-lineage.md`, ADR-0004, and ADR-0007.
+**Acceptance impact:** `.codex/config.toml`, skills, hooks, docs, and validation scripts declare the selected stack. Strict tooling verification fails in implementation environments when required tools are missing. Details live in `.codex/references/context-and-tooling-strategy.md`, `.codex/references/context-lineage.md`, ADR-0004, and ADR-0007.
 
 ## 5. Capability Tree
 
@@ -333,12 +333,15 @@ Create a reproducible, agent-friendly project foundation.
 
 #### Feature: C1.F2 Django project bootstrap
 
-- **Description:** Create the Django project under `src/libraryops/config` with local/test/production settings.
-- **Inputs:** `pyproject.toml`, environment variables, database URL.
-- **Outputs:** `manage.py`, settings modules, root URL config, WSGI/ASGI config.
-- **Behavior:** Local settings support development; production settings require explicit secure environment.
+- **Description:** Harden the existing Django project under `src/libraryops/config` with local/test/production settings and real `DATABASE_URL` support.
+- **Inputs:** Existing `manage.py`, `src/libraryops/config/*`, `pyproject.toml`, environment variables, database URL.
+- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable bootstrap.
+- **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, and production settings require explicit secure environment.
 - **Acceptance criteria:**
   - `uv run python manage.py check` succeeds.
+  - SQLite remains the fallback when `DATABASE_URL` is absent.
+  - Postgres is selected when `DATABASE_URL` is set.
+  - `/health/` smoke tests pass under the test settings.
   - Missing required production env vars fail loudly.
 
 #### Feature: C1.F3 Quality tools
@@ -369,7 +372,7 @@ Create a reproducible, agent-friendly project foundation.
 #### Feature: C1.F5 Code-intelligence and Socratic tooling governance
 
 - **Description:** Add decision-governed support for RTK, code graph, symbol retrieval, AST search, repo snapshots, and MCP/tool alternatives.
-- **Inputs:** `docs/decisioning/socratic-decision-framework.md`, `docs/agent-system/context-and-tooling-strategy.md`, `docs/reference/context-lineage.md`, `.agents/skills/code-intelligence/SKILL.md`, `.codex/agents/code-intelligence-architect.toml`.
+- **Inputs:** `docs/decisioning/socratic-decision-framework.md`, `.codex/references/context-and-tooling-strategy.md`, `.codex/references/context-lineage.md`, `.agents/skills/code-intelligence/SKILL.md`, `.codex/agents/code-intelligence-architect.toml`.
 - **Outputs:** Code-intelligence skill/agent, documented tool ladder, validation scripts, and explicit pause rules for trust/cost/scope changes.
 - **Behavior:** Agents evaluate context/tooling choices through accepted/recommended/ask/deferred decision statuses and tie material changes back to user decisions.
 - **Acceptance criteria:**
@@ -1544,7 +1547,7 @@ Code-intelligence tools are not all MCPs and are governed separately:
 - Run or inspect `task-master next` before implementing.
 - Use the Socratic decision framework before material tooling, MCP, architecture, context-budget, cost, credential, or scope changes.
 - Use RTK for noisy command output, but raw output/full logs for final evidence.
-- Use code graph/symbol/AST/repo-pack tools only according to `docs/agent-system/context-and-tooling-strategy.md`.
+- Use code graph/symbol/AST/repo-pack tools only according to `.codex/references/context-and-tooling-strategy.md`.
 - Use Context7 before using framework/library APIs that may have changed.
 - Use Exa for current external research or examples.
 - Use Figma MCP only for design artifacts and design-to-code context.
@@ -1906,7 +1909,7 @@ must be evidence-based. During implementation:
 
 If a review session lacks direct connector access, the agent MUST say so rather than imply usage.
 
-### 24.4 Best-in-Class Tooling Matrix
+### 24.4 Selected Tooling Matrix
 
 | Category | Baseline choice | Why | Alternatives / constraints |
 |---|---|---|---|

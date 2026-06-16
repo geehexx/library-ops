@@ -8,6 +8,7 @@ dependencies = [
   "django-ninja>=1.4,<2.0",
   "django-allauth>=65.0,<66.0",
   "django-htmx>=1.20,<2.0",
+  "dj-database-url>=2.2,<3.0",
   "psycopg[binary]>=3.2,<4.0",
   "pydantic>=2.10,<3.0",
   "python-dotenv>=1.0,<2.0",
@@ -169,12 +170,15 @@ ignore-module = true
 ignore-nested-functions = true
 ignore-private = true
 ignore-property-decorators = true
-fail-under = 80
-exclude = ["tests", "migrations"]
+fail-under = 100
+exclude = ["migrations"]
 
 [tool.pydoclint]
 style = "google"
-exclude = "(tests|migrations)"
+exclude = "(migrations)"
+arg-type-hints-in-docstring = false
+check-return-types = false
+allow-init-docstring = true
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv", "node_modules"]

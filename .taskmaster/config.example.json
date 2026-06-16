@@ -1,24 +1,24 @@
 {
   "models": {
     "main": {
-      "provider": "ollama",
-      "modelId": "qwen2.5-coder:3b",
+      "provider": "gemini-cli",
+      "modelId": "gemini-2.5-flash",
       "maxTokens": 64000,
       "temperature": 0.1,
-      "baseURL": "http://127.0.0.1:11434/api"
+      "baseURL": ""
     },
     "research": {
-      "provider": "ollama",
-      "modelId": "qwen2.5-coder:3b",
+      "provider": "gemini-cli",
+      "modelId": "gemini-2.5-flash",
       "maxTokens": 128000,
-      "temperature": 0.1,
-      "baseURL": "http://127.0.0.1:11434/api"
+      "temperature": 0.1
     },
     "fallback": {
-      "provider": "codex-cli",
-      "modelId": "gpt-5.4-mini",
+      "provider": "ollama",
+      "modelId": "deepseek-r1:7b",
       "maxTokens": 64000,
-      "temperature": 0.1
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
     }
   },
   "global": {
@@ -33,5 +33,6 @@
   },
   "codexCli": {
     "codexPath": "codex"
-  }
+  },
+  "geminiCli": {}
 }

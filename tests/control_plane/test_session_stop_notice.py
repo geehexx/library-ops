@@ -1,3 +1,5 @@
+"""Tests for the session-stop reminder hook."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -14,6 +16,7 @@ HOOK_PATH = REPO_ROOT / ".codex" / "hooks" / "session_stop_notice.py"
 
 
 def load_hook_module() -> ModuleType:
+    """Load the session-stop notice hook module for testing."""
     spec = importlib.util.spec_from_file_location("session_stop_notice", HOOK_PATH)
     assert spec is not None
     assert spec.loader is not None
@@ -25,6 +28,11 @@ def load_hook_module() -> ModuleType:
 def test_session_stop_notice_prints_expected_summary(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
+    """Ensure the session-stop hook prints the expected reminder.
+
+    Args:
+        capsys: Pytest capture fixture for stdout assertions.
+    """
     hook: Any = load_hook_module()
 
     assert hook.main() == 0

@@ -45,6 +45,7 @@ npm run verify:all
 - skill lint
 - strict skill audit
 - docs quality
+- docstring coverage and docstring lint for repo-owned Python
 - deterministic Promptfoo evals
 - dependency-tree integrity
 - workflow lint
@@ -60,6 +61,13 @@ npm run verify:all
 - pip-audit
 - `npm audit --audit-level=moderate`
 
+## Source-adjacent documentation loop
+
+```bash
+npm run docstrings:coverage
+npm run docstrings:lint
+```
+
 ## Tool-specific rules
 
 - Use RTK for noisy exploratory output, not for final security or release proof.
@@ -70,7 +78,7 @@ npm run verify:all
 
 ## PR evidence minimum
 
-Every substantial PR should state:
+Every non-trivial PR should state:
 
 - Task Master ID
 - PRD sections

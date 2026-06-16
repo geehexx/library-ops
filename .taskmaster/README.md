@@ -16,6 +16,14 @@ state, and runtime policy.
 - `.taskmaster/AGENTS.md`
   holds Task Master-specific execution rules.
 
+For Library Ops, treat Task Master as an essential MCP surface plus companion
+tools rather than a standalone generator:
+
+- Context7 for current framework/library documentation
+- Exa for current broader research and counter-evidence
+- Serena for symbol-aware repo alignment
+- code-review-graph for blast-radius checks
+
 ## Commit policy
 
 Committed:
@@ -47,3 +55,7 @@ npx --yes --package task-master-ai@0.43.1 -c 'task-master expand --all --researc
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master next'
 ```
+
+The active MCP mode in `.codex/config.toml` should stay on `standard` for this
+repo because the normal workflow needs complexity analysis, task expansion, and
+graph maintenance in addition to the lean/core task-read path.

@@ -11,6 +11,16 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
 - Spec Kit `plan.md` -> feature-specific implementation plan
 - Spec Kit `tasks.md` -> cross-check artifact, not final execution authority
 
+## Generation rules
+
+- Start from committed repo reality before inventing scaffolding work.
+- When a spec changes architecture, governance, or external dependencies, note
+  the PRD/ADR impact explicitly.
+- Keep human docs out of temporary handoff language; durable decisions belong in
+  the PRD, ADRs, AGENTS, skills, or concise runbook/setup surfaces.
+- Treat Task Master as derived from the canonical PRD and spec pack. If they
+  disagree, update PRD/spec first, then regenerate or reconcile the task graph.
+
 ## Required generated artifact qualities
 
 - Include explicit dependencies.
@@ -18,3 +28,12 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
 - Include test strategy.
 - Include security/accessibility/search considerations where relevant.
 - Include Task Master capability IDs when known.
+
+## Feature-plan expectations
+
+- `spec.md` should capture the requirement delta, constraints, and user-facing
+  acceptance shape for one feature slice.
+- `plan.md` should describe the implementation path, touched systems, and
+  validation approach without duplicating the whole PRD.
+- `tasks.md` should be small, reviewable, and consistent with the eventual Task
+  Master graph rather than acting as a second execution authority.

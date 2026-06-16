@@ -45,21 +45,18 @@ This file is the compact summary, not a second operating manual.
 
 - Root default: `gpt-5.4`
 - Read-heavy planning/research specialists: `gpt-5.4-mini`
-- Spark micro-workers: `gpt-5.3-codex-spark`
-- Fan-out cap: `agents.max_depth = 2`, `agents.max_threads = 8`
+- Spark micro-workers: `gpt-5.3-codex-spark` when explicitly invoked
+- Fan-out cap: `agents.max_depth = 1`, `agents.max_threads = 8`
 - Root stays the only interactive coordinator
-- Lead agents may coordinate one granular layer only when scope, ownership,
-  runtime cap, and upward synthesis are explicit
+- Specialists are called directly by the root unless a later validator-backed
+  experiment re-enables recursion
 
-Recursive fan-out is a controlled pilot: `agents.max_depth = 2` and
-`agents.max_threads = 8`. ADR-0008 owns the guardrails. The root remains the
-only interactive coordinator; a lead agent can
-coordinate one granular layer only when the root defines write ownership,
-runtime caps, upward summaries, and validation. Read-heavy planning and
-research fan-out stays on `gpt-5.4-mini`. Spark-named fan-out remains
-available through `spark_command_runner` and `spark_summarizer`, backed by
-`gpt-5.3-codex-spark`, for bounded text-only command summaries and
-community-source cleanup; raw commands remain authoritative for final
+Recursive fan-out is not the active default. `agents.max_depth = 1` keeps the
+control plane aligned with the current proven workflow and with current Codex
+guidance. ADR-0008 owns the guardrails for any future experiment that raises
+that cap again. Read-heavy planning and research stays on `gpt-5.4-mini`.
+Spark-named agents may still be useful for bounded text-only summaries or
+community-source cleanup, but raw commands remain authoritative for final
 validation evidence.
 
 Goal budgeting is separate. For long-horizon `/goal` work, omit goal token

@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
+"""Emit a concise session-close reminder for this repo."""
 
 
 def main() -> int:
+    """Print the required end-of-session summary fields.
+
+    Returns:
+        Zero for normal hook completion.
+    """
     print(
         "Session close: summarize Task ID, source-of-truth docs used, skills used, "
         "subagents used and their status, elicitation path used, files changed, "

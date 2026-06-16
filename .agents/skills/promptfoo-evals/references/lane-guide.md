@@ -1,4 +1,4 @@
-# Promptfoo eval references
+# Promptfoo eval lane guide
 
 Use this reference when expanding Library Ops eval coverage.
 

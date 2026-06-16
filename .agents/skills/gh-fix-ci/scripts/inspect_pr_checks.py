@@ -52,6 +52,8 @@ PENDING_LOG_MARKERS = (
 
 
 class GhResult:
+    """Simple container for GitHub CLI subprocess results."""
+
     def __init__(self, returncode: int, stdout: str, stderr: str):
         self.returncode = returncode
         self.stdout = stdout
@@ -59,6 +61,15 @@ class GhResult:
 
 
 def run_gh_command(args: Sequence[str], cwd: Path) -> GhResult:
+    """Run `gh` and capture decoded stdout/stderr.
+
+    Args:
+        args: Arguments to pass after `gh`.
+        cwd: Repository working directory.
+
+    Returns:
+        A small result wrapper with exit code and captured streams.
+    """
     process = subprocess.run(
         ["gh", *args],
         cwd=cwd,
@@ -69,6 +80,15 @@ def run_gh_command(args: Sequence[str], cwd: Path) -> GhResult:
 
 
 def run_gh_command_raw(args: Sequence[str], cwd: Path) -> tuple[int, bytes, str]:
+    """Run `gh` and return raw stdout bytes.
+
+    Args:
+        args: Arguments to pass after `gh`.
+        cwd: Repository working directory.
+
+    Returns:
+        A tuple of exit code, raw stdout bytes, and decoded stderr.
+    """
     process = subprocess.run(
         ["gh", *args],
         cwd=cwd,
@@ -79,6 +99,7 @@ def run_gh_command_raw(args: Sequence[str], cwd: Path) -> tuple[int, bytes, str]
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for the PR-check inspection tool."""
     parser = argparse.ArgumentParser(
         description=(
             "Inspect failing GitHub PR checks, fetch GitHub Actions logs, and extract a "
@@ -97,6 +118,11 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """Inspect failing PR checks and print actionable summaries.
+
+    Returns:
+        Zero when no failing checks are detected, otherwise non-zero.
+    """
     args = parse_args()
     repo_root = find_git_root(Path(args.repo))
     if repo_root is None:
@@ -139,6 +165,14 @@ def main() -> int:
 
 
 def find_git_root(start: Path) -> Path | None:
+    """Return the Git repository root for a starting path.
+
+    Args:
+        start: Path inside the target repository.
+
+    Returns:
+        The repository root path, or `None` if not inside a Git repository.
+    """
     result = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         cwd=start,
@@ -151,6 +185,14 @@ def find_git_root(start: Path) -> Path | None:
 
 
 def ensure_gh_available(repo_root: Path) -> bool:
+    """Verify that `gh` exists and is authenticated.
+
+    Args:
+        repo_root: Repository root used for auth checks.
+
+    Returns:
+        True when the GitHub CLI is usable.
+    """
     if which("gh") is None:
         print("Error: gh is not installed or not on PATH.", file=sys.stderr)
         return False
@@ -163,6 +205,15 @@ def ensure_gh_available(repo_root: Path) -> bool:
 
 
 def resolve_pr(pr_value: str | None, repo_root: Path) -> str | None:
+    """Resolve the target pull request number.
+
+    Args:
+        pr_value: Explicit PR number or URL, if provided.
+        repo_root: Repository root used for implicit PR lookup.
+
+    Returns:
+        The resolved PR number as a string, or `None` on failure.
+    """
     if pr_value:
         return pr_value
     result = run_gh_command(["pr", "view", "--json", "number"], cwd=repo_root)
@@ -183,12 +234,21 @@ def resolve_pr(pr_value: str | None, repo_root: Path) -> str | None:
 
 
 def fetch_checks(pr_value: str, repo_root: Path) -> list[dict[str, Any]] | None:
+    """Fetch PR checks via the GitHub CLI.
+
+    Args:
+        pr_value: Pull request number or URL.
+        repo_root: Repository root used for `gh` execution.
+
+    Returns:
+        A list of check dictionaries, or `None` on failure.
+    """
     primary_fields = ["name", "state", "conclusion", "detailsUrl", "startedAt", "completedAt"]
     result = run_gh_command(
         ["pr", "checks", pr_value, "--json", ",".join(primary_fields)],
         cwd=repo_root,
     )
-    if result.returncode != 0:
+    if result.returncode not in {0, 8} or not result.stdout.strip():
         message = "\n".join(filter(None, [result.stderr, result.stdout])).strip()
         available_fields = parse_available_fields(message)
         if available_fields:
@@ -228,6 +288,7 @@ def fetch_checks(pr_value: str, repo_root: Path) -> list[dict[str, Any]] | None:
 
 
 def is_failing(check: dict[str, Any]) -> bool:
+    """Return whether a check payload represents a failing status."""
     conclusion = normalize_field(check.get("conclusion"))
     if conclusion in FAILURE_CONCLUSIONS:
         return True
@@ -244,6 +305,17 @@ def analyze_check(
     max_lines: int,
     context: int,
 ) -> dict[str, Any]:
+    """Fetch logs and summarize one failing check.
+
+    Args:
+        check: Check payload returned by `gh pr checks`.
+        repo_root: Repository root used for `gh` execution.
+        max_lines: Maximum lines to keep in snippets and tails.
+        context: Context window around a detected failure marker.
+
+    Returns:
+        A structured analysis record for the failing check.
+    """
     url = check.get("detailsUrl") or check.get("link") or ""
     run_id = extract_run_id(url)
     job_id = extract_job_id(url)
@@ -289,6 +361,7 @@ def analyze_check(
 
 
 def extract_run_id(url: str) -> str | None:
+    """Extract a GitHub Actions run ID from a details URL."""
     if not url:
         return None
     for pattern in (r"/actions/runs/(\d+)", r"/runs/(\d+)"):
@@ -299,6 +372,7 @@ def extract_run_id(url: str) -> str | None:
 
 
 def extract_job_id(url: str) -> str | None:
+    """Extract a GitHub Actions job ID from a details URL."""
     if not url:
         return None
     match = re.search(r"/actions/runs/\d+/job/(\d+)", url)
@@ -311,6 +385,15 @@ def extract_job_id(url: str) -> str | None:
 
 
 def fetch_run_metadata(run_id: str, repo_root: Path) -> dict[str, Any] | None:
+    """Fetch metadata for a GitHub Actions run.
+
+    Args:
+        run_id: Actions run identifier.
+        repo_root: Repository root used for `gh` execution.
+
+    Returns:
+        Parsed run metadata, or `None` when unavailable.
+    """
     fields = [
         "conclusion",
         "status",
@@ -338,6 +421,16 @@ def fetch_check_log(
     job_id: str | None,
     repo_root: Path,
 ) -> tuple[str, str, str]:
+    """Fetch the most useful log stream for a failing check.
+
+    Args:
+        run_id: Actions run identifier.
+        job_id: Optional job identifier from the check details URL.
+        repo_root: Repository root used for `gh` execution.
+
+    Returns:
+        A tuple of log text, error text, and status label.
+    """
     log_text, log_error = fetch_run_log(run_id, repo_root)
     if not log_error:
         return log_text, "", "ok"
@@ -359,6 +452,7 @@ def fetch_check_log(
 
 
 def fetch_run_log(run_id: str, repo_root: Path) -> tuple[str, str]:
+    """Fetch the full run log for a GitHub Actions run."""
     result = run_gh_command(["run", "view", run_id, "--log"], cwd=repo_root)
     if result.returncode != 0:
         error = (result.stderr or result.stdout or "").strip()
@@ -367,6 +461,7 @@ def fetch_run_log(run_id: str, repo_root: Path) -> tuple[str, str]:
 
 
 def fetch_job_log(job_id: str, repo_root: Path) -> tuple[str, str]:
+    """Fetch raw job logs through the GitHub API."""
     repo_slug = fetch_repo_slug(repo_root)
     if not repo_slug:
         return "", "Error: unable to resolve repository name for job logs."
@@ -381,6 +476,7 @@ def fetch_job_log(job_id: str, repo_root: Path) -> tuple[str, str]:
 
 
 def fetch_repo_slug(repo_root: Path) -> str | None:
+    """Fetch the current repository slug in `owner/name` form."""
     result = run_gh_command(["repo", "view", "--json", "nameWithOwner"], cwd=repo_root)
     if result.returncode != 0:
         return None
@@ -395,12 +491,14 @@ def fetch_repo_slug(repo_root: Path) -> str | None:
 
 
 def normalize_field(value: Any) -> str:
+    """Normalize a check field to a lowercase comparison string."""
     if value is None:
         return ""
     return str(value).strip().lower()
 
 
 def parse_available_fields(message: str) -> list[str]:
+    """Parse the field list from a GitHub CLI schema error message."""
     if "Available fields:" not in message:
         return []
     fields: list[str] = []
@@ -419,15 +517,18 @@ def parse_available_fields(message: str) -> list[str]:
 
 
 def is_log_pending_message(message: str) -> bool:
+    """Return whether a log-fetch error indicates pending logs."""
     lowered = message.lower()
     return any(marker in lowered for marker in PENDING_LOG_MARKERS)
 
 
 def is_zip_payload(payload: bytes) -> bool:
+    """Return whether a raw payload looks like a ZIP archive."""
     return payload.startswith(b"PK")
 
 
 def extract_failure_snippet(log_text: str, max_lines: int, context: int) -> str:
+    """Extract a focused failure snippet from a log stream."""
     lines = log_text.splitlines()
     if not lines:
         return ""
@@ -445,6 +546,7 @@ def extract_failure_snippet(log_text: str, max_lines: int, context: int) -> str:
 
 
 def find_failure_index(lines: Sequence[str]) -> int | None:
+    """Find the last likely failure marker in a log line sequence."""
     for idx in range(len(lines) - 1, -1, -1):
         lowered = lines[idx].lower()
         if any(marker in lowered for marker in FAILURE_MARKERS):
@@ -453,6 +555,7 @@ def find_failure_index(lines: Sequence[str]) -> int | None:
 
 
 def tail_lines(text: str, max_lines: int) -> str:
+    """Return the last `max_lines` lines of a text block."""
     if max_lines <= 0:
         return ""
     lines = text.splitlines()
@@ -460,6 +563,7 @@ def tail_lines(text: str, max_lines: int) -> str:
 
 
 def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
+    """Render analyzed failing checks in a readable terminal format."""
     results_list = list(results)
     print(f"PR #{pr_number}: {len(results_list)} failing checks analyzed.")
     for result in results_list:
@@ -505,6 +609,7 @@ def render_results(pr_number: str, results: Iterable[dict[str, Any]]) -> None:
 
 
 def indent_block(text: str, prefix: str = "  ") -> str:
+    """Indent a multiline block for terminal output."""
     return "\n".join(f"{prefix}{line}" for line in text.splitlines())
 
 

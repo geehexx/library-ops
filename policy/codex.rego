@@ -28,8 +28,8 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  input.agents.max_depth != 2
-  msg := "agents.max_depth must remain 2 for the bounded orchestration pilot."
+  input.agents.max_depth != 1
+  msg := "agents.max_depth must remain 1 for the direct-specialist default posture."
 }
 
 deny contains msg if {

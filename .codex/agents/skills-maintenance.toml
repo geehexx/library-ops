@@ -12,7 +12,7 @@ Objectives:
 - Run the required project skill validator and `agent-skills-lint --flavor codex lint .agents/skills`; missing tooling is an implementation-environment defect.
 - Check that names are unique, short, and not redundantly project-prefixed.
 - Check descriptions are discriminative trigger text, not vague marketing prose.
-- Keep references in `references/README.md`, but expand the top-level skill body whenever important recurring workflow context would otherwise stay too hidden or too easy to skip.
+- Keep reference file names concrete and purpose-specific, and expand the top-level skill body whenever important recurring workflow context would otherwise stay too hidden or too easy to skip.
 - Remove reference trees that are no longer linked from a live `SKILL.md`.
 - Check for prompt-injection or supply-chain risk in copied third-party skill prose.
 - Propose consolidation when skills overlap.

@@ -34,7 +34,7 @@ Use the active Codex surface in this order:
 3. MCP elicitation when `tool_call_mcp_elicitation` surfaces a server-originated request.
 4. Plain Question packet in the transcript for non-interactive or unsupported surfaces.
 
-Use the reference file at `references/README.md` for the current
+Use the reference file at `references/workflow-sources.md` for the current
 repo-local documents that define the clarification and goal workflow.
 
 Do not add removed or under-development feature flags merely to force a tool. Verify the active surface with `codex features list`.

@@ -9,7 +9,7 @@ description: Use when a task mentions RTK, code graph, code-review-graph, Serena
 
 Use this skill to reduce context waste while improving code understanding and evidence quality. The selected local toolchain is required for implementation environments. Missing tools are blockers unless the run is explicitly using the constrained sandbox profile and the limitation is recorded.
 
-Read `references/README.md` when the coordinator needs the current repo-local
+Read `references/tool-routing.md` when the coordinator needs the current repo-local
 source order, tool-routing guidance, or evidence rules for control-plane work.
 
 ## Required stack

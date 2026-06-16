@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
+        "id": 1,
         "title": "Project Repository and Initial Toolchain Setup",
         "description": "Initialize the Python/Django repository baseline, dependency toolchain, and direct validation path. This includes the foundational `pyproject.toml`, `uv.lock`, repo-local Node tooling, and `.gitignore` coverage for generated artifacts.",
         "details": "As per Capability C1.F1, this task establishes Python 3.12+, Node 22+, uv, npm, and the direct-tool workflow used by the repo. Ensure `uv sync --all-groups`, `npm ci`, `codex doctor --summary --ascii --no-color`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` all succeed. `.pytest_cache`, `.venv`, corpora, model caches, and secrets must remain untracked. The project structure from section 6.1 should be present without relying on custom verifier scripts.",
@@ -83,7 +83,7 @@
         "updatedAt": "2026-06-16T08:10:23.795Z"
       },
       {
-        "id": "2",
+        "id": 2,
         "title": "Configure Core Quality and Agent Tooling",
         "description": "Configure static analysis, testing, and agent-specific tools for predictable development. This includes Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint, and the agent stack like Codex, Task Master, Spec Kit, Context7, Exa, Figma MCP, RTK, code-review-graph, Serena, ast-grep, and Repomix.",
         "details": "This task aligns with Capability C1.F3, C1.F4, and C1.F5. Configure `pyproject.toml` for Ruff, Pyright (strict defaults), pytest (with Hypothesis), Import Linter (for module boundaries once apps exist), coverage, pip-audit, and markdownlint. For agent tooling, set up `.codex/config.toml`, `AGENTS.md`, and relevant skills to enable Context7, Exa, Figma MCP, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix. Ensure no real MCP keys are committed and the project permission profile stays on the current workspace-scoped model. Validate with direct-tool commands rather than custom readiness scripts.",
@@ -145,7 +145,7 @@
             "dependencies": [
               4
             ],
-            "details": "Extend '.codex/config.toml' to integrate and configure the specified advanced agent capabilities, defining necessary hooks, operating rules, and context budgets for each. Keep the verification path on direct tool invocations such as `codex doctor`, pinned external Task Master CLI commands, `agent-skills-lint`, and the existing quality gates.\n\nDurable control-plane results now folded into the repo:\n- `npm run deps:tree` is a first-class dependency-tree integrity gate.\n- Promptfoo, markdownlint-cli2, agent-skills-lint, and Task Master run as pinned external CLIs.\n- The local provider eval lane is validated separately from the deterministic smoke lane.\n- Task Master runtime policy now lives under `.taskmaster/`.\n- Root and specialist model lanes were reduced to the conservative `gpt-5.4` / `gpt-5.4-mini` / Spark split.\n- `code-review-graph` and `semgrep` support verified `uvx` invocation paths, reducing persistent global-tool assumptions.\n- Externalizing `task-master-ai` removed the vulnerable subtree from the repo-owned npm graph while preserving Task Master CLI and MCP behavior.\n\nCurrent validation expectation:\n- `codex doctor --summary --ascii --no-color`\n- `npm run skills:lint`\n- `npm run policy:check`\n- `npm run verify:core`\n- `npm run verify:all`\n- `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'`",
+            "details": "Extend '.codex/config.toml' to integrate and configure the specified advanced agent capabilities, defining necessary hooks, operating rules, and context budgets for each. Keep the verification path on direct tool invocations such as `codex doctor`, pinned external Task Master CLI commands, `agent-skills-lint`, and the existing quality gates.\n\nDurable control-plane results now folded into the repo:\n- `npm run deps:tree` is a first-class dependency-tree integrity gate.\n- Promptfoo, markdownlint-cli2, agent-skills-lint, and Task Master run as pinned external CLIs.\n- The local provider eval lane is validated separately from the deterministic smoke lane.\n- Task Master runtime policy now lives under `.taskmaster/`.\n- The active orchestration posture is root plus direct specialists by default, with `agents.max_depth = 1` unless a later validator-backed experiment re-enables recursion.\n- Task Master MCP uses the `standard` tool surface in this repo because graph repair, analysis, and regeneration are normal work, not edge cases.\n- Current provider evidence shows `gemini-2.5-flash` is the best proven Task Master graph-management lane on this machine/account, while local Ollama remains an optimization track backed by `deepseek-r1:7b` rather than the old `qwen2.5-coder:3b` baseline.\n- `code-review-graph` and `semgrep` support verified `uvx` invocation paths, reducing persistent global-tool assumptions.\n- Externalizing `task-master-ai` removed the vulnerable subtree from the repo-owned npm graph while preserving Task Master CLI and MCP behavior.\n\nCurrent validation expectation:\n- `codex doctor --summary --ascii --no-color`\n- `npm run skills:lint`\n- `npm run policy:check`\n- `npm run verify:core`\n- `npm run verify:all`\n- `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'`",
             "status": "done",
             "testStrategy": "Execute `codex doctor --summary --ascii --no-color`, `npm run skills:lint`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` to verify the active agent/tooling surface. Confirm agent stack functions by running a small read-only task that exercises one or more integrated capabilities, such as a code-review-graph or ast-grep check.",
             "parentId": "undefined",
@@ -155,11 +155,11 @@
         "updatedAt": "2026-06-16T08:10:23.837Z"
       },
       {
-        "id": "3",
-        "title": "Django Project Bootstrap and Settings",
-        "description": "Create the core Django project structure and configure settings for local development, testing, and production environments.",
-        "details": "This covers Capability C1.F2. Create the Django project under `src/libraryops/config` using `django-admin startproject`. Set up `manage.py`, separate settings modules for local, test, and production, and the root URL configuration. Ensure production settings require explicit secure environment variables and fail loudly if missing. Implement basic WSGI/ASGI configurations. Structure according to section 6.1 (Repository Structure) and 6.2 (Module Definitions).",
-        "testStrategy": "Run `uv run python manage.py check` to ensure Django project integrity. Verify that missing required production environment variables cause the application to fail during startup in a production-like context. Confirm local development server starts successfully. Ensure migrations can be generated and applied (initially empty).",
+        "id": 3,
+        "title": "Harden Existing Django Bootstrap and Settings",
+        "description": "Harden the existing Django project structure and configure settings for local development, testing, and production environments without re-bootstraping the project tree.",
+        "details": "This covers Capability C1.F2. Treat the committed Django bootstrap as current reality: root `manage.py`, `src/libraryops/config/settings/base.py`, `local.py`, and `test.py`. Strengthen that bootstrap with real `DATABASE_URL` handling, explicit production env requirements, smoke-testable URLs, and CI parity so the repo is ready for the first domain-app implementation slice rather than a second `django-admin startproject` pass.",
+        "testStrategy": "Run `uv run python manage.py check` to ensure Django project integrity. Verify SQLite fallback when `DATABASE_URL` is absent, Postgres selection when it is present, and `/health/` smoke tests under test settings. Confirm missing required production environment variables still fail loudly and migrations remain clean.",
         "priority": "high",
         "dependencies": [
           "1",
@@ -169,24 +169,24 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Generate Initial Django Project Structure",
-            "description": "Use `django-admin startproject` to create the core `libraryops` Django project within the `src/libraryops/config` directory as specified in section 6.1. Relocate `manage.py` to `src/libraryops`.",
+            "title": "Audit and reconcile the existing Django bootstrap layout",
+            "description": "Confirm the current committed bootstrap layout and remove stale planning instructions that describe a second `django-admin startproject` pass or moving `manage.py` under `src/libraryops`.",
             "dependencies": [],
-            "details": "Execute `django-admin startproject libraryops src/libraryops/config/libraryops` to create the initial project files. Then, move `src/libraryops/config/manage.py` up to `src/libraryops/manage.py` and adjust paths if necessary. Ensure the project structure aligns with 'Repository Structure' (section 6.1).",
+            "details": "Treat root `manage.py` and `src/libraryops/config/*` as the bootstrap source of truth. Reconcile Task Master, README, and supporting docs so they describe the implemented layout and the next hardening steps instead of generating a nested `config/libraryops` tree.",
             "status": "pending",
-            "testStrategy": "Run `ls -R src/libraryops` to verify the presence of `manage.py` at `src/libraryops` and the project directory `src/libraryops/config/libraryops` containing basic Django files (e.g., `settings.py`, `urls.py`).",
+            "testStrategy": "Review the repo layout and ensure no planning artifact still requires `src/libraryops/config/libraryops` or `src/libraryops/manage.py` as the target structure.",
             "parentId": "undefined"
           },
           {
             "id": 2,
-            "title": "Implement Separated Django Settings Modules",
-            "description": "Refactor the default `settings.py` into a modular structure with `base.py`, `local.py`, `test.py`, and `production.py` within a new `settings` directory under `src/libraryops/config/libraryops`.",
+            "title": "Harden the existing settings modules",
+            "description": "Extend the current `base.py`, `local.py`, `test.py`, and `production.py` settings layout so database selection, host handling, and test behavior match local and CI expectations.",
             "dependencies": [
               1
             ],
-            "details": "Create `src/libraryops/config/libraryops/settings/` directory. Move the content of `settings.py` to `base.py`. Create `__init__.py` to import `local.py` by default. Implement `local.py` for development, `test.py` for testing, and `production.py` for production, inheriting from `base.py` and overriding relevant settings like `DEBUG`, `ALLOWED_HOSTS`, etc. This aligns with section 6.2 'Module Definitions'.",
+            "details": "Keep the current `src/libraryops/config/settings/` structure and harden it in place. Add `DATABASE_URL` parsing, preserve SQLite fallback when no URL is set, make test settings honor `DATABASE_URL`, and ensure smoke tests work with the Django test host.\n<info added on 2026-06-16T14:14:45.429Z>\n```plaintext\n2026-06-16: Hardened Django settings in place with DATABASE_URL parsing, SQLite fallback only when DATABASE_URL is absent, and focused smoke/settings tests. Verified with manage.py check under default and Postgres DATABASE_URL plus targeted pytest coverage.\n```\n</info added on 2026-06-16T14:14:45.429Z>",
             "status": "pending",
-            "testStrategy": "Verify the presence of `settings/__init__.py`, `base.py`, `local.py`, `test.py`, `production.py` in `src/libraryops/config/libraryops/settings/`. Ensure `__init__.py` correctly imports `local.py`.",
+            "testStrategy": "Add focused tests covering SQLite fallback, Postgres selection from `DATABASE_URL`, and host handling for the Django test client.",
             "parentId": "undefined"
           },
           {
@@ -196,42 +196,42 @@
             "dependencies": [
               2
             ],
-            "details": "Add `django-environ` to `requirements.txt`. In `src/libraryops/config/libraryops/settings/production.py`, use `env()` calls to fetch critical settings like `SECRET_KEY`, `DATABASE_URL`, `ALLOWED_HOSTS`. Ensure that `env.str()` or `env.list()` are used with `default=environ.Env.REQUIRED` to enforce explicit definition and cause startup failure if missing. Create an `env.example` file.",
+            "details": "Keep production settings strict about required environment variables while aligning implementation with the current dependency/tooling choices. The production module should require explicit secure values for `SECRET_KEY`, `DATABASE_URL`, and host configuration rather than silently inheriting local defaults.",
             "status": "pending",
-            "testStrategy": "Attempt to start the Django development server with `DJANGO_SETTINGS_MODULE` pointing to `production.py` but without required environment variables set. Verify that the application fails loudly with appropriate error messages indicating missing variables.",
+            "testStrategy": "Attempt to initialize Django with `DJANGO_SETTINGS_MODULE` pointing to `production.py` and verify startup fails loudly when required env vars are absent.",
             "parentId": "undefined"
           },
           {
             "id": 4,
-            "title": "Set Up Root URL Configuration and WSGI/ASGI",
-            "description": "Configure the root URL patterns in `src/libraryops/config/libraryops/urls.py` and implement basic WSGI/ASGI configurations for serving the application.",
+            "title": "Validate root URL configuration and health bootstrap",
+            "description": "Confirm the existing root URL patterns and WSGI/ASGI modules are correct for the committed bootstrap, including a smoke-testable health endpoint.",
             "dependencies": [
               1
             ],
-            "details": "Ensure `src/libraryops/config/libraryops/urls.py` is correctly configured to include future application URLs (initially just `admin/`). Verify `src/libraryops/config/libraryops/wsgi.py` and `src/libraryops/config/libraryops/asgi.py` are present and correctly define `application` objects. Update `WSGI_APPLICATION` and `ASGI_APPLICATION` in `base.py` to point to these files.",
+            "details": "Keep the current `src/libraryops/config/urls.py`, `wsgi.py`, and `asgi.py` modules and verify they remain aligned with the settings module paths. Preserve a minimal `/health/` endpoint for smoke tests and deployment probes.",
             "status": "pending",
-            "testStrategy": "Verify `urls.py` contains at least the admin URL configuration. Confirm `WSGI_APPLICATION` and `ASGI_APPLICATION` are correctly set in `base.py`. Ensure `wsgi.py` and `asgi.py` files exist and are not empty.",
+            "testStrategy": "Keep `/health/` smoke coverage in pytest and verify `WSGI_APPLICATION` and `ASGI_APPLICATION` still point to the committed config modules.",
             "parentId": "undefined"
           },
           {
             "id": 5,
-            "title": "Perform Initial Project Integrity Check and Server Startup",
-            "description": "Run Django's built-in `check` command to verify project integrity and attempt to start the development server using local settings to confirm basic functionality.",
+            "title": "Prove bootstrap integrity in local and CI-style runs",
+            "description": "Use Django checks, migration checks, and pytest under both default and `DATABASE_URL`-driven settings to prove the committed bootstrap is ready for product work.",
             "dependencies": [
               1,
               2,
               3,
               4
             ],
-            "details": "Navigate to `src/libraryops` and execute `python manage.py check` to identify any configuration errors. Then, run `python manage.py runserver` to attempt starting the development server. Confirm that the server starts without errors and is accessible via a web browser (e.g., `http://127.0.0.1:8000/admin/`).",
+            "details": "Validate the current bootstrap with `manage.py check`, `makemigrations --check --dry-run`, and pytest. Ensure CI uses the Postgres service it already starts by honoring `DATABASE_URL` in test settings instead of silently falling back to SQLite.",
             "status": "pending",
-            "testStrategy": "Run `python manage.py check` and ensure a 'System check identified no issues' message. Execute `python manage.py runserver` and confirm the server starts successfully without exceptions. Access `http://127.0.0.1:8000/admin/` in a browser to confirm the Django admin interface loads.",
+            "testStrategy": "Run the Django checks and pytest locally, then rerun them with `DATABASE_URL` set to the CI-style Postgres URL to prove parity.",
             "parentId": "undefined"
           }
         ]
       },
       {
-        "id": "4",
+        "id": 4,
         "title": "Implement Core Library Domain Models",
         "description": "Define the Django models representing the core library domain, including works, editions, copies, loans, audit events, and external source records.",
         "details": "This task addresses Capability C2. Implement `BibliographicWork`, `Contributor`, `WorkContributor`, `BookEdition`, `BookCopy`, `Loan`, `AuditEvent`, and `ExternalSourceRecord` models within the `catalog`, `inventory`, `circulation`, and `audit` apps as per section 6.2. Implement fields and relationships as detailed in section 11.1 (Data Model). Crucially, apply the partial unique constraint to prevent more than one active loan per copy (NFR-006) and ensure valid ISBNs are normalized and invalid ones fail validation (C2.F2). Create initial migrations for these models.",
@@ -306,7 +306,7 @@
         ]
       },
       {
-        "id": "5",
+        "id": 5,
         "title": "Configure Authentication and Role-Based Access Control",
         "description": "Set up user authentication, define role-based access control (RBAC) using Django groups and permissions, and integrate `django-allauth` for optional OAuth readiness.",
         "details": "This task aligns with Capability C3. Use Django's built-in authentication system. Create `Admin`, `Librarian`, and `Member` groups and assign default permissions as per the RBAC matrix (section 17.1). Develop server-side authorization services (`accounts` module) that provide permission checks (e.g., `require_librarian`, `can_manage_catalog`) for views, APIs, and services (FR-011, NFR-003). Integrate `django-allauth` for OAuth-ready SSO, ensuring local demo can run with username/password and OAuth is environment-driven and optional (C3.F3).",
@@ -378,7 +378,7 @@
         ]
       },
       {
-        "id": "6",
+        "id": 6,
         "title": "Implement Catalog Management UI and API",
         "description": "Develop user-facing catalog browse and detail pages, forms for creating/editing/archiving works, editions, and copies, cover image support, and configure Django Admin for internal management. Expose catalog endpoints via Django Ninja.",
         "details": "This task covers Capability C4 and parts of C9.F2. Create Django templates and views (`web` module) for catalog list and detail pages (C4.F1), showing availability and role-aware actions. Implement forms for `Admin`/`Librarian` to create, edit, and archive works, editions, and copies (C4.F2). Integrate cover image support, allowing external URLs or uploaded files with validation (C4.F3). Configure Django Admin (`admin.py` in `catalog`, `inventory` apps) for internal management, including list filters and search (C4.F4). Develop Django Ninja API endpoints (`api.py` in `catalog` app) for catalog resources, delegating to services/selectors (C9.F2). Ensure audit events are recorded for all mutations (FR-001, FR-002, FR-003, NFR-010).",
@@ -447,7 +447,7 @@
         ]
       },
       {
-        "id": "7",
+        "id": 7,
         "title": "Implement Circulation System",
         "description": "Implement the core checkout/borrow and checkin/return lifecycle services, transactional integrity, UI workflows for librarians/admins, and a loan dashboard. Expose circulation endpoints via Django Ninja.",
         "details": "This task addresses Capability C5 and parts of C9.F2. Develop `checkout_copy` and `return_copy` services within the `circulation` module, ensuring they are transactional (NFR-005) and enforce the 'only one active loan per copy' invariant (FR-006, NFR-006). Implement UI workflows (`web` module) for `Librarians`/`Admins` to perform checkout/return actions, potentially using HTMX modals (C5.F3). Create a loan dashboard (`web` module) to display active, overdue, and recent loans, with role-based visibility (C5.F4). Expose typed API endpoints for checkout and return via Django Ninja (C9.F2). Ensure audit events are recorded for all circulation actions (NFR-010).",
@@ -523,7 +523,7 @@
         ]
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Develop Hybrid Search Functionality",
         "description": "Implement a comprehensive hybrid search system that prioritizes exact identifiers, incorporates PostgreSQL full-text search, faceted filtering, `pgvector` semantic search, an optional ParadeDB/BM25 adapter, and robust rank fusion.",
         "details": "This task covers Capability C6. Create a `SearchDocument` model and a management command (`rebuild_search_documents`) to project denormalized catalog data (C6.F1). Implement exact identifier search for ISBNs, barcodes, and external IDs (C6.F2). Configure PostgreSQL full-text search using weighted `tsvector` for keyword searches (C6.F3, section 12.2). Add filters/facets for availability, contributor, subject, language, and source (C6.F4). Integrate `pgvector` for semantic search using embeddings (C6.F5). Provide an optional adapter for ParadeDB/BM25, controlled by an environment flag (C6.F6, section 12.4). Finally, implement rank fusion (e.g., reciprocal rank fusion) to combine results deterministically (C6.F7, section 12.5). Exact identifiers MUST outrank all other search results (FR-010, section 12.1).",
@@ -596,7 +596,7 @@
         ]
       },
       {
-        "id": "9",
+        "id": 9,
         "title": "Implement AI Assistance Features",
         "description": "Add bounded AI features, including local embedding management and AI-assisted metadata suggestions, ensuring all AI-generated content requires human review and is grounded in stored records.",
         "details": "This task addresses Capability C7. Implement local embedding generation using a small Sentence Transformers-compatible model for `SearchDocument` records (C7.F1). Ensure the model cache is local and excluded from git. Develop a feature for AI-assisted metadata suggestions (subjects, tags, short description) from existing edition metadata (C7.F2). Critically, AI suggestions MUST require human review before persistence (FR-015, C7.F2). Implement AI safety and grounding measures (C7.F3), ensuring availability always comes from the database and AI does not invent non-existent records (FR-016).",
@@ -669,7 +669,7 @@
         ]
       },
       {
-        "id": "10",
+        "id": 10,
         "title": "Implement Reproducible Seed Data and Demo Corpus",
         "description": "Create Django management commands to seed demo roles, users, import a public-domain catalog, generate copies, and create example loan states for a reproducible demo dataset.",
         "details": "This task covers Capability C8. Implement management commands as outlined in section 13.1: `seed_roles`, `seed_demo_users` (with password reset, FR-012), `import_public_domain_catalog` (from Open Library/Project Gutenberg, FR-013), `build_search_documents`, `build_embeddings`, and `seed_circulation_examples`. Commands MUST be idempotent and support refresh/dry-run options. Seed Admin, Librarian, and Member demo accounts with documented credentials (C8.F1, section 13.2). Import curated public-domain records (up to 1,000) with provenance (C8.F2, FR-013). Generate realistic copies and example loans (C8.F3). Ensure imported corpora, downloaded dumps, generated embeddings, and model caches are not committed (section 13.3).",
@@ -746,7 +746,7 @@
         ]
       },
       {
-        "id": "11",
+        "id": 11,
         "title": "Prepare for Deployment and Generate Demo Evidence",
         "description": "Configure the Django application for live deployment, update evaluation-facing documentation, create a demo script, and tag a release to deliver a complete, reviewable product.",
         "details": "This task covers Capability C10 and C11. Configure Django app for deployment to Render or equivalent (C10.F1, section 24.6). Ensure production environment variables are managed securely and database migrations run. Update `README.md` (C10.F2) with the live URL, demo accounts, a feature checklist, setup instructions, and known limitations (section 19.3, 24.5). Prepare a Loom/demo script covering product, architecture, tests, and tradeoffs (C10.F3, section 16.2). Tag a SemVer release from `main` (C10.F3, section 16.4). Finalize OpenAPI documentation (`/api/docs`, `/api/openapi.json`) via Django Ninja (C9.F1). Keep evaluator-facing documentation in the canonical README, runbook, and release surfaces rather than reviving deleted evidence-doc trees.",
@@ -829,7 +829,7 @@
         ]
       },
       {
-        "id": "12",
+        "id": 12,
         "title": "Finalize Control-Plane Consolidation",
         "description": "Collapse remaining duplicate and stale control-plane documentation into the right source-of-truth surfaces, reconcile Task Master and Spec Kit artifacts to the implemented command/runtime model, and keep the repo in a coherent low-drift state while product implementation begins.",
         "details": "This task covers the remaining meta/control-plane work after Tasks 1 and 2. Focus on reducing duplicated human-facing docs, reconciling supporting Spec Kit artifacts with the implemented externalized Task Master/runtime model, simplifying stale or overlapping skill/agent instructions, and keeping release/governance surfaces aligned with the actual packaging flow. Do not reintroduce historical transcript-like notes; prefer concise durable summaries and current command surfaces.",
@@ -867,7 +867,7 @@
             "id": 3,
             "title": "Refine agent and skill instructions to the current conservative policy",
             "description": "Remove stale references and overlapping guidance from agents and skills so the catalog consistently reflects the current model split, tool-routing rules, and approval boundaries.",
-            "details": "Audit `.codex/agents/*.toml`, `.agents/skills/*/SKILL.md`, and any remaining skill-local references for stale paths, outdated packaging assumptions, duplicated command guidance, or instructions that contradict the workspace-scoped permission model and the externalized Task Master surface. Current progress includes the repo-owned Serena reminder path, slimmer agent-system docs, command-runner fast-path guidance, richer `agents/openai.yaml` metadata, curated repo-local skill installs, explicit skill-discovery routing, and a stricter `skills:audit` gate integrated into the normal hygiene path.",
+            "details": "Audit `.codex/agents/*.toml`, `.agents/skills/*/SKILL.md`, and any remaining skill-local references for stale paths, outdated packaging assumptions, duplicated command guidance, or instructions that contradict the workspace-scoped permission model and the externalized Task Master surface. Current progress includes the repo-owned Serena reminder path, slimmer agent-system docs, command-runner fast-path guidance, richer `agents/openai.yaml` metadata, curated repo-local skill installs, explicit skill-discovery routing, and a stricter `skills:audit` gate integrated into the normal hygiene path.\n<info added on 2026-06-16T14:14:47.614Z>\n### Tightened control-plane governance by replacing generic skill reference README names, adding governance tests (ADR index parity, bidi safety, explicit reference linkage), moving agent-facing clarification/context guidance into .codex/references, enforcing repo-owned Python docstring coverage/lint in aggregate gates, and updating Task Master runtime policy with evidence-backed provider guidance and standard MCP tool-mode rationale.\n</info added on 2026-06-16T14:14:47.614Z>",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
@@ -905,7 +905,9 @@
       "completedCount": 3,
       "tags": [
         "master"
-      ]
+      ],
+      "created": "2026-06-16T14:14:40.498Z",
+      "description": "Tasks for master context"
     }
   }
 }

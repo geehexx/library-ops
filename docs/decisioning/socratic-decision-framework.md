@@ -94,7 +94,7 @@ Rotate in UX, search, deployment, or data-provenance reviewers when the decision
 | Product WHAT and acceptance criteria | `.taskmaster/docs/prd.md` |
 | Task graph | `.taskmaster/tasks/tasks.json` after parse |
 | Architecture decisions | `docs/adr/` |
-| Alternatives and evidence | `.taskmaster/docs/prd.md`, `docs/adr/`, `docs/reference/context-lineage.md`, Task Master notes |
+| Alternatives and evidence | `.taskmaster/docs/prd.md`, `docs/adr/`, `.codex/references/context-lineage.md`, Task Master notes |
 | Operating procedures | `docs/runbook.md`, `docs/process/` |
 | Agent workflow | `AGENTS.md`, `.codex/agents/`, `.agents/skills/` |
 | Design source | `docs/design/wireframes.md` |

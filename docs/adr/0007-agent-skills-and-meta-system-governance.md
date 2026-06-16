@@ -39,4 +39,4 @@ Treat the meta-system as first-class implementation surface:
 
 - `npm run skills:lint` runs the external linter when the package is installed.
 - Skill structure and trigger quality are enforced through review and the remaining direct-tool gates rather than a second custom validator.
-- `docs/agent-system/context-and-tooling-strategy.md` remains the compact human/agent operating summary, with `AGENTS.md`, agent TOMLs, and skills carrying the executable detail.
+- `.codex/references/context-and-tooling-strategy.md` remains the compact agent-facing operating summary, with `AGENTS.md`, agent TOMLs, and skills carrying the executable detail while `docs/` stays human-facing.

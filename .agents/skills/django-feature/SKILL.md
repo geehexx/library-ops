@@ -5,25 +5,30 @@ description: Use when implementing Django models, services, selectors, forms, vi
 
 # Django Feature Skill
 
-## Layering
+## Design stance
 
-- `domain.py`: pure rules only.
-- `models.py`: persistence schema and simple invariants.
-- `selectors.py`: read queries only.
-- `services.py`: transactional mutations.
-- `forms.py`: template-flow validation.
-- `api.py`: Django Ninja endpoints only.
-- `views.py`: request/response orchestration only.
+Use idiomatic Django layering, but do not force every feature through the same
+file pattern.
+
+- Keep domain invariants close to the owning model or service.
+- Use selectors when read-query reuse or query complexity justifies them.
+- Use services for transactional mutations, orchestration, or policy-heavy
+  write paths.
+- Use forms for server-side validation in template flows.
+- Use Django Ninja or API modules only when the feature actually exposes an API.
+- Keep views thin, but do not invent extra layers merely to satisfy a pattern.
+- Prefer the smallest structure that preserves correctness, testability, and
+  future extension.
 
 ## Workflow
 
 1. Read task, PRD, and nested AGENTS rules.
-2. Add/update tests first where practical.
-3. Implement domain/service behavior.
-4. Add view/API integration.
-5. Run targeted tests.
-6. Run quality gates.
-7. Summarize verification.
+2. Identify the minimum files/layers the feature really needs.
+3. Add/update tests first where practical.
+4. Implement model/domain/service behavior.
+5. Add view, form, or API integration only where the feature needs it.
+6. Run targeted tests, then broader gates.
+7. Summarize verification and any intentional layering tradeoffs.
 
 ## Completion criteria
 
@@ -31,3 +36,4 @@ description: Use when implementing Django models, services, selectors, forms, vi
 - Server-side authorization for protected operations.
 - Tests cover success and failure paths.
 - Migrations intentional and checked.
+- Added layers are justified by the feature rather than copied by habit.

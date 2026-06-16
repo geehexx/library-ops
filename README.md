@@ -23,7 +23,7 @@ The full local gate is:
 npm run verify:all
 ```
 
-The faster comprehensive local loop, excluding the full security aggregate, is:
+The faster full local loop, excluding the full security aggregate, is:
 
 ```bash
 npm run verify:core
@@ -73,7 +73,7 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current implementation posture
 
-The repository is now positioned to start product implementation from the canonical graph. The next product-facing task is Task `3`, Django bootstrap and settings, while the control-plane state remains governed by the PRD, Task Master graph, agent config, skills, and thin durable docs.
+The repository is now positioned to continue product implementation from the canonical graph. The next product-facing task is Task `3`, hardening the existing Django bootstrap and settings so the first domain-app slice can start from a verified baseline, while the control-plane state remains governed by the PRD, Task Master graph, agent config, skills, and thin durable docs.
 
 ## Documentation map
 
@@ -86,7 +86,7 @@ Important entry points:
 - `docs/runbook.md` — operational commands and validation flow.
 - `docs/design/wireframes.md` — evaluator/demo UX flow.
 - `docs/evaluation/eval-strategy.md` — Promptfoo-first eval strategy.
-- `docs/reference/context-lineage.md` — source-of-truth, artifact, and retained-context rules.
+- `.codex/references/context-lineage.md` — source-of-truth, artifact, and retained-context rules.
 - `docs/process/quality-gates.md` — validation ladder.
 - `docs/process/sdlc.md` — branch, PR, and release flow.
 - `scripts/cleanup_transient_artifacts.sh` — optional local cleanup for ignored reports and caches.

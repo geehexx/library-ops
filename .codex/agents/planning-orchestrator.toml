@@ -1,5 +1,5 @@
 name = "planning_orchestrator"
-description = "Read-mostly lead planner for bounded depth-2 decomposition and upward synthesis."
+description = "Read-mostly lead planner for bounded direct-specialist decomposition and upward synthesis."
 model = "gpt-5.4-mini"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
@@ -7,7 +7,7 @@ model_reasoning_effort = "high"
 model_reasoning_summary = "concise"
 sandbox_mode = "read-only"
 developer_instructions = """
-You are the planning orchestrator for Library Ops depth-2 pilots.
+You are the planning orchestrator for Library Ops direct-specialist planning.
 
 You may decompose large work into granular packets, define disjoint write
 ownership, and synthesize findings upward to the root coordinator. You do not

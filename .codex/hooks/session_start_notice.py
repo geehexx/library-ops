@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Emit a compact startup reminder for Codex sessions in this repo."""
+
 from __future__ import annotations
 
 import hashlib
@@ -14,12 +16,21 @@ PUBLIC_INSTRUCTION_PATHS = [
     "AGENTS.md",
     ".taskmaster/docs/prd.md",
     ".specify/memory/constitution.md",
-    "docs/agent-system/context-and-tooling-strategy.md",
-    "docs/agent-system/clarification-and-goals.md",
+    ".codex/references/context-and-tooling-strategy.md",
+    ".codex/references/clarification-and-goals.md",
 ]
 
 
 def run_text(args: list[str], cwd: Path) -> str:
+    """Run a command and return stripped stdout when successful.
+
+    Args:
+        args: Command arguments to execute.
+        cwd: Working directory for the command.
+
+    Returns:
+        Stripped stdout, or ``"unavailable"`` if the command fails.
+    """
     try:
         result = subprocess.run(args, cwd=cwd, text=True, capture_output=True, check=False)
     except OSError:
@@ -30,6 +41,14 @@ def run_text(args: list[str], cwd: Path) -> str:
 
 
 def repo_root(cwd: Path) -> Path:
+    """Resolve the repository root from a working directory.
+
+    Args:
+        cwd: Candidate working directory.
+
+    Returns:
+        The Git repository root when available, otherwise ``cwd``.
+    """
     root = run_text(["git", "rev-parse", "--show-toplevel"], cwd)
     if root and root != "unavailable":
         return Path(root)
@@ -37,6 +56,15 @@ def repo_root(cwd: Path) -> Path:
 
 
 def file_fingerprint(root: Path, relative: str) -> str:
+    """Summarize a tracked instruction file by line count and digest.
+
+    Args:
+        root: Repository root.
+        relative: Repo-relative file path.
+
+    Returns:
+        A compact fingerprint string for the target file.
+    """
     path = root / relative
     if not path.exists():
         return f"{relative}:missing"
@@ -47,6 +75,14 @@ def file_fingerprint(root: Path, relative: str) -> str:
 
 
 def load_config(root: Path) -> dict[str, Any]:
+    """Load the repo-local Codex config when present.
+
+    Args:
+        root: Repository root.
+
+    Returns:
+        Parsed TOML config data, or an empty mapping when absent.
+    """
     path = root / ".codex" / "config.toml"
     if not path.exists():
         return {}
@@ -55,6 +91,14 @@ def load_config(root: Path) -> dict[str, Any]:
 
 
 def mcp_summary(config: dict[str, Any]) -> str:
+    """Summarize configured MCP servers for the startup message.
+
+    Args:
+        config: Parsed Codex config data.
+
+    Returns:
+        A compact MCP summary string.
+    """
     mcps = config.get("mcp_servers", {})
     if not isinstance(mcps, dict):
         return "none"
@@ -74,6 +118,14 @@ def mcp_summary(config: dict[str, Any]) -> str:
 
 
 def task_graph_status(root: Path) -> str:
+    """Summarize the committed Task Master graph shape.
+
+    Args:
+        root: Repository root.
+
+    Returns:
+        A short status string describing the task graph.
+    """
     tasks_path = root / ".taskmaster" / "tasks" / "tasks.json"
     if not tasks_path.exists():
         return "missing"
@@ -95,6 +147,11 @@ def task_graph_status(root: Path) -> str:
 
 
 def main() -> int:
+    """Print the redacted startup context summary.
+
+    Returns:
+        Zero for normal hook completion.
+    """
     try:
         payload = json.loads(sys.stdin.read() or "{}")
     except json.JSONDecodeError:

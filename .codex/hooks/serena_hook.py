@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Rate-limit repeated narrow shell exploration in favor of symbolic tools."""
 
 import json
 import os
@@ -105,6 +106,8 @@ MIN_DENY_INTERVAL_SECONDS = 60
 
 @dataclass
 class ToolUseState:
+    """Persist recent hook counters for one Codex session."""
+
     grep_uses: int = 0
     read_uses: int = 0
     non_symbolic_uses: int = 0
@@ -114,6 +117,7 @@ class ToolUseState:
     last_deny_at: str | None = None
 
     def reset(self) -> None:
+        """Reset all exploration counters except the deny timestamp."""
         self.grep_uses = 0
         self.read_uses = 0
         self.non_symbolic_uses = 0
@@ -123,20 +127,38 @@ class ToolUseState:
 
 
 def now_utc() -> datetime:
+    """Return the current UTC timestamp."""
     return datetime.now(UTC)
 
 
 def parse_ts(value: str | None) -> datetime | None:
+    """Parse an ISO timestamp when present.
+
+    Args:
+        value: ISO formatted datetime string or ``None``.
+
+    Returns:
+        A timezone-aware ``datetime`` or ``None``.
+    """
     if not value:
         return None
     return datetime.fromisoformat(value)
 
 
 def state_path(session_id: str) -> Path:
+    """Return the persisted state path for a session ID."""
     return STATE_ROOT / session_id / "tool_use_state.json"
 
 
 def load_state(session_id: str) -> ToolUseState:
+    """Load persisted hook state for a session.
+
+    Args:
+        session_id: Codex session identifier.
+
+    Returns:
+        The previously persisted state, or a fresh state on failure.
+    """
     path = state_path(session_id)
     try:
         return ToolUseState(**json.loads(path.read_text(encoding="utf-8")))
@@ -145,12 +167,19 @@ def load_state(session_id: str) -> ToolUseState:
 
 
 def save_state(session_id: str, state: ToolUseState) -> None:
+    """Persist hook state for a session.
+
+    Args:
+        session_id: Codex session identifier.
+        state: State object to serialize.
+    """
     path = state_path(session_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(asdict(state), indent=2), encoding="utf-8")
 
 
 def cleanup_state(session_id: str) -> None:
+    """Remove persisted hook state for a session."""
     path = state_path(session_id).parent
     if not path.exists():
         return
@@ -160,6 +189,11 @@ def cleanup_state(session_id: str) -> None:
 
 
 def load_payload() -> dict[str, Any] | None:
+    """Load and validate the hook payload from stdin.
+
+    Returns:
+        A validated payload mapping, or ``None`` when the payload is unusable.
+    """
     raw_input = sys.stdin.read()
     try:
         payload = json.loads(raw_input)
@@ -173,6 +207,7 @@ def load_payload() -> dict[str, Any] | None:
 
 
 def codex_hook_output(reason: str, additional_context: str = "") -> str:
+    """Build a Codex pre-tool deny response payload."""
     output: dict[str, Any] = {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
@@ -186,6 +221,7 @@ def codex_hook_output(reason: str, additional_context: str = "") -> str:
 
 
 def session_start_output() -> str:
+    """Build the session-start reminder payload for Codex."""
     message = (
         "**IMPORTANT**: If the current directory is a coding project you are working on:"
         " 1. activate it using Serena's activate_project tool unless already done."
@@ -203,12 +239,21 @@ def session_start_output() -> str:
 
 
 def is_serena_symbolic_tool(tool_name: str) -> bool:
+    """Return whether a tool name maps to symbolic Serena usage."""
     return "serena" in tool_name and not any(
         substring in tool_name for substring in SERENA_NON_SYMBOLIC_SUBSTRINGS
     )
 
 
 def parse_command(tool_input: dict[str, Any] | None) -> tuple[str | None, list[str]]:
+    """Extract a command name and argument list from hook tool input.
+
+    Args:
+        tool_input: Raw tool input payload from the hook.
+
+    Returns:
+        A tuple of command name and remaining arguments.
+    """
     if not tool_input:
         return None, []
     raw_command = str(tool_input.get("cmd") or tool_input.get("command") or "").strip()
@@ -224,6 +269,7 @@ def parse_command(tool_input: dict[str, Any] | None) -> tuple[str | None, list[s
 
 
 def is_code_file_path(raw_value: str) -> bool:
+    """Return whether a shell token looks like a code-like file path."""
     cleaned = raw_value.strip().strip("'\"")
     if not cleaned or cleaned.startswith("-"):
         return False
@@ -231,6 +277,14 @@ def is_code_file_path(raw_value: str) -> bool:
 
 
 def classify_tool_call(payload: dict[str, Any]) -> str:
+    """Classify a tool call into reminder buckets.
+
+    Args:
+        payload: Parsed hook payload.
+
+    Returns:
+        One of ``symbolic``, ``grep``, ``read``, ``neutral``, or ``reset``.
+    """
     tool_name = str(payload.get("tool_name") or payload.get("toolName") or "").lower().strip()
     tool_input = payload.get("tool_input") or payload.get("toolInput")
 
@@ -257,6 +311,16 @@ def classify_tool_call(payload: dict[str, Any]) -> str:
 def increment_counter(
     previous_at: str | None, current_value: int, current_time: datetime
 ) -> tuple[int, str]:
+    """Increment or reset a counter based on elapsed time.
+
+    Args:
+        previous_at: Previous ISO timestamp for the counter.
+        current_value: Previous counter value.
+        current_time: Current timestamp.
+
+    Returns:
+        Updated counter value and timestamp string.
+    """
     previous_dt = parse_ts(previous_at)
     if (
         previous_dt is not None
@@ -267,6 +331,7 @@ def increment_counter(
 
 
 def should_rate_limit(state: ToolUseState, current_time: datetime) -> bool:
+    """Return whether the hook should suppress repeated deny messages."""
     last_deny = parse_ts(state.last_deny_at)
     if last_deny is None:
         return False
@@ -274,6 +339,15 @@ def should_rate_limit(state: ToolUseState, current_time: datetime) -> bool:
 
 
 def remind(session_id: str, payload: dict[str, Any]) -> int:
+    """Apply reminder logic for one pre-tool hook event.
+
+    Args:
+        session_id: Codex session identifier.
+        payload: Parsed hook payload.
+
+    Returns:
+        Zero after either updating state or printing a deny payload.
+    """
     state = load_state(session_id)
     current_time = now_utc()
 
@@ -346,6 +420,11 @@ def remind(session_id: str, payload: dict[str, Any]) -> int:
 
 
 def main() -> int:
+    """Dispatch the Serena hook subcommands.
+
+    Returns:
+        Zero for all handled hook paths.
+    """
     if len(sys.argv) != 2 or sys.argv[1] not in VALID_ACTIONS:
         print("usage: serena_hook.py activate|remind|cleanup", file=sys.stderr)
         return 0
