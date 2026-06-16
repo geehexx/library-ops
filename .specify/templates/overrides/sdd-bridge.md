@@ -28,6 +28,10 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
 - Include test strategy.
 - Include security/accessibility/search considerations where relevant.
 - Include Task Master capability IDs when known.
+- Include whether the change belongs to the canonical PRD or to a bounded phase
+  PRD view.
+- Call out when a local-model-friendly phase slice should be regenerated before
+  touching the committed Task Master graph.
 
 ## Feature-plan expectations
 
@@ -37,3 +41,6 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
   validation approach without duplicating the whole PRD.
 - `tasks.md` should be small, reviewable, and consistent with the eventual Task
   Master graph rather than acting as a second execution authority.
+- If a feature affects governance, runtime policy, or control-plane behavior,
+  `plan.md` should explicitly map the change across constitution, PRD,
+  Task Master, AGENTS, skills, ADRs, and human docs.

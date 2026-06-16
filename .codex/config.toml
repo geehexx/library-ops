@@ -88,11 +88,11 @@ description = "Runs explicit safe commands and summarizes output, preferring RTK
 config_file = "agents/command-runner.toml"
 
 [agents.spark_command_runner]
-description = "Fast Spark specialist for bounded command summaries, low-risk scans, and community-source cleanup."
+description = "Experimental Spark specialist for bounded command summaries, low-risk scans, and community-source cleanup after a working-lane smoke."
 config_file = "agents/spark-command-runner.toml"
 
 [agents.planning_orchestrator]
-description = "Read-mostly lead planner for bounded direct-specialist decomposition, handoff contracts, and upward synthesis."
+description = "Read-mostly lead planner that pushes work into bounded direct-specialist packets instead of letting the root absorb broad implementation by default."
 config_file = "agents/planning-orchestrator.toml"
 
 [agents.context_gatherer]
@@ -104,7 +104,7 @@ description = "Read-only current-source researcher for official docs, Exa discov
 config_file = "agents/docs-researcher.toml"
 
 [agents.spark_summarizer]
-description = "Fast Spark specialist for noisy-source cleanup, Reddit/community summaries, and long-output condensation."
+description = "Experimental Spark specialist for noisy-source cleanup and long-output condensation after a working-lane smoke."
 config_file = "agents/spark-summarizer.toml"
 
 [agents.retrospective_analyst]

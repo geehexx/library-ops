@@ -47,3 +47,11 @@ When artifacts disagree:
 2. regenerate or reconcile the lower derived layer
 3. do not reintroduce superseded process or stack choices without a new
    explicit decision
+
+## Placement rule
+
+- Human-facing final-state explanation belongs in `docs/`.
+- Agent-operating instructions belong in `AGENTS.md`, skills, Codex config, or
+  repo-local references.
+- Runtime logs, generated graphs, benchmark outputs, and session artifacts stay
+  local unless explicitly promoted into durable repo truth.

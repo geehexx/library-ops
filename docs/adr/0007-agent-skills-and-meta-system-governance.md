@@ -26,7 +26,7 @@ Treat the meta-system as first-class implementation surface:
 |---|---|---|
 | Large AGENTS.md | Simple discovery | Bloats every session and encourages stale instructions. |
 | Many tiny skills | Fine-grained | Risk of collisions and poor triggering. |
-| One mega-skill | Easy to find | Too much irrelevant context when invoked. |
+| One mega-skill | Single discovery point | Too much irrelevant context when invoked. |
 | Marketplace skills without review | Fast | Supply-chain and hallucinated-command risk. |
 
 ## Consequences

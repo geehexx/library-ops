@@ -17,6 +17,13 @@ Every PR must include:
 - Quality gate results.
 - Self-review checklist.
 
+Every control-plane PR should also prove:
+
+- source-of-truth reconciliation across constitution, PRD, Task Master, AGENTS,
+  skills, ADRs, and docs when any of those surfaces move;
+- whether claimed local-model or MCP behavior was actually exercised;
+- which review threads were closed by the current head.
+
 Dependency automation should follow the same integration path:
 
 - Dependabot PRs target `development`, not `main`.
@@ -31,3 +38,10 @@ Dependency automation should follow the same integration path:
 - The current GitHub workflow is a readiness check, not a publishing workflow:
   it must prove changelog and version generation can run without committing,
   tagging, pushing, or creating a remote release.
+
+## Enforcement
+
+The SDLC is not only descriptive. Branch protection, CI job names, policy
+checks, docstring gates, ADR index validation, and Task Master dependency
+validation are all part of the enforceable contract and should stay aligned
+with this document.

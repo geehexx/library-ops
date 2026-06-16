@@ -11,6 +11,11 @@ related_adrs:
 
 # Architecture Approach, Alternatives, and Validation
 
+This document is a human-facing final-state explainer. Agent-operating rules,
+question-routing policy, and runtime enforcement belong in `AGENTS.md`,
+repo-local references, skills, and Codex config rather than being recreated
+here.
+
 ## Decision summary
 
 The project uses a **hybrid architecture communication model**:

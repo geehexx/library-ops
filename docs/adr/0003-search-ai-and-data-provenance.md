@@ -27,7 +27,7 @@ Use a hybrid search baseline:
 | Vector-only search | Impressive AI demo | Poor exact-match behavior and weak explainability for library records. |
 | PostgreSQL FTS only | Simple and portable | Misses semantic discovery and AI showcase value. |
 | Mandatory ParadeDB | Better BM25 ranking | Adds deployment risk; use adapter until environment support is proven. |
-| Static fixtures only | Easy to review | Too rigid and weak on provenance/rebuild. |
+| Static fixtures only | Small review surface | Too rigid and weak on provenance/rebuild. |
 | Live external imports at runtime | Fresh data | Demo reliability and rate/license risks. |
 
 ## Consequences

@@ -18,6 +18,12 @@ Rules:
 - Treat the root agent as the only interactive coordinator.
 - Keep plans tied to the constitution, PRD, specs, Task Master graph, AGENTS,
   skills, ADRs, source, and tests in that order.
+- Prefer a hard cut-over to direct specialists when the root could otherwise do
+  the work directly from broad context. The planner should define ownership,
+  validation, and handoff packets that make specialist use the default path.
+- Read only the source-of-truth surfaces needed for the current decomposition.
+- Treat runtime-policy, AGENTS, and skill references as operating constraints,
+  not optional background notes.
 - Return bounded worker packets only when the work can be verified by clear
   file ownership and validation commands.
 - Do not edit files directly.

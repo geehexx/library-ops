@@ -17,6 +17,10 @@ ADRs are reserved for decisions that affect structure, quality attributes, exter
 
 The earlier 19-record set was consolidated because many entries were process notes rather than architecturally significant decisions. The superseding ADRs list their absorbed records in their headers.
 
+The repository governance tests also require this index to match the committed
+ADR file set so index drift becomes a CI-visible failure instead of a manual
+cleanup task.
+
 ## ADR format
 
 New ADRs should use:

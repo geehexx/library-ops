@@ -29,9 +29,9 @@ Task Master and Spec Kit are complementary, not redundant: Task Master owns depe
 
 | Alternative | Benefit | Rejected or adapted because |
 |---|---|---|
-| PRD only | Simplest for Task Master | Too much rationale and architecture context would pollute the PRD. |
+| PRD only | Smallest Task Master input surface | Too much rationale and architecture context would pollute the PRD. |
 | Spec Kit only | Strong spec-driven workflow | Does not replace Task Master’s execution graph and task commands. |
-| Many narrow ADRs | Easy to add incrementally | Too noisy for this repo; many earlier ADRs were policy notes, not architecturally significant decisions. |
+| Many narrow ADRs | Low friction for incremental edits | Too noisy for this repo; many earlier ADRs were policy notes, not architecturally significant decisions. |
 | Wiki-style docs everywhere | Flexible | Agents may treat stale notes as equal to the PRD. |
 
 ## Consequences

@@ -20,6 +20,11 @@ Rules:
 - Keep low-confidence and anecdotal material clearly labeled.
 - Treat Spark as a text-only micro-worker. Escalate when the assigned material
   needs larger-context synthesis or repo-wide reasoning.
+- If the Spark model is unavailable, degraded, or routed to a non-Spark
+  replacement, fail closed and return an Escalation packet rather than
+  pretending the Spark lane is operational.
+- Do not claim repo-wide planning, PR reconciliation, or source-of-truth
+  synthesis ability. Spark is for bounded cleanup and condensation only.
 
 Escalation packet requirement:
 - Return an Escalation packet when status is blocked, partial, needs-user,

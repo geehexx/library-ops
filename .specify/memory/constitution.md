@@ -34,6 +34,10 @@ Supporting docs SHOULD remain intentionally few. The project MUST avoid a sprawl
 of overlapping PRDs, SRS documents, architecture documents, and test plans unless
 the canonical PRD becomes too large to review.
 
+When the canonical PRD is too large for a local-model operation, the project MAY
+derive bounded phase PRDs under `.taskmaster/docs/phases/`, but those phase
+views MUST remain derived artifacts rather than competing product truths.
+
 ## III. Domain Correctness
 
 The system MUST distinguish:
@@ -110,6 +114,9 @@ usage when implementation details are uncertain. Agents MAY use Exa or equivalen
 web research for current external evidence. Figma MCP MAY be used for mockups,
 but Markdown wireframes remain the repo-local design source.
 
+Agent-operating context SHOULD live in AGENTS, skills, Codex config, or
+repo-local references instead of being recreated under human-facing docs.
+
 ## VIII. Scope Discipline
 
 The Valsoft assignment comes first:
@@ -167,6 +174,10 @@ traceable to at least one of:
 Agents MUST NOT present a claim as verified when it was inferred, remembered, or
 unavailable to the current tool session. Version-sensitive claims MUST be
 rechecked during implementation.
+
+Local-model recommendations MUST be backed by either a real bounded workflow
+run or a repository-specific benchmark artifact. "Installed" is not evidence of
+"fit for this repo."
 
 ## XIII. Connector and MCP Truthfulness
 
