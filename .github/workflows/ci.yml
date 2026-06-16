@@ -177,11 +177,4 @@ jobs:
         run: go install github.com/open-policy-agent/conftest@latest
 
       - name: Validate Codex policy inputs
-        run: |
-          python - <<'PY' > /tmp/codex-policy-input.json
-          import json, tomllib
-          from pathlib import Path
-          data = {"path": ".codex/config.toml", "config": tomllib.loads(Path(".codex/config.toml").read_text())}
-          print(json.dumps(data))
-          PY
-          conftest test /tmp/codex-policy-input.json --policy policy --namespace library_ops.codex
+        run: conftest test .codex/config.toml --policy policy --namespace library_ops.codex
