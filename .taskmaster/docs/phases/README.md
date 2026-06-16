@@ -10,6 +10,9 @@ Rules:
 
 - The canonical source of truth remains `.taskmaster/docs/prd.md`.
 - If a phase PRD and the canonical PRD disagree, update the canonical PRD first.
+- Keep phase PRDs intentionally few and implementation-facing; expand them when
+  the active branch needs decision-complete detail, and consolidate them when
+  they start duplicating later-phase or evaluator-facing material.
 - Regenerated Task Master drafts from phase PRDs must still be reviewed against
   the committed graph and `specs/001-core/tasks.md`.
 - Phase PRDs are for bounded regeneration, expansion, and local-model

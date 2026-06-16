@@ -40,6 +40,10 @@ source-of-truth order, routing, decisions, and final judgment.
     explaining why the governor path was not used.
 11. Root plus direct specialists is the default orchestration posture unless an
     ADR and validator explicitly re-enable deeper recursion.
+12. Treat phase PRDs, Spec Kit summaries, Task Master notes, AGENTS, and skill
+    instructions as living implementation surfaces: when code or decisions make
+    one of them stale, update or consolidate it in the same branch instead of
+    leaving drift for a later cleanup pass.
 
 Do not rely on per-agent `skills.config` overrides as if they make a skill
 always loaded for one subagent. Treat skill selection as a discovery and

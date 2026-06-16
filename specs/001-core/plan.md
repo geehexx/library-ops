@@ -15,26 +15,34 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 
 ## Phase 1: Django foundation
 
-- Bootstrap `src/libraryops`, settings modules, `manage.py`, test settings, static/templates layout.
-- Configure environment parsing, database URL, static/media, and health check.
-- Ensure CI gates activate once bootstrap exists.
+- Treat the committed bootstrap as fixed reality and finish the remaining
+  hardening/verification work in place.
+- Wire in application apps, templates, and auth settings needed for the first
+  evaluator-visible surface.
+- Keep `manage.py`, `src/libraryops/config/settings/*`, and `/health/` as the
+  bootstrap contract.
 
 ## Phase 2: Domain model and boundaries
 
-- Implement accounts, catalog, inventory, circulation, audit, seed, search modules.
-- Add migrations, model constraints, indexes, and service/selector skeletons.
-- Validate Import Linter contracts.
+- Implement the first real app modules: accounts, catalog, inventory,
+  circulation, audit, and web.
+- Add migrations, core constraints, and only the service/form code needed for
+  the protected foundation slice.
+- Validate Import Linter contracts against the actual Phase 1 app boundaries.
 
 ## Phase 3: Auth and catalog
 
-- Seed roles/demo users.
-- Implement catalog CRUD, cover handling, archive behavior, audit events.
-- Add authorization tests.
+- Seed roles and disposable demo users.
+- Implement shared authorization helpers plus role-aware navigation.
+- Add the first protected create flow and the read-only catalog browse surface.
+- Record audit events for protected foundation mutations.
 
 ## Phase 4: Circulation invariants
 
-- Implement checkout/return/renewal services with transactions and constraints.
-- Add integration and property tests for loan state.
+- Implement the `Loan` model and database invariants now.
+- Defer checkout/return/renewal services to the next branch unless a bug fix is
+  required for Phase 1 correctness.
+- Add integration and property tests that prove the active-loan constraint.
 
 ## Phase 5: Seed and search
 
