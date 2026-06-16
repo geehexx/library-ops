@@ -36,9 +36,12 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
 ## Feature-plan expectations
 
 - `spec.md` should capture the requirement delta, constraints, and user-facing
-  acceptance shape for one feature slice.
+  acceptance shape for one feature slice, plus explicit deferred scope when the
+  branch is intentionally narrower than the full product roadmap.
 - `plan.md` should describe the implementation path, touched systems, and
-  validation approach without duplicating the whole PRD.
+  validation approach without duplicating the whole PRD. For phase-oriented
+  work, prefer a clear structure of entry point, current-slice scope, deferred
+  scope, and cross-cutting validation.
 - `tasks.md` should be small, reviewable, and consistent with the eventual Task
   Master graph rather than acting as a second execution authority.
 - If a feature affects governance, runtime policy, or control-plane behavior,

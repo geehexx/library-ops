@@ -36,8 +36,12 @@ If the canonical PRD is too large for the active local model lane, derive
 bounded phase PRDs that:
 
 - preserve the same source-of-truth order,
+- include a concise goal,
+- define entry criteria,
+- define implementation notes and explicit out-of-scope boundaries,
 - state their canonical parent,
 - define exit criteria,
+- include suggested validation commands when the slice is implementation-near,
 - and are safe to regenerate without replacing the canonical PRD.
 
 ## Library Ops bias
