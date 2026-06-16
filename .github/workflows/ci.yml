@@ -56,7 +56,7 @@ jobs:
           go-version: '1.23'
 
       - name: Install Vale
-        run: go install github.com/errata-ai/vale/v3@latest
+        run: go install github.com/errata-ai/vale/v3/cmd/vale@latest
 
       - name: Lint skills
         run: npm run skills:lint
