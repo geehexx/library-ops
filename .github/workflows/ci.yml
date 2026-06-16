@@ -53,6 +53,9 @@ jobs:
       - name: Lint skills
         run: npm run skills:lint
 
+      - name: Audit skills
+        run: npm run skills:audit
+
       - name: Validate Task Master dependencies
         run: npm run taskmaster:validate
 
@@ -61,6 +64,18 @@ jobs:
 
       - name: Markdown lint
         run: npm run markdownlint
+
+      - name: Docs quality
+        run: npm run docs:quality
+
+      - name: Docstring coverage
+        run: npm run docstrings:coverage
+
+      - name: Docstring lint
+        run: npm run docstrings:lint
+
+      - name: Eval smoke and config validation
+        run: npm run eval:ci
 
       - name: Node dependency audit
         run: npm audit --audit-level=moderate
