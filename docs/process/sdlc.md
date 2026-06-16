@@ -2,8 +2,8 @@
 
 ## Branching
 
-- `main`: release branch, protected.
-- `development`: integration branch, protected.
+- `main`: release branch.
+- `development`: integration branch.
 - `feature/TM-<id>-<slug>`: implementation branches.
 - `release/vX.Y.Z`: optional release-preparation branch only when a dedicated stabilization branch is justified.
 
@@ -41,7 +41,8 @@ Dependency automation should follow the same integration path:
 
 ## Enforcement
 
-The SDLC is not only descriptive. Branch protection, CI job names, policy
-checks, docstring gates, ADR index validation, and Task Master dependency
-validation are all part of the enforceable contract and should stay aligned
-with this document.
+The SDLC is not only descriptive. CI job names, policy checks, docstring gates,
+ADR index validation, Task Master dependency validation, and the documented PR
+evidence path are all part of the enforceable contract and should stay aligned
+with this document. If a remote repository policy blocks a required step, treat
+that as an explicit blocker instead of working around it.

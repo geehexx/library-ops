@@ -878,7 +878,7 @@
             "id": 4,
             "title": "Harden release and branch governance to the implemented packaging flow",
             "description": "Keep release-readiness, Dependabot, CODEOWNERS, PR template, and branch guidance aligned with the actual packaging and validation model.",
-            "details": "Review release/governance docs and GitHub config for stale references to old blockers or superseded flows. The durable repo state includes pinned GitHub Actions, Dependabot targeting `development`, CODEOWNERS coverage for `.taskmaster/`, PR template alignment, and a read-only `release-readiness` workflow consistent with the externalized Task Master packaging model and the protected `development` -> `main` path.",
+            "details": "Review release/governance docs and GitHub config for stale references to old blockers or superseded flows. The durable repo state includes pinned GitHub Actions, Dependabot targeting `development`, CODEOWNERS coverage for `.taskmaster/`, PR template alignment, and a read-only `release-readiness` workflow consistent with the externalized Task Master packaging model and the documented `development` -> `main` path.",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,

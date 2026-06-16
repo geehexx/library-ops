@@ -54,7 +54,7 @@ Skill discovery flow:
 
 ## Question packet
 
-Use this shape when user input may alter scope, credentials, cost, security, architecture, MCPs, context budgets, branch protection, deployment, or irreversible repository state:
+Use this shape when user input may alter scope, credentials, cost, security, architecture, MCPs, context budgets, remote branch/review policy, deployment, or irreversible repository state:
 
 ```text
 Question packet
@@ -90,6 +90,12 @@ Next validation:
 ```
 
 The coordinator decides whether to ask the user, continue safe partial work, or stop.
+
+If remote repository policy blocks a required merge, push, or release step, do
+not work around it by switching to an alternate base branch, bypassing policy,
+or assuming the action can happen later. Return `Status: blocked` with the exact
+GitHub evidence and stop until the user changes the policy or gives an explicit
+new instruction.
 
 ## Required selected stack
 

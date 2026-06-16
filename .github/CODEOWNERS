@@ -1,4 +1,4 @@
-# Solo project: CODEOWNERS documents ownership and supports branch protection.
+# Solo project: CODEOWNERS documents ownership and review surfaces.
 * @geehexx
 
 /.codex/ @geehexx

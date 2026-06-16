@@ -11,7 +11,7 @@ The repository must demonstrate disciplined delivery without hiding behind verbo
 
 ## Decision
 
-Use GitHub flow with protected `main` and `development`, feature branches, Conventional Commits, semantic-release-compatible history, and layered quality gates.
+Use GitHub flow with `main` and `development`, feature branches, Conventional Commits, semantic-release-compatible history, and layered quality gates.
 
 Required gates:
 
@@ -28,7 +28,7 @@ Render is the primary documented deployment path, with portability to other Pyth
 
 Workflow-security posture, updated 2026-06-15: pin the GitHub Actions used by
 the repo workflows to concrete commit SHAs and keep `zizmor` clean without a
-local exception file. Branch protection must require `quality`,
+local exception file. The expected merge evidence remains `quality`,
 `workflow-security`, `security`, `policy`, and `commitlint`.
 
 Release workflow posture, accepted 2026-06-14: the current release workflow is a
@@ -70,8 +70,11 @@ Task Master packaging posture, updated 2026-06-16:
 
 - `.github/workflows/ci.yml`, security workflow, pre-commit hooks, and direct commands encode gates.
 - `codex doctor --summary --ascii --no-color` plus direct tool probes fail fast when required local tools are absent or misconfigured.
-- Branch protection is documented as a manual/admin setup concern, not a repo helper workflow.
-- Branch protection requires quality, workflow-security, security, policy, and
-  commitlint checks.
+- Remote branch policy is not treated as the source of merge truth for this
+  repo; the source of truth is the documented PR flow plus green required
+  checks on the head being merged.
+- If a remote repository policy blocks a required merge, push, or release step,
+  the active goal must be marked blocked until the policy is changed or the
+  user gives a new instruction.
 - `npm audit --audit-level=moderate --loglevel=verbose` remains the required
   command for supply-chain evidence.

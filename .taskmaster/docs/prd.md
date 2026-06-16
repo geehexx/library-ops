@@ -758,7 +758,7 @@ Ship a live, reviewable product and documentation evidence.
 - **Description:** Deploy Django app to Render or equivalent Python-friendly host.
 - **Inputs:** GitHub repository, environment variables, managed Postgres.
 - **Outputs:** Live app URL.
-- **Behavior:** Deploy from protected branch after CI passes.
+- **Behavior:** Deploy from `main` after CI passes and release readiness is proven.
 - **Acceptance criteria:**
   - Live URL loads.
   - Static assets are served.
@@ -1568,11 +1568,15 @@ register. If a connector is unavailable in a session, agents MUST say so and use
 ### 16.1 Branch Model
 
 ```text
-main       production/release branch, protected
-development integration branch, protected
+main       production/release branch
+development integration branch
 feature/TM-<id>-<slug>  implementation branches
 release/vX.Y.Z          optional release preparation
 ```
+
+Remote repository policy MAY reinforce this branch flow, but it is not the
+source of truth. If GitHub blocks a required merge, push, or release step, stop
+and resolve the policy or user instruction instead of working around it.
 
 ### 16.2 Required Pull Request Evidence
 
@@ -1843,7 +1847,7 @@ Exa, or web research before making version-sensitive implementation changes.
 | S19 | Ruff docs: https://docs.astral.sh/ruff/ | Linting and formatting. |
 | S20 | Import Linter docs: https://import-linter.readthedocs.io/ | Architecture import constraints. |
 | S21 | Render Django docs: https://render.com/docs/deploy-django | Deployment path. |
-| S22 | GitHub protected branches docs: https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches | Branch protection and required checks. |
+| S22 | GitHub pull request docs: https://docs.github.com/pull-requests | Pull request flow and review mechanics. |
 | S24 | Context7 docs: https://github.com/upstash/context7 and Exa MCP docs: https://exa.ai/docs/reference/exa-mcp | Agent research/documentation MCPs. |
 | S25 | WCAG overview: https://www.w3.org/WAI/standards-guidelines/wcag/ | Accessibility baseline. |
 | S26 | OWASP ASVS/SAMM: https://owasp.org/www-project-application-security-verification-standard/ and https://owaspsamm.org/ | Security verification and SDLC framing. |
@@ -1882,7 +1886,7 @@ The updated control-plane package preserved the prior strategic decisions:
 - Borrow/Return terminology for check-in/check-out ambiguity;
 - hybrid search with exact identifiers before lexical/vector search;
 - deterministic seed-data management commands;
-- protected-branch, PR, CI, Conventional Commits, and SemVer workflow.
+- reviewed-PR, CI, Conventional Commits, and SemVer workflow.
 
 The updated control-plane package added repo-local wireframes, UX design skill/agent, runbook, deterministic-seed ADR,
 evidence register, and context-drift review. It removed committed `.pytest_cache` artifacts.
@@ -1918,7 +1922,7 @@ If a review session lacks direct connector access, the agent MUST say so rather 
 | Decisioning | Socratic decision framework | Prevents guessing and unexamined tool adoption | Pause and ask for trust/cost/scope decisions |
 | Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after bootstrap exists |
 | Deployment | Render + managed PostgreSQL | Familiar Django deployment path with a small operational surface | Fly/Railway/Heroku/container host if Render limits apply |
-| SDLC | GitHub Actions + protected branches + Conventional Commits + SemVer | Visible, enforceable solo-project governance | Merge queue optional and likely excessive for solo demo |
+| SDLC | GitHub Actions + reviewed PR branch flow + Conventional Commits + SemVer | Visible, enforceable solo-project governance | Merge queue optional and likely excessive for solo demo |
 
 ### 24.5 Documentation Evidence Package
 

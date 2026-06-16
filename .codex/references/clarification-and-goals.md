@@ -57,3 +57,11 @@ Next validation:
 Use `/goal` only after the outcome is measurable, the evidence surface is
 clear, and the stop/ask conditions are explicit. For long-horizon work, omit a
 token budget by default unless a hard ceiling is intentional.
+
+## Remote policy blockers
+
+If GitHub or another remote system blocks a required merge, push, or release
+step through repository policy, treat that as a real blocker. Do not continue
+from an alternate base branch, assume a later merge, or bypass the policy
+unless the user explicitly instructs that change. Emit a blocked escalation with
+the exact remote evidence first.

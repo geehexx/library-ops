@@ -76,15 +76,16 @@ git push -u origin development
 
 Feature work should branch from `development`.
 
-## Branch protection
+## Branch governance
 
-Configure this in GitHub, not through a repo helper script:
+Use the documented PR flow and CI evidence as the merge contract:
 
-- protect `main` and `development`
-- require pull requests and conversation resolution
-- require `quality`, `workflow-security`, `security`, `policy`, and `commitlint`
-- prevent force pushes and branch deletion
-- require CODEOWNERS where applicable
+- merge product and control-plane work through pull requests
+- keep `quality`, `workflow-security`, `security`, `policy`, and `commitlint`
+  green on the branch head being merged
+- use CODEOWNERS as ownership metadata, not as a substitute for source review
+- if a remote repository policy blocks a required step, stop and fix the policy
+  or ask the user instead of working around it
 
 ## Canonical follow-up docs
 
