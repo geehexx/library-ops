@@ -1,0 +1,37 @@
+{
+  "models": {
+    "main": {
+      "provider": "ollama",
+      "modelId": "qwen2.5-coder:3b",
+      "maxTokens": 64000,
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
+    },
+    "research": {
+      "provider": "ollama",
+      "modelId": "qwen2.5-coder:3b",
+      "maxTokens": 128000,
+      "temperature": 0.1,
+      "baseURL": "http://127.0.0.1:11434/api"
+    },
+    "fallback": {
+      "provider": "codex-cli",
+      "modelId": "gpt-5.4-mini",
+      "maxTokens": 64000,
+      "temperature": 0.1
+    }
+  },
+  "global": {
+    "logLevel": "info",
+    "debug": false,
+    "defaultSubtasks": 5,
+    "defaultPriority": "medium",
+    "defaultTag": "master",
+    "projectName": "Library Ops",
+    "ollamaBaseURL": "http://127.0.0.1:11434/api",
+    "anonymousTelemetry": false
+  },
+  "codexCli": {
+    "codexPath": "codex"
+  }
+}

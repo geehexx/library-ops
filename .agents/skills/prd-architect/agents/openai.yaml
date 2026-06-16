@@ -1,0 +1,4 @@
+interface:
+  display_name: "PRD Architect"
+  short_description: "Revise the canonical PRD and decomposition"
+  default_prompt: "Use $prd-architect to update the canonical Library Ops PRD, capability tree, acceptance criteria, or task-decomposition logic without creating a competing source of truth."

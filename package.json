@@ -1,0 +1,63 @@
+{
+  "name": "library-ops-governance",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Governance, Codex control-plane, quality, evaluation, and commit gates for Library Ops.",
+  "scripts": {
+    "commitlint": "commitlint --last --verbose",
+    "commitlint:last": "commitlint --edit .git/COMMIT_EDITMSG",
+    "commitlint:range": "commitlint --from=origin/development --to=HEAD --verbose",
+    "markdownlint": "npx --yes markdownlint-cli2@0.22.1 \"**/*.md\" \"!node_modules\" \"!.venv\" \"!.git\" \"!.serena\" \"!.repomix\" \"!.code-review-graph\" \"!.agents/skills/**\"",
+    "skills:lint": "for file in .agents/skills/*/SKILL.md; do npx --yes @swarmclawai/agent-skills-lint@0.1.0 lint \"$file\" --flavor codex || exit 1; done",
+    "skills:audit": "npx --yes agent-skillforge@0.3.2 lint . --strict",
+    "graph:build": "mkdir -p reports/validation/logs && uvx --from code-review-graph code-review-graph build 2>&1 | tee reports/validation/logs/code-review-graph-build.log",
+    "graph:status": "mkdir -p reports/validation/logs && uvx --from code-review-graph code-review-graph status 2>&1 | tee reports/validation/logs/code-review-graph-status.log",
+    "graph:review": "mkdir -p reports/validation/logs && { uvx --from code-review-graph code-review-graph build && uvx --from code-review-graph code-review-graph status; } 2>&1 | tee reports/validation/logs/code-review-graph-review.log",
+    "taskmaster:validate": "npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'",
+    "deps:tree": "npm ls --all",
+    "workflow:lint": "actionlint && zizmor .",
+    "policy:check": "conftest test .codex/config.toml --policy policy --namespace library_ops.codex && conftest test .github/workflows/*.yml --policy policy --namespace library_ops.github_actions",
+    "security:scan": "gitleaks detect --source . --redact && uvx --from semgrep semgrep scan --config .semgrep.yml && uv run pip-audit --progress-spinner off && npm audit --audit-level=moderate",
+    "checks:precommit": "uv run ruff format --check . && uv run ruff check . && npm run markdownlint && npm run skills:lint && npm run skills:audit && npm run taskmaster:validate",
+    "checks:governance": "npm run skills:lint && npm run skills:audit && npm run docs:quality && npm run eval:ci && npm run deps:tree && npm run workflow:lint && npm run policy:check && npm run release:check && npm run taskmaster:validate",
+    "checks:python": "uv run ruff format --check . && uv run ruff check . && uv run pyright && uv run pytest -q && PYTHONPATH=src uv run lint-imports && uv run python manage.py check",
+    "verify:core": "npm run checks:governance && npm run checks:python",
+    "verify:all": "npm run checks:governance && npm run security:scan && npm run checks:python",
+    "release:check": "uv run semantic-release version --no-commit --no-tag --no-push --no-vcs-release --changelog",
+    "importlint": "PYTHONPATH=src uv run lint-imports",
+    "test": "uv run pytest",
+    "django:check": "uv run python manage.py check",
+    "docs:style": "vale --glob='!{.venv,.serena,.repomix,.code-review-graph,node_modules,.agents/skills}/**' .",
+    "docs:spell": "cspell --no-progress --exclude '.agents/skills/**' .",
+    "docs:links": "lychee --config lychee.toml .",
+    "docs:inclusive": "alex AGENTS.md PACKAGE_MANIFEST.md README.md llms.txt docs specs src tests evals",
+    "docs:quality:offline": "npm run markdownlint && npm run docs:style && npm run docs:spell && npm run docs:inclusive",
+    "docs:quality": "npm run docs:quality:offline && npm run docs:links",
+    "eval:validate": "npx --yes promptfoo@0.121.15 validate -c promptfooconfig.yaml",
+    "evals:meta": "npm run eval:validate",
+    "eval:smoke": "npx --yes promptfoo@0.121.15 eval -c promptfooconfig.yaml --no-cache --no-table --output reports/validation/promptfoo-smoke.json",
+    "eval:ci": "npm run eval:validate && npm run eval:smoke",
+    "eval:provider:local": "OLLAMA_BASE_URL=http://127.0.0.1:11434 npx --yes promptfoo@0.121.15 eval -j 1 -c evals/release/control-plane-provider.yaml --no-cache --no-table --output reports/validation/promptfoo-provider-local.json",
+    "cleanup:transient": "bash scripts/cleanup_transient_artifacts.sh"
+  },
+  "devDependencies": {
+    "@ast-grep/cli": "0.43.0",
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@upstash/context7-mcp": "3.2.1",
+    "alex": "^11.0.1",
+    "cspell": "^10.0.1",
+    "husky": "^9.1.7",
+    "repomix": "1.14.1"
+  },
+  "overrides": {
+    "@opentelemetry/sdk-node": "0.219.0",
+    "@opentelemetry/exporter-prometheus": "0.219.0",
+    "diff": "8.0.3",
+    "uuid": "11.1.1"
+  },
+  "engines": {
+    "node": ">=22.22.0",
+    "npm": ">=10.9.0"
+  }
+}

@@ -1,0 +1,45 @@
+description: Library Ops local provider-backed control-plane governance eval
+
+providers:
+  - id: ollama:chat:qwen3.5:0.8b
+    config:
+      temperature: 0
+      num_predict: 512
+      think: false
+
+prompts:
+  - |
+    Review this Library Ops control-plane repo-state case.
+    Return raw JSON only with keys: decision, blockers, next_actions, secret_risk.
+    The `decision` value must be exactly either "blocked" or "needs-work".
+    Mention Task Master and code-review-graph in blockers or next_actions when they are relevant.
+
+    Case:
+    {{case}}
+
+tests:
+  - description: local provider triages repo-state evidence gaps
+    vars:
+      case: file://../fixtures/control-plane-provider-case.md
+    assert:
+      - type: is-json
+      - type: contains
+        value: "\"decision\""
+      - type: contains-any
+        value:
+          - "needs-work"
+          - "blocked"
+      - type: contains
+        value: "blockers"
+      - type: contains-any
+        value:
+          - "Task Master"
+          - "task master"
+      - type: contains-any
+        value:
+          - "code-review-graph"
+          - "Code-review-graph"
+      - type: not-contains
+        value: ".taskmaster/config.json"
+      - type: not-contains
+        value: "```"

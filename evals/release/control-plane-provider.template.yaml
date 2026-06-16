@@ -1,0 +1,32 @@
+description: Library Ops provider-backed control-plane governance eval template
+
+# Copy this file to control-plane-provider.yaml only after a local provider is
+# approved and working. Keep real provider IDs and keys in the local environment
+# or user-level tool config, never in the repo.
+providers:
+  - id: "{{env.PROMPTFOO_PROVIDER_ID}}"
+
+prompts:
+  - |
+    Review this Library Ops control-plane repo-state case.
+    Given this remediation goal:
+    {{goal}}
+
+    Return raw JSON with:
+    - decision: pass | needs-work
+    - blockers: string[]
+    - evidence_required: string[]
+    - secret_risk: low | medium | high
+
+tests:
+  - description: provider can judge governance-readiness evidence gaps
+    vars:
+      goal: "Verify current control-plane state has direct-tool evidence, Task Master validity, Figma OAuth posture, Promptfoo coverage, and no committed secrets."
+    assert:
+      - type: is-json
+      - type: contains
+        value: "decision"
+      - type: contains
+        value: "blockers"
+      - type: contains
+        value: "secret_risk"

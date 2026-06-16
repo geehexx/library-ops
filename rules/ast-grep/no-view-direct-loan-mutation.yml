@@ -1,0 +1,21 @@
+id: no-view-direct-loan-mutation
+language: Python
+severity: error
+message: Views/API handlers must not directly mutate Loan objects; call circulation services.
+rule:
+  all:
+    - inside:
+        any:
+          - pattern: |
+              def $FUNC(...):
+                $$$
+          - pattern: |
+              async def $FUNC(...):
+                $$$
+    - any:
+        - pattern: Loan.objects.create($$$)
+        - pattern: $LOAN.status = $VALUE
+        - pattern: $LOAN.returned_at = $VALUE
+files:
+  - "src/libraryops/**/views.py"
+  - "src/libraryops/**/api.py"

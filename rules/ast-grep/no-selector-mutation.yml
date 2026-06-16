@@ -1,0 +1,12 @@
+id: no-selector-mutation
+language: Python
+severity: error
+message: selectors.py modules are read-only and must not call save/delete/create/update.
+rule:
+  any:
+    - pattern: $OBJ.save($$$)
+    - pattern: $OBJ.delete($$$)
+    - pattern: $MODEL.objects.create($$$)
+    - pattern: $QUERYSET.update($$$)
+files:
+  - "src/libraryops/**/selectors.py"

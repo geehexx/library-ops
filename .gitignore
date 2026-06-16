@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyright/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Django/local runtime
+*.sqlite3
+media/
+staticfiles/
+.envrc
+.direnv/
+.env
+.env.*
+!env.example
+
+# Node/tooling
+node_modules/
+npm-debug.log*
+.yarn/
+.pnpm-store/
+
+# Codex/local agent state
+.codex-local/
+.codex-log/
+.codex-session-notes/
+.mcp.json
+.codex.local.toml
+.codex/.runtime/
+
+
+# Local code-intelligence / context-tool state
+.rtk/
+.rtk-cache/
+.crg/
+.code-review-graph/
+.serena/
+.serena-memory/
+.repomix/
+.repomix-cache/
+repomix-output.*
+.ast-grep-cache/
+.tokenix/
+.leanctx/
+.headroom/
+.gitleaks/
+.semgrep/
+
+# Task Master generated runtime state; keep config/docs/templates only
+.taskmaster/config.json
+.taskmaster/state.json
+.taskmaster/tasks/*.md
+.taskmaster/reports/
+
+# Large imported corpora and models
+.data/
+data/
+models/
+*.onnx
+*.safetensors
+*.bin
+
+# Build artifacts
+build/
+dist/
+coverage.xml
+reports/
+
+# OS/editor
+.DS_Store
+.idea/
+*.swp

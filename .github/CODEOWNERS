@@ -1,0 +1,11 @@
+# Solo project: CODEOWNERS documents ownership and supports branch protection.
+* @geehexx
+
+/.codex/ @geehexx
+/.agents/ @geehexx
+/.taskmaster/ @geehexx
+/.specify/memory/constitution.md @geehexx
+/docs/adr/ @geehexx
+/src/libraryops/circulation/ @geehexx
+/src/libraryops/search/ @geehexx
+/src/libraryops/ai_assist/ @geehexx

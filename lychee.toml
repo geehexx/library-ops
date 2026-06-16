@@ -1,0 +1,5 @@
+exclude_path = ["node_modules", ".venv", ".git", "uv.lock", "package-lock.json", "dist", "build", "reports"]
+accept = [200, 204, 206, 429]
+max_retries = 2
+retry_wait_time = 2
+scheme = ["https", "http", "file"]

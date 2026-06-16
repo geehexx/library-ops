@@ -1,0 +1,31 @@
+rules:
+  - id: django-no-debug-true-production
+    languages: [python]
+    severity: ERROR
+    message: Do not set DEBUG=True in production settings.
+    paths:
+      include:
+        - /src/libraryops/config/settings/production.py
+    pattern: DEBUG = True
+
+  - id: django-no-direct-loan-create-in-views
+    languages: [python]
+    severity: ERROR
+    message: Use circulation services for loan creation; views/API must not create loans directly.
+    paths:
+      include:
+        - /src/libraryops/**/views.py
+        - /src/libraryops/**/api.py
+    pattern: Loan.objects.create(...)
+
+  - id: django-no-csrf-exempt-without-adr
+    languages: [python]
+    severity: WARNING
+    message: csrf_exempt requires explicit ADR/task justification and compensating controls.
+    pattern: '@csrf_exempt'
+
+  - id: python-no-subprocess-shell-true
+    languages: [python]
+    severity: ERROR
+    message: Avoid shell=True; use argument arrays and explicit allowlists.
+    pattern: subprocess.$FUNC(..., shell=True, ...)

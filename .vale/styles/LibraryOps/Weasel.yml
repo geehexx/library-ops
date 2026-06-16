@@ -1,0 +1,10 @@
+extends: existence
+message: "Avoid vague qualifier '%s' unless it is tied to measurable evidence."
+level: suggestion
+ignorecase: true
+tokens:
+  - very
+  - simply
+  - obviously
+  - clearly
+  - basically

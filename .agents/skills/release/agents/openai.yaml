@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Governance"
+  short_description: "Check SemVer, changelog, and release readiness"
+  default_prompt: "Use $release to verify the Library Ops release path, changelog, and protected release flow before changing publishing or branch-governance behavior."

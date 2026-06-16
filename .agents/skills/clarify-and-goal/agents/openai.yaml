@@ -1,0 +1,10 @@
+interface:
+  display_name: "Clarify and Goal"
+  short_description: "Route ambiguity, questions, and goals correctly"
+  default_prompt: "Use $clarify-and-goal to decide whether this Library Ops task needs a native question path, a repo-specific escalation packet, or a properly scoped goal."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "taskmaster-ai"
+      description: "Task Master MCP server for reading the active graph before setting or refining repo work goals"

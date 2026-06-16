@@ -1,0 +1,45 @@
+# Generated/local state
+.git/
+.venv/
+node_modules/
+__pycache__/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.pyright/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Agent/tool local state
+.codex-local/
+.rtk/
+.crg/
+.code-review-graph/
+.serena/
+.serena-memory/
+.repomix/
+.repomix-cache/
+.ast-grep-cache/
+.tokenix/
+.headroom/
+repomix-output.*
+
+# Runtime/demo data
+media/
+staticfiles/
+*.sqlite3
+*.db
+*.dump
+*.jsonl
+*.parquet
+*.csv
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+*secret*
+*credential*
