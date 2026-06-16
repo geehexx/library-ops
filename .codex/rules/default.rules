@@ -35,11 +35,11 @@ prefix_rule(
     decision = "allow",
     justification = "Codex lifecycle hooks run through the repo-managed uv Python environment from the git root.",
     match = [
-        "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
-        "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
-        "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
-        "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
-        "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
+        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
     ],
 )
 
@@ -58,7 +58,6 @@ prefix_rule(
     justification = "Repo-invoked ephemeral tool execution for code-review-graph and semgrep avoids unnecessary persistent global installs.",
     match = [
         "uvx --from code-review-graph code-review-graph --version",
-        "uvx --from code-review-graph code-review-graph install --platform codex",
         "uvx --from code-review-graph code-review-graph build",
         "uvx --from code-review-graph code-review-graph status",
         "uvx --from semgrep semgrep --version",
@@ -244,7 +243,6 @@ prefix_rule(
     justification = "Required semantic code tool; Serena state/log writes are covered by the permission profile.",
     match = [
         "serena --version",
-        "serena init",
         "serena start-mcp-server --project-from-cwd --context=codex",
     ],
 )

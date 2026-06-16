@@ -19,7 +19,7 @@
             "details": "Run `git init` in the repository root. Create an initial `pyproject.toml` file at the root with a `[project]` section specifying name, version, and `requires-python = \">=3.12\"`. Establish the basic project structure as per section 6.1, including `src` and the remaining durable top-level directories.",
             "status": "done",
             "testStrategy": "Verify `git status` shows an empty repository (excluding `.git` directory contents). Confirm `pyproject.toml` exists at the root and contains the specified Python version requirement.",
-            "parentId": "undefined",
+            "parentId": "1",
             "updatedAt": "2026-06-16T08:10:23.762Z"
           },
           {
@@ -32,7 +32,7 @@
             "details": "Ensure `uv` is installed and accessible in the environment. Run `uv sync --all-groups` to populate the virtual environment and generate the `uv.lock` file based on the `pyproject.toml` dependencies. Confirm Python 3.12+ is the active interpreter for `uv` operations.",
             "status": "done",
             "testStrategy": "Execute `uv sync --all-groups`. Confirm `uv.lock` is generated and contains resolved dependencies. Run `uv run python -c \"import sys; print(sys.version)\"` to verify Python 3.12+ is active.",
-            "parentId": "undefined",
+            "parentId": "1",
             "updatedAt": "2026-06-16T08:10:23.769Z"
           },
           {
@@ -45,7 +45,7 @@
             "details": "Verify Node.js version 20+ is installed and configured on the system. Create an initial `package.json` file at the project root with basic project metadata. Run `npm install` to initialize Node.js dependencies and generate `package-lock.json`.",
             "status": "done",
             "testStrategy": "Run `node -v` to confirm Node.js version 20+. Execute `npm install` and verify it completes without any errors. Check for the creation of the `node_modules` directory and `package-lock.json` file.",
-            "parentId": "undefined",
+            "parentId": "1",
             "updatedAt": "2026-06-16T08:10:23.779Z"
           },
           {
@@ -60,7 +60,7 @@
             "details": "Add entries to the `.gitignore` file at the project root. Include `.pytest_cache/`, `.venv/`, `node_modules/`, `__pycache__/`, `*.pyc`, `*.env`, `secrets.toml`, and other common Python/Node/IDE generated files. Ensure future directories for `corpora` and `model_caches` are also included.",
             "status": "done",
             "testStrategy": "Create temporary files/directories matching patterns (e.g., `.venv/temp`, `node_modules/temp`, `.pytest_cache/temp`). Run `git status --ignored` to confirm these temporary files are listed as ignored. Manually review the `.gitignore` file for completeness.",
-            "parentId": "undefined",
+            "parentId": "1",
             "updatedAt": "2026-06-16T08:10:23.788Z"
           },
           {
@@ -76,7 +76,7 @@
             "details": "Ensure the repo exposes and documents a runnable validation path through `npm run verify:all`, `codex doctor --summary --ascii --no-color`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'`. The repo should no longer depend on custom verifier scripts to prove basic package hygiene or toolchain readiness.\n\nCurrent validated direct path summary:\n- `codex doctor --summary --ascii --no-color`\n- `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'`\n- `npm run skills:lint`\n- `npm run docs:quality`\n- `npm run verify:core`\n- `npm run verify:all`\n\nKeep failures attached to the real underlying command, not to removed verifier-era wrappers.",
             "status": "done",
             "testStrategy": "Execute `npm run verify:all` until the first real blocker, and verify that any failure is a genuine underlying tool or dependency issue rather than a missing custom verifier script. Confirm ignored-file behavior with a manual `git status --ignored` check if needed.",
-            "parentId": "undefined",
+            "parentId": "1",
             "updatedAt": "2026-06-16T08:10:23.795Z"
           }
         ],
@@ -102,7 +102,7 @@
             "details": "Edit 'pyproject.toml' to include Ruff configuration, defining specific linting rules, formatting style, and file exclusions. Add Pyright configuration, enabling strict mode and specifying project roots to enforce robust type annotations and improve code correctness.",
             "status": "done",
             "testStrategy": "Run 'ruff check .' to verify linting rules are applied and 'ruff format .' to confirm formatting consistency. Execute 'pyright .' to ensure the codebase passes strict type checking with no errors or warnings.",
-            "parentId": "undefined",
+            "parentId": "2",
             "updatedAt": "2026-06-16T08:10:23.809Z"
           },
           {
@@ -113,7 +113,7 @@
             "details": "Update 'pyproject.toml' to configure pytest, including plugins like Hypothesis, define specific coverage settings (e.g., target source paths, exclusion patterns), and set up pip-audit for regular security checks of installed Python packages.",
             "status": "done",
             "testStrategy": "Execute 'pytest --hypothesis-show-statistics --cov=.' to confirm tests run, Hypothesis is active, and coverage reports are accurately generated. Run 'pip-audit' to ensure it successfully scans dependencies and reports any identified vulnerabilities.",
-            "parentId": "undefined",
+            "parentId": "2",
             "updatedAt": "2026-06-16T08:10:23.815Z"
           },
           {
@@ -124,7 +124,7 @@
             "details": "Add Import Linter configuration to 'pyproject.toml', defining initial module boundaries and forbidden import rules. Configure markdownlint within 'pyproject.toml' as specified, defining required style rules and exceptions for all project markdown files.",
             "status": "done",
             "testStrategy": "Create a test markdown file with known violations and run 'markdownlint' to confirm rules are correctly applied. For Import Linter, create a simple test case with a forbidden import between hypothetical modules and verify it fails.",
-            "parentId": "undefined",
+            "parentId": "2",
             "updatedAt": "2026-06-16T08:10:23.821Z"
           },
           {
@@ -135,7 +135,7 @@
             "details": "Create or update '.codex/config.toml' with basic agent settings, ensuring sensitive keys are referenced via environment variables or secure secrets management. Establish 'AGENTS.md' documenting the purpose and high-level capabilities of each agent. Keep the project permission profile on the bounded workspace-scoped model and implement measures to prevent real MCP keys from being committed.",
             "status": "done",
             "testStrategy": "Manually review '.codex/config.toml' to verify sensitive keys are not hardcoded and the workspace-scoped permission profile remains intact. Check 'AGENTS.md' for clarity and completeness. Verify secret-like files stay untracked and caught by the repo hygiene/security gates.",
-            "parentId": "undefined",
+            "parentId": "2",
             "updatedAt": "2026-06-16T08:10:23.827Z"
           },
           {
@@ -148,7 +148,7 @@
             "details": "Extend '.codex/config.toml' to integrate and configure the specified advanced agent capabilities, defining necessary hooks, operating rules, and context budgets for each. Keep the verification path on direct tool invocations such as `codex doctor`, pinned external Task Master CLI commands, `agent-skills-lint`, and the existing quality gates.\n\nDurable control-plane results now folded into the repo:\n- `npm run deps:tree` is a first-class dependency-tree integrity gate.\n- Promptfoo, markdownlint-cli2, agent-skills-lint, and Task Master run as pinned external CLIs.\n- The local provider eval lane is validated separately from the deterministic smoke lane.\n- Task Master runtime policy now lives under `.taskmaster/`.\n- The active orchestration posture is root plus direct specialists by default, with `agents.max_depth = 1` unless a later validator-backed experiment re-enables recursion.\n- Task Master MCP uses the custom minimal surface `get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd`, while heavier graph analysis, regeneration, and mutation route through the pinned CLI.\n- Current provider evidence shows the strongest committed local lane is `qwen2.5-coder:7b-instruct` for main/research with `qwen3:latest` as the local fallback, while remote providers remain explicit rescue lanes rather than the default runtime.\n- `code-review-graph` and `semgrep` support verified `uvx` invocation paths, reducing persistent global-tool assumptions.\n- Externalizing `task-master-ai` removed the vulnerable subtree from the repo-owned npm graph while preserving Task Master CLI and MCP behavior.\n\nCurrent validation expectation:\n- `codex doctor --summary --ascii --no-color`\n- `npm run skills:lint`\n- `npm run policy:check`\n- `npm run verify:core`\n- `npm run verify:all`\n- `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'`",
             "status": "done",
             "testStrategy": "Execute `codex doctor --summary --ascii --no-color`, `npm run skills:lint`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` to verify the active agent/tooling surface. Confirm agent stack functions by running a small read-only task that exercises one or more integrated capabilities, such as a code-review-graph or ast-grep check.",
-            "parentId": "undefined",
+            "parentId": "2",
             "updatedAt": "2026-06-16T08:10:23.837Z"
           }
         ],
@@ -175,7 +175,7 @@
             "details": "Treat root `manage.py` and `src/libraryops/config/*` as the bootstrap source of truth. Reconcile Task Master, README, and supporting docs so they describe the implemented layout and the next hardening steps instead of generating a nested `config/libraryops` tree.",
             "status": "pending",
             "testStrategy": "Review the repo layout and ensure no planning artifact still requires `src/libraryops/config/libraryops` or `src/libraryops/manage.py` as the target structure.",
-            "parentId": "undefined"
+            "parentId": "3"
           },
           {
             "id": 2,
@@ -187,7 +187,7 @@
             "details": "Keep the current `src/libraryops/config/settings/` structure and harden it in place. Add `DATABASE_URL` parsing, preserve SQLite fallback when no URL is set, make test settings honor `DATABASE_URL`, and ensure smoke tests work with the Django test host.\n<info added on 2026-06-16T14:14:45.429Z>\n```plaintext\n2026-06-16: Hardened Django settings in place with DATABASE_URL parsing, SQLite fallback only when DATABASE_URL is absent, and focused smoke/settings tests. Verified with manage.py check under default and Postgres DATABASE_URL plus targeted pytest coverage.\n```\n</info added on 2026-06-16T14:14:45.429Z>",
             "status": "pending",
             "testStrategy": "Add focused tests covering SQLite fallback, Postgres selection from `DATABASE_URL`, and host handling for the Django test client.",
-            "parentId": "undefined"
+            "parentId": "3"
           },
           {
             "id": 3,
@@ -199,7 +199,7 @@
             "details": "Keep production settings strict about required environment variables while aligning implementation with the current dependency/tooling choices. The production module should require explicit secure values for `SECRET_KEY`, `DATABASE_URL`, and host configuration rather than silently inheriting local defaults.",
             "status": "pending",
             "testStrategy": "Attempt to initialize Django with `DJANGO_SETTINGS_MODULE` pointing to `production.py` and verify startup fails loudly when required env vars are absent.",
-            "parentId": "undefined"
+            "parentId": "3"
           },
           {
             "id": 4,
@@ -211,7 +211,7 @@
             "details": "Keep the current `src/libraryops/config/urls.py`, `wsgi.py`, and `asgi.py` modules and verify they remain aligned with the settings module paths. Preserve a minimal `/health/` endpoint for smoke tests and deployment probes.",
             "status": "pending",
             "testStrategy": "Keep `/health/` smoke coverage in pytest and verify `WSGI_APPLICATION` and `ASGI_APPLICATION` still point to the committed config modules.",
-            "parentId": "undefined"
+            "parentId": "3"
           },
           {
             "id": 5,
@@ -226,7 +226,7 @@
             "details": "Validate the current bootstrap with `manage.py check`, `makemigrations --check --dry-run`, and pytest. Ensure CI uses the Postgres service it already starts by honoring `DATABASE_URL` in test settings instead of silently falling back to SQLite.",
             "status": "pending",
             "testStrategy": "Run the Django checks and pytest locally, then rerun them with `DATABASE_URL` set to the CI-style Postgres URL to prove parity.",
-            "parentId": "undefined"
+            "parentId": "3"
           }
         ]
       },
@@ -250,7 +250,7 @@
             "details": "Create or update `catalog/models.py` to include `BibliographicWork` (e.g., title, description, publication year), `Contributor` (e.g., name, role), and `WorkContributor` (to link works and contributors with specific roles). Ensure all fields and relationships align with section 11.1 (Data Model).",
             "status": "pending",
             "testStrategy": "Write unit tests for `BibliographicWork`, `Contributor`, and `WorkContributor` models to verify field types, relationships (e.g., ManyToMany through WorkContributor), and basic object creation.",
-            "parentId": "undefined"
+            "parentId": "4"
           },
           {
             "id": 2,
@@ -262,7 +262,7 @@
             "details": "Create or update `inventory/models.py` to define `BookEdition` (e.g., ISBN, publisher, publication date, foreign key to `BibliographicWork`) and `BookCopy` (e.g., acquisition date, status, foreign key to `BookEdition`). Implement custom validation for the ISBN field in `BookEdition` to normalize valid ISBNs (ISBN-10 to ISBN-13, remove hyphens) and reject invalid ones, as per requirement C2.F2. Consider a custom `ISBNField` or model `clean` method.",
             "status": "pending",
             "testStrategy": "Write unit tests for `BookEdition` and `BookCopy` models. Focus on ISBN validation: test valid ISBNs (10-digit, 13-digit, with/without hyphens) for normalization and invalid ISBNs for proper rejection. Verify relationships to `BibliographicWork` and other fields.",
-            "parentId": "undefined"
+            "parentId": "4"
           },
           {
             "id": 3,
@@ -274,7 +274,7 @@
             "details": "Create or update `circulation/models.py` to define the `Loan` model (e.g., `book_copy` Foreign Key, `borrower` Foreign Key, `loan_date`, `due_date`, `return_date`, `status` field). Implement a `UniqueConstraint` with a `condition` in the model's `Meta` class to enforce that only one `Loan` record can have an 'active' status for a given `BookCopy` at any time. The `status` field should be an Enum or choices field, with 'active' being one of the possible states.",
             "status": "pending",
             "testStrategy": "Write unit tests for the `Loan` model. Verify field types and relationships. Crucially, write tests that attempt to create multiple active loans for the same `BookCopy` and ensure the `UniqueConstraint` correctly raises a `ValidationError` or `IntegrityError`.",
-            "parentId": "undefined"
+            "parentId": "4"
           },
           {
             "id": 4,
@@ -286,7 +286,7 @@
             "details": "Create `audit/models.py` and define `AuditEvent` (e.g., `timestamp`, `user`, `action_type`, `related_object_id`, `related_object_content_type`, `details`). Create or update `catalog/models.py` to include `ExternalSourceRecord` (e.g., `source_name`, `source_id`, `url`, `last_synced_date`, Foreign Key to a `BibliographicWork` or `BookEdition`). Ensure fields and relationships align with section 11.1 (Data Model).",
             "status": "pending",
             "testStrategy": "Write unit tests for `AuditEvent` and `ExternalSourceRecord` models to verify field types, default values, and relationships. Ensure `AuditEvent` correctly handles generic foreign keys if implemented.",
-            "parentId": "undefined"
+            "parentId": "4"
           },
           {
             "id": 5,
@@ -301,7 +301,7 @@
             "details": "After defining all models, run `python manage.py makemigrations catalog inventory circulation audit` to generate the initial migration files. Review the generated migration files and their corresponding SQL output (`python manage.py sqlmigrate <app_name> <migration_id>`) to ensure they correctly reflect the model definitions, including primary keys, foreign keys, constraints (especially the partial unique constraint for Loan), and field types.",
             "status": "pending",
             "testStrategy": "Apply the generated migrations to a clean test database (`python manage.py migrate`). Verify that all tables are created correctly and that the database schema matches the intended model definitions. Attempt to violate the partial unique constraint for the Loan model directly in the database to confirm it is enforced at the DB level.",
-            "parentId": "undefined"
+            "parentId": "4"
           }
         ]
       },
@@ -325,7 +325,7 @@
             "details": "Create `src/libraryops/accounts` app. Add 'accounts' to `INSTALLED_APPS` in `src/libraryops/config/settings/base.py`. Verify that Django's built-in authentication views (login/logout) can be accessed and function using the default User model.",
             "status": "pending",
             "testStrategy": "Run `python manage.py check`. Manually test basic user creation and login/logout functionality via Django admin or custom minimal views to ensure the default auth system is active.",
-            "parentId": "undefined"
+            "parentId": "5"
           },
           {
             "id": 2,
@@ -337,7 +337,7 @@
             "details": "Develop an initial data migration (or a custom management command in the `accounts` app) to create Django `Group` instances for 'Admin', 'Librarian', and 'Member'. Programmatically assign relevant permissions (e.g., 'can_add_book', 'can_view_loan') to these groups as per the defined RBAC matrix. Admin should have all permissions.",
             "status": "pending",
             "testStrategy": "Write unit tests to verify the existence of the created groups and that the correct permissions are assigned to each group. Run the migration/command and inspect groups/permissions via `python manage.py shell` or Django admin.",
-            "parentId": "undefined"
+            "parentId": "5"
           },
           {
             "id": 3,
@@ -349,7 +349,7 @@
             "details": "Within `src/libraryops/accounts/permissions.py` (or similar), create functions like `can_manage_catalog(user)` and decorators like `@require_librarian` that leverage Django's permission system (`user.has_perm()` or group checks). These services should provide permission checks for various operations on views, APIs, and services (FR-011, NFR-003).",
             "status": "pending",
             "testStrategy": "Implement unit tests for authorization utilities (e.g., `can_manage_catalog`, `require_librarian`) to verify correct allow/deny decisions based on mock user roles and permissions. Test edge cases with authenticated and unauthenticated users.",
-            "parentId": "undefined"
+            "parentId": "5"
           },
           {
             "id": 4,
@@ -361,7 +361,7 @@
             "details": "Install `django-allauth`. Add required `allauth` apps to `INSTALLED_APPS` in `settings.py`. Configure `AUTHENTICATION_BACKENDS`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL`, and other necessary `allauth` settings. Include `allauth` URLs in `src/libraryops/config/urls.py`. Develop or override basic `allauth` templates for common flows (login, signup).",
             "status": "pending",
             "testStrategy": "Verify that `allauth` URLs are accessible. Manually test username/password registration and login flows through `allauth`'s default views. Ensure redirects work as configured for login/logout.",
-            "parentId": "undefined"
+            "parentId": "5"
           },
           {
             "id": 5,
@@ -373,7 +373,7 @@
             "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.",
             "status": "pending",
             "testStrategy": "Verify local username/password login works without any OAuth provider configured. Test with and without relevant environment variables set to ensure OAuth providers are conditionally enabled/disabled as expected. Attempt to access a social login endpoint when its provider is intentionally disabled to confirm it fails gracefully.",
-            "parentId": "undefined"
+            "parentId": "5"
           }
         ]
       },
@@ -398,7 +398,7 @@
             "details": "Create `catalog/views.py` functions and corresponding templates in `web/templates/catalog/` for `Work` list, `Edition` list, `Work` detail, and `Edition` detail. Use `catalog.selectors` to fetch data. Ensure availability status is displayed and actions are conditional on user roles (e.g., 'borrow' button for members, 'edit' for librarians).",
             "status": "pending",
             "testStrategy": "Write unit tests for views ensuring correct context data is passed to templates. Manually verify page rendering, data display, and link navigation in a browser for different user roles.",
-            "parentId": "undefined"
+            "parentId": "6"
           },
           {
             "id": 2,
@@ -410,7 +410,7 @@
             "details": "Create `catalog/forms.py` with `WorkForm`, `EditionForm`, `CopyForm`. Implement `create`, `update`, and `archive` views/services (e.g., `catalog/services.py`) that utilize these forms. These operations must trigger audit event recording as per FR-001, FR-002, FR-003, NFR-010. Integrate these forms into the `web` module, linking from the catalog detail or list pages.",
             "status": "pending",
             "testStrategy": "Write integration tests for forms to validate input, ensure required fields are enforced, and verify that successful submissions result in persisted records and corresponding audit events. Test archiving functionality for soft deletion.",
-            "parentId": "undefined"
+            "parentId": "6"
           },
           {
             "id": 3,
@@ -422,7 +422,7 @@
             "details": "Modify `EditionForm` to include fields for cover image upload (e.g., `ImageField`) and an external URL field. Implement backend logic in `catalog/services.py` to handle file storage (e.g., Django's `FileField` with configured storage backend) and URL validation. Ensure images are resized/optimized if uploaded and displayed on edition detail pages.",
             "status": "pending",
             "testStrategy": "Write unit tests for image validation and processing logic. Integration tests should verify that images (both uploaded and URL-linked) are correctly associated with editions and displayed on detail pages without breaking layout.",
-            "parentId": "undefined"
+            "parentId": "6"
           },
           {
             "id": 4,
@@ -432,7 +432,7 @@
             "details": "Create/modify `catalog/admin.py` and `inventory/admin.py`. Register relevant models with `admin.site.register()`. Define `list_display`, `list_filter`, `search_fields`, `fieldsets`, and `readonly_fields` for each model to provide a comprehensive internal management interface for `Admins`/`Librarians`.",
             "status": "pending",
             "testStrategy": "Manually verify Django Admin functionality by logging in as an admin, navigating to each model's change list and change form, and testing search, filters, and field editing. Ensure correct display of related objects.",
-            "parentId": "undefined"
+            "parentId": "6"
           },
           {
             "id": 5,
@@ -442,7 +442,7 @@
             "details": "Create `catalog/api.py` and define `Router` instances for works, editions, and copies. Implement CRUD endpoints (GET, POST, PUT, DELETE) using Pydantic schemas for request/response bodies. Utilize `catalog.services` for all write operations and `catalog.selectors` for read operations. Ensure API mutations also trigger audit events (FR-001, FR-002, FR-003, NFR-010).",
             "status": "pending",
             "testStrategy": "Write API integration tests using `pytest` and `httpx` (or similar) to cover all endpoints, including validation, successful creation, retrieval, update, and deletion of resources. Verify proper HTTP status codes and response bodies. Confirm audit events are generated for POST/PUT/DELETE requests.",
-            "parentId": "undefined"
+            "parentId": "6"
           }
         ]
       },
@@ -470,7 +470,7 @@
             "details": "Ensure fields are defined as per section 11.1 of the data model specification.",
             "status": "pending",
             "testStrategy": "Write unit tests for each model to verify field types, relationships, and custom validations.",
-            "parentId": "undefined"
+            "parentId": "7"
           },
           {
             "id": 2,
@@ -482,7 +482,7 @@
             "details": "Ensure they are transactional (NFR-005) and enforce 'only one active loan per copy' invariant (FR-006, NFR-006).",
             "status": "pending",
             "testStrategy": "Implement unit tests for `checkout_copy` and `return_copy` services to verify copy status transitions, loan creation/completion, and enforcement of the active loan uniqueness constraint.",
-            "parentId": "undefined"
+            "parentId": "7"
           },
           {
             "id": 3,
@@ -494,7 +494,7 @@
             "details": "Ensure workflow components are modular and responsive.",
             "status": "pending",
             "testStrategy": "Write integration tests for UI workflows to ensure accessibility and smooth user interaction.",
-            "parentId": "undefined"
+            "parentId": "7"
           },
           {
             "id": 4,
@@ -506,7 +506,7 @@
             "details": "Ensure the dashboard uses responsive design principles and provides insights into library operations.",
             "status": "pending",
             "testStrategy": "Write unit tests for loan dashboard components to verify data rendering and filtering.",
-            "parentId": "undefined"
+            "parentId": "7"
           },
           {
             "id": 5,
@@ -518,7 +518,7 @@
             "details": "Ensure endpoints are documented and secure (C9.F2).",
             "status": "pending",
             "testStrategy": "Implement unit tests to verify endpoint responses and error handling.",
-            "parentId": "undefined"
+            "parentId": "7"
           }
         ]
       },
@@ -543,7 +543,7 @@
             "details": "Implement `models.py` in `catalog/models` with necessary fields and related managers. Ensure proper data types are used (e.g., text for ISBNs/barcodes/external IDs).",
             "status": "pending",
             "testStrategy": "Write unit tests to verify model fields, default values, and migrations.",
-            "parentId": "undefined"
+            "parentId": "8"
           },
           {
             "id": 2,
@@ -555,7 +555,7 @@
             "details": "In `models.py`, add a new method called `exact_identifier_search` that filters by ISBNs, barcodes, and external IDs. Ensure it uses the model's index for efficiency.",
             "status": "pending",
             "testStrategy": "Write unit tests to verify exact identifier search functionality.",
-            "parentId": "undefined"
+            "parentId": "8"
           },
           {
             "id": 3,
@@ -567,7 +567,7 @@
             "details": "Update `models.py` to include the necessary fields and configure a search index in `catalog/admin.py`. Use PyCharm's SQL Editor to verify the index creation.",
             "status": "pending",
             "testStrategy": "Run Django migrations and verify that the full-text index is created. Write integration tests for full-text search using specific keywords.",
-            "parentId": "undefined"
+            "parentId": "8"
           },
           {
             "id": 4,
@@ -579,7 +579,7 @@
             "details": "In `models.py`, add fields like `availability`, `contributor`, `subject`, `language`, and `source`. Implement filter methods that retrieve relevant documents based on these criteria.",
             "status": "pending",
             "testStrategy": "Write unit tests to ensure filters work as expected with various search queries.",
-            "parentId": "undefined"
+            "parentId": "8"
           },
           {
             "id": 5,
@@ -591,7 +591,7 @@
             "details": "Install `pgvector` and integrate it into the `models.py`. Use PyCharm's SQL Editor to verify the vector index creation. Implement vector search methods that return relevant documents based on semantic similarity.",
             "status": "pending",
             "testStrategy": "Run Django migrations and write integration tests for semantic search with example data.",
-            "parentId": "undefined"
+            "parentId": "8"
           }
         ]
       },
@@ -615,7 +615,7 @@
             "details": "Create a new branch in your project and start designing the model architecture, including input/output specifications and performance metrics.",
             "status": "pending",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "9"
           },
           {
             "id": 2,
@@ -627,7 +627,7 @@
             "details": "Write code to load the model, preprocess documents, and generate embeddings. Ensure the model is cached locally and not tracked by version control.",
             "status": "pending",
             "testStrategy": "Write unit tests for embedding generation, including checks for vector correctness and cache management.",
-            "parentId": "undefined"
+            "parentId": "9"
           },
           {
             "id": 3,
@@ -637,7 +637,7 @@
             "details": "Integrate a machine learning component for suggestion generation, ensuring it can handle various metadata fields and is integrated with the database.",
             "status": "pending",
             "testStrategy": "Write unit tests to ensure metadata suggestions are in the correct format and that they require human review.",
-            "parentId": "undefined"
+            "parentId": "9"
           },
           {
             "id": 4,
@@ -649,7 +649,7 @@
             "details": "Develop checks and mechanisms to verify the integrity of suggestions before persistence, ensuring they reference existing records.",
             "status": "pending",
             "testStrategy": "Write unit tests to verify AI-generated content matches stored references.",
-            "parentId": "undefined"
+            "parentId": "9"
           },
           {
             "id": 5,
@@ -664,7 +664,7 @@
             "details": "Perform integration testing to verify that embedding generation works correctly, metadata suggestions are generated as expected, and safety measures prevent accidental creation of non-existent data.",
             "status": "pending",
             "testStrategy": "Run comprehensive tests including unit tests for each feature and end-to-end testing with real-world scenarios.",
-            "parentId": "undefined"
+            "parentId": "9"
           }
         ]
       },
@@ -693,7 +693,7 @@
             "details": "Implement the `seed_roles` command in `management/commands/seed_roles.py`. Ensure that the command creates predefined role objects with default permissions and statuses. Use Django's built-in admin site to manage these roles if needed.",
             "status": "pending",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "10"
           },
           {
             "id": 2,
@@ -705,7 +705,7 @@
             "details": "Implement the `seed_demo_users` command in `management/commands/seed_demo_users.py`. Create users with specific passwords (e.g., 'admin@libraryops.demo', 'librarian@libraryops.demo') and assign them to the predefined roles created by `seed_roles`. Use Django's admin site for user management if needed.",
             "status": "pending",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "10"
           },
           {
             "id": 3,
@@ -717,7 +717,7 @@
             "details": "Implement the `import_public_domain_catalog` command in `management/commands/import_public_domain_catalog.py`. Use Open Library/Project Gutenberg as the source and ensure that imported records include source links and copyright notes. Handle duplicates and provide a dry-run option to review changes without affecting the database.",
             "status": "pending",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "10"
           },
           {
             "id": 4,
@@ -729,7 +729,7 @@
             "details": "Implement the `build_search_documents` command in `management/commands/build_search_documents.py`. Use Sentence Transformers for embedding generation. Store embeddings locally and ensure they are not committed to git. Handle existing documents by checking freshness or using a dry-run option.",
             "status": "pending",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "10"
           },
           {
             "id": 5,
@@ -741,7 +741,7 @@
             "details": "Implement the `build_embeddings` command in `management/commands/build_embeddings.py`. Use Sentence Transformers for embedding generation. Store embeddings locally and ensure they are not committed to git. Handle existing embeddings by checking freshness or using a dry-run option.",
             "status": "pending",
             "testStrategy": null,
-            "parentId": "undefined"
+            "parentId": "10"
           }
         ]
       },
@@ -776,7 +776,7 @@
             "details": "Install dependencies, configure environment variables securely, set up database migrations, and ensure secure secrets management.",
             "status": "pending",
             "testStrategy": "Verify deployment on Render by accessing the live URL and checking for static assets.",
-            "parentId": "undefined"
+            "parentId": "11"
           },
           {
             "id": 2,
@@ -788,7 +788,7 @@
             "details": "Review and edit the `README.md` file to include all required details for the evaluation process.",
             "status": "pending",
             "testStrategy": "Verify that the updated `README.md` aligns with all assignment criteria and contains all necessary information.",
-            "parentId": "undefined"
+            "parentId": "11"
           },
           {
             "id": 3,
@@ -800,7 +800,7 @@
             "details": "Record a comprehensive video that covers the key features of the application, its architecture, testing approach, and any known trade-offs.",
             "status": "pending",
             "testStrategy": "Verify the Loom script using a screen capture tool to ensure it covers all specified aspects.",
-            "parentId": "undefined"
+            "parentId": "11"
           },
           {
             "id": 4,
@@ -812,7 +812,7 @@
             "details": "Create a Git tag with a version number following SemVer format (e.g., v1.2.3) and update the `CHANGELOG.md` file.\n\nDurable release/governance state now folded into the repo:\n- `CHANGELOG.md` exists and is managed through Python Semantic Release.\n- `npm run release:check` verifies changelog/version readiness without publishing side effects.\n- the GitHub release workflow is a read-only readiness workflow.\n- Dependabot targets `development` and follows the documented integration path.\n- workflow security remains pinned and validated through `actionlint` and `zizmor`.",
             "status": "pending",
             "testStrategy": "Verify that the release is tagged correctly and the changelog reflects the changes.",
-            "parentId": "undefined"
+            "parentId": "11"
           },
           {
             "id": 5,
@@ -824,7 +824,7 @@
             "details": "Update the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements.",
             "status": "pending",
             "testStrategy": "Test the generated OpenAPI documentation locally using tools like Swagger UI or Postman.",
-            "parentId": "undefined"
+            "parentId": "11"
           }
         ]
       },
@@ -850,7 +850,7 @@
             "dependencies": [],
             "parentTaskId": 12,
             "updatedAt": "2026-06-16T08:23:11.948Z",
-            "parentId": "undefined"
+            "parentId": "12"
           },
           {
             "id": 2,
@@ -860,7 +860,7 @@
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
-            "parentId": "undefined",
+            "parentId": "12",
             "updatedAt": "2026-06-16T08:23:11.975Z"
           },
           {
@@ -871,7 +871,7 @@
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
-            "parentId": "undefined",
+            "parentId": "12",
             "updatedAt": "2026-06-16T09:24:09.797Z"
           },
           {
@@ -882,7 +882,7 @@
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
-            "parentId": "undefined"
+            "parentId": "12"
           },
           {
             "id": 5,
@@ -892,7 +892,7 @@
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
-            "parentId": "undefined"
+            "parentId": "12"
           }
         ],
         "updatedAt": "2026-06-16T09:24:09.797Z"

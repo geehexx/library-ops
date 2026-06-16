@@ -5,7 +5,7 @@ rules:
     message: Do not set DEBUG=True in production settings.
     paths:
       include:
-        - /src/libraryops/config/settings/production.py
+        - '**/src/libraryops/config/settings/production.py'
     pattern: DEBUG = True
 
   - id: django-no-direct-loan-create-in-views
@@ -14,8 +14,8 @@ rules:
     message: Use circulation services for loan creation; views/API must not create loans directly.
     paths:
       include:
-        - /src/libraryops/**/views.py
-        - /src/libraryops/**/api.py
+        - '**/src/libraryops/**/views.py'
+        - '**/src/libraryops/**/api.py'
     pattern: Loan.objects.create(...)
 
   - id: django-no-csrf-exempt-without-adr

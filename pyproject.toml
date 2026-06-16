@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "library-ops"
 version = "0.1.0"
@@ -187,3 +191,10 @@ exclude_dirs = ["tests", ".venv", "node_modules"]
 source_paths = ["src/libraryops"]
 runner = "python -m pytest"
 test_paths = ["tests"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["libraryops*"]

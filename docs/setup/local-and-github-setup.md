@@ -49,10 +49,9 @@ npx --yes --package task-master-ai@0.43.1 -c 'task-master models --setup'
 
 ```bash
 rtk init -g --codex
-uvx --from code-review-graph code-review-graph install --platform codex
 uvx --from code-review-graph code-review-graph build
 uv tool install -p 3.13 serena-agent
-serena init
+serena project health-check
 ast-grep scan
 repomix --config repomix.config.json
 ```

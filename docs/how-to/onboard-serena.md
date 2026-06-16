@@ -13,11 +13,10 @@ Serena is a required local semantic-code MCP for implementation work. It must be
   `serena project health-check` evidence.
 - Stop hooks may still run cleanup and session summary reminders.
 
-## Install and initialize
+## Install and verify
 
 ```bash
 uv tool install -p 3.13 serena-agent
-serena init
 serena project health-check
 ```
 

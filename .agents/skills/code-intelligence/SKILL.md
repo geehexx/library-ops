@@ -104,8 +104,6 @@ Run graph or symbol discovery before broad edits:
 uvx --from code-review-graph code-review-graph build
 uvx --from code-review-graph code-review-graph status
 # Use MCP graph tools for focused blast-radius questions.
-serena init
-# Project MCP config starts Serena through `.codex/config.toml`.
 ast-grep scan
 ```
 

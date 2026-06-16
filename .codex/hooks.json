@@ -6,13 +6,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
             "timeout": 10,
             "statusMessage": "Loading Library Ops session guardrails"
           },
           {
             "type": "command",
-            "command": "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
             "timeout": 10,
             "statusMessage": "Activating Serena project context"
           }
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
             "timeout": 10,
             "statusMessage": "Checking symbolic-tool usage"
           }
@@ -36,13 +36,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
             "timeout": 10,
             "statusMessage": "Cleaning Serena hook state"
           },
           {
             "type": "command",
-            "command": "uv run --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
             "timeout": 10,
             "statusMessage": "Preparing retrospective reminder"
           }

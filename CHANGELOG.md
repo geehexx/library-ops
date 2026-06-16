@@ -21,6 +21,16 @@ This file is managed by Python Semantic Release.
   targets the base repository context instead of the fork head.
 - Reworked skill-reference taxonomy toward concrete names and added governance
   tests for skill references, ADR index alignment, and bidi-control safety.
+- Promoted a proven local-first Task Master lane based on bounded Ollama runs,
+  committed phase PRDs for local-model-friendly regeneration, and aligned the
+  runtime policy, Task Master config example, and task graph notes around that
+  evidence.
+- Removed unproven Spark-specific agent lanes and demoted private design-tool
+  workflows so repo-local wireframes remain the only committed design authority.
+- Fixed remaining control-plane release and automation defects by adding an
+  explicit Python build backend, sanitizing Task Master subtask parent IDs,
+  making Semgrep path filters future-proof, and running Codex hook scripts with
+  `uv run --no-sync`.
 
 ### Not Yet Implemented
 
