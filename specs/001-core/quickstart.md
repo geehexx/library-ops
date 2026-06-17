@@ -27,6 +27,10 @@ Current graph note:
 Before editing, use code-review-graph, Serena, and ast-grep where available and
 record tool output in Task Master notes.
 
+Run feature tests in kind-first order: model and constraint coverage first,
+then request or integration coverage, then browser/E2E only when the user
+flow needs it.
+
 ## Post-bootstrap local run
 
 ```bash

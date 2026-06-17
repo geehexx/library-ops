@@ -8,8 +8,8 @@ Ship the first product-facing foundation slice on top of the existing Django
 bootstrap.
 
 This phase proves the project has real models, seeded roles/users, server-side
-authorization, and evaluator-visible pages before later branches add the full
-assignment feature set.
+authorization, evaluator-visible pages, and app-owned presentation surfaces
+before later branches add the full assignment feature set.
 
 ## Includes
 
@@ -55,7 +55,7 @@ assignment feature set.
 - exact/FTS/vector search implementation
 - public-domain import commands beyond role/demo-user seeding
 - AI suggestion workflows
-- deployment/release evidence work
+- deployment/release evidence work, which stays visible in the phase 4 view
 
 ## Exit criteria
 

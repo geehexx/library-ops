@@ -38,6 +38,10 @@ When the canonical PRD is too large for a local-model operation, the project MAY
 derive bounded phase PRDs under `.taskmaster/docs/phases/`, but those phase
 views MUST remain derived artifacts rather than competing product truths.
 
+The project MUST avoid bad anchor surfaces. No monolithic presentation shell or
+catch-all UI owner SHOULD absorb app-specific pages when the relevant Django app
+can own the route, URLConf, view module, and template namespace.
+
 ## III. Domain Correctness
 
 The system MUST distinguish:
@@ -94,6 +98,10 @@ Every pull request to `development` or `main` MUST pass the applicable subset of
 - property-based tests for core invariants,
 - E2E tests for user-critical flows once bootstraped.
 
+Validation planning SHOULD stay kind-first: lower-level invariants and
+constraints first, request and integration coverage next, and browser/E2E
+coverage only where the user flow requires it.
+
 Checks MAY be conditionally skipped only while their target bootstrap does not yet
 exist, and the skip MUST be explicit in CI output.
 
@@ -108,6 +116,10 @@ other MCP-capable agents by keeping source-of-truth artifacts portable:
 - `.specify/memory/constitution.md`,
 - `.agents/skills/*/SKILL.md`,
 - and conventional Markdown runbooks.
+
+The coordinator MUST use bounded delegation explicitly: assign owned slices,
+avoid local takeover of active owned work, and wait for return or blocked
+status instead of reopening scope early.
 
 Agents MUST use Context7 or equivalent current documentation for framework/API
 usage when implementation details are uncertain. Agents MAY use Exa or equivalent
@@ -199,6 +211,9 @@ Before a release is evaluator-ready, the runbook and README MUST identify:
 - smoke-test checklist,
 - rollback or reset procedure,
 - live URL and demo credentials when available.
+
+Even when later work is deferred, the planning surfaces MUST continue to show
+the route through deployment and release so the end-to-end path stays visible.
 
 ## XV. Version Alignment
 

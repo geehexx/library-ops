@@ -26,7 +26,9 @@
 - `audit` owns append-only audit events.
 - `search` owns projections/ranking, not authoritative state.
 - `ai_assist` owns suggestions, not direct catalog mutation.
-- `seed` owns import commands and provenance.
+- `accounts` owns demo-user seeding.
+- `catalog` owns public-domain import commands and provenance.
+- `search` and `ai_assist` own search-document and embedding rebuild workflows.
 
 ## Key constraints
 

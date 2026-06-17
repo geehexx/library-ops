@@ -6,7 +6,7 @@ owner: Engineering
 source_of_truth: true
 taskmaster_profile: rpg
 constitution: .specify/memory/constitution.md
-last_reviewed: 2026-06-12
+last_reviewed: 2026-06-17
 ---
 
 # Library Ops — Canonical RPG PRD
@@ -66,12 +66,14 @@ Evaluation criteria are completeness, creativity, product quality, and usability
 than a real integrated library system, but it should demonstrate mature engineering choices:
 
 - correct library domain modeling;
+- opinionated app-based Django organization for models, forms, URLs, views, and templates;
 - predictable spec-driven delivery;
 - secure role-based operations;
 - reproducible seed data;
 - hybrid search that respects exact library identifiers;
 - clear test and CI gates;
 - deployable Python/Django implementation;
+- kind-first test topology that keeps control-plane, smoke, product, and evaluator evidence distinct;
 - agent-compatible implementation workflow using Codex, Task Master, Spec Kit, Context7, Exa, RTK, and governed code-intelligence tooling.
 
 The project is not judged only by feature volume. It is judged by whether an evaluator can see that the
@@ -147,6 +149,8 @@ This PRD follows the Repository Planning Graph method from Task Master’s RPG t
 
 Task Master’s parser should treat each `### Capability:` as a top-level task candidate and each
 `#### Feature:` as a subtask candidate. The dependency sections provide sequencing context.
+Later capabilities through deployment and release remain in this PRD even while execution is focused on earlier
+foundation or product slices.
 
 ### 2.3 Spec Kit Relationship
 
@@ -311,9 +315,39 @@ to a task should be rejected or converted into a PRD/task update first.
 
 **Reasoning:** The user clarified that these should not remain vague optional add-ons. Alternatives were examined across smaller dedicated tools, larger hosted platforms, and raw/manual workflows. The project chooses local-first tools by default and defers hosted/cloud code-indexing, paid dashboards, and broader context layers until an explicit user decision.
 
-**Acceptance impact:** `.codex/config.toml`, skills, hooks, docs, and validation scripts declare the selected stack. Strict tooling verification fails in implementation environments when required tools are missing. Details live in `.codex/references/context-and-tooling-strategy.md`, `.codex/references/context-lineage.md`, ADR-0004, and ADR-0007.
+**Acceptance impact:** `.codex/config.toml`, skills, hooks, docs, and validation scripts declare the selected stack. Strict tooling verification fails in implementation environments when required tools are missing. Details live in `AGENTS.md`, capability-matched skills, ADR-0004, and ADR-0007.
+
+### Q15. How should evaluator-facing Django UI code be organized?
+
+**Decision:** Favor app-owned Django UI slices. Product apps SHOULD own their own `urls.py`, view modules/packages, and
+template namespaces when they expose evaluator-facing flows. The shared `web` app remains the thin shell for landing,
+home, navigation, and reusable presentation helpers rather than becoming a monolithic destination for every view.
+
+**Reasoning:** The project is growing beyond a single `views.py` surface. App-based URL/view/template ownership makes
+catalog, circulation, and future flows easier to review, test, and evolve without mixing unrelated concerns into one
+catch-all UI layer.
+
+**Acceptance impact:** `config/urls.py` composes app URLConfs; non-trivial UI surfaces are split by app and page family;
+templates use explicit app namespaces such as `templates/web/`, `templates/catalog/`, and `templates/circulation/`.
+
+### Q16. What is the durable test-topology direction?
+
+**Decision:** Keep all automated tests under `tests/` and group them first by test kind, then by module or evaluator
+flow. `tests/control_plane/`, `tests/smoke/`, and `tests/e2e/` are current stable anchors. Domain folders are
+transitional waypoints that should migrate toward `tests/unit/`, `tests/integration/`, and `tests/property/`.
+
+**Reasoning:** Kind-first organization keeps meta-system checks, bootstrap checks, domain invariants, DB-backed
+orchestration, and evaluator-visible browser flows distinct. That lowers review friction and keeps future test growth
+from collapsing into monolithic domain buckets.
+
+**Acceptance impact:** New tests are placed by validation regime first; product tests do not return to `src/libraryops/`;
+temporary domain folders are treated as migration waypoints rather than the desired end state.
 
 ## 5. Capability Tree
+
+The capability tree intentionally keeps the end-to-end path visible from foundation through deployment, release
+evidence, and reusable process capture. Current execution may be focused on an earlier capability, but later delivery
+capabilities remain planned here so Task Master regeneration preserves the full route to a shipped demo.
 
 ### Capability: C1 Project Foundation
 
@@ -335,10 +369,10 @@ Create a reproducible, agent-friendly project foundation.
 
 #### Feature: C1.F2 Django project bootstrap
 
-- **Description:** Harden the existing Django project under `src/libraryops/config` with local/test/production settings and real `DATABASE_URL` support.
+- **Description:** Harden the existing Django project under `src/libraryops/config` with local/test/production settings, real `DATABASE_URL` support, and root URL composition that can mount app-owned URLConfs cleanly.
 - **Inputs:** Existing `manage.py`, `src/libraryops/config/*`, `pyproject.toml`, environment variables, database URL.
 - **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable bootstrap.
-- **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, and production settings require explicit secure environment.
+- **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, production settings require explicit secure environment, and root routing stays thin enough to compose app-based UI/API surfaces.
 - **Acceptance criteria:**
   - `uv run python manage.py check` succeeds.
   - SQLite remains the fallback when `DATABASE_URL` is absent.
@@ -373,16 +407,17 @@ Create a reproducible, agent-friendly project foundation.
 
 #### Feature: C1.F5 Code-intelligence and Socratic tooling governance
 
-- **Description:** Add decision-governed support for RTK, code graph, symbol retrieval, AST search, repo snapshots, and MCP/tool alternatives.
-- **Inputs:** `docs/decisioning/socratic-decision-framework.md`, `.codex/references/context-and-tooling-strategy.md`, `.codex/references/context-lineage.md`, `.agents/skills/code-intelligence/SKILL.md`, `.codex/agents/code-intelligence-architect.toml`.
-- **Outputs:** Code-intelligence skill/agent, documented tool ladder, validation scripts, and explicit pause rules for trust/cost/scope changes.
-- **Behavior:** Agents evaluate context/tooling choices through accepted/recommended/ask/deferred decision statuses and tie material changes back to user decisions.
+- **Description:** Add decision-governed support for RTK, code graph, symbol retrieval, AST search, repo snapshots, MCP/tool alternatives, and the current meta-system hardening priorities.
+- **Inputs:** `AGENTS.md`, `.agents/skills/code-intelligence/SKILL.md`, `.codex/agents/code-intelligence-architect.toml`, and the current docs hub surfaces.
+- **Outputs:** Code-intelligence skill/agent, documented tool ladder, focused meta-system regression coverage, validation scripts, and explicit pause rules for trust/cost/scope changes.
+- **Behavior:** Agents evaluate context/tooling choices through accepted/recommended/ask/deferred decision statuses, tie material changes back to user decisions, and keep source-order/routing/tooling checks ahead of deeper product implementation assumptions.
 - **Acceptance criteria:**
   - RTK is documented as required in implementation environments and raw evidence rules are explicit.
   - code-review-graph is configured as a required project MCP with restricted graph/review tools.
   - Serena, ast-grep, Repomix, agent-skills-lint, actionlint, zizmor, Conftest, tokenix, Headroom, LeanCTX, and cloud semantic-code stores are classified.
   - `npm run checks:precommit`, `npm run taskmaster:validate`, and the focused hook/agent tests surface local tooling and meta-system regressions without custom verifier wrappers.
   - `codex doctor --summary --ascii --no-color` plus direct tool probes validate agent, skill, docs, context settings, and TOML/config health.
+  - The hardening priority order is explicit: source-of-truth alignment, required-tool/runtime verification, coordinator and skill routing correctness, continuation/evidence surface integrity, and focused governance-test coverage.
 
 ### Capability: C2 Library Domain Model
 
@@ -489,8 +524,8 @@ Provide evaluator-facing catalog workflows and internal admin support.
 
 - **Description:** Show books, editions, contributors, copies, availability, and allowed actions.
 - **Inputs:** Catalog records, current user role, search/filter state.
-- **Outputs:** HTML pages with role-aware actions.
-- **Behavior:** Anonymous/member users can view; librarians/admins see management actions.
+- **Outputs:** App-owned catalog URL, views, and templates with role-aware actions.
+- **Behavior:** Anonymous/member users can view; librarians/admins see management actions; catalog UI remains organized under catalog-owned routes and templates rather than a shared monolithic view file.
 - **Acceptance criteria:**
   - Book list has empty/loading/error states where relevant.
   - Book detail shows availability from copy state.
@@ -558,8 +593,8 @@ Implement checkout/borrow and checkin/return lifecycle.
 
 - **Description:** Provide checkout/return workflows for librarians/admins.
 - **Inputs:** Book detail actions, copy barcode, patron search, due date.
-- **Outputs:** HTML/HTMX modal or page response.
-- **Behavior:** Use progressive enhancement; actions work without large frontend framework.
+- **Outputs:** App-owned circulation URL, views, and HTML/HTMX modal or page response.
+- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer.
 - **Acceptance criteria:**
   - Checkout can be completed from book detail or circulation page.
   - Return can be completed from active loans dashboard.
@@ -821,6 +856,8 @@ Ship a live, reviewable product and documentation evidence.
 
 ### 6.1 Repository Structure
 
+The target repository shape for the Django product is:
+
 ```text
 library-ops/
   README.md
@@ -842,14 +879,22 @@ library-ops/
     core/
     accounts/
     catalog/
+      urls.py
+      views/
     inventory/
     circulation/
+      urls.py
+      views/
     search/
     ai_assist/
     audit/
-    seed/
     web/
+      urls.py
+      views/
   templates/
+    web/
+    catalog/
+    circulation/
   static/
   tests/e2e/
   tests/property/
@@ -867,14 +912,14 @@ library-ops/
 #### Module: `accounts`
 
 - **Maps to capability:** C3 Authentication and RBAC.
-- **Responsibility:** role initialization, permissions, profile-level helpers.
+- **Responsibility:** role initialization, demo-user seeding, permissions, profile-level helpers.
 - **Exports:** `require_librarian`, `require_admin`, `can_manage_catalog`, `can_manage_circulation`.
 - **Dependencies:** `core` and Django auth.
 
 #### Module: `catalog`
 
 - **Maps to capability:** C2/C4 catalog domain.
-- **Responsibility:** works, editions, contributors, catalog forms/views/API.
+- **Responsibility:** works, editions, contributors, provenance-backed imports, and catalog-owned Django forms, URLs, views, templates, and import helpers.
 - **Exports:** catalog selectors and mutation services.
 - **Dependencies:** `core`, `accounts`, `audit`.
 
@@ -888,7 +933,7 @@ library-ops/
 #### Module: `circulation`
 
 - **Maps to capability:** C5 circulation.
-- **Responsibility:** checkout, return, loans, overdue calculations.
+- **Responsibility:** checkout, return, loans, overdue calculations, and circulation-owned route/view/template flows.
 - **Exports:** `checkout_copy`, `return_copy`, loan selectors.
 - **Dependencies:** `core`, `accounts`, `inventory`, `audit`.
 
@@ -913,19 +958,20 @@ library-ops/
 - **Exports:** `record_audit_event`, `record_source_provenance`.
 - **Dependencies:** `core`, `accounts` only where actor references are required.
 
-#### Module: `seed`
+#### Seed workflows
 
 - **Maps to capability:** C8 seed data.
-- **Responsibility:** management commands and importers.
-- **Exports:** command modules, importer services.
+- **Responsibility:** app-owned management commands for demo roles/users, public-domain import/provenance, search-document rebuilds, embeddings rebuilds, and circulation examples; no standalone `seed` app directory.
+- **Exports:** management commands and importer/rebuild services in the owning app modules.
 - **Dependencies:** domain modules, not web views.
 
 #### Module: `web`
 
 - **Maps to capability:** C4/C5/C6 presentation.
-- **Responsibility:** navigation, view models, template utilities.
+- **Responsibility:** landing/home composition, shared navigation, view models, and presentation utilities.
 - **Exports:** navigation context, display formatting helpers.
 - **Dependencies:** selectors/services, not low-level persistence details.
+- **Boundary:** `web` SHOULD stay thin and SHOULD NOT become the default home for unrelated catalog or circulation views once app-owned UI slices exist.
 
 ### 6.3 Layering Rules
 
@@ -934,8 +980,12 @@ library-ops/
 - `selectors.py` contains read queries only.
 - `services.py` contains transactional mutations.
 - `forms.py` validates template flows.
+- `urls.py` belongs to the owning Django app when that app exposes evaluator-facing routes.
 - `api.py` contains Django Ninja endpoints only.
-- `views.py` orchestrates HTTP/template behavior and delegates rules to services/selectors.
+- non-trivial UI surfaces SHOULD use `views/` packages or split modules by page/flow family instead of one growing `views.py`.
+- templates live under explicit app namespaces such as `templates/web/`, `templates/catalog/`, and `templates/circulation/`.
+- `config/urls.py` composes app URL trees and cross-cutting endpoints rather than becoming a feature catch-all.
+- views orchestrate HTTP/template behavior and delegate rules to services/selectors.
 - `admin.py` configures internal admin only.
 
 ## 7. Dependency Chain
@@ -957,7 +1007,6 @@ library-ops/
 
 - `circulation`: depends on `core`, `accounts`, `inventory`, `audit`.
 - `search`: depends on `core`, `catalog`, `inventory`.
-- `seed`: depends on domain/search modules.
 
 ### Presentation/API Layer — Phase 3
 
@@ -972,6 +1021,10 @@ library-ops/
 
 ## 8. Development Phases
 
+These phases remain represented in the PRD from foundation through deployment and release evidence even when the current
+implementation task is earlier in the chain. Future steps are planned up front so task regeneration and review do not
+lose the path to a deployed demo.
+
 ### Phase 0: Governance and Foundation
 
 **Goal:** Make the repo safe and predictable before app code.
@@ -984,6 +1037,7 @@ library-ops/
 - remove generated junk from repo;
 - verify scripts and CI are accurate;
 - initialize Task Master and Spec Kit in-place;
+- lock meta-system hardening priorities and kind-first test-direction rules into the canonical docs/tests surfaces;
 - create feature branch workflow.
 
 **Exit criteria:**
@@ -991,6 +1045,7 @@ library-ops/
 - control-plane package verification passes;
 - PRD can be parsed by Task Master;
 - current task graph has no circular dependencies;
+- focused governance and smoke checks cover the meta-system and bootstrap surfaces that exist;
 - CI skeleton is ready.
 
 **Delivers:** An implementable plan and governed agent workspace.
@@ -1004,10 +1059,11 @@ library-ops/
 **Tasks:**
 
 - bootstrap Django project;
+- establish app-owned route/view/template skeletons for the first evaluator-facing flows;
 - implement models/migrations;
 - seed roles/users;
 - implement permission services;
-- add domain/constraint tests.
+- add domain/constraint tests and begin the kind-first test migration away from temporary domain buckets.
 
 **Exit criteria:**
 
@@ -1199,8 +1255,10 @@ ai_assist app
   embeddings and reviewed metadata suggestions
 audit app
   audit and provenance records
-seed app
-  demo users, corpus import, embeddings rebuild
+seed workflows
+  accounts: demo roles and demo users
+  catalog: public-domain import and provenance
+  search/ai_assist: search documents and embeddings rebuild
 ```
 
 ### 10.4 Architectural Constraints
@@ -1208,7 +1266,7 @@ seed app
 - The web layer MUST NOT implement business rules directly.
 - The API layer MUST NOT bypass service-layer authorization.
 - Search relevance code SHOULD be deterministic and testable.
-- Seed imports MUST be idempotent.
+- Seed/import management commands MUST be idempotent.
 - App must remain useful without optional hosted AI.
 
 ## 11. Data Model
@@ -1414,7 +1472,9 @@ The UI must label these as suggestions and require explicit save.
 
 ## 13. Seed Data and Demo Corpus
 
-### 13.1 Seed Commands
+### 13.1 Seed and Import Commands
+
+These management commands live in the owning apps. They do not imply a standalone `seed` package.
 
 ```bash
 uv run python manage.py seed_roles
@@ -1542,7 +1602,7 @@ Code-intelligence tools are not all MCPs and are governed separately:
 - Run or inspect `task-master next` before implementing.
 - Use the Socratic decision framework before material tooling, MCP, architecture, context-budget, cost, credential, or scope changes.
 - Use RTK for noisy command output, but raw output/full logs for final evidence.
-- Use code graph/symbol/AST/repo-pack tools only according to `.codex/references/context-and-tooling-strategy.md`.
+- Use code graph/symbol/AST/repo-pack tools only according to `AGENTS.md`, the relevant code-intelligence skill workflow, and the current docs hub surfaces.
 - Use Context7 before using framework/library APIs that may have changed.
 - Use Exa for current external research or examples.
 - Do not store secrets in Task Master metadata, PRD, README, or MCP config.
@@ -1550,6 +1610,12 @@ Code-intelligence tools are not all MCPs and are governed separately:
   bounded subagent ownership, avoid duplicate local implementation in those
   owned slices, and prefer waiting or blocked status over taking work back
   early.
+- Current meta-system hardening priority order is:
+  1. source-of-truth alignment across constitution, PRD, tasks, AGENTS, and skills;
+  2. required tool/runtime verification for Codex, Task Master, RTK, and selected code-intelligence surfaces;
+  3. coordinator-first routing and bounded specialist ownership;
+  4. continuation, evidence, and documentation integrity;
+  5. focused governance/smoke tests that fail fast on meta-system regressions.
 
 ### 15.4 Connector Truthfulness
 
@@ -1652,14 +1718,20 @@ This is a demo product. It should not store real patron data. Demo users and loa
 
 ## 18. Verification Strategy
 
-### 18.1 Test Pyramid
+### 18.1 Kind-First Test Topology
 
 ```text
-        E2E tests          small number, critical flows
-     Integration tests     services, views, API, DB constraints
-  Unit/property tests      domain rules, normalization, ranking, permissions
-Static/architecture gates  Ruff, Pyright, Import Linter, migration checks
+tests/control_plane/   agent workflow, governance, hooks, docs/process gates
+tests/smoke/           deterministic bootstrap and environment checks
+tests/unit/            isolated rules, normalization, serializers/forms/helpers
+tests/integration/     services, views, APIs, DB constraints, management commands
+tests/property/        invariant-heavy generated input/state transitions
+tests/e2e/             evaluator-visible browser and navigation flows
 ```
+
+Coverage still follows a pyramid shape inside that topology: control-plane and smoke checks fail fast, unit/property
+coverage protects invariants, integration tests cover orchestration, and E2E tests stay few and high-signal. Temporary
+domain folders are migration waypoints only and should converge into the kind-first layout above.
 
 ### 18.2 Unit and Integration Tests
 
@@ -1670,6 +1742,7 @@ Static/architecture gates  Ruff, Pyright, Import Linter, migration checks
 - Checkout/return services.
 - Search normalization.
 - Rank fusion.
+- App-owned URL/view/template flows and redirect/403 behavior.
 
 ### 18.3 Property-Based Tests
 
@@ -1789,12 +1862,14 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 | Filtered command output hides failure detail | Medium | Medium | RTK/raw evidence policy + tee/raw reruns | Rerun raw commands |
 | Code graph output treated as proof | Medium | Medium | Source/test inspection required after graph findings | Fall back to raw source review |
 | Django bootstrap conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
+| Evaluator UI drifts into a monolithic shared web layer | Medium | Medium | App-owned URL/view/template rules plus review | Split routes/views/templates by app before adding more flows |
 | Search overengineered | Medium | Medium | Baseline exact + FTS first | Defer vectors/BM25 |
 | ParadeDB unavailable on deployment | Low | High | Optional adapter only | Use standard FTS |
 | Public data licensing confusion | Medium | Medium | Store provenance and license notes; use official dumps/catalogs | Use synthetic seed records |
 | Free hosting limits | Medium | Medium | Keep corpus small; document local fallback | Provide local demo only if needed |
 | File upload security | Medium | Medium | Validate size/type/decode; limit uploads | External cover URLs only |
 | CI ignores real failures while bootstrap incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until bootstrap exists |
+| Test topology migration stalls in temporary domain folders | Medium | Medium | Kind-first placement rules and governance tests | Finish the split before broadening coverage further |
 
 ## 22. Task Master Parsing Contract
 
@@ -1965,5 +2040,5 @@ As of this PRD revision:
 
 - **Verified:** standards/tooling/deployment claims recorded in the source register and research register.
 - **Mechanically verified:** control-plane package archive hygiene and Markdown/Python static checks.
-- **Planned but not implemented:** Django app, database models, search services, seed importers, API, and deployment.
+- **Planned but not implemented:** app-based Django UI slices, database models, search services, kind-first test end state, seed importers, API, and deployment.
 - **Implementation-time checks required:** selected PostgreSQL host extension support, ParadeDB availability, final Codex model availability/cost policy, strict required-tooling check, and actual Task Master-generated task graph quality.
