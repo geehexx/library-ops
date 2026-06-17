@@ -89,19 +89,28 @@ def test_base_settings_disable_socialaccount_by_default(monkeypatch: Any) -> Non
 
 
 @pytest.mark.parametrize(
-    ("provider", "client_id_env", "secret_env", "provider_app"),
+    ("provider", "client_id_env", "secret_env", "provider_app", "provider_defaults"),
     [
         (
             "google",
             "DJANGO_ALLAUTH_GOOGLE_CLIENT_ID",
             "DJANGO_ALLAUTH_GOOGLE_SECRET",
             "allauth.socialaccount.providers.google",
+            {
+                "SCOPE": ["profile", "email"],
+                "AUTH_PARAMS": {"access_type": "online"},
+                "OAUTH_PKCE_ENABLED": True,
+            },
         ),
         (
             "github",
             "DJANGO_ALLAUTH_GITHUB_CLIENT_ID",
             "DJANGO_ALLAUTH_GITHUB_SECRET",
             "allauth.socialaccount.providers.github",
+            {
+                "SCOPE": ["user"],
+                "VERIFIED_EMAIL": True,
+            },
         ),
     ],
 )
@@ -111,6 +120,7 @@ def test_base_settings_enable_socialaccount_provider_from_env(
     client_id_env: str,
     secret_env: str,
     provider_app: str,
+    provider_defaults: dict[str, Any],
 ) -> None:
     """Ensure each OAuth provider appears only when its env vars are set."""
 
@@ -137,7 +147,8 @@ def test_base_settings_enable_socialaccount_provider_from_env(
                 "secret": f"{provider}-secret",
                 "key": "",
             }
-        ]
+        ],
+        **provider_defaults,
     }
     other_provider_app = (
         "allauth.socialaccount.providers.github"

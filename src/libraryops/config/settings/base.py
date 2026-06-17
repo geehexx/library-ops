@@ -58,17 +58,26 @@ def build_socialaccount_configuration() -> tuple[list[str], dict[str, Any]]:
             "allauth.socialaccount.providers.google",
             "DJANGO_ALLAUTH_GOOGLE_CLIENT_ID",
             "DJANGO_ALLAUTH_GOOGLE_SECRET",
+            {
+                "SCOPE": ["profile", "email"],
+                "AUTH_PARAMS": {"access_type": "online"},
+                "OAUTH_PKCE_ENABLED": True,
+            },
         ),
         (
             "github",
             "allauth.socialaccount.providers.github",
             "DJANGO_ALLAUTH_GITHUB_CLIENT_ID",
             "DJANGO_ALLAUTH_GITHUB_SECRET",
+            {
+                "SCOPE": ["user"],
+                "VERIFIED_EMAIL": True,
+            },
         ),
     ]
     installed_apps: list[str] = []
     provider_settings: dict[str, Any] = {}
-    for provider_name, app_label, client_id_env, secret_env in provider_defs:
+    for provider_name, app_label, client_id_env, secret_env, defaults in provider_defs:
         client_id = os.getenv(client_id_env, "").strip()
         secret = os.getenv(secret_env, "").strip()
         if not client_id or not secret:
@@ -85,6 +94,7 @@ def build_socialaccount_configuration() -> tuple[list[str], dict[str, Any]]:
                 }
             ]
         }
+        provider_settings[provider_name].update(defaults)
     return installed_apps, provider_settings
 
 

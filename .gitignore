@@ -70,6 +70,7 @@ models/
 build/
 dist/
 coverage.xml
+output/playwright/
 reports/
 *.egg-info/
 
