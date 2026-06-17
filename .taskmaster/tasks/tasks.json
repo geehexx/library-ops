@@ -702,7 +702,7 @@
           "8",
           "9"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -721,10 +721,11 @@
             "dependencies": [
               1
             ],
-            "details": "Implement the `seed_demo_users` command in `management/commands/seed_demo_users.py`. Create users with specific passwords (e.g., 'admin@libraryops.demo', 'librarian@libraryops.demo') and assign them to the predefined roles created by `seed_roles`. Use Django's admin site for user management if needed.",
-            "status": "pending",
+            "details": "Implement the `seed_demo_users` command in `management/commands/seed_demo_users.py`. Create users with specific passwords (e.g., 'admin@libraryops.demo', 'librarian@libraryops.demo') and assign them to the predefined roles created by `seed_roles`. Use Django's admin site for user management if needed.\n<info added on 2026-06-17T17:51:01.674Z>\nImplemented `seed_demo_users` command in `management/commands/seed_demo_users.py`. Created users with specific passwords and assigned them to predefined roles. Updated integration tests to verify role assignment behavior and handle missing access code. Checks: `uv run pyright src/libraryops/accounts/management/commands/seed_demo_users.py tests/integration/accounts/test_seed_commands.py` (0 errors), `uv run pytest -q tests/integration/accounts/test_seed_commands.py` (3 passed). No control-plane/meta files were modified.\n</info added on 2026-06-17T17:51:01.674Z>",
+            "status": "done",
             "testStrategy": null,
-            "parentId": "10"
+            "parentId": "10",
+            "updatedAt": "2026-06-17T17:50:48.069Z"
           },
           {
             "id": 3,
@@ -762,7 +763,8 @@
             "testStrategy": null,
             "parentId": "10"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T17:50:48.069Z"
       },
       {
         "id": 11,
@@ -921,13 +923,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-17T12:44:39.686Z",
+      "lastModified": "2026-06-17T17:50:48.069Z",
       "taskCount": 12,
       "completedCount": 5,
       "tags": [
         "master"
       ],
-      "created": "2026-06-17T12:51:45.980Z",
+      "created": "2026-06-17T17:50:51.174Z",
       "description": "Tasks for master context"
     }
   }

@@ -8,6 +8,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import tomllib
 from pathlib import Path
 from typing import Any, cast
@@ -117,8 +118,21 @@ def mcp_summary(config: dict[str, Any]) -> str:
         )
         enabled = table_data.get("enabled", True)
         required = table_data.get("required", False)
-        entries.append(f"{name}(enabled={enabled},required={required},{auth_hint})")
+        approval = table_data.get("default_tools_approval_mode", "unspecified")
+        entries.append(
+            f"{name}(enabled={enabled},required={required},approval={approval},{auth_hint})"
+        )
     return ", ".join(entries) if entries else "none"
+
+
+def runtime_cache_hint() -> str:
+    """Describe the cache-safe paths used by repo-local shell wrappers."""
+    tmpdir = Path(tempfile.gettempdir())
+    return (
+        "cache_hint="
+        f"npm_config_cache={tmpdir / 'codex-npm-cache'};"
+        f"XDG_CACHE_HOME={tmpdir / 'codex-xdg-cache'}"
+    )
 
 
 def task_graph_status(root: Path) -> str:
@@ -180,8 +194,10 @@ def main() -> int:
         f"cwd={cwd}; repo={root}; branch={branch}; dirty_files={dirty_count}; "
         f"task_graph={task_graph_status(root)}; permission_profile={permission_profile}; "
         f"features={','.join(enabled_features) or 'none'}; mcps={mcp_summary(config)}; "
+        f"{runtime_cache_hint()}; "
         f"instructions={fingerprints}. "
         "Read source-of-truth docs and relevant skills before editing. "
+        "Use specialist or subagent packets before broad root-local tool use. "
         "OAuth/provider setup is operator-local; if a required login is missing, "
         "ask the user to run the official login/setup command."
     )

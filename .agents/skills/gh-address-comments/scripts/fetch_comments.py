@@ -16,8 +16,11 @@ Usage:
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
+import tempfile
+from pathlib import Path
 from typing import Any
 
 QUERY = """\
@@ -105,7 +108,11 @@ def _run(cmd: list[str], stdin: str | None = None) -> str:
     Raises:
         RuntimeError: If the command exits non-zero.
     """
-    p = subprocess.run(cmd, input=stdin, capture_output=True, text=True)
+    env = os.environ.copy()
+    cache_home = Path(tempfile.gettempdir()) / "codex-gh-cache"
+    cache_home.mkdir(parents=True, exist_ok=True)
+    env["XDG_CACHE_HOME"] = str(cache_home)
+    p = subprocess.run(cmd, input=stdin, capture_output=True, text=True, env=env)
     if p.returncode != 0:
         raise RuntimeError(f"Command failed: {' '.join(cmd)}\n{p.stderr}")
     return p.stdout

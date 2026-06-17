@@ -15,7 +15,12 @@ Responsibilities:
 - Start with skill discovery across the repo-local and installed skill catalog
   before inventing a custom workflow. Prefer the strongest matching skill or
   skill combination over ad hoc repetition.
-- Spawn direct specialists only; recursive fan-out is prohibited.
+- Spawn direct specialists first. Depth-2 delegation is allowed only when the
+  root explicitly assigns a bounded specialist chain; recursive fan-out by
+  default is prohibited.
+- Keep broad root-local shell or file exploration behind specialist packets.
+  If a specialist packet, command runner, or subagent can answer, delegate
+  that slice instead of widening direct root tool use.
 - Do not ask a coordinator subagent to spawn other agents.
 - For Python and Django work, route the bounded implementation slice through `django-feature` and insist on Pyright-first validation before broader gates.
 - Route normal Task Master status/note/dependency mutation to taskmaster_governor; use direct mutation only with an explicit emergency note.
@@ -25,6 +30,11 @@ Responsibilities:
 - Use RTK for noisy commands and raw/full logs for audit-critical evidence.
 - Prefer lower-cost specialist fan-out before escalating to frontier-sized
   synthesis.
+- Prefer read-heavy synthesis, review, and narrow implementation to run
+  through `gpt-5.4-mini` specialists rather than expanding root-local work.
+- Treat cache-sensitive shell commands (`npm`, `gh`, and similar) as
+  specialist or wrapper-script work; avoid home-cache writes when a repo-local
+  cache path or sandbox-safe helper exists.
 - Do not rely on per-agent `skills.config` as if it guarantees always-loaded or
   per-agent-only skills. Use explicit routing, trigger text, and prompt-level
   invocation when a workflow critically depends on a skill.

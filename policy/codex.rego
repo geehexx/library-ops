@@ -28,13 +28,13 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  input.agents.max_depth != 1
-  msg := "agents.max_depth must remain 1 for the direct-specialist default posture."
+  input.agents.max_depth != 2
+  msg := "agents.max_depth must remain 2 for the bounded depth-2 specialist posture."
 }
 
 deny contains msg if {
-  input.agents.max_threads > 8
-  msg := "agents.max_threads must remain <= 8."
+  input.agents.max_threads > 12
+  msg := "agents.max_threads must remain <= 12."
 }
 
 deny contains msg if {
@@ -50,4 +50,12 @@ deny contains msg if {
   missing := required - configured
   count(missing) > 0
   msg := sprintf("Missing required MCP server(s): %v", [missing])
+}
+
+deny contains msg if {
+  required := {"context7", "exa", "taskmaster-ai", "code-review-graph", "serena"}
+  some name in required
+  server := input.mcp_servers[name]
+  server.default_tools_approval_mode != "approve"
+  msg := sprintf("MCP server must default to approve: %s", [name])
 }

@@ -7,9 +7,9 @@ Promptfoo is the primary Library Ops control-plane and AI-behavior evaluation sy
 | Lane | Command | Purpose | Credentials |
 |---|---|---|---|
 | Config | `npm run eval:validate` | Validate Promptfoo config syntax and schema. | None. |
-| Deterministic smoke | `npm run eval:smoke` | Check control-plane wording, artifact policy, local-only config posture, and no-secret contracts with the `echo` provider. Writes a local ignored result under `reports/validation/`. | None. |
+| Deterministic smoke | `npm run eval:smoke` | Check control-plane wording, artifact policy, local-only config posture, and no-secret contracts with the `echo` provider. The script runs through `scripts/codex-runtime-env.sh` so `PROMPTFOO_CONFIG_DIR`, `PROMPTFOO_LOG_DIR`, and promptfoo state/logs stay under `TMPDIR`. | None. |
 | CI aggregate | `npm run eval:ci` | Run config plus deterministic smoke. | None. |
-| Provider semantic | `OLLAMA_BASE_URL=http://127.0.0.1:11434 npx --yes promptfoo@0.121.15 eval -j 1 -c evals/release/<suite>.yaml --no-cache --output reports/validation/promptfoo-<suite>.json` | Compare provider/model behavior after local provider setup succeeds. Outputs stay local under ignored `reports/validation/`. | Local/user-approved only. |
+| Provider semantic | `OLLAMA_BASE_URL=http://127.0.0.1:11434 scripts/codex-runtime-env.sh npx --yes promptfoo@0.121.15 eval -j 1 -c evals/release/<suite>.yaml --no-cache --output reports/validation/promptfoo-<suite>.json` | Compare provider/model behavior after local provider setup succeeds. Outputs stay local under ignored `reports/validation/`, and `PROMPTFOO_CONFIG_DIR` plus `PROMPTFOO_LOG_DIR` keep promptfoo state/logs under `TMPDIR`. | Local/user-approved only. |
 | Red-team | `npx --yes promptfoo@0.121.15 redteam init`, `npx --yes promptfoo@0.121.15 redteam run`, `npx --yes promptfoo@0.121.15 redteam report` | Probe prompt-injection, unsafe tool use, RBAC, data exfiltration, and policy bypass after the app boundary exists. | Local/user-approved only. |
 
 ## Current deterministic smoke scope

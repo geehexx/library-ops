@@ -25,6 +25,16 @@ and the required local toolchain.
 - Spawn direct specialists for bounded work; do not let the root absorb broad
   implementation or recursive fan-out by habit. If a specialist already owns a
   slice, wait for its return or an explicit scope change.
+- Depth-2 delegation is allowed only when the root explicitly assigns a
+  bounded sub-specialist chain. The root remains the only interactive
+  coordinator and final decision owner.
+- Discovery is mandatory by default: start with skill discovery, then route the
+  slice to the narrowest specialist or subagent before broad root-local tool
+  use. If the root can keep widening the search, it is a coordination defect.
+- Broad direct shell or file exploration from the root is gated. Prefer
+  specialist packets or `scripts/codex-runtime-env.sh` for cache-sensitive
+  commands such as `npm` and `gh` so home-directory cache writes do not become
+  sandbox failures.
 - Keep root `AGENTS.md` lean. Shared clarification, escalation, tooling, and
   continuation mechanics belong in `.codex/agents/*.toml` and the explicit
   repo-local skill entrypoints under `.agents/skills/`.
@@ -32,6 +42,9 @@ and the required local toolchain.
   `.agents/skills/clarify-and-goal/SKILL.md`.
 - The tool-routing, evidence, and blast-radius contract lives in
   `.agents/skills/code-intelligence/SKILL.md`.
+- Required repo-local MCP servers in `.codex/config.toml` should stay
+  `required = true` and `default_tools_approval_mode = "approve"` unless a
+  deliberate trust change is recorded.
 
 ## Required session start
 

@@ -31,7 +31,7 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["uv", "run", "--project"],
+    pattern = ["uv", "run", "--no-sync", "--project"],
     decision = "allow",
     justification = "Codex lifecycle hooks run through the repo-managed uv Python environment from the git root.",
     match = [
@@ -115,6 +115,12 @@ prefix_rule(
         "npm run policy:check",
         "npm run security:scan",
     ],
+)
+
+prefix_rule(
+    pattern = ["scripts/codex-runtime-env.sh"],
+    decision = "allow",
+    justification = "Cache-safe command wrapper for npm and gh so shell tools do not default to home-directory cache paths.",
 )
 
 prefix_rule(

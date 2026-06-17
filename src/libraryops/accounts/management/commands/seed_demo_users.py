@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 
-DEFAULT_PASSWORD_ENV_VAR = "LIBRARYOPS_DEMO_PASSWORD"
+DEMO_ACCESS_CODE_ENV_VAR = "LIBRARYOPS_DEMO_ACCESS_CODE"
 DEMO_USERS = (
     ("admin@libraryops.demo", ROLE_ADMIN, True, True),
     ("librarian@libraryops.demo", ROLE_LIBRARIAN, True, False),
@@ -24,17 +24,20 @@ class Command(BaseCommand):
 
     help = "Create the demo users and assign each one application role."
 
-    def default_password(self) -> str:
-        """Return the required disposable demo password from the environment.
+    def default_access_code(self) -> str:
+        """Return the required disposable demo access code from the environment.
+
+        Returns:
+            The local disposable access code used when seeding demo users.
 
         Raises:
-            CommandError: The local demo password environment variable is absent.
+            CommandError: The local demo access-code environment variable is absent.
         """
 
-        value = os.getenv(DEFAULT_PASSWORD_ENV_VAR)
+        value = os.getenv(DEMO_ACCESS_CODE_ENV_VAR)
         if value is None or not value.strip():
             raise CommandError(
-                f"Missing demo password. Set `{DEFAULT_PASSWORD_ENV_VAR}` before "
+                f"Missing demo access code. Set `{DEMO_ACCESS_CODE_ENV_VAR}` before "
                 "running `python manage.py seed_demo_users`."
             )
         return value
@@ -48,12 +51,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--reset-passwords",
             action="store_true",
-            help="Reset the disposable demo user passwords to the default value.",
+            help="Reset the disposable demo user access code to the default value.",
         )
 
     def handle(self, *_args: str, **options: object) -> None:
         """Create or refresh the demo users."""
-        default_password = self.default_password()
+        default_access_code = self.default_access_code()
         missing_groups = [
             name
             for name in (ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER)
@@ -75,7 +78,7 @@ class Command(BaseCommand):
                 },
             )
             if created or bool(options["reset_passwords"]):
-                user.set_password(default_password)
+                user.set_password(default_access_code)
             user.is_staff = is_staff
             user.is_superuser = is_superuser
             user.username = email

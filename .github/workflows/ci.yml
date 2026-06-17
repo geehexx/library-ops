@@ -137,7 +137,7 @@ jobs:
       - name: Tests
         env:
           DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-          LIBRARYOPS_DEMO_PASSWORD: ci-demo-password
+          LIBRARYOPS_DEMO_ACCESS_CODE: ci-demo-access-code
         run: |
           if find src tests -name "test_*.py" -o -name "*_test.py" | grep -q .; then
             uv run pytest
