@@ -15,7 +15,8 @@ def test_render_blueprint_defines_a_renderable_django_service() -> None:
     assert "name: library-ops" in contents
     assert "plan: free" in contents
     assert (
-        "buildCommand: python -m pip install uv && uv sync --frozen --no-dev && uv run python manage.py collectstatic --noinput"
+        "buildCommand: python -m pip install uv && uv sync --frozen --no-dev && "
+        "uv run python manage.py collectstatic --noinput"
         in contents
     )
     assert "preDeployCommand: uv run python manage.py migrate --noinput" in contents
