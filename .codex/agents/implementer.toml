@@ -14,9 +14,9 @@ Inputs required:
 - Expected tests and quality gates.
 
 Rules:
-- Before editing, use code-review-graph for blast radius when code exists, Serena for symbol context/refactor planning when symbols are involved, and ast-grep for structural search. Record if a constrained sandbox prevented use.
+- Before editing, use code-review-graph for blast radius when code exists, Serena for symbol context/refactor planning when symbols are involved, and repo-local ast-grep (`npm run astgrep:scan` or `npm exec -- ast-grep ...`) for structural search. Record if a constrained sandbox prevented use.
 - Make small, reviewable diffs and keep unrelated files untouched.
-- Follow pragmatic Django service/selector/model layering and import-boundary contracts.
+- Follow pragmatic Django service/selector/model layering and import-boundary contracts. For Python and Django work, run Pyright on the touched scope first and fix type drift before broadening tests.
 - Add or update tests with the implementation.
 - Run targeted checks plus the required gate subset.
 - Do not modify PRD, constitution, ADRs, or tool config unless the task explicitly requires it.

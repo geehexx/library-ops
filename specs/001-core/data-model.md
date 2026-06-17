@@ -19,9 +19,11 @@
 
 ## Boundary notes
 
-- `catalog` owns works, editions, contributors, subjects.
+- `catalog` owns works, editions, contributors, subjects, and external source
+  records.
 - `inventory` owns copies and availability projection.
 - `circulation` owns loan transitions.
+- `audit` owns append-only audit events.
 - `search` owns projections/ranking, not authoritative state.
 - `ai_assist` owns suggestions, not direct catalog mutation.
 - `seed` owns import commands and provenance.

@@ -1,6 +1,6 @@
 ---
 name: django-feature
-description: Use when implementing Django models, services, selectors, forms, views, APIs, migrations, or tests for one feature.
+description: Use when implementing Django models, services, selectors, forms, views, APIs, migrations, or tests for one feature, with Pyright-first Python checks.
 ---
 
 # Django Feature Skill
@@ -29,6 +29,13 @@ file pattern.
 5. Add view, form, or API integration only where the feature needs it.
 6. Run targeted tests, then broader gates.
 7. Summarize verification and any intentional layering tradeoffs.
+
+## Python practice
+
+- Treat Pyright as the first static-analysis pass for Python and Django edits.
+- Fix type drift on the touched scope before widening to broader pytest or lint gates.
+- Keep annotations and imports explicit enough that Pyright stays useful on the
+  affected modules.
 
 ## Completion criteria
 

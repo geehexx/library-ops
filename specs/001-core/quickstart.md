@@ -19,9 +19,10 @@ operations.
 
 Current graph note:
 
-- complete the remaining control-plane consolidation task first if it is still
-  active
-- otherwise the next product-facing task is Django bootstrap and settings
+- Task 3 is the current Phase 1 entry point.
+- Treat the bootstrap as already committed and extend it in place.
+- The first real product slice is bootstrap proof plus domain/RBAC foundation,
+  not full catalog/circulation/search completion.
 
 Before editing, use code-review-graph, Serena, and ast-grep where available and
 record tool output in Task Master notes.
@@ -37,5 +38,5 @@ uv run python manage.py runserver
 
 ## Post-bootstrap checks
 
-Use `npm run verify:core` plus any focused Django or test commands needed for
-the current task.
+Use `npm run verify:core` plus any focused Django, Import Linter, and browser
+test commands needed for the current Phase 1 slice.

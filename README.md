@@ -11,8 +11,9 @@ npm ci
 uv sync --all-groups
 npm run skills:lint
 npm run skills:audit
-uv run pytest
 uv run python manage.py check
+uv run python manage.py makemigrations --check --dry-run
+uv run pytest tests/smoke tests/web tests/e2e
 npm run eval:ci
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 ```
@@ -34,6 +35,23 @@ The fastest local hygiene loop is:
 ```bash
 npm run checks:precommit
 ```
+
+## Coordinator-first startup
+
+For a fresh session that should use the repo-local coordinator-default flow,
+launch Codex through:
+
+```bash
+./scripts/codex-coordinator.sh
+```
+
+Continuation state lives locally in:
+
+- `.codex-session-notes/continuation.md`
+- `.codex-session-notes/scratch.md`
+
+These files are gitignored on purpose. They replace `/tmp/prompt.md` as the
+canonical handoff pattern for this repo.
 
 Some gates require local tools, MCP auth, browser access, or provider approval. When a gate cannot run in the current environment, record the exact blocker in the current task notes and, if useful, a local `reports/validation/*` artifact rather than claiming the check passed.
 

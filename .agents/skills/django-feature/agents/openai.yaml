@@ -1,4 +1,4 @@
 interface:
   display_name: "Django Feature"
-  short_description: "Implement one Django feature with proper layering"
-  default_prompt: "Use $django-feature to implement one bounded Library Ops Django feature with the repo’s service, selector, model, and test conventions."
+  short_description: "Implement one Django feature with proper layering and Pyright-first checks"
+  default_prompt: "Use $django-feature to implement one bounded Library Ops Django feature with the repo’s service, selector, model, test, and Pyright-first conventions."

@@ -104,8 +104,11 @@ Run graph or symbol discovery before broad edits:
 uvx --from code-review-graph code-review-graph build
 uvx --from code-review-graph code-review-graph status
 # Use MCP graph tools for focused blast-radius questions.
-ast-grep scan
+npm run astgrep:scan
 ```
+
+Use the repo-local `ast-grep` binary through `npm run astgrep:scan` or
+`npm exec -- ast-grep ...`. Do not assume a global `ast-grep` command exists.
 
 Graph or symbol output is planning evidence, not behavioral proof. Always
 inspect the underlying files and run tests.

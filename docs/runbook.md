@@ -14,6 +14,12 @@ npm run taskmaster:validate
 npm run verify:core
 ```
 
+For fresh coordinator-first sessions, prefer:
+
+```bash
+./scripts/codex-coordinator.sh
+```
+
 Use `npm run checks:precommit` for the fastest local hygiene loop, `npm run
 verify:core` for the full local loop, and `npm run verify:all` when
 you want the same loop plus the full security aggregate.
@@ -34,7 +40,7 @@ in the current task notes.
 rtk init -g --codex
 uvx --from code-review-graph code-review-graph status
 serena project health-check
-ast-grep scan
+npm run astgrep:scan
 repomix --config repomix.config.json
 ```
 

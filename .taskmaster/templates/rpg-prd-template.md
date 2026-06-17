@@ -36,8 +36,12 @@ If the canonical PRD is too large for the active local model lane, derive
 bounded phase PRDs that:
 
 - preserve the same source-of-truth order,
+- include a concise goal,
+- define entry criteria,
+- define implementation notes and explicit out-of-scope boundaries,
 - state their canonical parent,
 - define exit criteria,
+- include suggested validation commands when the slice is implementation-near,
 - and are safe to regenerate without replacing the canonical PRD.
 
 ## Library Ops bias
@@ -50,3 +54,7 @@ Prefer explicit evaluator-facing evidence language over generic phrases that
 sound stronger than the evidence. If a claim needs words such as "high-signal",
 "complete", or "thorough", the PRD should also state the measurable proof
 behind that claim.
+
+If the PRD touches coordinator or subagent behavior, state the delegation rule
+explicitly: bounded ownership, no duplicate local implementation of active
+owned slices, and waiting or blocked status over early takeover.

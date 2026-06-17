@@ -20,6 +20,8 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
   the PRD, ADRs, AGENTS, skills, or concise runbook/setup surfaces.
 - Treat Task Master as derived from the canonical PRD and spec pack. If they
   disagree, update PRD/spec first, then regenerate or reconcile the task graph.
+- If a spec or plan changes coordinator routing or subagent behavior, preserve
+  the delegation rule explicitly instead of softening it into advisory wording.
 
 ## Required generated artifact qualities
 
@@ -36,9 +38,12 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
 ## Feature-plan expectations
 
 - `spec.md` should capture the requirement delta, constraints, and user-facing
-  acceptance shape for one feature slice.
+  acceptance shape for one feature slice, plus explicit deferred scope when the
+  branch is intentionally narrower than the full product roadmap.
 - `plan.md` should describe the implementation path, touched systems, and
-  validation approach without duplicating the whole PRD.
+  validation approach without duplicating the whole PRD. For phase-oriented
+  work, prefer a clear structure of entry point, current-slice scope, deferred
+  scope, and cross-cutting validation.
 - `tasks.md` should be small, reviewable, and consistent with the eventual Task
   Master graph rather than acting as a second execution authority.
 - If a feature affects governance, runtime policy, or control-plane behavior,

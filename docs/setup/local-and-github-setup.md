@@ -27,12 +27,17 @@ Project MCPs are already declared in `.codex/config.toml`.
 
 ```bash
 cd <repo-root>
-codex --cd <repo-root>
+./scripts/codex-coordinator.sh
 codex mcp list
 ```
 
 Start Codex from a shell where direnv has already loaded the repo environment.
 Do not print `.envrc` and do not use `direnv exec` as the normal startup path.
+
+Canonical continuation artifacts for paused work:
+
+- `.codex-session-notes/continuation.md`
+- `.codex-session-notes/scratch.md`
 
 ## MCP repair commands
 
@@ -52,7 +57,7 @@ rtk init -g --codex
 uvx --from code-review-graph code-review-graph build
 uv tool install -p 3.13 serena-agent
 serena project health-check
-ast-grep scan
+npm run astgrep:scan
 repomix --config repomix.config.json
 ```
 

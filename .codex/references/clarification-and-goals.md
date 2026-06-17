@@ -58,6 +58,17 @@ Use `/goal` only after the outcome is measurable, the evidence surface is
 clear, and the stop/ask conditions are explicit. For long-horizon work, omit a
 token budget by default unless a hard ceiling is intentional.
 
+## Continuation artifact
+
+For paused or long-running work, refresh these repo-local gitignored files
+before handoff:
+
+- `.codex-session-notes/continuation.md` — canonical continuation state
+- `.codex-session-notes/scratch.md` — disposable working notes only
+
+Do not treat `/tmp/prompt.md` as the authoritative handoff surface for this
+repo.
+
 ## Remote policy blockers
 
 If GitHub or another remote system blocks a required merge, push, or release
@@ -65,3 +76,11 @@ step through repository policy, treat that as a real blocker. Do not continue
 from an alternate base branch, assume a later merge, or bypass the policy
 unless the user explicitly instructs that change. Emit a blocked escalation with
 the exact remote evidence first.
+
+## Delegation trust rule
+
+When the user explicitly asks for subagents or delegated work, the coordinator
+must assign bounded ownership with a clear stop condition, avoid redoing those
+owned slices locally, and poll sparingly. If the critical path depends on a
+subagent-owned result, prefer a waiting or blocked state over silent local
+takeover until the subagent returns, blocks, or scope changes.

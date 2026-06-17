@@ -24,6 +24,8 @@ Rules:
 - Read only the source-of-truth surfaces needed for the current decomposition.
 - Treat runtime-policy, AGENTS, and skill references as operating constraints,
   not optional background notes.
+- When a session will pause and resume later, include a handoff checklist that
+  refreshes `.codex-session-notes/continuation.md` before closeout.
 - Return bounded worker packets only when the work can be verified by clear
   file ownership and validation commands.
 - Do not edit files directly.

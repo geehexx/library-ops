@@ -38,6 +38,18 @@ npm run verify:core
 npm run verify:all
 ```
 
+### Phase 1 validation ladder
+
+```bash
+uv run ruff format --check .
+uv run ruff check .
+uv run python manage.py check
+uv run python manage.py makemigrations --check --dry-run
+PYTHONPATH=src uv run lint-imports
+uv run pyright
+uv run pytest tests/smoke tests/web tests/e2e
+```
+
 ## What the aggregate gates cover
 
 `npm run verify:core` covers:
@@ -51,7 +63,7 @@ npm run verify:all
 - workflow lint
 - policy checks
 - release readiness
-- Ruff, Pyright, pytest, Import Linter, and Django checks
+- Ruff, Django `check`, Django `makemigrations --check --dry-run`, Pyright, pytest, and Import Linter
 - Task Master validation
 
 `npm run verify:all` adds:

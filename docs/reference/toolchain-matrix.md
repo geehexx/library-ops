@@ -10,7 +10,7 @@ The selected implementation environment treats the configured tools as required.
 | RTK | Noisy shell-output compression. |
 | Serena | Symbol-aware retrieval/refactor planning, kept as a persistent local install because hooks depend on `serena-hooks`. |
 | code-review-graph | Graph/blast-radius review, with repo-preferred `uvx` or npm wrapper invocation. |
-| ast-grep | Deterministic AST rules/codemods. |
+| ast-grep | Deterministic AST rules/codemods via repo-local `npm exec -- ast-grep` or `npm run astgrep:scan`. |
 | Repomix | Bounded repo snapshots. |
 | Context7/Exa MCP | Docs and research context. |
 | Promptfoo | Eval and red-team gate, invoked as a pinned external CLI. |
