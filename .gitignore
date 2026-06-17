@@ -71,6 +71,7 @@ build/
 dist/
 coverage.xml
 reports/
+*.egg-info/
 
 # OS/editor
 .DS_Store

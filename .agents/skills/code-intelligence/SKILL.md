@@ -9,8 +9,18 @@ description: Use when a task mentions RTK, code graph, code-review-graph, Serena
 
 Use this skill to reduce context waste while improving code understanding and evidence quality. The selected local toolchain is required for implementation environments. Missing tools are blockers unless the run is explicitly using the constrained sandbox profile and the limitation is recorded.
 
-Read `references/tool-routing.md` when the coordinator needs the current repo-local
-source order, tool-routing guidance, or evidence rules for control-plane work.
+Choose the next skill or tool by capability and trigger match first, not by
+file name familiarity or habit.
+
+## Current sources
+
+Treat these as the durable repo-local sources for control-plane work:
+
+- `AGENTS.md` for coordinator posture and source order.
+- `.taskmaster/docs/prd.md`, `specs/001-core/`, and current Task Master state.
+- `.codex/agents/*.toml` for agent routing metadata.
+- `.agents/skills/*/SKILL.md` for explicit capability entrypoints.
+- `docs/process/quality-gates.md` for the validation ladder.
 
 ## Required stack
 
@@ -37,6 +47,9 @@ Security/permission impact:
 Rollback:
 Open user decision:
 ```
+
+If a blocker belongs to another owned slice, stop at the boundary and return
+an escalation instead of broadening the search or implementation scope.
 
 Pause for user input only when the choice changes credentials, cost, hosted/remote code transfer, irreversible repository state, or explicit project scope. Do not pause merely because a local required tool needs to be run, configured, or smoke-tested.
 

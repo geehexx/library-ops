@@ -386,7 +386,8 @@ def remind(session_id: str, payload: dict[str, Any]) -> int:
         )
         additional_context = (
             "The repo reminder only engages after repeated grep-style shell searches. "
-            "Reset it by using Serena symbolic tools or a broader graph/symbol pass."
+            "Reset it by using Serena symbolic tools, a broader graph/symbol pass, "
+            "or a specialist packet instead of widening root-local exploration."
         )
     elif classification == "read" and state.read_uses >= READ_THRESHOLD:
         deny_reason = (
@@ -395,7 +396,8 @@ def remind(session_id: str, payload: dict[str, Any]) -> int:
         )
         additional_context = (
             "The reminder targets repeated narrow file reads of code-like files. "
-            "Symbol-aware reads should reset this counter."
+            "Symbol-aware reads should reset this counter, and specialist routing "
+            "should take over before the root keeps broadening the read loop."
         )
     elif state.non_symbolic_uses >= NON_SYMBOLIC_THRESHOLD:
         deny_reason = (
@@ -405,7 +407,8 @@ def remind(session_id: str, payload: dict[str, Any]) -> int:
         )
         additional_context = (
             "Mixed grep/read shell bursts are intentionally throttled so the workflow shifts "
-            "back to symbolic or graph tooling."
+            "back to symbolic or graph tooling, or to a specialist packet when the root "
+            "is trying to keep expanding direct tool use."
         )
 
     if deny_reason is None:

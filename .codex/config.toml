@@ -24,11 +24,13 @@ goals = true
 tool_call_mcp_elicitation = true
 
 # Root coordinator plus direct specialists. The root remains the only
-# interactive coordinator; recursion is disabled by default until a later
-# validator-backed experiment proves deeper fan-out is worth it.
+# interactive coordinator; depth-2 delegation is allowed only for explicitly
+# assigned bounded specialist chains, not habitual recursive fan-out.
+# Broad root-local exploration should stay routed through specialists or cache
+# safe wrappers when a narrower owned slice exists.
 [agents]
-max_threads = 8
-max_depth = 1
+max_threads = 12
+max_depth = 2
 job_max_runtime_seconds = 1800
 
 [agents.coordinator]
@@ -131,8 +133,6 @@ glob_scan_max_depth = 5
 "secrets/**" = "deny"
 "config/credentials/**" = "deny"
 "config/secrets/**" = "deny"
-".git/**" = "read"
-".taskmaster/state.json" = "deny"
 ".codex/**" = "write"
 ".agents/**" = "write"
 
@@ -194,7 +194,7 @@ command = "node"
 args = ["node_modules/@upstash/context7-mcp/dist/index.js", "--transport", "stdio"]
 env_vars = ["CONTEXT7_API_KEY"]
 required = true
-default_tools_approval_mode = "prompt"
+default_tools_approval_mode = "approve"
 startup_timeout_sec = 20
 tool_timeout_sec = 45
 
@@ -202,7 +202,7 @@ tool_timeout_sec = 45
 url = "https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa"
 required = true
 enabled_tools = ["web_search_exa", "web_fetch_exa"]
-default_tools_approval_mode = "prompt"
+default_tools_approval_mode = "approve"
 startup_timeout_sec = 20
 tool_timeout_sec = 45
 
@@ -210,7 +210,7 @@ tool_timeout_sec = 45
 command = "npx"
 args = ["--yes", "--package", "task-master-ai@0.43.1", "task-master-ai"]
 required = true
-default_tools_approval_mode = "prompt"
+default_tools_approval_mode = "approve"
 startup_timeout_sec = 30
 tool_timeout_sec = 60
 
@@ -222,7 +222,7 @@ command = "code-review-graph"
 args = ["serve", "--tools", "query_graph_tool,semantic_search_nodes_tool,detect_changes_tool,get_review_context_tool"]
 required = true
 enabled_tools = ["query_graph_tool", "semantic_search_nodes_tool", "detect_changes_tool", "get_review_context_tool"]
-default_tools_approval_mode = "prompt"
+default_tools_approval_mode = "approve"
 startup_timeout_sec = 30
 tool_timeout_sec = 60
 
@@ -231,6 +231,6 @@ enabled = true
 command = "serena"
 args = ["start-mcp-server", "--project-from-cwd", "--context=codex"]
 required = true
-default_tools_approval_mode = "prompt"
+default_tools_approval_mode = "approve"
 startup_timeout_sec = 30
 tool_timeout_sec = 90

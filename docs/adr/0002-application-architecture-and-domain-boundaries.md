@@ -2,8 +2,7 @@
 
 - Status: accepted
 - Date: 2026-06-13
-- Deciders: user, project coordinator
-- Supersedes: ADR-0004, ADR-0013, ADR-0018
+- Deciders: Andrew Crozier
 
 ## Context
 
@@ -52,7 +51,7 @@ Core domain split:
 
 ## Validation
 
-- `docs/architecture/architecture-approach.md` defines the hybrid model and boundary rules.
+- `docs/ARCHITECTURE.md` defines the hybrid model and boundary rules.
 - `pyproject.toml` includes Import Linter contracts.
 - Services/selectors/tests must be added with implementation tasks.
 - Reviewers must reject direct state mutation from views/API when a service boundary exists.

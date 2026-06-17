@@ -10,14 +10,10 @@ related_prd: .taskmaster/docs/prd.md
 
 ## Purpose
 
-This file is the repo-local design source for the first implementation pass. It
-keeps the UI implementable without private external design-tool access.
-
-Use `docs/design/evaluator-design-handoff.md` for the durable evaluator-facing
-screen/state matrix, role/action matrix, accessibility contract, and design token
-fallback that must remain available without private design-tool access.
-Use `docs/design/mockup-plan.md` for the low-fidelity mockup
-execution plan and acceptance checks.
+This file is the canonical repo-local design source for the first implementation
+pass. It keeps the UI implementable without private external design-tool access
+and absorbs the evaluator handoff and mockup-plan notes so the maintained
+design surface stays in one place.
 
 The design target is a polished but restrained engineering-manager interview
 demo: clear workflows, visible quality gates, role-aware actions, accessible
@@ -63,6 +59,7 @@ forms, and no unnecessary visual complexity.
 | Return | HTMX modal/panel | Admin, Librarian | Close an active loan. |
 | Loans | `/loans/` | Admin, Librarian, Member | View active/historical loans. |
 | Admin users | `/admin/users/` or Django Admin | Admin | Manage roles/users. |
+| API/docs | `/api/docs` or Django Ninja OpenAPI route | All | Verify the public API contract and protected mutations. |
 | AI metadata assist | HTMX panel | Admin, Librarian | Review suggested tags/description. |
 
 ## 1. Public landing
@@ -338,6 +335,105 @@ Implementation notes:
 - Persist provenance if suggestions are applied.
 - Do not generate availability or copy state.
 
+## 11. API/docs evaluator link
+
+```text
++---------------------------------------------------------------+
+| API docs                                                      |
+| OpenAPI schema  /api/openapi.json                              |
+| [Open docs] [Back to dashboard] [Back to catalog]             |
+|                                                               |
+| Demo access: Admin, Librarian, Member labels only              |
+| Protected mutations require auth and role checks               |
++---------------------------------------------------------------+
+```
+
+Implementation notes:
+
+- Surface the OpenAPI UI or JSON route selected during implementation.
+- Keep the docs page visible to anonymous users, but block protected mutation
+  execution.
+- Link back to the dashboard, catalog, and README evidence.
+
+States:
+
+| State | Requirement |
+|---|---|
+| Default | OpenAPI UI loads and includes catalog, loans, and auth-related endpoints. |
+| Unauthenticated | Read docs remain visible; protected endpoint execution is blocked by auth. |
+| Permission denied | Error copy names the required role without exposing internals. |
+| Schema error | Show a concise failure banner and link to setup/quality checks. |
+
+## 12. Evaluator contract
+
+### Role and action matrix
+
+| Surface/action | Anonymous | Member | Librarian | Admin |
+|---|---:|---:|---:|---:|
+| View landing and public catalog | Yes | Yes | Yes | Yes |
+| View own loans | No | Yes | Yes, filtered by patron | Yes |
+| View all loans | No | No | Yes | Yes |
+| Create/edit/archive catalog record | No | No | Yes | Yes |
+| Checkout/return copy | No | No | Yes | Yes |
+| Run import/search-index actions | No | No | Yes, if enabled | Yes |
+| Review/apply AI metadata suggestions | No | No | Yes | Yes |
+| Manage users and roles | No | No | No | Yes |
+| Open API docs | Yes | Yes | Yes | Yes |
+| Execute protected API mutations | No | No | Yes | Yes |
+
+### State matrix
+
+| Surface | Loading | Empty | Error | Permission | Success |
+|---|---|---|---|---|---|
+| Dashboard | Skeleton metrics | Seed/setup callout | Metric load banner | Member variant | Recent activity update |
+| Catalog | Search spinner | No matches text | Search unavailable | Hidden privileged actions | Result count live update |
+| Book detail | Copy table spinner | No copies | Metadata load banner | Edit/archive hidden | Copy table refresh |
+| Create/edit | Save button busy | Not applicable | Error summary | Denial page | Redirect/toast |
+| Checkout | Patron search busy | No patron found | Copy unavailable | Action hidden | Modal closes and row refreshes |
+| Return | Button busy | No active loan | Conflict text | Action hidden | Loan closed and row refreshes |
+| Loans | Table spinner | No loans | Load banner | Member-only filter | Status update |
+| Admin users | Table spinner | No users | Validation summary | Denial page | Role change toast |
+| API/docs | OpenAPI loading | No schema | Schema load banner | Auth prompt | Endpoint response shown |
+
+### Accessibility contract
+
+- Initial focus lands on the page heading after navigation and on the dialog
+  title after modal open.
+- Dialogs use an accessible name, keep focus within the modal while open, close
+  on Escape, and return focus to the trigger.
+- Error summaries receive focus after failed submit and each field with an
+  error uses `aria-describedby`.
+- Search result updates and checkout/return success messages use an ARIA live
+  region.
+- Status badges include text, not color alone.
+- Destructive actions require a keyboard-accessible confirmation.
+- Tables retain headers on narrow screens or collapse into labeled rows.
+- Playwright/a11y tests cover catalog search, create/edit validation, checkout
+  conflict, return conflict, member loans, admin denial, and API docs loading.
+
+### Design token fallback
+
+| Token | Value |
+|---|---|
+| Font | System UI stack |
+| Page max width | 1200 px |
+| Spacing | 4, 8, 12, 16, 24, 32 px |
+| Radius | 4 px controls, 8 px repeated cards |
+| Focus ring | 2 px solid, high contrast, outside offset |
+| Available | Green text and badge with "Available" label |
+| On loan | Blue or neutral badge with "On loan" label |
+| Overdue | Red text/badge with "Overdue" label |
+| Archived | Neutral badge with "Archived" label |
+| Destructive | Red action text/button with confirmation |
+
+Responsive behavior:
+
+- desktop uses a left navigation shell for authenticated users;
+- tablet keeps nav visible if width allows, otherwise collapses to top nav;
+- mobile stacks filters before results and converts dense tables to labeled row
+  groups;
+- action bars wrap rather than overflowing.
+
 ## Implementation extraction checklist
 
 When extracting wireframes or implementation notes into code, capture:
@@ -350,6 +446,13 @@ When extracting wireframes or implementation notes into code, capture:
 - permission conditions;
 - empty/error/loading states;
 - Playwright assertions.
+
+When extracting the evaluator contract, also capture:
+
+- API/docs route and auth behavior;
+- role-specific admin and member states;
+- evaluator link targets back to README and canonical docs;
+- confirmation copy for protected admin mutations.
 
 ## Design authority rules
 

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -42,3 +44,19 @@ def test_mcp_summary_mentions_required_servers() -> None:
     assert "taskmaster-ai(" in summary
     assert "code-review-graph(" in summary
     assert "serena(" in summary
+
+
+def test_startup_notice_mentions_cache_safe_defaults_and_specialist_routing(
+    monkeypatch: Any, capsys: Any
+) -> None:
+    """Ensure the startup notice advertises cache-safe defaults and delegation."""
+    hook: Any = load_hook_module()
+    monkeypatch.setattr(hook.sys, "stdin", StringIO(json.dumps({"cwd": str(REPO_ROOT)})))
+
+    assert hook.main() == 0
+    output = capsys.readouterr().out
+
+    assert "approval=approve" in output
+    assert "npm_config_cache=" in output
+    assert "XDG_CACHE_HOME=" in output
+    assert "specialist or subagent packets" in output

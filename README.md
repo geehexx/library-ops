@@ -1,6 +1,10 @@
 # Library Ops
 
-**Library Ops** is an interview-demo library management system plus the Codex control plane used to build it safely. The repository is intentionally split between product truth, agent-control truth, committed execution artifacts, and transient local outputs so an evaluator can see both the planned application and the quality system around it.
+**Library Ops** is an interview-demo library management system plus the Codex
+control plane used to build it safely. The repository is intentionally split
+between product truth, agent-control truth, committed execution artifacts, and
+transient local outputs so an evaluator can see both the planned application
+and the quality system around it.
 
 ## Evaluator fast path
 
@@ -9,11 +13,9 @@ Start here if you are reviewing the project for the interview.
 ```bash
 npm ci
 uv sync --all-groups
-npm run skills:lint
-npm run skills:audit
-uv run python manage.py check
-uv run python manage.py makemigrations --check --dry-run
-uv run pytest tests/smoke tests/web tests/e2e
+npm run checks:precommit
+npm run docs:quality
+npm run verify:core
 npm run eval:ci
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 ```
@@ -36,14 +38,9 @@ The fastest local hygiene loop is:
 npm run checks:precommit
 ```
 
-## Coordinator-first startup
-
 For a fresh session that should use the repo-local coordinator-default flow,
-launch Codex through:
-
-```bash
-./scripts/codex-coordinator.sh
-```
+launch Codex through `./scripts/codex-coordinator.sh`. See `SETUP.md` for the
+canonical bootstrap and operator commands.
 
 Continuation state lives locally in:
 
@@ -53,7 +50,10 @@ Continuation state lives locally in:
 These files are gitignored on purpose. They replace `/tmp/prompt.md` as the
 canonical handoff pattern for this repo.
 
-Some gates require local tools, MCP auth, browser access, or provider approval. When a gate cannot run in the current environment, record the exact blocker in the current task notes and, if useful, a local `reports/validation/*` artifact rather than claiming the check passed.
+Some gates require local tools, MCP auth, browser access, or provider approval.
+When a gate cannot run in the current environment, record the exact blocker in
+the current task notes and, if useful, a local `reports/validation/*` artifact
+rather than claiming the check passed.
 
 ## What this repo contains
 
@@ -61,8 +61,9 @@ Some gates require local tools, MCP auth, browser access, or provider approval. 
 |---|---|---|
 | Product contract | `.taskmaster/docs/prd.md`, `specs/001-core/` | Library domain, user journeys, acceptance criteria, task-generation source. |
 | Agent control plane | `AGENTS.md`, `.codex/`, `.agents/skills/` | Coordinator rules, subagents, skills, hooks, MCP policy, escalation behavior. |
-| Architecture and decisions | `docs/architecture/`, `docs/adr/`, `docs/reference/` | arc42/C4/DDD-lite direction, decision records, and durable reference material. |
-| Human documentation | `docs/README.md`, `docs/runbook.md`, `docs/how-to/`, `docs/design/` | Setup, operation, evaluator-ready wireframes/mockups. |
+| Architecture and decisions | `docs/ARCHITECTURE.md`, `docs/adr/`, `docs/reference/` | arc42/C4/DDD-lite direction, decision records, and durable reference material. |
+| Human documentation | `SETUP.md`, `docs/AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/README.md`, `docs/design/wireframes.md`, `docs/evaluation/eval-strategy.md`, `docs/reference/context-lineage.md`, `docs/reference/question-packet-schema.md`, `docs/process/quality-gates.md`, `docs/process/retrospective.md`, `docs/process/sdlc.md` | Canonical bootstrap, docs-local decisioning, architecture rationale, evaluator-facing design/evaluation guidance, stable reference material, session lessons, and validation/release flow. |
+| Documentation policy | `docs/AGENTS.md` | Docs-local placement rules and maintenance boundaries. |
 | Quality gates | `policy/`, `.github/`, `promptfooconfig.yaml`, `evals/`, direct npm/uv/npx commands | Workflow security, docs quality, Promptfoo evals, and direct-tool validation. |
 | Transient local outputs | `reports/**` | Ignored local validation summaries, Promptfoo output, SBOMs, and other derived run artifacts. |
 
@@ -95,17 +96,25 @@ The repository is now positioned to continue product implementation from the can
 
 ## Documentation map
 
-Use `docs/README.md` as the navigation hub. The intended shape is Diátaxis for human docs, arc42 for architecture explanation, C4 only where diagrams clarify, DDD-lite for strategic vocabulary/boundaries, and MADR-light ADRs for significant decisions only.
+Use `docs/README.md` as the navigation hub. The intended shape is a small
+canonical set: `SETUP.md` for bootstrap, `docs/ARCHITECTURE.md` for rationale,
+`docs/design/wireframes.md` for evaluator-facing UX, `docs/evaluation/eval-strategy.md`
+for eval guidance, `docs/reference/` for stable schemas/context, and
+`docs/process/` for validation, delivery flow, and retrospectives.
 
 Important entry points:
 
 - `CHANGELOG.md` — release history and semantic-release target file.
+- `SETUP.md` — canonical local bootstrap and operator commands.
+- `docs/AGENTS.md` — docs-local decisioning and placement rules.
+- `docs/ARCHITECTURE.md` — architecture approach, alternatives, and validation.
 - `docs/README.md` — documentation navigation.
-- `docs/runbook.md` — operational commands and validation flow.
-- `docs/design/wireframes.md` — evaluator/demo UX flow.
+- `docs/design/wireframes.md` — evaluator/demo UX flow and evaluator contract.
 - `docs/evaluation/eval-strategy.md` — Promptfoo-first eval strategy.
-- `.codex/references/context-lineage.md` — source-of-truth, artifact, and retained-context rules.
+- `docs/reference/context-lineage.md` — source-of-truth, artifact, and retained-context rules.
+- `docs/reference/question-packet-schema.md` — question, escalation, and status packet shapes.
 - `docs/process/quality-gates.md` — validation ladder.
+- `docs/process/retrospective.md` — recurring lesson capture and promotion rules.
 - `docs/process/sdlc.md` — branch, PR, and release flow.
 - `scripts/cleanup_transient_artifacts.sh` — optional local cleanup for ignored reports and caches.
 

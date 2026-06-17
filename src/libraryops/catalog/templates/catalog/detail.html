@@ -1,0 +1,44 @@
+<!-- cspell:ignore forloop -->
+{% extends "base.html" %}
+
+{% block title %}{{ work.title }} | Library Ops{% endblock %}
+{% block page_title %}{{ work.title }}{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <p class="eyebrow">Contributors</p>
+    <p>
+      {% for relation in work.work_contributors.all %}
+        {{ relation.contributor.name }} ({{ relation.get_role_display }}){% if not forloop.last %}, {% endif %}
+      {% empty %}
+        No contributors linked.
+      {% endfor %}
+    </p>
+    {% if can_manage_catalog %}
+      <a class="button" href="{% url 'catalog-create' %}">Create another foundation record</a>
+    {% else %}
+      <a class="button button--ghost" href="{% url 'catalog-index' %}">Back to catalog</a>
+    {% endif %}
+  </section>
+
+  {% for edition in work.editions.all %}
+    <section class="panel">
+      <h2 style="margin-top: 0;">Edition {{ forloop.counter }}</h2>
+      <p><strong>ISBN:</strong> {{ edition.isbn|default:"Not set" }}</p>
+      <p><strong>Publisher:</strong> {{ edition.publisher|default:"Not set" }}</p>
+      <p><strong>Language:</strong> {{ edition.language }}</p>
+      <p class="eyebrow">Copies</p>
+      <ul class="clean">
+        {% for copy in edition.copies.all %}
+          <li>{{ copy.barcode }} — {{ copy.get_status_display }}{% if copy.shelf_location %} — shelf {{ copy.shelf_location }}{% endif %}</li>
+        {% empty %}
+          <li>No copies linked.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% empty %}
+    <section class="panel">
+      <p>No editions linked yet.</p>
+    </section>
+  {% endfor %}
+{% endblock %}

@@ -2,8 +2,7 @@
 
 - Status: accepted selected stack; open only for remote/paid/credentialed expansion
 - Date: 2026-06-13
-- Deciders: user, project coordinator
-- Supersedes: ADR-0006, ADR-0016, ADR-0017, ADR-0019 tooling portions
+- Deciders: Andrew Crozier
 
 ## Context
 

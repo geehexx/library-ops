@@ -10,6 +10,9 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
   required toolchain docs.
 - Confirm direct tool readiness from `codex doctor --summary --ascii --no-color`
   plus `npm run taskmaster:validate` in the trusted local environment.
+- Use explicit coordinator-first routing with mandatory bounded delegation for
+  bounded slices, and stop at ownership boundaries instead of widening scope
+  locally.
 - Finish any still-open control-plane consolidation work before treating the
   product roadmap as the only next frontier.
 
@@ -17,22 +20,23 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 
 - Treat the committed bootstrap as fixed reality and finish the remaining
   hardening/verification work in place.
-- Wire in application apps, templates, and auth settings needed for the first
-  evaluator-visible surface.
+- Wire in app-owned presentation surfaces, templates, and auth settings needed
+  for the first evaluator-visible experience.
 - Keep `manage.py`, `src/libraryops/config/settings/*`, and `/health/` as the
   bootstrap contract.
 
 ## Phase 2: Domain model and boundaries
 
 - Implement the first real app modules: accounts, catalog, inventory,
-  circulation, audit, and web.
+  circulation, audit, and the app-owned presentation surfaces.
 - Add migrations, core constraints, and only the service/form code needed for
   the protected foundation slice.
-- Validate Import Linter contracts against the actual Phase 1 app boundaries.
+- Validate Import Linter contracts against the actual Phase 1 app boundaries
+  and presentation ownership.
 
 ## Phase 3: Auth and catalog
 
-- Seed roles and disposable demo users.
+- Seed roles and disposable demo users via accounts-owned management commands.
 - Implement shared authorization helpers plus role-aware navigation.
 - Add the first protected create flow and the read-only catalog browse surface.
 - Record audit events for protected foundation mutations.
@@ -46,7 +50,7 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 
 ## Phase 5: Seed and search
 
-- Implement public-domain import commands with provenance.
+- Implement catalog-owned public-domain import commands with provenance.
 - Build search documents, exact/FTS/vector ranking, result explanations, and tests.
 
 ## Phase 6: AI assist, API, and UI polish
@@ -65,3 +69,7 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 
 Every phase records Task Master ID, PRD section, files changed, required tools
 used, raw evidence where required, and rollback path.
+Testing follows a kind-first order: lower-level invariants before request or
+browser layers, with browser coverage reserved for user-critical flows.
+Later phases through deployment and release remain visible in the plan even
+when current work focuses on an earlier slice.

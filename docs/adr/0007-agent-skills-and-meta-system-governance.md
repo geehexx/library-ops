@@ -2,7 +2,7 @@
 
 - Status: accepted
 - Date: 2026-06-13
-- Deciders: user, project coordinator
+- Deciders: Andrew Crozier
 
 ## Context
 

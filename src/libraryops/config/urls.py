@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 from django.http import HttpRequest, HttpResponse
-from django.urls import path
+from django.urls import include, path
 
 
 def health(_request: HttpRequest) -> HttpResponse:
@@ -14,5 +14,8 @@ def health(_request: HttpRequest) -> HttpResponse:
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),
     path("health/", health, name="health"),
+    path("", include("libraryops.shell.urls")),
+    path("catalog/", include("libraryops.catalog.urls")),
 ]

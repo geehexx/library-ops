@@ -2,8 +2,7 @@
 
 - Status: accepted
 - Date: 2026-06-13
-- Deciders: user, project coordinator
-- Supersedes: ADR-0005, ADR-0010, ADR-0011
+- Deciders: Andrew Crozier
 
 ## Context
 

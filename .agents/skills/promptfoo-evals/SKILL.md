@@ -34,13 +34,16 @@ npm run eval:smoke
 ```
 
 Use this lane for source-of-truth wording, artifact taxonomy, no-secret policies, Task Master local-only config, and Codex auth handling.
+Use `scripts/codex-runtime-env.sh` before promptfoo commands so `PROMPTFOO_CONFIG_DIR`,
+`PROMPTFOO_LOG_DIR`, and promptfoo state/logs stay under `TMPDIR` rather than
+`~/.promptfoo`.
 
 ## Provider-backed semantic lane
 
 Use this lane only when a local provider has been approved and configured. Keep provider secrets in local environment or user-level tool config.
 
 ```bash
-OLLAMA_BASE_URL=http://127.0.0.1:11434 npx --yes promptfoo@0.121.15 eval -j 1 -c evals/release/<suite>.yaml --no-cache --output reports/validation/promptfoo-<suite>.json
+OLLAMA_BASE_URL=http://127.0.0.1:11434 scripts/codex-runtime-env.sh npx --yes promptfoo@0.121.15 eval -j 1 -c evals/release/<suite>.yaml --no-cache --output reports/validation/promptfoo-<suite>.json
 ```
 
 For the current Library Ops local-provider lane, the validated shape is:

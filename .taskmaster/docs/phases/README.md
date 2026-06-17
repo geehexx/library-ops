@@ -4,7 +4,7 @@ These files are **derived working views** of the canonical PRD in
 `.taskmaster/docs/prd.md`.
 
 Use them when a local provider is strong enough for one phase slice but not yet
-reliable enough for the full monolithic PRD.
+reliable enough for the full canonical PRD.
 
 Rules:
 

@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from shutil import which
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
@@ -70,12 +72,11 @@ def run_gh_command(args: Sequence[str], cwd: Path) -> GhResult:
     Returns:
         A small result wrapper with exit code and captured streams.
     """
-    process = subprocess.run(
-        ["gh", *args],
-        cwd=cwd,
-        text=True,
-        capture_output=True,
-    )
+    env = os.environ.copy()
+    cache_home = Path(tempfile.gettempdir()) / "codex-gh-cache"
+    cache_home.mkdir(parents=True, exist_ok=True)
+    env["XDG_CACHE_HOME"] = str(cache_home)
+    process = subprocess.run(["gh", *args], cwd=cwd, text=True, capture_output=True, env=env)
     return GhResult(process.returncode, process.stdout, process.stderr)
 
 
@@ -89,11 +90,11 @@ def run_gh_command_raw(args: Sequence[str], cwd: Path) -> tuple[int, bytes, str]
     Returns:
         A tuple of exit code, raw stdout bytes, and decoded stderr.
     """
-    process = subprocess.run(
-        ["gh", *args],
-        cwd=cwd,
-        capture_output=True,
-    )
+    env = os.environ.copy()
+    cache_home = Path(tempfile.gettempdir()) / "codex-gh-cache"
+    cache_home.mkdir(parents=True, exist_ok=True)
+    env["XDG_CACHE_HOME"] = str(cache_home)
+    process = subprocess.run(["gh", *args], cwd=cwd, capture_output=True, env=env)
     stderr = process.stderr.decode(errors="replace")
     return process.returncode, process.stdout, stderr
 
@@ -145,7 +146,7 @@ def main() -> int:
         print(f"PR #{pr_value}: no failing checks detected.")
         return 0
 
-    results = []
+    results: list[dict[str, Any]] = []
     for check in failing:
         results.append(
             analyze_check(
@@ -284,7 +285,14 @@ def fetch_checks(pr_value: str, repo_root: Path) -> list[dict[str, Any]] | None:
     if not isinstance(data, list):
         print("Error: unexpected checks JSON shape.", file=sys.stderr)
         return None
-    return data
+    raw_items = cast("list[object]", data)
+    checks: list[dict[str, Any]] = []
+    for item in raw_items:
+        if not isinstance(item, dict):
+            print("Error: unexpected check item shape.", file=sys.stderr)
+            return None
+        checks.append(cast("dict[str, Any]", item))
+    return checks
 
 
 def is_failing(check: dict[str, Any]) -> bool:
@@ -413,7 +421,7 @@ def fetch_run_metadata(run_id: str, repo_root: Path) -> dict[str, Any] | None:
         return None
     if not isinstance(data, dict):
         return None
-    return data
+    return cast("dict[str, Any]", data)
 
 
 def fetch_check_log(

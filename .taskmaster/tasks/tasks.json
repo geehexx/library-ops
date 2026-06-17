@@ -99,7 +99,7 @@
             "title": "Configure Python Static Analysis: Ruff and Pyright",
             "description": "Set up Ruff for comprehensive code formatting and linting, and Pyright for strict type checking within 'pyproject.toml'. This ensures consistent code quality, adherence to style guides, and early detection of type-related errors across the Python codebase.",
             "dependencies": [],
-            "details": "Edit 'pyproject.toml' to include Ruff configuration, defining specific linting rules, formatting style, and file exclusions. Add Pyright configuration, enabling strict mode and specifying project roots to enforce robust type annotations and improve code correctness.",
+            "details": "Edit 'pyproject.toml' to include Ruff configuration, defining specific linting rules, formatting style, and file exclusions. Add Pyright configuration, enabling strict mode and specifying project roots to enforce robust type annotations and improve code correctness.\n<info added on 2026-06-17T13:05:06.343Z>\nNarrow Pyright-cleanup slice for the new factory layer completed in `tests/factories.py`. Reworked factory declarations to use explicit typed helpers and local `Any` aliases for `factory_boy` declaration objects, added generic `DjangoModelFactory[T]` annotations, and kept runtime behavior intact. Validation passed with `uv run pyright tests/factories.py` and a Django import smoke test under `DJANGO_SETTINGS_MODULE=libraryops.config.settings.test` after `django.setup()`.\n</info added on 2026-06-17T13:05:06.343Z>\n<info added on 2026-06-17T13:34:32.443Z>\nUpdated 'pyproject.toml' to include Ruff configuration, defining specific linting rules, formatting style, and file exclusions. Added Pyright configuration, enabling strict mode and specifying project roots to enforce robust type annotations and improve code correctness. Narrowed Pyright-cleanup slice for the new factory layer completed in `tests/factories.py`. Reworked factory declarations to use explicit typed helpers and local `Any` aliases for `factory_boy` declaration objects, added generic `DjangoModelFactory[T]` annotations, and kept runtime behavior intact. Validation passed with `uv run pyright tests/factories.py` and a Django import smoke test under `DJANGO_SETTINGS_MODULE=libraryops.config.settings.test` after `django.setup()`.\n\nRemoved the remaining direct-workaround patterns in the domain model slice. Replaced `cast(\"models.DateTimeField[...]\", models.DateTimeField(...))` with direct generic field declarations in `src/libraryops/catalog/models.py`, `src/libraryops/inventory/models.py`, `src/libraryops/circulation/models.py`, and `src/libraryops/audit/models.py`; kept only the minimal `BibliographicWork.objects` override exception because Pyright still needs it for the live custom manager API used by `catalog/selectors.py` and `catalog/views.py`. Also removed the `super().form_valid(...)` suppression in `src/libraryops/catalog/views.py` by returning `HttpResponseRedirect(self.get_success_url())` explicitly. Updated `tests/control_plane/test_governance_surfaces.py`, `.agents/skills/django-feature/SKILL.md`, and `.codex/agents/implementer.toml` to codify the preference for direct field generics and explicit CBV redirects.\n\nValidation:\n- `uv run pyright src/libraryops/catalog/models.py src/libraryops/catalog/views.py src/libraryops/inventory/models.py src/libraryops/circulation/models.py src/libraryops/audit/models.py src/libraryops/audit/services.py`\n- `uv run pytest tests/control_plane/test_governance_surfaces.py tests/catalog/test_models.py tests/circulation/test_models.py tests/web/test_foundation_ui.py`\n- `git diff --check`\n</info added on 2026-06-17T13:34:32.443Z>",
             "status": "done",
             "testStrategy": "Run 'ruff check .' to verify linting rules are applied and 'ruff format .' to confirm formatting consistency. Execute 'pyright .' to ensure the codebase passes strict type checking with no errors or warnings.",
             "parentId": "2",
@@ -165,17 +165,18 @@
           "1",
           "2"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
             "title": "Audit and reconcile the existing Django bootstrap layout",
             "description": "Confirm the current committed bootstrap layout and remove stale planning instructions that describe a second `django-admin startproject` pass or moving `manage.py` under `src/libraryops`.",
             "dependencies": [],
-            "details": "Treat root `manage.py` and `src/libraryops/config/*` as the bootstrap source of truth. Reconcile Task Master, README, and supporting docs so they describe the implemented layout and the next hardening steps instead of generating a nested `config/libraryops` tree.",
-            "status": "pending",
+            "details": "Treat root `manage.py` and `src/libraryops/config/*` as the bootstrap source of truth. Reconcile Task Master, README, and supporting docs so they describe the implemented layout and the next hardening steps instead of generating a nested `config/libraryops` tree.\n<info added on 2026-06-16T19:38:15.435Z>\nUpdated layout and initial hardening steps now documented in Task Master, README, and supporting docs. Next steps outlined for further security enhancements and UI refinements.\n</info added on 2026-06-16T19:38:15.435Z>\n<info added on 2026-06-16T20:10:52.571Z>\nUpdated Pyright typing and narrow local casting for Django auth, client, response, live-server, and Playwright page surfaces in `src/libraryops/web/views.py`, `src/libraryops/web/forms.py`. Final checks passed with uv run ruff check, pytest, django manage.py check, and pyright. All tests verified successful integration and no UX changes.\n</info added on 2026-06-16T20:10:52.571Z>",
+            "status": "done",
             "testStrategy": "Review the repo layout and ensure no planning artifact still requires `src/libraryops/config/libraryops` or `src/libraryops/manage.py` as the target structure.",
-            "parentId": "3"
+            "parentId": "3",
+            "updatedAt": "2026-06-16T19:55:07.103Z"
           },
           {
             "id": 2,
@@ -185,9 +186,10 @@
               1
             ],
             "details": "Keep the current `src/libraryops/config/settings/` structure and harden it in place. Add `DATABASE_URL` parsing, preserve SQLite fallback when no URL is set, make test settings honor `DATABASE_URL`, and ensure smoke tests work with the Django test host.\n<info added on 2026-06-16T14:14:45.429Z>\n```plaintext\n2026-06-16: Hardened Django settings in place with DATABASE_URL parsing, SQLite fallback only when DATABASE_URL is absent, and focused smoke/settings tests. Verified with manage.py check under default and Postgres DATABASE_URL plus targeted pytest coverage.\n```\n</info added on 2026-06-16T14:14:45.429Z>",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Add focused tests covering SQLite fallback, Postgres selection from `DATABASE_URL`, and host handling for the Django test client.",
-            "parentId": "3"
+            "parentId": "3",
+            "updatedAt": "2026-06-17T12:26:54.885Z"
           },
           {
             "id": 3,
@@ -196,10 +198,11 @@
             "dependencies": [
               2
             ],
-            "details": "Keep production settings strict about required environment variables while aligning implementation with the current dependency/tooling choices. The production module should require explicit secure values for `SECRET_KEY`, `DATABASE_URL`, and host configuration rather than silently inheriting local defaults.",
-            "status": "pending",
+            "details": "Keep production settings strict about required environment variables while aligning implementation with the current dependency/tooling choices. The production module should require explicit secure values for `SECRET_KEY`, `DATABASE_URL`, and host configuration rather than silently inheriting local defaults.\n<info added on 2026-06-16T20:24:27.079Z>\nUpdated production settings module now requires explicit `SECRET_KEY`, `DATABASE_URL`, and `DJANGO_ALLOWED_HOSTS`. Fails loudly with `ImproperlyConfigured` if any required environment variables are missing. Added smoke tests to cover failure and success paths, and updated `env.example` to document the new contract. Validation run: `uv run pyright src/libraryops/config/settings tests/smoke`, `uv run pytest tests/smoke/test_django_settings.py tests/smoke/test_production_settings.py tests/smoke/test_django_bootstrap.py`, `SECRET_KEY=... DATABASE_URL=... DJANGO_ALLOWED_HOSTS=... DJANGO_SETTINGS_MODULE=libraryops.config.settings.production uv run python manage.py check`, and a missing-env import check that raised `ImproperlyConfigured: Production settings require SECRET_KEY.`\n</info added on 2026-06-16T20:24:27.079Z>",
+            "status": "done",
             "testStrategy": "Attempt to initialize Django with `DJANGO_SETTINGS_MODULE` pointing to `production.py` and verify startup fails loudly when required env vars are absent.",
-            "parentId": "3"
+            "parentId": "3",
+            "updatedAt": "2026-06-16T20:24:02.699Z"
           },
           {
             "id": 4,
@@ -209,9 +212,10 @@
               1
             ],
             "details": "Keep the current `src/libraryops/config/urls.py`, `wsgi.py`, and `asgi.py` modules and verify they remain aligned with the settings module paths. Preserve a minimal `/health/` endpoint for smoke tests and deployment probes.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Keep `/health/` smoke coverage in pytest and verify `WSGI_APPLICATION` and `ASGI_APPLICATION` still point to the committed config modules.",
-            "parentId": "3"
+            "parentId": "3",
+            "updatedAt": "2026-06-17T12:26:54.897Z"
           },
           {
             "id": 5,
@@ -223,24 +227,26 @@
               3,
               4
             ],
-            "details": "Validate the current bootstrap with `manage.py check`, `makemigrations --check --dry-run`, and pytest. Ensure CI uses the Postgres service it already starts by honoring `DATABASE_URL` in test settings instead of silently falling back to SQLite.",
-            "status": "pending",
+            "details": "Validate the current bootstrap with `manage.py check`, `makemigrations --check --dry-run`, and pytest. Ensure CI uses the Postgres service it already starts by honoring `DATABASE_URL` in test settings instead of silently falling back to SQLite.\n<info added on 2026-06-17T12:27:30.563Z>\n\"Verified end-to-end bootstrap integrity using `uv run python manage.py check`, `uv run python manage.py makemigrations --check --dry-run`, and pytest with specified test suites.\"\n</info added on 2026-06-17T12:27:30.563Z>",
+            "status": "done",
             "testStrategy": "Run the Django checks and pytest locally, then rerun them with `DATABASE_URL` set to the CI-style Postgres URL to prove parity.",
-            "parentId": "3"
+            "parentId": "3",
+            "updatedAt": "2026-06-17T12:26:54.904Z"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T12:26:54.904Z"
       },
       {
         "id": 4,
         "title": "Implement Core Library Domain Models",
         "description": "Define the Django models representing the core library domain, including works, editions, copies, loans, audit events, and external source records.",
-        "details": "This task addresses Capability C2. Implement `BibliographicWork`, `Contributor`, `WorkContributor`, `BookEdition`, `BookCopy`, `Loan`, `AuditEvent`, and `ExternalSourceRecord` models within the `catalog`, `inventory`, `circulation`, and `audit` apps as per section 6.2. Implement fields and relationships as detailed in section 11.1 (Data Model). Crucially, apply the partial unique constraint to prevent more than one active loan per copy (NFR-006) and ensure valid ISBNs are normalized and invalid ones fail validation (C2.F2). Create initial migrations for these models.",
-        "testStrategy": "Write unit tests for each model to verify field types, relationships, and custom validations (e.g., ISBN normalization, invalid ISBN rejection). Implement property-based tests (NFR-008) for loan invariants, ensuring that a copy cannot have more than one active loan and status transitions are correct. Run `uv run python manage.py makemigrations` and `uv run python manage.py migrate` to ensure migrations apply correctly.",
-        "priority": "high",
+        "status": "done",
         "dependencies": [
           "3"
         ],
-        "status": "pending",
+        "priority": "high",
+        "details": "This task addresses Capability C2. Implement `BibliographicWork`, `Contributor`, `WorkContributor`, `BookEdition`, `BookCopy`, `Loan`, `AuditEvent`, and `ExternalSourceRecord` models within the `catalog`, `inventory`, `circulation`, and `audit` apps as per section 6.2. Implement fields and relationships as detailed in section 11.1 (Data Model). Crucially, apply the partial unique constraint to prevent more than one active loan per copy (NFR-006) and ensure valid ISBNs are normalized and invalid ones fail validation (C2.F2). Create initial migrations for these models.",
+        "testStrategy": "Write unit tests for each model to verify field types, relationships, and custom validations (e.g., ISBN normalization, invalid ISBN rejection). Implement property-based tests (NFR-008) for loan invariants, ensuring that a copy cannot have more than one active loan and status transitions are correct. Run `uv run python manage.py makemigrations` and `uv run python manage.py migrate` to ensure migrations apply correctly.",
         "subtasks": [
           {
             "id": 1,
@@ -248,21 +254,23 @@
             "description": "Define the `BibliographicWork`, `Contributor`, and `WorkContributor` Django models within the `catalog` application. These models will establish the foundational structure for managing bibliographic information.",
             "dependencies": [],
             "details": "Create or update `catalog/models.py` to include `BibliographicWork` (e.g., title, description, publication year), `Contributor` (e.g., name, role), and `WorkContributor` (to link works and contributors with specific roles). Ensure all fields and relationships align with section 11.1 (Data Model).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests for `BibliographicWork`, `Contributor`, and `WorkContributor` models to verify field types, relationships (e.g., ManyToMany through WorkContributor), and basic object creation.",
-            "parentId": "4"
+            "parentId": "4",
+            "updatedAt": "2026-06-17T12:26:58.834Z"
           },
           {
             "id": 2,
-            "title": "Implement Inventory Core Models with ISBN Validation",
-            "description": "Define the `BookEdition` and `BookCopy` Django models within the `inventory` application, incorporating robust ISBN normalization and validation logic.",
+            "title": "Implement BookEdition and BookCopy Models with ISBN Validation",
+            "description": "Define the `BookEdition` Django model within the `catalog` application and the `BookCopy` Django model within the `inventory` application, incorporating robust ISBN normalization and validation logic for the edition model.",
             "dependencies": [
               1
             ],
-            "details": "Create or update `inventory/models.py` to define `BookEdition` (e.g., ISBN, publisher, publication date, foreign key to `BibliographicWork`) and `BookCopy` (e.g., acquisition date, status, foreign key to `BookEdition`). Implement custom validation for the ISBN field in `BookEdition` to normalize valid ISBNs (ISBN-10 to ISBN-13, remove hyphens) and reject invalid ones, as per requirement C2.F2. Consider a custom `ISBNField` or model `clean` method.",
-            "status": "pending",
+            "details": "Create or update `catalog/models.py` to define `BookEdition` (e.g., ISBN, publisher, publication date, foreign key to `BibliographicWork`) and `inventory/models.py` to define `BookCopy` (e.g., acquisition date, status, foreign key to `BookEdition`). Implement custom validation for the ISBN field in `BookEdition` to normalize valid ISBNs (ISBN-10 to ISBN-13, remove hyphens) and reject invalid ones, as per requirement C2.F2. Consider a custom `ISBNField` or model `clean` method.",
+            "status": "done",
             "testStrategy": "Write unit tests for `BookEdition` and `BookCopy` models. Focus on ISBN validation: test valid ISBNs (10-digit, 13-digit, with/without hyphens) for normalization and invalid ISBNs for proper rejection. Verify relationships to `BibliographicWork` and other fields.",
-            "parentId": "4"
+            "parentId": "4",
+            "updatedAt": "2026-06-17T12:26:58.842Z"
           },
           {
             "id": 3,
@@ -272,9 +280,10 @@
               2
             ],
             "details": "Create or update `circulation/models.py` to define the `Loan` model (e.g., `book_copy` Foreign Key, `borrower` Foreign Key, `loan_date`, `due_date`, `return_date`, `status` field). Implement a `UniqueConstraint` with a `condition` in the model's `Meta` class to enforce that only one `Loan` record can have an 'active' status for a given `BookCopy` at any time. The `status` field should be an Enum or choices field, with 'active' being one of the possible states.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests for the `Loan` model. Verify field types and relationships. Crucially, write tests that attempt to create multiple active loans for the same `BookCopy` and ensure the `UniqueConstraint` correctly raises a `ValidationError` or `IntegrityError`.",
-            "parentId": "4"
+            "parentId": "4",
+            "updatedAt": "2026-06-16T19:33:46.584Z"
           },
           {
             "id": 4,
@@ -284,9 +293,10 @@
               1
             ],
             "details": "Create `audit/models.py` and define `AuditEvent` (e.g., `timestamp`, `user`, `action_type`, `related_object_id`, `related_object_content_type`, `details`). Create or update `catalog/models.py` to include `ExternalSourceRecord` (e.g., `source_name`, `source_id`, `url`, `last_synced_date`, Foreign Key to a `BibliographicWork` or `BookEdition`). Ensure fields and relationships align with section 11.1 (Data Model).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests for `AuditEvent` and `ExternalSourceRecord` models to verify field types, default values, and relationships. Ensure `AuditEvent` correctly handles generic foreign keys if implemented.",
-            "parentId": "4"
+            "parentId": "4",
+            "updatedAt": "2026-06-17T12:26:58.849Z"
           },
           {
             "id": 5,
@@ -298,12 +308,14 @@
               3,
               4
             ],
-            "details": "After defining all models, run `python manage.py makemigrations catalog inventory circulation audit` to generate the initial migration files. Review the generated migration files and their corresponding SQL output (`python manage.py sqlmigrate <app_name> <migration_id>`) to ensure they correctly reflect the model definitions, including primary keys, foreign keys, constraints (especially the partial unique constraint for Loan), and field types.",
-            "status": "pending",
+            "details": "After defining all models, run `python manage.py makemigrations catalog inventory circulation audit` to generate the initial migration files. Review the generated migration files and their corresponding SQL output (`python manage.py sqlmigrate <app_name> <migration_id>`) to ensure they correctly reflect the model definitions, including primary keys, foreign keys, constraints (especially the partial unique constraint for Loan), and field types.\n<info added on 2026-06-17T12:27:39.832Z>\nInitial migrations for catalog, inventory, circulation, and audit applications have been verified to be correct using `uv run python manage.py makemigrations --check --dry-run`, which reported no changes detected. The model test suites for catalog and circulation also passed as part of the branch validation run, confirming that the initial migrations accurately reflect the implemented domain models.\n</info added on 2026-06-17T12:27:39.832Z>",
+            "status": "done",
             "testStrategy": "Apply the generated migrations to a clean test database (`python manage.py migrate`). Verify that all tables are created correctly and that the database schema matches the intended model definitions. Attempt to violate the partial unique constraint for the Loan model directly in the database to confirm it is enforced at the DB level.",
-            "parentId": "4"
+            "parentId": "4",
+            "updatedAt": "2026-06-17T12:26:58.856Z"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T12:26:58.856Z"
       },
       {
         "id": 5,
@@ -315,7 +327,7 @@
         "dependencies": [
           "4"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -323,9 +335,10 @@
             "description": "Create the 'accounts' Django app to house authentication and authorization logic, register it, and confirm Django's default user authentication system is functioning correctly.",
             "dependencies": [],
             "details": "Create `src/libraryops/accounts` app. Add 'accounts' to `INSTALLED_APPS` in `src/libraryops/config/settings/base.py`. Verify that Django's built-in authentication views (login/logout) can be accessed and function using the default User model.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Run `python manage.py check`. Manually test basic user creation and login/logout functionality via Django admin or custom minimal views to ensure the default auth system is active.",
-            "parentId": "5"
+            "parentId": "5",
+            "updatedAt": "2026-06-17T12:27:01.326Z"
           },
           {
             "id": 2,
@@ -335,9 +348,10 @@
               1
             ],
             "details": "Develop an initial data migration (or a custom management command in the `accounts` app) to create Django `Group` instances for 'Admin', 'Librarian', and 'Member'. Programmatically assign relevant permissions (e.g., 'can_add_book', 'can_view_loan') to these groups as per the defined RBAC matrix. Admin should have all permissions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests to verify the existence of the created groups and that the correct permissions are assigned to each group. Run the migration/command and inspect groups/permissions via `python manage.py shell` or Django admin.",
-            "parentId": "5"
+            "parentId": "5",
+            "updatedAt": "2026-06-17T12:27:01.333Z"
           },
           {
             "id": 3,
@@ -347,9 +361,10 @@
               2
             ],
             "details": "Within `src/libraryops/accounts/permissions.py` (or similar), create functions like `can_manage_catalog(user)` and decorators like `@require_librarian` that leverage Django's permission system (`user.has_perm()` or group checks). These services should provide permission checks for various operations on views, APIs, and services (FR-011, NFR-003).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Implement unit tests for authorization utilities (e.g., `can_manage_catalog`, `require_librarian`) to verify correct allow/deny decisions based on mock user roles and permissions. Test edge cases with authenticated and unauthenticated users.",
-            "parentId": "5"
+            "parentId": "5",
+            "updatedAt": "2026-06-17T12:27:01.344Z"
           },
           {
             "id": 4,
@@ -358,10 +373,11 @@
             "dependencies": [
               1
             ],
-            "details": "Install `django-allauth`. Add required `allauth` apps to `INSTALLED_APPS` in `settings.py`. Configure `AUTHENTICATION_BACKENDS`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL`, and other necessary `allauth` settings. Include `allauth` URLs in `src/libraryops/config/urls.py`. Develop or override basic `allauth` templates for common flows (login, signup).",
-            "status": "pending",
+            "details": "Install `django-allauth`. Add required `allauth` apps to `INSTALLED_APPS` in `settings.py`. Configure `AUTHENTICATION_BACKENDS`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL`, and other necessary `allauth` settings. Include `allauth` URLs in `src/libraryops/config/urls.py`. Develop or override basic `allauth` templates for common flows (login, signup).\n<info added on 2026-06-17T12:27:46.231Z>\nBranch validation run confirmed `allauth` integration without regressions.\n</info added on 2026-06-17T12:27:46.231Z>",
+            "status": "done",
             "testStrategy": "Verify that `allauth` URLs are accessible. Manually test username/password registration and login flows through `allauth`'s default views. Ensure redirects work as configured for login/logout.",
-            "parentId": "5"
+            "parentId": "5",
+            "updatedAt": "2026-06-17T12:27:01.354Z"
           },
           {
             "id": 5,
@@ -370,12 +386,13 @@
             "dependencies": [
               4
             ],
-            "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.",
+            "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.\n<info added on 2026-06-17T12:27:57.951Z>\nEnsure `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment. Next steps include integrating OAuth provider toggles and completing the local demo configuration as per Task 5.\n</info added on 2026-06-17T12:27:57.951Z>",
             "status": "pending",
             "testStrategy": "Verify local username/password login works without any OAuth provider configured. Test with and without relevant environment variables set to ensure OAuth providers are conditionally enabled/disabled as expected. Attempt to access a social login endpoint when its provider is intentionally disabled to confirm it fails gracefully.",
             "parentId": "5"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T12:27:01.354Z"
       },
       {
         "id": 6,
@@ -388,17 +405,18 @@
           "4",
           "5"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
             "title": "Implement Public Catalog Browse and Detail Pages",
             "description": "Develop Django templates and views within the `web` module for listing works/editions and displaying detailed information, including availability and role-aware actions (C4.F1).",
             "dependencies": [],
-            "details": "Create `catalog/views.py` functions and corresponding templates in `web/templates/catalog/` for `Work` list, `Edition` list, `Work` detail, and `Edition` detail. Use `catalog.selectors` to fetch data. Ensure availability status is displayed and actions are conditional on user roles (e.g., 'borrow' button for members, 'edit' for librarians).",
-            "status": "pending",
+            "details": "Create `catalog/views.py` functions and corresponding templates in `web/templates/catalog/` for `Work` list, `Edition` list, `Work` detail, and `Edition` detail. Use `catalog.selectors` to fetch data. Ensure availability status is displayed and actions are conditional on user roles (e.g., 'borrow' button for members, 'edit' for librarians).\n<info added on 2026-06-17T12:44:39.471Z>\nRefactored presentation layout for foundation slice, moved catalog presentation into `src/libraryops/catalog/{forms.py,views.py,urls.py}`, and moved the dashboard into `src/libraryops/shell/{views.py,urls.py,apps.py,AGENTS.md}`. Switched `src/libraryops/config/urls.py` to thin include-based routing, updated `src/libraryops/config/settings/base.py` to install `libraryops.shell`, updated catalog/config/templates AGENTS files, moved the home template to `templates/shell/home.html`, removed the obsolete `src/libraryops/web` presentation modules, and updated import-linter contracts in `pyproject.toml` to cover `libraryops.shell`. All targeted checks passed after fixing the URL name namespace regression by removing `app_name` from the included catalog/shell URLConfs. Risk: `src/libraryops/web` now remains only as a legacy compatibility namespace and AGENTS note; if future work wants to delete it fully, do that as a separate cleanup slice.\n</info added on 2026-06-17T12:44:39.471Z>\n<info added on 2026-06-17T12:59:02.155Z>\nUpdated `catalog/views.py` functions to render app-owned HTML templates using Django's template engine, ensuring separation of concerns and maintainability. Moved catalog presentation into `src/libraryops/catalog/{views.py,urls.py}` and updated corresponding import paths in other modules. Refactored URL routing to use include-based approach for better organization and management. Updated settings to properly install and manage `libraryops.shell` application. Created new tests in `tests/control_plane/test_governance_surfaces.py` to verify that app-owned templates remain within their respective directories, enhancing security and adhering to project guidelines.\n</info added on 2026-06-17T12:59:02.155Z>",
+            "status": "done",
             "testStrategy": "Write unit tests for views ensuring correct context data is passed to templates. Manually verify page rendering, data display, and link navigation in a browser for different user roles.",
-            "parentId": "6"
+            "parentId": "6",
+            "updatedAt": "2026-06-17T12:44:39.685Z"
           },
           {
             "id": 2,
@@ -444,7 +462,8 @@
             "testStrategy": "Write API integration tests using `pytest` and `httpx` (or similar) to cover all endpoints, including validation, successful creation, retrieval, update, and deletion of resources. Verify proper HTTP status codes and response bodies. Confirm audit events are generated for POST/PUT/DELETE requests.",
             "parentId": "6"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T12:44:39.685Z"
       },
       {
         "id": 7,
@@ -671,9 +690,9 @@
       {
         "id": 10,
         "title": "Implement Reproducible Seed Data and Demo Corpus",
-        "description": "Create Django management commands to seed demo roles, users, import a public-domain catalog, generate copies, and create example loan states for a reproducible demo dataset.",
-        "details": "This task covers Capability C8. Implement management commands as outlined in section 13.1: `seed_roles`, `seed_demo_users` (with password reset, FR-012), `import_public_domain_catalog` (from Open Library/Project Gutenberg, FR-013), `build_search_documents`, `build_embeddings`, and `seed_circulation_examples`. Commands MUST be idempotent and support refresh/dry-run options. Seed Admin, Librarian, and Member demo accounts with documented credentials (C8.F1, section 13.2). Import curated public-domain records (up to 1,000) with provenance (C8.F2, FR-013). Generate realistic copies and example loans (C8.F3). Ensure imported corpora, downloaded dumps, generated embeddings, and model caches are not committed (section 13.3).",
-        "testStrategy": "Run all seed commands with and without `--refresh` to verify idempotency and correct data generation. Confirm that demo users (admin@libraryops.demo, etc.) are created with specified roles and passwords. Verify that imported catalog records include source and license/copyright notes. Check that the loan dashboard displays active and overdue loans as expected. Use the 'Scenario: Demo seed can be refreshed' (19.6) to validate the seed process.",
+        "description": "Create app-owned Django management commands to seed demo roles, users, import a public-domain catalog, generate copies, and create example loan states for a reproducible demo dataset.",
+        "details": "This task covers Capability C8. Implement management commands as outlined in section 13.1, keeping the work in the owning app modules instead of a standalone `seed` package: `seed_roles`, `seed_demo_users` (with password reset, FR-012), `import_public_domain_catalog` (from Open Library/Project Gutenberg, FR-013), `build_search_documents`, `build_embeddings`, and `seed_circulation_examples`. Commands MUST be idempotent and support refresh/dry-run options. Seed Admin, Librarian, and Member demo accounts with documented credentials (C8.F1, section 13.2). Import curated public-domain records (up to 1,000) with provenance (C8.F2, FR-013). Generate realistic copies and example loans (C8.F3). Ensure imported corpora, downloaded dumps, generated embeddings, and model caches are not committed (section 13.3).\n<info added on 2026-06-17T13:29:42Z>\nRemoved the empty seed package anchor, removed import-linter references, and reworded the PRD/spec planning surfaces to keep seed behavior in app-owned management-command workflows. Validated with import-linter, ast-grep, and import smoke checks.\n</info added on 2026-06-17T13:29:42Z>",
+        "testStrategy": "Run all seed/import/rebuild commands with and without `--refresh` to verify idempotency and correct data generation. Confirm that demo users (admin@libraryops.demo, etc.) are created with specified roles and passwords. Verify that imported catalog records include source and license/copyright notes. Check that the loan dashboard displays active and overdue loans as expected. Use the 'Scenario: Demo seed can be refreshed' (19.6) to validate the seed process.",
         "priority": "high",
         "dependencies": [
           "4",
@@ -683,7 +702,7 @@
           "8",
           "9"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -702,10 +721,11 @@
             "dependencies": [
               1
             ],
-            "details": "Implement the `seed_demo_users` command in `management/commands/seed_demo_users.py`. Create users with specific passwords (e.g., 'admin@libraryops.demo', 'librarian@libraryops.demo') and assign them to the predefined roles created by `seed_roles`. Use Django's admin site for user management if needed.",
-            "status": "pending",
+            "details": "Implement the `seed_demo_users` command in `management/commands/seed_demo_users.py`. Create users with specific passwords (e.g., 'admin@libraryops.demo', 'librarian@libraryops.demo') and assign them to the predefined roles created by `seed_roles`. Use Django's admin site for user management if needed.\n<info added on 2026-06-17T17:51:01.674Z>\nImplemented `seed_demo_users` command in `management/commands/seed_demo_users.py`. Created users with specific passwords and assigned them to predefined roles. Updated integration tests to verify role assignment behavior and handle missing access code. Checks: `uv run pyright src/libraryops/accounts/management/commands/seed_demo_users.py tests/integration/accounts/test_seed_commands.py` (0 errors), `uv run pytest -q tests/integration/accounts/test_seed_commands.py` (3 passed). No control-plane/meta files were modified.\n</info added on 2026-06-17T17:51:01.674Z>",
+            "status": "done",
             "testStrategy": null,
-            "parentId": "10"
+            "parentId": "10",
+            "updatedAt": "2026-06-17T17:50:48.069Z"
           },
           {
             "id": 3,
@@ -743,7 +763,8 @@
             "testStrategy": null,
             "parentId": "10"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T17:50:48.069Z"
       },
       {
         "id": 11,
@@ -764,7 +785,7 @@
           "9",
           "10"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -785,10 +806,11 @@
             "dependencies": [
               10
             ],
-            "details": "Review and edit the `README.md` file to include all required details for the evaluation process.",
-            "status": "pending",
+            "details": "Review and edit the `README.md` file to include all required details for the evaluation process.\n<info added on 2026-06-17T12:19:23.179Z>\nUpdate `README.md` to consolidate evaluator-facing and operator documentation, include product live URL, demo accounts, feature checklist, setup instructions, and known limitations. Address the repo-wide docs:quality failure on the unrelated `querysets` cspell warning.\n</info added on 2026-06-17T12:19:23.179Z>",
+            "status": "done",
             "testStrategy": "Verify that the updated `README.md` aligns with all assignment criteria and contains all necessary information.",
-            "parentId": "11"
+            "parentId": "11",
+            "updatedAt": "2026-06-17T12:19:23.239Z"
           },
           {
             "id": 3,
@@ -826,7 +848,8 @@
             "testStrategy": "Test the generated OpenAPI documentation locally using tools like Swagger UI or Postman.",
             "parentId": "11"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-17T12:19:23.239Z"
       },
       {
         "id": 12,
@@ -845,7 +868,7 @@
             "id": 1,
             "title": "Collapse duplicated control-plane docs into canonical surfaces",
             "description": "Reduce duplicated machine/runtime instructions across docs by keeping `.taskmaster/` as the runtime-policy home and slimming human-facing docs to durable operator guidance only.",
-            "details": "Keep `.taskmaster/README.md` and `.taskmaster/docs/runtime-policy.md` as the runtime-policy home, and keep human-facing docs thin. Durable repo docs stay limited to the runbook, setup guide, quality gates, and reference surfaces needed by current operators and evaluators.",
+            "details": "Keep `.taskmaster/README.md` and `.taskmaster/docs/runtime-policy.md` as the runtime-policy home, and keep human-facing docs thin. Durable repo docs stay limited to the runbook, setup guide, quality gates, and reference surfaces needed by current operators and evaluators.\n<info added on 2026-06-17T12:52:05.885Z>\nDocs consolidation slice completed in owned docs surface. Absorbed decisioning guidance into docs/AGENTS.md, updated README.md, SETUP.md, docs/README.md, and docs/ARCHITECTURE.md to point at canonical surfaces, and deleted compatibility-only leaves docs/runbook.md, docs/architecture/architecture-approach.md, and docs/decisioning/socratic-decision-framework.md. Validation: git diff --check passed; npm run astgrep:scan passed; focused cspell on README.md, SETUP.md, docs/README.md, docs/ARCHITECTURE.md, and docs/AGENTS.md passed. Repo-level npm run docs:quality failed only on pre-existing unrelated cspell issue in src/libraryops/config/AGENTS.md (unknown word 'Confs').\n</info added on 2026-06-17T12:52:05.885Z>",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
@@ -867,7 +890,7 @@
             "id": 3,
             "title": "Refine agent and skill instructions to the current conservative policy",
             "description": "Remove stale references and overlapping guidance from agents and skills so the catalog consistently reflects the current model split, tool-routing rules, and approval boundaries.",
-            "details": "Audit `.codex/agents/*.toml`, `.agents/skills/*/SKILL.md`, and any remaining skill-local references for stale paths, outdated packaging assumptions, duplicated command guidance, or instructions that contradict the workspace-scoped permission model and the externalized Task Master surface. Current progress includes the repo-owned Serena reminder path, slimmer agent-system docs, command-runner fast-path guidance, richer `agents/openai.yaml` metadata, curated repo-local skill installs, explicit skill-discovery routing, and a stricter `skills:audit` gate integrated into the normal hygiene path.\n<info added on 2026-06-16T14:14:47.614Z>\n### Tightened control-plane governance by replacing generic skill reference README names, adding governance tests (ADR index parity, bidi safety, explicit reference linkage), moving agent-facing clarification/context guidance into .codex/references, enforcing repo-owned Python docstring coverage/lint in aggregate gates, and updating Task Master runtime policy with evidence-backed provider guidance and standard MCP tool-mode rationale.\n</info added on 2026-06-16T14:14:47.614Z>",
+            "details": "Audit `.codex/agents/*.toml`, `.agents/skills/*/SKILL.md`, and any remaining skill-local references for stale paths, outdated packaging assumptions, duplicated command guidance, or instructions that contradict the workspace-scoped permission model and the externalized Task Master surface. Current progress includes the repo-owned Serena reminder path, slimmer agent-system docs, command-runner fast-path guidance, richer `agents/openai.yaml` metadata, curated repo-local skill installs, explicit skill-discovery routing, and a stricter `skills:audit` gate integrated into the normal hygiene path.\n<info added on 2026-06-16T14:14:47.614Z>\n### Tightened control-plane governance by replacing generic skill reference README names, adding governance tests (ADR index parity, bidi safety, explicit reference linkage), moving agent-facing clarification/context guidance into .codex/references, enforcing repo-owned Python docstring coverage/lint in aggregate gates, and updating Task Master runtime policy with evidence-backed provider guidance and standard MCP tool-mode rationale.\n</info added on 2026-06-16T14:14:47.614Z>\n<info added on 2026-06-17T12:20:55.082Z>\nCompleted hub/index cleanup tranche for control-plane surfaces, updated AGENTS.md, .codex/references/*, .agents/skills/*, llms.txt, PACKAGE_MANIFEST.md, package.json, repomix.config.json, and tests/control_plane/test_governance_surfaces.py. Shifted skill-discovery wording to capability/trigger matching, tightened stop/coordinator language, converted llms.txt and PACKAGE_MANIFEST.md into index surfaces, added .codex/references/**/*.md to repomix, and added governance checks for retired doc-surface drift. Validation: uv run pyright tests/control_plane/test_governance_surfaces.py (pass), uv run pytest -q tests/control_plane/test_governance_surfaces.py (10 passed), git diff --check on touched files (pass). Repo-wide npm run checks:precommit still fails on pre-existing unrelated formatting drift in other files outside the owned slice.\n</info added on 2026-06-17T12:20:55.082Z>\n<info added on 2026-06-17T12:30:20.442Z>\nUpdated hub/index surfaces and guardrails for docs consolidation slice. Files changed: AGENTS.md, .codex/references/clarification-and-goals.md, .codex/references/context-and-tooling-strategy.md, .agents/skills/clarify-and-goal/SKILL.md, .agents/skills/code-intelligence/SKILL.md, .agents/skills/clarify-and-goal/references/workflow-sources.md, .agents/skills/code-intelligence/references/tool-routing.md, .agents/skills/skills-maintenance/SKILL.md, llms.txt, PACKAGE_MANIFEST.md, package.json, and tests/control_plane/test_governance_surfaces.py. Changes: tightened coordinator/stop language, kept skill selection capability-based, converted llms/PACKAGE_MANIFEST into hub/index wording, scoped skills:lint to entrypoint SKILL.md files via find, and extended governance tests to reject retired doc-surface names. Validations: uv run pyright tests/control_plane/test_governance_surfaces.py; npm run skills:lint; uv run pytest -q tests/control_plane/test_governance_surfaces.py; git diff --check; scoped ast-grep retired-path scan. Remaining risk: broader docs tree is still owned by the docs-consolidation agent, so this slice only guards the hub/index surfaces and does not reconcile the retired files themselves.\n</info added on 2026-06-17T12:30:20.442Z>",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
@@ -900,13 +923,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-16T09:24:09.797Z",
+      "lastModified": "2026-06-17T17:50:48.069Z",
       "taskCount": 12,
-      "completedCount": 3,
+      "completedCount": 5,
       "tags": [
         "master"
       ],
-      "created": "2026-06-16T14:14:40.498Z",
+      "created": "2026-06-17T17:50:51.174Z",
       "description": "Tasks for master context"
     }
   }

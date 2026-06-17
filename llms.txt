@@ -1,3 +1,14 @@
-# Library Ops Codex Control Plane
+# Library Ops Hub Index
 
-Start with README.md, AGENTS.md, .taskmaster/README.md, and docs/agent-system/clarification-and-goals.md.
+This is a compact hub index only, not a leaf mirror. Start with `AGENTS.md`
+and follow the source-of-truth order from there.
+
+- `AGENTS.md` for coordinator rules and source order.
+- `.codex/agents/` for agent policy and prompt routing metadata.
+- `.agents/skills/` for capability-based skill discovery.
+- `.taskmaster/docs/prd.md` and `specs/001-core/` for requirements and task
+  structure.
+- `README.md`, `SETUP.md`, `docs/README.md`, and `docs/ARCHITECTURE.md` for
+  canonical human-facing repo entrypoints.
+- `package.json`, `pyproject.toml`, and `repomix.config.json` for packaging,
+  validation, and repo-level command surfaces.

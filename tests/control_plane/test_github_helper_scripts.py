@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -67,6 +68,31 @@ def test_fetch_checks_accepts_pending_exit_code_with_json_stdout(
     ]
 
 
+def test_fetch_comments_routes_gh_cache_into_tmp(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Ensure PR comment fetching relocates gh cache writes away from home."""
+    module = load_module(
+        ".agents/skills/gh-address-comments/scripts/fetch_comments.py",
+        "fetch_comments_cache_env",
+    )
+    captured: dict[str, Any] = {}
+
+    def fake_run(
+        cmd: list[str],
+        **kwargs: Any,
+    ) -> Any:
+        captured["cmd"] = cmd
+        captured["env"] = kwargs.get("env")
+        return SimpleNamespace(returncode=0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    assert module._run(["gh", "auth", "status"]) == "ok"
+    assert captured["cmd"] == ["gh", "auth", "status"]
+    assert str(captured["env"]["XDG_CACHE_HOME"]).endswith("codex-gh-cache")
+
+
 def test_fetch_checks_fails_without_stdout_on_error(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -91,6 +117,35 @@ def test_fetch_checks_fails_without_stdout_on_error(
 
     assert checks is None
     assert "boom" in capsys.readouterr().err
+
+
+def test_inspect_pr_checks_routes_gh_cache_into_tmp(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Ensure the failing-check inspector relocates gh cache writes away from home."""
+    module = load_module(
+        ".agents/skills/gh-fix-ci/scripts/inspect_pr_checks.py",
+        "inspect_pr_checks_cache_env",
+    )
+    captured: dict[str, Any] = {}
+
+    def fake_run(
+        args: list[str],
+        cwd: Path,
+        **kwargs: Any,
+    ) -> Any:
+        captured["args"] = args
+        captured["cwd"] = cwd
+        captured["env"] = kwargs.get("env")
+        return SimpleNamespace(returncode=0, stdout="{}", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    result = module.run_gh_command(["auth", "status"], Path("."))
+
+    assert result.returncode == 0
+    assert captured["args"] == ["gh", "auth", "status"]
+    assert str(captured["env"]["XDG_CACHE_HOME"]).endswith("codex-gh-cache")
 
 
 def test_get_current_pr_ref_uses_base_repository() -> None:

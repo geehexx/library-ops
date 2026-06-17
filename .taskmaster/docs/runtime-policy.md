@@ -58,6 +58,19 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
   - `set_task_status`
   - `update_subtask`
   - `parse_prd`
+- Repo-local required MCPs should stay `required = true` and
+  `default_tools_approval_mode = "approve"` in `.codex/config.toml` so the
+  coordinator can route the standard interactive toolchain without repeated
+  approval churn.
+- When shelling out to `npm` or `gh` from a sandboxed session, prefer
+  `scripts/codex-runtime-env.sh` or an equivalent repo-local cache override so
+  `npm_config_cache` and `XDG_CACHE_HOME` land under `TMPDIR` instead of a
+  home-directory cache path.
+- When running promptfoo locally, keep `PROMPTFOO_CONFIG_DIR` and
+  `PROMPTFOO_LOG_DIR` under `TMPDIR` so the config database, WAL, and logs do
+  not fall back to `~/.promptfoo`.
+- Do not read `.taskmaster/state.json` directly; use the Task Master MCP or CLI
+  and keep local runtime state out of the committed graph.
 - Keep on CLI:
   - `analyze_project_complexity`
   - `complexity_report`

@@ -26,6 +26,9 @@ This repo does not use Task Master in isolation. Pair it with:
 5. Implement or delegate one bounded subtask.
 6. Update task notes with files changed, checks run, risks, and remaining work.
 7. Mark done only when acceptance criteria and checks pass.
+8. If the subtask is blocked on a decision or another agent-owned slice, stop,
+   record the blocker, and return an Escalation packet instead of branching into
+   adjacent work.
 
 ## Library Ops MCP posture
 

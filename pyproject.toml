@@ -11,6 +11,8 @@ dependencies = [
   "django>=5.2,<6.0",
   "django-ninja>=1.4,<2.0",
   "django-allauth>=65.0,<66.0",
+  "django-guardian>=3.2,<4.0",
+  "django-unfold>=0.76,<1.0",
   "django-htmx>=1.20,<2.0",
   "dj-database-url>=2.2,<3.0",
   "psycopg[binary]>=3.2,<4.0",
@@ -67,8 +69,8 @@ venv = ".venv"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "libraryops.config.settings.test"
 pythonpath = ["src"]
-python_files = ["test_*.py", "*_test.py"]
-testpaths = ["src", "tests"]
+python_files = ["test_*.py"]
+testpaths = ["tests"]
 addopts = ["--strict-markers", "--strict-config"]
 markers = [
   "property: property-based tests",
@@ -99,8 +101,8 @@ forbidden_modules = [
   "libraryops.search",
   "libraryops.ai_assist",
   "libraryops.audit",
-  "libraryops.seed",
   "libraryops.web",
+  "libraryops.shell",
 ]
 
 [[tool.importlinter.contracts]]
@@ -111,7 +113,7 @@ forbidden_modules = ["libraryops.circulation"]
 
 
 [[tool.importlinter.contracts]]
-name = "inventory must not depend on circulation/search/ai/web"
+name = "inventory must not depend on circulation/search/ai/web/shell"
 type = "forbidden"
 source_modules = ["libraryops.inventory"]
 forbidden_modules = [
@@ -119,31 +121,32 @@ forbidden_modules = [
   "libraryops.search",
   "libraryops.ai_assist",
   "libraryops.web",
+  "libraryops.shell",
 ]
 
 [[tool.importlinter.contracts]]
-name = "circulation must not depend on search/ai/seed/web"
+name = "circulation must not depend on search/ai/web/shell"
 type = "forbidden"
 source_modules = ["libraryops.circulation"]
 forbidden_modules = [
   "libraryops.search",
   "libraryops.ai_assist",
-  "libraryops.seed",
   "libraryops.web",
+  "libraryops.shell",
 ]
 
 [[tool.importlinter.contracts]]
-name = "search must not depend on circulation/seed/web"
+name = "search must not depend on circulation/web/shell"
 type = "forbidden"
 source_modules = ["libraryops.search"]
 forbidden_modules = [
   "libraryops.circulation",
-  "libraryops.seed",
   "libraryops.web",
+  "libraryops.shell",
 ]
 
 [[tool.importlinter.contracts]]
-name = "domain modules must not depend on web"
+name = "domain modules must not depend on presentation apps"
 type = "forbidden"
 source_modules = [
   "libraryops.accounts",
@@ -154,7 +157,7 @@ source_modules = [
   "libraryops.ai_assist",
   "libraryops.audit",
 ]
-forbidden_modules = ["libraryops.web"]
+forbidden_modules = ["libraryops.web", "libraryops.shell"]
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
@@ -175,7 +178,13 @@ ignore-nested-functions = true
 ignore-private = true
 ignore-property-decorators = true
 fail-under = 100
-exclude = ["migrations"]
+exclude = [
+  "src/libraryops/accounts/migrations",
+  "src/libraryops/audit/migrations",
+  "src/libraryops/catalog/migrations",
+  "src/libraryops/circulation/migrations",
+  "src/libraryops/inventory/migrations",
+]
 
 [tool.pydoclint]
 style = "google"

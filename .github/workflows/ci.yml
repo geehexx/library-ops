@@ -50,6 +50,9 @@ jobs:
       - name: Install Node governance dependencies
         run: npm ci
 
+      - name: Install Playwright browser
+        run: uv run playwright install --with-deps chromium
+
       - name: Set up Go for Vale
         uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
@@ -134,6 +137,7 @@ jobs:
       - name: Tests
         env:
           DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
+          LIBRARYOPS_DEMO_ACCESS_CODE: ci-demo-access-code
         run: |
           if find src tests -name "test_*.py" -o -name "*_test.py" | grep -q .; then
             uv run pytest

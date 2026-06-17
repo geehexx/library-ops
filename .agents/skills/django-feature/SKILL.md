@@ -34,8 +34,10 @@ file pattern.
 
 - Treat Pyright as the first static-analysis pass for Python and Django edits.
 - Fix type drift on the touched scope before widening to broader pytest or lint gates.
-- Keep annotations and imports explicit enough that Pyright stays useful on the
-  affected modules.
+- Prefer direct `models.DateTimeField[...] = models.DateTimeField(...)` field declarations.
+- Prefer explicit CBV redirects when a `super().form_valid(...)` path only returns the redirect.
+- Keep manager annotations minimal; preserve a custom manager type only when a live call site needs the manager API and Pyright cannot model it cleanly.
+- Keep annotations and imports explicit enough that Pyright stays useful on the affected modules.
 
 ## Completion criteria
 
