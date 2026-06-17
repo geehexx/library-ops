@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, cast
 
 from django.contrib.auth import get_user_model
@@ -10,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 
-DEFAULT_PASSWORD = "LibraryOpsDemo123!"
+DEFAULT_PASSWORD_ENV_VAR = "LIBRARYOPS_DEMO_PASSWORD"
 DEMO_USERS = (
     ("admin@libraryops.demo", ROLE_ADMIN, True, True),
     ("librarian@libraryops.demo", ROLE_LIBRARIAN, True, False),
@@ -22,6 +23,21 @@ class Command(BaseCommand):
     """Seed the disposable demo accounts."""
 
     help = "Create the demo users and assign each one application role."
+
+    def default_password(self) -> str:
+        """Return the required disposable demo password from the environment.
+
+        Raises:
+            CommandError: The local demo password environment variable is absent.
+        """
+
+        value = os.getenv(DEFAULT_PASSWORD_ENV_VAR)
+        if value is None or not value.strip():
+            raise CommandError(
+                f"Missing demo password. Set `{DEFAULT_PASSWORD_ENV_VAR}` before "
+                "running `python manage.py seed_demo_users`."
+            )
+        return value
 
     def add_arguments(self, parser: Any) -> None:
         """Register command arguments.
@@ -37,6 +53,7 @@ class Command(BaseCommand):
 
     def handle(self, *_args: str, **options: object) -> None:
         """Create or refresh the demo users."""
+        default_password = self.default_password()
         missing_groups = [
             name
             for name in (ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER)
@@ -58,7 +75,7 @@ class Command(BaseCommand):
                 },
             )
             if created or bool(options["reset_passwords"]):
-                user.set_password(DEFAULT_PASSWORD)
+                user.set_password(default_password)
             user.is_staff = is_staff
             user.is_superuser = is_superuser
             user.username = email

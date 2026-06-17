@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, Protocol, cast
 
 from django.contrib.auth import get_user_model
@@ -9,8 +10,13 @@ from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.test import TestCase
 
-from libraryops.accounts.management.commands.seed_demo_users import DEFAULT_PASSWORD, DEMO_USERS
+from libraryops.accounts.management.commands.seed_demo_users import (
+    DEFAULT_PASSWORD_ENV_VAR,
+    DEMO_USERS,
+)
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
+
+TEST_DEMO_PASSWORD = "library-ops-demo-password"
 
 
 class _PermissionGroupLike(Protocol):
@@ -74,6 +80,20 @@ class SeedDemoUsersCommandTests(TestCase):
 
         call_command("seed_roles")
 
+    def setUp(self) -> None:
+        """Set the required demo password env var for the command under test."""
+
+        self.original_demo_password = os.environ.get(DEFAULT_PASSWORD_ENV_VAR)
+        os.environ[DEFAULT_PASSWORD_ENV_VAR] = TEST_DEMO_PASSWORD
+
+    def tearDown(self) -> None:
+        """Restore the prior demo password env var after the test."""
+
+        if self.original_demo_password is None:
+            os.environ.pop(DEFAULT_PASSWORD_ENV_VAR, None)
+            return
+        os.environ[DEFAULT_PASSWORD_ENV_VAR] = self.original_demo_password
+
     def test_seed_demo_users_is_idempotent_and_assigns_roles(self) -> None:
         """Ensure the demo-user seed is stable and role-aware."""
 
@@ -85,7 +105,7 @@ class SeedDemoUsersCommandTests(TestCase):
 
         for email, role_name, is_staff, is_superuser in DEMO_USERS:
             user = cast("_SeedUserLike", user_model.objects.get(email=email))
-            assert user.check_password(DEFAULT_PASSWORD)
+            assert user.check_password(TEST_DEMO_PASSWORD)
             assert user.is_staff == is_staff
             assert user.is_superuser == is_superuser
             assert [group.name for group in user.groups.all()] == [role_name]
