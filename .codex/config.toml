@@ -121,12 +121,14 @@ extends = ":workspace"
 glob_scan_max_depth = 5
 ":slash_tmp" = "write"
 ":tmpdir" = "write"
-"/home/gxx/.cache/ms-playwright" = "write"
-"/home/gxx/.cache/pip" = "write"
-"/home/gxx/.cache/uv" = "write"
-"/home/gxx/.config/gh" = "write"
-"/home/gxx/.local/share/uv" = "write"
-"/home/gxx/.npm" = "write"
+
+[permissions.workspace.workspace_roots]
+"~/.cache/ms-playwright" = true
+"~/.cache/pip" = true
+"~/.cache/uv" = true
+"~/.config/gh" = true
+"~/.local/share/uv" = true
+"~/.npm" = true
 
 [permissions.workspace.filesystem.":workspace_roots"]
 "." = "write"
