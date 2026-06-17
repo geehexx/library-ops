@@ -122,6 +122,14 @@ glob_scan_max_depth = 5
 ":slash_tmp" = "write"
 ":tmpdir" = "write"
 
+[permissions.workspace.workspace_roots]
+"~/.cache/ms-playwright" = true
+"~/.cache/pip" = true
+"~/.cache/uv" = true
+"~/.config/gh" = true
+"~/.local/share/uv" = true
+"~/.npm" = true
+
 [permissions.workspace.filesystem.":workspace_roots"]
 "." = "write"
 ".env" = "deny"
@@ -133,6 +141,7 @@ glob_scan_max_depth = 5
 "secrets/**" = "deny"
 "config/credentials/**" = "deny"
 "config/secrets/**" = "deny"
+".git/**" = "write"
 ".codex/**" = "write"
 ".agents/**" = "write"
 
