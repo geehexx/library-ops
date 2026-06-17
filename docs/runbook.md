@@ -14,6 +14,12 @@ npm run taskmaster:validate
 npm run verify:core
 ```
 
+For fresh coordinator-first sessions, prefer:
+
+```bash
+./scripts/codex-coordinator.sh
+```
+
 Use `npm run checks:precommit` for the fastest local hygiene loop, `npm run
 verify:core` for the full local loop, and `npm run verify:all` when
 you want the same loop plus the full security aggregate.

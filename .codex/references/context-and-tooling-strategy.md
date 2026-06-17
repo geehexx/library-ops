@@ -17,6 +17,24 @@ posture for Library Ops.
   edits;
 - For Python and Django changes, treat Pyright as the first static check on the touched scope before wider pytest or gate runs.
 
+## Auto-loaded vs manual surfaces
+
+- Keep root `AGENTS.md` as the short coordinator contract only.
+- Use nested `AGENTS.md` only for directory-specific rules.
+- Put repeatable workflows in skills.
+- Put role-specific behavior in `.codex/agents/*.toml`.
+- Keep `.codex/references/*` for shared manual reference material, not for long
+  always-on instructions that should auto-load by default.
+
+## Repo-local tool and startup paths
+
+- Use repo-local ast-grep via `npm run astgrep:scan` or
+  `npm exec -- ast-grep ...`.
+- Prefer tracked repo-local launchers and wrappers over hidden global aliases
+  when a workflow should be reproducible for other operators.
+- Fresh sessions should use `./scripts/codex-coordinator.sh` rather than ad hoc
+  shell wrappers.
+
 ## Required verification
 
 ```bash

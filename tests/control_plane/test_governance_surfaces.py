@@ -68,9 +68,26 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
 
     assert "Spawn direct specialists only" in coordinator_text
     assert "default coordinator" in coordinator_text
+    assert ".codex-session-notes/continuation.md" in coordinator_text
     assert "Pyright" in implementer_text
     assert "Pyright" in django_skill_text
     assert "Pyright" in django_prompt_text
+
+
+def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
+    """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
+    root_agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    clarify_ref = (
+        REPO_ROOT / ".codex" / "references" / "clarification-and-goals.md"
+    ).read_text(encoding="utf-8")
+    tooling_ref = (
+        REPO_ROOT / ".codex" / "references" / "context-and-tooling-strategy.md"
+    ).read_text(encoding="utf-8")
+
+    assert ".codex-session-notes/continuation.md" in root_agents
+    assert "npm run astgrep:scan" in root_agents
+    assert "/tmp/prompt.md" in clarify_ref
+    assert "npm run astgrep:scan" in tooling_ref
 
 
 def test_adr_index_matches_committed_adr_files() -> None:

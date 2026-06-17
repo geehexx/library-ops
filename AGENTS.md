@@ -2,163 +2,118 @@
 
 ## Mission
 
-Build **Library Ops** from the canonical PRD/spec pack and derived Task Master graph using Codex CLI, Spec Kit, Task Master, and the required local toolchain. This repository is a governed Codex control-plane package with explicit clarification, goal-setting, subagent escalation, and quality-gate policy.
+Build **Library Ops** from the canonical PRD/spec pack and derived Task Master
+graph using a coordinator-first Codex workflow, explicit specialist routing,
+and the required local toolchain.
 
 ## Source-of-truth order
 
 1. `.specify/memory/constitution.md`
 2. `.taskmaster/docs/prd.md`
 3. `specs/001-core/*`
-4. generated `.taskmaster/tasks/tasks.json` after PRD parsing
+4. committed `.taskmaster/tasks/tasks.json`
 5. current Task Master task/subtask
 6. this file, nested `AGENTS.md`, and `.codex/agents/*.toml`
 7. relevant `.agents/skills/*/SKILL.md`
 8. consolidated ADRs and supporting docs under `docs/`
-9. source code and tests once implemented
+9. source code and tests
+
+## Coordinator-default contract
+
+- The interactive root agent is always the coordinator by default.
+- Do not rely on a hidden `default-agent` setting to enforce that posture.
+- Spawn direct specialists for bounded work; do not let the root absorb broad
+  implementation or recursive fan-out by habit.
+- Keep root `AGENTS.md` lean. Shared clarification, escalation, tooling, and
+  continuation mechanics belong in:
+  - `.codex/references/clarification-and-goals.md`
+  - `.codex/references/context-and-tooling-strategy.md`
+  - `.codex/agents/*.toml`
+  - repo-local skills under `.agents/skills/`
 
 ## Required session start
 
-Root coordinator mode: the interactive root agent must behave as the coordinator
-by default. Do not rely on a Codex `default-agent` config key. Spawn the
-`coordinator` subagent only for bounded synthesis; otherwise the root agent owns
-source-of-truth order, routing, decisions, and final judgment.
-
-1. Read the current task and linked PRD/spec section. If
-   `.taskmaster/tasks/tasks.json` or a current task does not yet exist, read the
-   constitution, canonical PRD, and `specs/001-core/*` first, then generate and
-   validate the Task Master graph after coordinator/subagent setup is verified.
+1. Read the current task and linked PRD/spec section. If the task graph does
+   not yet exist, read the constitution, canonical PRD, and `specs/001-core/*`
+   first.
 2. Check `git status`.
-3. Confirm whether the change is meta/control-plane, product-code, or both; split commits accordingly.
-4. Perform skill discovery before broad work: check the repo-local and installed skill catalog, load the relevant skill(s), and prefer explicit skill workflows over ad hoc repeated prompting. Use `clarify-and-goal` when ambiguity exists.
-5. Use `/plan` and the native user-question path when available before high-risk implementation: `request_user_input` in Plan mode, `ask_user_question` if exposed by the active build, or MCP elicitation through `tool_call_mcp_elicitation`. Otherwise emit a Question packet.
-6. Use `/goal` for long work after the goal is measurable and evidence-backed. For long-horizon work, omit a token budget by default; set one only when a hard stop, cost ceiling, or deliberate summarize-and-handoff checkpoint is actually needed.
-7. Use Serena, code-review-graph, and ast-grep before broad source changes.
-   Use the repo-local ast-grep path via `npm run astgrep:scan` or
-   `npm exec -- ast-grep ...`, not a guessed global binary.
-8. Use RTK for noisy exploratory commands and raw output for exact evidence.
+3. Confirm whether the work is meta/control-plane, product-code, or both; split
+   commits accordingly.
+4. Confirm the canonical continuation artifacts:
+   - `.codex-session-notes/continuation.md` is authoritative
+   - `.codex-session-notes/scratch.md` is optional scratch only
+5. Perform skill discovery before broad work. Start with the repo-local catalog
+   under `.agents/skills/`, then installed/global skills. Prefer explicit skill
+   workflows over ad hoc repetition.
+6. Use `/plan`, native question routing, and `/goal` according to
+   `.codex/references/clarification-and-goals.md`.
+7. Use Serena, code-review-graph, and repo-local ast-grep before broad source
+   changes. Use `npm run astgrep:scan` or `npm exec -- ast-grep ...`, not a
+   guessed global binary.
+8. Use RTK for noisy exploration and raw output for exact evidence.
 9. Record decisions, evidence, and validation in Task Master notes.
-10. Task Master mutations normally route through `taskmaster_governor`; root
-    may read Task Master directly and may write only with an explicit note
-    explaining why the governor path was not used.
-11. Root plus direct specialists is the default orchestration posture unless an
-    ADR and validator explicitly re-enable deeper recursion.
-12. Treat phase PRDs, Spec Kit summaries, Task Master notes, AGENTS, and skill
-    instructions as living implementation surfaces: when code or decisions make
-    one of them stale, update or consolidate it in the same branch instead of
-    leaving drift for a later cleanup pass.
-13. When the user explicitly asks for subagent delegation, root must delegate
-    bounded slices with a clear owner and return condition, avoid duplicating or
-    reclaiming subagent-owned work while it is still active, and prefer waiting
-    or blocked status over early local rework.
 
-Do not rely on per-agent `skills.config` overrides as if they make a skill
-always loaded for one subagent. Treat skill selection as a discovery and
-routing problem owned by the root/coordinator, with explicit skill invocation
-or clear trigger text as the reliable path.
+## Routing rules
 
-Skill discovery flow:
-1. Start with the repo-local catalog under `.agents/skills/`.
-2. Use each skill's `name`, `description`, and `agents/openai.yaml` metadata as the first routing layer.
-3. Prefer the strongest matching workflow skill or skill combination before ad hoc prompting.
-4. If a workflow depends on an installed curated skill, route to it explicitly rather than assuming a subagent-local override will make it always loaded.
+- Route Python/Django implementation through `$django-feature`.
+- Route code/context/tooling questions through `$code-intelligence`.
+- Route ambiguity, question packets, and goal shaping through
+  `$clarify-and-goal` and `$define-goal` when appropriate.
+- Route routine Task Master mutation through `taskmaster_governor`; root may
+  write directly only with an explicit note explaining why.
+- Do not rely on `skills.config` overrides as if they guarantee always-loaded
+  behavior. Use explicit routing, trigger text, and prompt-level invocation.
 
-## Question packet
+## Delegation and escalation
 
-Use this shape when user input may alter scope, credentials, cost, security, architecture, MCPs, context budgets, remote branch/review policy, deployment, or irreversible repository state:
+- When the user explicitly asks for subagents, root must delegate bounded slices
+  with a clear owner and return condition.
+- Do not duplicate or reclaim active owned slices early.
+- Prefer waiting or blocked status over silent local takeover when the critical
+  path belongs to a specialist.
+- Question and Escalation packet formats, remote-policy blocker handling, and
+  native user-input routing live in `.codex/references/clarification-and-goals.md`.
 
-```text
-Question packet
-Decision needed:
-Why this blocks or changes risk:
-Options:
-  A. <option> — tradeoff
-  B. <option> — tradeoff
-Recommended default:
-Confidence:
-Can proceed without answer? yes/no
-Safe partial work while waiting:
-Files/tasks affected:
-Validation after answer:
-```
+## Required local checks
 
-## Escalation packet
-
-Every subagent must return this packet when blocked, partial, needs-user, low-confidence, or risk-significant:
-
-```text
-Escalation packet
-Status: clear | needs-user | blocked | partial
-Confidence: 0.00-1.00
-Finding:
-Evidence:
-Risk if ignored:
-User question needed:
-Recommended default:
-Partial work safe to continue:
-Owner agent:
-Next validation:
-```
-
-The coordinator decides whether to ask the user, continue safe partial work, or stop.
-
-If remote repository policy blocks a required merge, push, or release step, do
-not work around it by switching to an alternate base branch, bypassing policy,
-or assuming the action can happen later. Return `Status: blocked` with the exact
-GitHub evidence and stop until the user changes the policy or gives an explicit
-new instruction.
-
-## Required selected stack
-
-Implementation environments must provide Codex CLI, Task Master, RTK, Serena, code-review-graph, ast-grep, Repomix, Context7 MCP, Exa MCP, Task Master MCP, Promptfoo, Playwright, Schemathesis, mutmut, Vale, cspell, lychee, alex, agent-skills-lint, Gitleaks, Semgrep, Bandit, pip-audit, actionlint, zizmor, Conftest, CycloneDX, Import Linter, Ruff, Pyright, pytest, and Hypothesis.
-
-Run:
+Use these entry points:
 
 ```bash
 codex doctor --summary --ascii --no-color
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
+npm run checks:precommit
+npm run verify:core
+npm run verify:all
 ```
 
-## Decision rules
-
-Use `docs/decisioning/socratic-decision-framework.md` and `.codex/references/clarification-and-goals.md` for material choices. Do not pause merely because a required local tool needs to be configured or smoke-tested. Do pause before adding vendors, exporting source to cloud tools, changing project scope, or performing irreversible git/GitHub actions.
-
-## Architecture rules
-
-Use the hybrid architecture approach in `docs/architecture/architecture-approach.md`: Spec Kit as delivery/spec backbone, Task Master as derived graph, arc42 for quality/risk framing, C4 only where diagrams clarify, strategic DDD-lite only, and idiomatic Django layers.
-- For Python and Django work, use `$django-feature`, keep typed boundaries explicit, and run Pyright on the touched scope before widening to broader Python gates.
-
-## Required local gates
+For the current detailed validation ladder, read:
 
 ```bash
-npm run skills:lint
-npm run skills:audit
-npm run docs:quality
-npm run docstrings:coverage
-npm run docstrings:lint
-npm run eval:validate
-uv run ruff format --check .
-uv run ruff check .
-uv run pyright
-uv run pytest
-uv run python manage.py check
-PYTHONPATH=src uv run lint-imports
-npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
+sed -n '1,220p' docs/process/quality-gates.md
 ```
 
-Security/workflow/supply-chain:
+## Coordinator-first launcher
+
+Use the tracked repo-local launcher for fresh sessions:
 
 ```bash
-gitleaks detect --source . --redact
-uvx --from semgrep semgrep scan --config .semgrep.yml
-uv run bandit -c pyproject.toml -r src
-uv run pip-audit --progress-spinner off
-npm audit --audit-level=moderate
-actionlint
-zizmor .
-conftest test .codex/config.toml --policy policy
-uv run cyclonedx-py environment --output-format json --output-file reports/sbom/python.cdx.json
+./scripts/codex-coordinator.sh
 ```
+
+If you want a shell alias, point it at that tracked script rather than hiding
+workflow logic in untracked global wrappers.
+
+## Continuation and retrospective
+
+- Keep `.codex-session-notes/continuation.md` updated at major checkpoints.
+- Treat `.codex-session-notes/scratch.md` as disposable working notes only.
+- Promote repeated lessons into tracked surfaces through
+  `docs/process/retrospective.md` instead of letting memory-only instructions
+  compound indefinitely.
 
 ## Repository hygiene
 
-Never commit secrets, private MCP state, generated corpora, media, embeddings, local databases, code graph caches, Repomix output, Promptfoo result exports, virtualenvs, node_modules, or scan artifacts unless explicitly sanitized and approved.
+Never commit secrets, private MCP state, generated corpora, media, embeddings,
+local databases, code graph caches, Repomix output, Promptfoo result exports,
+virtualenvs, `node_modules`, or scan artifacts unless explicitly sanitized and
+approved.

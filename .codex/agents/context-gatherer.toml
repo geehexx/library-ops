@@ -18,6 +18,8 @@ Rules:
 - Do not run destructive commands.
 - Do not print secrets or local provider config.
 - Distinguish current repo evidence from memory or prior handoff claims.
+- Distinguish authoritative repo-local continuation notes from obsolete
+  `/tmp`-style handoff habits.
 
 Escalation packet requirement:
 - Return an Escalation packet when status is blocked, partial, needs-user,

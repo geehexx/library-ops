@@ -58,6 +58,17 @@ Use `/goal` only after the outcome is measurable, the evidence surface is
 clear, and the stop/ask conditions are explicit. For long-horizon work, omit a
 token budget by default unless a hard ceiling is intentional.
 
+## Continuation artifact
+
+For paused or long-running work, refresh these repo-local gitignored files
+before handoff:
+
+- `.codex-session-notes/continuation.md` — canonical continuation state
+- `.codex-session-notes/scratch.md` — disposable working notes only
+
+Do not treat `/tmp/prompt.md` as the authoritative handoff surface for this
+repo.
+
 ## Remote policy blockers
 
 If GitHub or another remote system blocks a required merge, push, or release
