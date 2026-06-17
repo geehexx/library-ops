@@ -327,7 +327,7 @@
         "dependencies": [
           "4"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -386,13 +386,14 @@
             "dependencies": [
               4
             ],
-            "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.\n<info added on 2026-06-17T12:27:57.951Z>\nEnsure `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment. Next steps include integrating OAuth provider toggles and completing the local demo configuration as per Task 5.\n</info added on 2026-06-17T12:27:57.951Z>",
-            "status": "pending",
+            "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.\n<info added on 2026-06-17T12:27:57.951Z>\nEnsure `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment. Next steps include integrating OAuth provider toggles and completing the local demo configuration as per Task 5.\n</info added on 2026-06-17T12:27:57.951Z>\n<info added on 2026-06-17T20:03:26.520Z>\n```\nImplemented env-driven optional OAuth gating in `src/libraryops/config/settings/base.py`, covered by `tests/smoke/test_django_settings.py`, and documented in `env.example`. Validation passed.\n```\n</info added on 2026-06-17T20:03:26.520Z>",
+            "status": "done",
             "testStrategy": "Verify local username/password login works without any OAuth provider configured. Test with and without relevant environment variables set to ensure OAuth providers are conditionally enabled/disabled as expected. Attempt to access a social login endpoint when its provider is intentionally disabled to confirm it fails gracefully.",
-            "parentId": "5"
+            "parentId": "5",
+            "updatedAt": "2026-06-17T20:01:47.325Z"
           }
         ],
-        "updatedAt": "2026-06-17T12:27:01.354Z"
+        "updatedAt": "2026-06-17T20:01:47.325Z"
       },
       {
         "id": 6,
@@ -923,13 +924,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-17T17:50:48.069Z",
+      "lastModified": "2026-06-17T20:01:47.332Z",
       "taskCount": 12,
-      "completedCount": 5,
+      "completedCount": 6,
       "tags": [
         "master"
       ],
-      "created": "2026-06-17T17:50:51.174Z",
+      "created": "2026-06-17T20:01:55.102Z",
       "description": "Tasks for master context"
     }
   }

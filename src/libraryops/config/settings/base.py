@@ -43,7 +43,54 @@ def build_default_database() -> dict[str, Any]:
     }
 
 
+def build_socialaccount_configuration() -> tuple[list[str], dict[str, Any]]:
+    """Build optional allauth socialaccount apps and provider settings.
+
+    Returns:
+        A tuple of installed app labels and provider settings for enabled
+        OAuth providers. When no provider credentials exist, both entries are
+        empty so local email/password auth stays the default.
+    """
+
+    provider_defs = [
+        (
+            "google",
+            "allauth.socialaccount.providers.google",
+            "DJANGO_ALLAUTH_GOOGLE_CLIENT_ID",
+            "DJANGO_ALLAUTH_GOOGLE_SECRET",
+        ),
+        (
+            "github",
+            "allauth.socialaccount.providers.github",
+            "DJANGO_ALLAUTH_GITHUB_CLIENT_ID",
+            "DJANGO_ALLAUTH_GITHUB_SECRET",
+        ),
+    ]
+    installed_apps: list[str] = []
+    provider_settings: dict[str, Any] = {}
+    for provider_name, app_label, client_id_env, secret_env in provider_defs:
+        client_id = os.getenv(client_id_env, "").strip()
+        secret = os.getenv(secret_env, "").strip()
+        if not client_id or not secret:
+            continue
+        if "allauth.socialaccount" not in installed_apps:
+            installed_apps.append("allauth.socialaccount")
+        installed_apps.append(app_label)
+        provider_settings[provider_name] = {
+            "APPS": [
+                {
+                    "client_id": client_id,
+                    "secret": secret,
+                    "key": "",
+                }
+            ]
+        }
+    return installed_apps, provider_settings
+
+
 ALLOWED_HOSTS = parse_csv_env("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,testserver")
+
+SOCIALACCOUNT_INSTALLED_APPS, SOCIALACCOUNT_PROVIDERS = build_socialaccount_configuration()
 
 INSTALLED_APPS = [
     "unfold",
@@ -65,6 +112,7 @@ INSTALLED_APPS = [
     "libraryops.audit",
     "libraryops.shell",
 ]
+INSTALLED_APPS.extend(SOCIALACCOUNT_INSTALLED_APPS)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

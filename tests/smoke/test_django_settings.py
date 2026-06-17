@@ -6,6 +6,8 @@ import importlib
 import sys
 from typing import Any
 
+import pytest
+
 
 def reload_module(module_name: str):
     """Import a settings module after environment-variable changes.
@@ -18,6 +20,11 @@ def reload_module(module_name: str):
     """
 
     sys.modules.pop(module_name, None)
+    if (
+        module_name.startswith("libraryops.config.settings.")
+        and module_name != "libraryops.config.settings.base"
+    ):
+        sys.modules.pop("libraryops.config.settings.base", None)
     return importlib.import_module(module_name)
 
 
@@ -63,6 +70,81 @@ def test_base_settings_use_database_url_when_present(
     assert settings_module.DATABASES["default"]["USER"] == "libraryops"
     assert settings_module.DATABASES["default"]["HOST"] == "localhost"
     assert settings_module.DATABASES["default"]["PORT"] == 5432
+
+
+def test_base_settings_disable_socialaccount_by_default(monkeypatch: Any) -> None:
+    """Ensure optional OAuth providers stay disabled without credentials."""
+
+    monkeypatch.delenv("DJANGO_ALLAUTH_GOOGLE_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DJANGO_ALLAUTH_GOOGLE_SECRET", raising=False)
+    monkeypatch.delenv("DJANGO_ALLAUTH_GITHUB_CLIENT_ID", raising=False)
+    monkeypatch.delenv("DJANGO_ALLAUTH_GITHUB_SECRET", raising=False)
+
+    settings_module = reload_module("libraryops.config.settings.base")
+
+    assert "allauth.socialaccount" not in settings_module.INSTALLED_APPS
+    assert "allauth.socialaccount.providers.google" not in settings_module.INSTALLED_APPS
+    assert "allauth.socialaccount.providers.github" not in settings_module.INSTALLED_APPS
+    assert settings_module.SOCIALACCOUNT_PROVIDERS == {}
+
+
+@pytest.mark.parametrize(
+    ("provider", "client_id_env", "secret_env", "provider_app"),
+    [
+        (
+            "google",
+            "DJANGO_ALLAUTH_GOOGLE_CLIENT_ID",
+            "DJANGO_ALLAUTH_GOOGLE_SECRET",
+            "allauth.socialaccount.providers.google",
+        ),
+        (
+            "github",
+            "DJANGO_ALLAUTH_GITHUB_CLIENT_ID",
+            "DJANGO_ALLAUTH_GITHUB_SECRET",
+            "allauth.socialaccount.providers.github",
+        ),
+    ],
+)
+def test_base_settings_enable_socialaccount_provider_from_env(
+    monkeypatch: Any,
+    provider: str,
+    client_id_env: str,
+    secret_env: str,
+    provider_app: str,
+) -> None:
+    """Ensure each OAuth provider appears only when its env vars are set."""
+
+    for env_name in (
+        "DJANGO_ALLAUTH_GOOGLE_CLIENT_ID",
+        "DJANGO_ALLAUTH_GOOGLE_SECRET",
+        "DJANGO_ALLAUTH_GITHUB_CLIENT_ID",
+        "DJANGO_ALLAUTH_GITHUB_SECRET",
+    ):
+        monkeypatch.delenv(env_name, raising=False)
+
+    monkeypatch.setenv(client_id_env, f"{provider}-client-id")
+    monkeypatch.setenv(secret_env, f"{provider}-secret")
+
+    settings_module = reload_module("libraryops.config.settings.base")
+
+    assert "allauth.socialaccount" in settings_module.INSTALLED_APPS
+    assert provider_app in settings_module.INSTALLED_APPS
+    assert set(settings_module.SOCIALACCOUNT_PROVIDERS) == {provider}
+    assert settings_module.SOCIALACCOUNT_PROVIDERS[provider] == {
+        "APPS": [
+            {
+                "client_id": f"{provider}-client-id",
+                "secret": f"{provider}-secret",
+                "key": "",
+            }
+        ]
+    }
+    other_provider_app = (
+        "allauth.socialaccount.providers.github"
+        if provider == "google"
+        else "allauth.socialaccount.providers.google"
+    )
+    assert other_provider_app not in settings_module.INSTALLED_APPS
 
 
 def test_test_settings_only_override_sqlite_without_database_url(
