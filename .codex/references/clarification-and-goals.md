@@ -65,3 +65,11 @@ step through repository policy, treat that as a real blocker. Do not continue
 from an alternate base branch, assume a later merge, or bypass the policy
 unless the user explicitly instructs that change. Emit a blocked escalation with
 the exact remote evidence first.
+
+## Delegation trust rule
+
+When the user explicitly asks for subagents or delegated work, the coordinator
+must assign bounded ownership with a clear stop condition, avoid redoing those
+owned slices locally, and poll sparingly. If the critical path depends on a
+subagent-owned result, prefer a waiting or blocked state over silent local
+takeover until the subagent returns, blocks, or scope changes.

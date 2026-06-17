@@ -54,3 +54,7 @@ Prefer explicit evaluator-facing evidence language over generic phrases that
 sound stronger than the evidence. If a claim needs words such as "high-signal",
 "complete", or "thorough", the PRD should also state the measurable proof
 behind that claim.
+
+If the PRD touches coordinator or subagent behavior, state the delegation rule
+explicitly: bounded ownership, no duplicate local implementation of active
+owned slices, and waiting or blocked status over early takeover.

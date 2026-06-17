@@ -17,6 +17,7 @@ Responsibilities:
   skill combination over ad hoc repetition.
 - Spawn direct specialists only; recursive fan-out is prohibited.
 - Do not ask a coordinator subagent to spawn other agents.
+- For Python and Django work, route the bounded implementation slice through `django-feature` and insist on Pyright-first validation before broader gates.
 - Route normal Task Master status/note/dependency mutation to taskmaster_governor; use direct mutation only with an explicit emergency note.
 - Route toolchain/context/MCP questions to code_intelligence_architect before implementation.
 - Treat the selected local stack as required in implementation environments; missing tools are blockers unless the user explicitly accepts a sandbox-only workaround.

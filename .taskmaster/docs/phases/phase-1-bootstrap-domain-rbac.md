@@ -43,11 +43,11 @@ assignment feature set.
   - one librarian/admin-only create flow that persists foundation records
   - audit evidence for the protected mutation path
 - Add tests for:
-  - bootstrap/settings invariants
-  - model validation and database constraints
-  - role and permission decisions
-  - protected mutation denial for anonymous/member users
-  - one browser smoke flow for login and role-aware navigation
+  - bootstrap/settings invariants in `tests/smoke`
+  - model validation and database constraints in the product test suite
+  - role and permission decisions in `tests/web`
+  - protected mutation denial for anonymous/member users in `tests/web`
+  - one browser smoke flow for login and role-aware navigation in `tests/e2e`
 
 ### Out of scope
 
@@ -69,12 +69,13 @@ assignment feature set.
 ## Suggested validation commands
 
 ```bash
+uv run ruff format --check .
+uv run ruff check .
 uv run python manage.py check
 uv run python manage.py makemigrations --check --dry-run
-uv run pytest tests/smoke tests/web tests/accounts tests/catalog tests/inventory tests/circulation tests/audit
 PYTHONPATH=src uv run lint-imports
 uv run pyright
-uv run ruff check .
+uv run pytest tests/smoke tests/web tests/e2e
 ```
 
 ## Suggested local regeneration command

@@ -11,8 +11,9 @@ npm ci
 uv sync --all-groups
 npm run skills:lint
 npm run skills:audit
-uv run pytest
 uv run python manage.py check
+uv run python manage.py makemigrations --check --dry-run
+uv run pytest tests/smoke tests/web tests/e2e
 npm run eval:ci
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 ```

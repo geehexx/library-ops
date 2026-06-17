@@ -44,6 +44,10 @@ source-of-truth order, routing, decisions, and final judgment.
     instructions as living implementation surfaces: when code or decisions make
     one of them stale, update or consolidate it in the same branch instead of
     leaving drift for a later cleanup pass.
+13. When the user explicitly asks for subagent delegation, root must delegate
+    bounded slices with a clear owner and return condition, avoid duplicating or
+    reclaiming subagent-owned work while it is still active, and prefer waiting
+    or blocked status over early local rework.
 
 Do not rely on per-agent `skills.config` overrides as if they make a skill
 always loaded for one subagent. Treat skill selection as a discovery and
@@ -119,6 +123,7 @@ Use `docs/decisioning/socratic-decision-framework.md` and `.codex/references/cla
 ## Architecture rules
 
 Use the hybrid architecture approach in `docs/architecture/architecture-approach.md`: Spec Kit as delivery/spec backbone, Task Master as derived graph, arc42 for quality/risk framing, C4 only where diagrams clarify, strategic DDD-lite only, and idiomatic Django layers.
+- For Python and Django work, use `$django-feature`, keep typed boundaries explicit, and run Pyright on the touched scope before widening to broader Python gates.
 
 ## Required local gates
 

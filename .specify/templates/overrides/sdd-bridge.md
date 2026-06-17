@@ -20,6 +20,8 @@ Use this as a project-local guide when generating Spec Kit specs/plans/tasks.
   the PRD, ADRs, AGENTS, skills, or concise runbook/setup surfaces.
 - Treat Task Master as derived from the canonical PRD and spec pack. If they
   disagree, update PRD/spec first, then regenerate or reconcile the task graph.
+- If a spec or plan changes coordinator routing or subagent behavior, preserve
+  the delegation rule explicitly instead of softening it into advisory wording.
 
 ## Required generated artifact qualities
 

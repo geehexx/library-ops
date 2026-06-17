@@ -1546,6 +1546,10 @@ Code-intelligence tools are not all MCPs and are governed separately:
 - Use Context7 before using framework/library APIs that may have changed.
 - Use Exa for current external research or examples.
 - Do not store secrets in Task Master metadata, PRD, README, or MCP config.
+- If the user explicitly asks for delegation, the coordinator MUST trust
+  bounded subagent ownership, avoid duplicate local implementation in those
+  owned slices, and prefer waiting or blocked status over taking work back
+  early.
 
 ### 15.4 Connector Truthfulness
 

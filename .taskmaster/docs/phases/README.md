@@ -17,3 +17,6 @@ Rules:
   the committed graph and `specs/001-core/tasks.md`.
 - Phase PRDs are for bounded regeneration, expansion, and local-model
   benchmarking, not for creating a second product truth.
+- If a phase PRD or derived doc mentions coordinator/subagent behavior, keep the
+  delegation rule explicit: bounded ownership, no local takeover of active
+  owned slices, and waiting or blocked status over early rework.

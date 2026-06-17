@@ -46,6 +46,33 @@ def test_skill_reference_files_are_linked_from_skill_entrypoints() -> None:
         assert reference_path.name in skill_md
 
 
+def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_first() -> None:
+    """Ensure the coordinator and Django skill keep the routing and typing posture explicit."""
+    coordinator_text = (REPO_ROOT / ".codex" / "agents" / "coordinator.toml").read_text(
+        encoding="utf-8",
+    )
+    implementer_text = (REPO_ROOT / ".codex" / "agents" / "implementer.toml").read_text(
+        encoding="utf-8",
+    )
+    django_skill_text = (
+        REPO_ROOT / ".agents" / "skills" / "django-feature" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    django_prompt_text = (
+        REPO_ROOT
+        / ".agents"
+        / "skills"
+        / "django-feature"
+        / "agents"
+        / "openai.yaml"
+    ).read_text(encoding="utf-8")
+
+    assert "Spawn direct specialists only" in coordinator_text
+    assert "default coordinator" in coordinator_text
+    assert "Pyright" in implementer_text
+    assert "Pyright" in django_skill_text
+    assert "Pyright" in django_prompt_text
+
+
 def test_adr_index_matches_committed_adr_files() -> None:
     """Ensure the ADR index stays aligned with committed ADR files."""
     adr_dir = REPO_ROOT / "docs" / "adr"
