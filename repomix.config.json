@@ -12,7 +12,6 @@
   "include": [
     "AGENTS.md",
     "README.md",
-    "PACKAGE_MANIFEST.md",
     "llms.txt",
     "env.example",
     ".gitignore",
@@ -32,6 +31,7 @@
     ".github/pull_request_template.md",
     ".husky/**/*",
     ".codex/**/*.toml",
+    ".codex/agents/**/*.toml",
     ".codex/**/*.json",
     ".codex/hooks/**/*.py",
     ".codex/rules/**/*.rules",

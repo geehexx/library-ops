@@ -23,13 +23,15 @@ and the required local toolchain.
 - The interactive root agent is always the coordinator by default.
 - Do not rely on a hidden `default-agent` setting to enforce that posture.
 - Spawn direct specialists for bounded work; do not let the root absorb broad
-  implementation or recursive fan-out by habit.
+  implementation or recursive fan-out by habit. If a specialist already owns a
+  slice, wait for its return or an explicit scope change.
 - Keep root `AGENTS.md` lean. Shared clarification, escalation, tooling, and
-  continuation mechanics belong in:
-  - `.codex/references/clarification-and-goals.md`
-  - `.codex/references/context-and-tooling-strategy.md`
-  - `.codex/agents/*.toml`
-  - repo-local skills under `.agents/skills/`
+  continuation mechanics belong in `.codex/agents/*.toml` and the explicit
+  repo-local skill entrypoints under `.agents/skills/`.
+- The native question, escalation, and goal-shaping contract lives in
+  `.agents/skills/clarify-and-goal/SKILL.md`.
+- The tool-routing, evidence, and blast-radius contract lives in
+  `.agents/skills/code-intelligence/SKILL.md`.
 
 ## Required session start
 
@@ -43,10 +45,12 @@ and the required local toolchain.
    - `.codex-session-notes/continuation.md` is authoritative
    - `.codex-session-notes/scratch.md` is optional scratch only
 5. Perform skill discovery before broad work. Start with the repo-local catalog
-   under `.agents/skills/`, then installed/global skills. Prefer explicit skill
-   workflows over ad hoc repetition.
+   under `.agents/skills/`, choose the skill whose capability and trigger best
+   match the task, then installed/global skills. Prefer explicit skill
+   workflows over ad hoc repetition and stop at ownership boundaries instead
+   of widening scope locally.
 6. Use `/plan`, native question routing, and `/goal` according to
-   `.codex/references/clarification-and-goals.md`.
+   `.agents/skills/clarify-and-goal/SKILL.md`.
 7. Use Serena, code-review-graph, and repo-local ast-grep before broad source
    changes. Use `npm run astgrep:scan` or `npm exec -- ast-grep ...`, not a
    guessed global binary.
@@ -55,10 +59,12 @@ and the required local toolchain.
 
 ## Routing rules
 
-- Route Python/Django implementation through `$django-feature`.
-- Route code/context/tooling questions through `$code-intelligence`.
-- Route ambiguity, question packets, and goal shaping through
-  `$clarify-and-goal` and `$define-goal` when appropriate.
+- Route Python/Django implementation through the strongest matching Django or
+  repo-local application workflow skill.
+- Route code/context/tooling questions through the strongest matching
+  code-intelligence or repo-tooling workflow skill.
+- Route ambiguity, question packets, and goal shaping through the strongest
+  matching clarification/goal workflow skill when appropriate.
 - Route routine Task Master mutation through `taskmaster_governor`; root may
   write directly only with an explicit note explaining why.
 - Do not rely on `skills.config` overrides as if they guarantee always-loaded
@@ -68,11 +74,24 @@ and the required local toolchain.
 
 - When the user explicitly asks for subagents, root must delegate bounded slices
   with a clear owner and return condition.
-- Do not duplicate or reclaim active owned slices early.
+- Do not duplicate or reclaim active owned slices early; wait for the owner to
+  return, block, or hand back scope.
 - Prefer waiting or blocked status over silent local takeover when the critical
   path belongs to a specialist.
+- Treat root absorption of broad implementation after delegation as a process
+  defect that should be corrected before closeout.
+- Do not stop at a merely stable-looking partial point when real blockers are
+  absent and the requested end state is still incomplete. If the work is
+  blocked on a decision or another agent's owned slice, stop and report the
+  block instead of branching into adjacent work.
+- Closeout summaries must state:
+  - what was actually finished
+  - what remains incomplete
+  - why work is stopping now
+  - whether the stop is due to a real blocker, user stop, or session boundary
 - Question and Escalation packet formats, remote-policy blocker handling, and
-  native user-input routing live in `.codex/references/clarification-and-goals.md`.
+  native user-input routing live in
+  `.agents/skills/clarify-and-goal/SKILL.md`.
 
 ## Required local checks
 

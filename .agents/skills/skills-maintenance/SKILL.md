@@ -27,8 +27,14 @@ Invoke this skill when you need to audit the skills catalog or when a retrospect
 
 * **Naming**: Skill names must be short and descriptive (e.g., `django-feature`, `taskmaster`, `release-manager`). Avoid prefixes like `libraryops-`.
 * **Triggers**: The `description` should state when to use the skill. Each skill should have unique trigger phrases to reduce ambiguity.
+* **Discovery**: Skill selection should be capability-based. Prefer the skill whose
+  trigger and workflow best match the task, not the one with the most familiar
+  name or prefix.
+* **Lint scope**: Keep `skills:lint` scoped to skill entrypoints only
+  (`.agents/skills/*/SKILL.md` or an equivalent entrypoint-only finder). Do not
+  broaden linting to reference markdown or other leaf docs.
 * **Progressive disclosure**: Use references and scripts to avoid one giant file, but do not optimize for thinness. Important recurring workflows should keep enough top-level context that Codex does not repeatedly miss the right path.
-* **References**: Keep reference files only when they provide concrete progressive-disclosure material linked from `SKILL.md`; remove placeholder-only reference directories.
+* **References**: Keep reference files only when they provide concrete progressive-disclosure material linked from `SKILL.md`; remove placeholder-only reference directories and avoid separate leaf docs when the `SKILL.md` can hold the durable guidance directly.
 * **Metadata richness**: Add `agents/openai.yaml` when it improves discovery, default prompting, or machine-readable dependency declaration.
 * **Out-of-the-box first**: Before adding a new repo-local skill, check whether an existing system/plugin/curated skill already covers the need well enough.
 * **Review**: Summarize the outcome of each maintenance session, including the number of skills audited, changes proposed or made, and any outstanding follow‑ups.

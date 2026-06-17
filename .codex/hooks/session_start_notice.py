@@ -10,14 +10,17 @@ import subprocess
 import sys
 import tomllib
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 PUBLIC_INSTRUCTION_PATHS = [
     "AGENTS.md",
     ".taskmaster/docs/prd.md",
     ".specify/memory/constitution.md",
-    ".codex/references/context-and-tooling-strategy.md",
-    ".codex/references/clarification-and-goals.md",
+    ".codex/agents/coordinator.toml",
+    ".codex/agents/implementer.toml",
+    ".codex/agents/taskmaster-governor.toml",
+    ".agents/skills/clarify-and-goal/SKILL.md",
+    ".agents/skills/code-intelligence/SKILL.md",
 ]
 
 
@@ -103,16 +106,17 @@ def mcp_summary(config: dict[str, Any]) -> str:
     if not isinstance(mcps, dict):
         return "none"
     entries: list[str] = []
-    for name, table in sorted(mcps.items()):
+    for name, table in sorted(cast("dict[str, Any]", mcps).items()):
         if not isinstance(table, dict):
             continue
+        table_data = cast("dict[str, Any]", table)
         auth_hint = (
             "auth-env"
-            if table.get("bearer_token_env_var") or table.get("env_vars")
+            if table_data.get("bearer_token_env_var") or table_data.get("env_vars")
             else "auth-config"
         )
-        enabled = table.get("enabled", True)
-        required = table.get("required", False)
+        enabled = table_data.get("enabled", True)
+        required = table_data.get("required", False)
         entries.append(f"{name}(enabled={enabled},required={required},{auth_hint})")
     return ", ".join(entries) if entries else "none"
 
@@ -134,15 +138,16 @@ def task_graph_status(root: Path) -> str:
     except json.JSONDecodeError:
         return "invalid-json"
     if isinstance(data, dict):
-        tasks = data.get("tasks")
+        data_dict = cast("dict[str, Any]", data)
+        tasks = data_dict.get("tasks")
         if isinstance(tasks, list):
-            return f"present:tasks={len(tasks)}"
+            return f"present:tasks={len(cast('list[Any]', tasks))}"
 
-        master = data.get("master")
+        master = data_dict.get("master")
         if isinstance(master, dict):
-            master_tasks = master.get("tasks")
+            master_tasks = cast("dict[str, Any]", master).get("tasks")
             if isinstance(master_tasks, list):
-                return f"present:tasks={len(master_tasks)}"
+                return f"present:tasks={len(cast('list[Any]', master_tasks))}"
     return "present:unknown-shape"
 
 
@@ -153,7 +158,7 @@ def main() -> int:
         Zero for normal hook completion.
     """
     try:
-        payload = json.loads(sys.stdin.read() or "{}")
+        payload = cast("dict[str, Any]", json.loads(sys.stdin.read() or "{}"))
     except json.JSONDecodeError:
         payload = {}
     cwd = Path(payload.get("cwd") or os.getcwd()).resolve()
@@ -162,10 +167,13 @@ def main() -> int:
     branch = run_text(["git", "branch", "--show-current"], root) or "detached-or-unavailable"
     status = run_text(["git", "status", "--short"], root)
     dirty_count = 0 if status in {"", "unavailable"} else len(status.splitlines())
-    features = config.get("features", {}) if isinstance(config.get("features"), dict) else {}
-    enabled_features = sorted(name for name, enabled in features.items() if enabled is True)
+    features_obj = config.get("features", {})
+    features = cast("dict[str, Any]", features_obj) if isinstance(features_obj, dict) else {}
+    enabled_features: list[str] = sorted(
+        name for name, enabled in features.items() if enabled is True
+    )
     fingerprints = "; ".join(file_fingerprint(root, path) for path in PUBLIC_INSTRUCTION_PATHS)
-    permission_profile = config.get("default_permissions", "unconfigured")
+    permission_profile = str(config.get("default_permissions", "unconfigured"))
 
     print(
         "Library Ops startup context (redacted): "

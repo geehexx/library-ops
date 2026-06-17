@@ -14,6 +14,16 @@ Use the installed `$define-goal` skill alongside this one when the main need is
 to shape or improve the actual goal text. This repo-local skill owns the
 Library Ops routing rules, native question path, and escalation contract.
 
+## Current sources
+
+Treat these as the durable repo-local sources for this workflow:
+
+- `AGENTS.md` for coordinator posture and source order.
+- `.taskmaster/docs/prd.md` and `specs/001-core/` for requirements.
+- `.codex/agents/*.toml` for agent routing metadata.
+- `.agents/skills/code-intelligence/SKILL.md` for tool-routing boundaries.
+- `docs/process/quality-gates.md` for the validation ladder.
+
 ## Procedure
 
 1. Read the current Task Master task, PRD section, and relevant spec.
@@ -23,7 +33,9 @@ Library Ops routing rules, native question path, and escalation contract.
 5. If native user-input tooling is unavailable or non-interactive, print the Question packet and stop with `needs-user`.
 6. If the task is long-running, route goal shaping through `$define-goal` and
    keep this skill focused on question/escalation routing.
-7. If a subagent raised a concern, normalize it into an Escalation packet and pass it to the coordinator.
+7. If a subagent raised a concern, normalize it into an Escalation packet, stop
+   the blocked branch, and pass it to the coordinator without continuing
+   adjacent implementation work.
 
 ## Native Codex question preference
 
@@ -35,9 +47,6 @@ Use the active Codex surface in this order:
 2. `ask_user_question` when the active build exposes the questionnaire UI/tool.
 3. MCP elicitation when `tool_call_mcp_elicitation` surfaces a server-originated request.
 4. Plain Question packet in the transcript for non-interactive or unsupported surfaces.
-
-Use the reference file at `references/workflow-sources.md` for the current
-repo-local documents that define the clarification and goal workflow.
 
 Do not add removed or under-development feature flags merely to force a tool. Verify the active surface with `codex features list`.
 
