@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 import importlib
-from typing import TYPE_CHECKING, Any
-
-if TYPE_CHECKING:
-    import pytest
+import sys
+from typing import Any
 
 
-def reload_module(module_name: str) -> Any:
-    """Reload a settings module after environment-variable changes.
+def reload_module(module_name: str):
+    """Import a settings module after environment-variable changes.
 
     Args:
         module_name: Fully qualified module name to reload.
@@ -18,15 +16,18 @@ def reload_module(module_name: str) -> Any:
     Returns:
         The reloaded Python module object.
     """
-    return importlib.reload(importlib.import_module(module_name))
+
+    sys.modules.pop(module_name, None)
+    return importlib.import_module(module_name)
 
 
-def test_base_settings_default_to_sqlite(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_base_settings_default_to_sqlite(monkeypatch: Any) -> None:
     """Ensure base settings fall back to SQLite and include the test host.
 
     Args:
         monkeypatch: Pytest environment patch helper.
     """
+
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("DJANGO_DB_ENGINE", raising=False)
     monkeypatch.delenv("DJANGO_DB_NAME", raising=False)
@@ -41,14 +42,18 @@ def test_base_settings_default_to_sqlite(monkeypatch: pytest.MonkeyPatch) -> Non
     assert "testserver" in settings_module.ALLOWED_HOSTS
 
 
-def test_base_settings_use_database_url_when_present(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_base_settings_use_database_url_when_present(
+    monkeypatch: Any,
+) -> None:
     """Ensure `DATABASE_URL` selects Postgres settings.
 
     Args:
         monkeypatch: Pytest environment patch helper.
     """
+
     monkeypatch.setenv(
-        "DATABASE_URL", "postgres://libraryops:libraryops@localhost:5432/libraryops_test"
+        "DATABASE_URL",
+        "postgres://libraryops:libraryops@localhost:5432/libraryops_test",
     )
 
     settings_module = reload_module("libraryops.config.settings.base")
@@ -61,13 +66,14 @@ def test_base_settings_use_database_url_when_present(monkeypatch: pytest.MonkeyP
 
 
 def test_test_settings_only_override_sqlite_without_database_url(
-    monkeypatch: pytest.MonkeyPatch,
+    monkeypatch: Any,
 ) -> None:
     """Ensure test settings force in-memory SQLite only without `DATABASE_URL`.
 
     Args:
         monkeypatch: Pytest environment patch helper.
     """
+
     monkeypatch.delenv("DATABASE_URL", raising=False)
 
     settings_module = reload_module("libraryops.config.settings.test")
@@ -76,14 +82,16 @@ def test_test_settings_only_override_sqlite_without_database_url(
     assert settings_module.DATABASES["default"]["NAME"] == ":memory:"
 
 
-def test_test_settings_respect_database_url(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_test_settings_respect_database_url(monkeypatch: Any) -> None:
     """Ensure test settings preserve Postgres when `DATABASE_URL` is set.
 
     Args:
         monkeypatch: Pytest environment patch helper.
     """
+
     monkeypatch.setenv(
-        "DATABASE_URL", "postgres://libraryops:libraryops@localhost:5432/libraryops_test"
+        "DATABASE_URL",
+        "postgres://libraryops:libraryops@localhost:5432/libraryops_test",
     )
 
     settings_module = reload_module("libraryops.config.settings.test")

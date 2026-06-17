@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Library Ops{% endblock %}</title>
+  <style>
+    :root {
+      --bg: #f3efe7;
+      --panel: #fffaf3;
+      --ink: #1f1a17;
+      --muted: #6f6256;
+      --accent: #9b432e;
+      --accent-strong: #7d2f1d;
+      --line: #d7cab7;
+    }
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, #fbe2c6 0, transparent 36%),
+        linear-gradient(180deg, #f5f1eb 0%, var(--bg) 100%);
+      color: var(--ink);
+    }
+    a { color: var(--accent-strong); }
+    header, main { max-width: 960px; margin: 0 auto; padding: 1rem 1.25rem; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 12px 30px rgba(80, 49, 29, 0.08);
+      margin-bottom: 1rem;
+    }
+    .nav-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .button, button {
+      display: inline-block;
+      border: 0;
+      border-radius: 999px;
+      background: var(--accent);
+      color: white;
+      padding: 0.7rem 1rem;
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+    }
+    .button--ghost {
+      background: transparent;
+      color: var(--accent-strong);
+      border: 1px solid var(--line);
+    }
+    .eyebrow {
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    form p {
+      display: grid;
+      gap: 0.35rem;
+    }
+    label {
+      font-weight: 600;
+    }
+    input, select, textarea {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+      font: inherit;
+      background: white;
+    }
+    .error,
+    .errorlist {
+      color: #8a2416;
+    }
+    .errorlist {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+    ul.clean {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.9rem;
+    }
+    .muted { color: var(--muted); }
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="eyebrow">Library Ops</div>
+      <h1 style="margin: 0.2rem 0 0;">{% block page_title %}Library Ops{% endblock %}</h1>
+    </div>
+    <nav class="nav-actions" aria-label="Primary">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'catalog-index' %}">Catalog</a>
+      {% if can_manage_catalog %}
+        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+        <a href="{% url 'account_logout' %}">Sign out</a>
+      {% else %}
+        <a class="button button--ghost" href="{% url 'account_login' %}">Sign in</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

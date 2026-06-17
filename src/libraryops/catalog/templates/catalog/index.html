@@ -1,0 +1,42 @@
+<!-- cspell:ignore forloop -->
+{% extends "base.html" %}
+
+{% block title %}Catalog | Library Ops{% endblock %}
+{% block page_title %}Catalog Foundation{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <p>
+      The catalog view is intentionally small in Phase 1: it proves the work,
+      contributor, edition, and copy relationships that later phases build on.
+    </p>
+    {% if can_manage_catalog %}
+      <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+    {% else %}
+      <p class="muted">Sign in as an Admin or Librarian to create foundation records.</p>
+      <a class="button button--ghost" href="{% url 'account_login' %}">Sign in</a>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    {% if works %}
+      <ul class="clean">
+        {% for work in works %}
+          <li>
+            <a href="{% url 'catalog-detail' work_id=work.pk %}"><strong>{{ work.title }}</strong></a>
+            <div class="muted">
+              {% for relation in work.work_contributors.all %}
+                {{ relation.contributor.name }} ({{ relation.get_role_display }}){% if not forloop.last %}, {% endif %}
+              {% empty %}
+                No contributors yet.
+              {% endfor %}
+            </div>
+            <div class="muted">{{ work.editions.count }} edition{{ work.editions.count|pluralize }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No foundation records exist yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Create foundation record | Library Ops{% endblock %}
+{% block page_title %}Create Foundation Record{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <p>
+      This protected Phase 1 form creates one work, one contributor relation,
+      one edition, and one copy in a single audited transaction.
+    </p>
+    {% if form.errors %}
+      <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+        <h2 style="margin-top: 0;">Fix the highlighted fields</h2>
+        {% if form.non_field_errors %}
+          {{ form.non_field_errors }}
+        {% endif %}
+      </div>
+    {% endif %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <p>
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}
+            <span class="muted">{{ field.help_text }}</span>
+          {% endif %}
+          {% for error in field.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </p>
+      {% endfor %}
+      <button type="submit">Create foundation record</button>
+    </form>
+  </section>
+{% endblock %}
