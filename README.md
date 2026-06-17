@@ -92,15 +92,15 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-The release-evidence slice is not fully complete yet. The Render target points
-at https://library-ops.onrender.com, but current probes time out there, so the
-live service is still unverified on this branch. The OpenAPI shell exists, and
-Render deployment is scaffolded on this branch, but the live service has not
-yet been proven end-to-end for this branch.
+The release-evidence slice is not fully complete yet. The current Render
+deployment probe is timing out, so the live service is still unverified on
+this branch. The OpenAPI shell exists, and Render deployment is scaffolded on
+this branch, but the live service has not yet been proven end-to-end for this
+branch.
 
 Evaluator-facing expectations:
 
-- use the live URL above as the current review target;
+- use the Render deployment path as the current review target;
 - sign in with the documented demo accounts after seeding or on the seeded live
   environment;
 - expect password-based demo auth to work first; OAuth/social auth remains
