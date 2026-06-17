@@ -1,9 +1,9 @@
 ---
-id: DOC-ARCHITECTURE-APPROACH
+id: DOC-ARCHITECTURE
 title: Architecture Approach, Alternatives, and Validation
 status: active
-last_reviewed: 2026-06-13
-related_prd: ../../.taskmaster/docs/prd.md
+last_reviewed: 2026-06-17
+related_prd: ../.taskmaster/docs/prd.md
 related_adrs:
   - ../adr/0002-application-architecture-and-domain-boundaries.md
   - ../adr/0004-agent-toolchain-mcp-and-context-optimization.md
@@ -11,21 +11,30 @@ related_adrs:
 
 # Architecture Approach, Alternatives, and Validation
 
-This document is a human-facing final-state explainer. Agent-operating rules,
-question-routing policy, and runtime enforcement belong in `AGENTS.md`,
-repo-local references, skills, and Codex config rather than being recreated
-here.
+This is the canonical architecture explainer. Operational commands live in
+`../SETUP.md`; agent-operating rules live in `../AGENTS.md`, and
+documentation-local decisioning guidance lives in `AGENTS.md` rather than being
+duplicated here.
 
 ## Decision summary
 
 The project uses a **hybrid architecture communication model**:
 
-1. **C4-style views** for fast orientation: system context, containers, components, and code-level diagrams only when they clarify implementation.
-2. **arc42-style quality and risk framing** for measurable quality attributes, cross-cutting concerns, runtime/deployment views, and risks.
-3. **Pragmatic domain modeling** rather than full enterprise DDD. Domain language is explicit, bounded contexts are named, and invariants live in services/domain functions, but the implementation remains idiomatic Django.
+1. **C4-style views** for fast orientation: system context, containers,
+   components, and code-level diagrams only when they clarify implementation.
+2. **arc42-style quality and risk framing** for measurable quality attributes,
+   cross-cutting concerns, runtime/deployment views, and risks.
+3. **Pragmatic domain modeling** rather than full enterprise DDD. Domain
+   language is explicit, bounded contexts are named, and invariants live in
+   services/domain functions, but the implementation remains idiomatic Django.
 4. **Import Linter + tests** as executable architectural validation.
 
-This is not unexamined C4 or unexamined DDD. C4 alone is too diagram-centric for delivery governance; arc42 alone is too documentation-heavy for a small interview project; full DDD is too much ceremony for a Django demo; an anemic CRUD-only design would miss circulation/search invariants. The selected hybrid keeps the architectural intent visible without creating a second application framework inside Django.
+This is not unexamined C4 or unexamined DDD. C4 alone is too diagram-centric
+for delivery governance; arc42 alone is too documentation-heavy for a small
+interview project; full DDD is too much ceremony for a Django demo; an anemic
+CRUD-only design would miss circulation/search invariants. The selected hybrid
+keeps the architectural intent visible without creating a second application
+framework inside Django.
 
 ## Alternatives examined
 
@@ -76,7 +85,6 @@ circulation     checkout, return, renewal, loan invariants
 audit           append-only user/action evidence
 search          exact, FTS, vector, fusion, result explanations
 ai_assist       grounded metadata suggestion boundary
-seed            public-domain imports and provenance
 web/api         templates, HTMX endpoints, Django Ninja endpoints
 ```
 
@@ -89,11 +97,14 @@ Only add class/function-level diagrams when they remove ambiguity for:
 - import provenance flow;
 - authorization boundary for an evaluator-critical action.
 
-Do not create code-level diagrams for routine Django views, forms, or admin registration.
+Do not create code-level diagrams for routine Django views, forms, or admin
+registration.
 
 ## Pragmatic domain model
 
-The bounded contexts are implementation modules, not distributed services. Cross-context communication stays in-process and transactional unless a future decision changes deployment topology.
+The bounded contexts are implementation modules, not distributed services.
+Cross-context communication stays in-process and transactional unless a future
+decision changes deployment topology.
 
 | Context | Owns | Must not own |
 |---|---|---|
@@ -103,7 +114,6 @@ The bounded contexts are implementation modules, not distributed services. Cross
 | `circulation` | loan workflow, transactional checkout/return/renewal | search ranking, metadata import |
 | `search` | search documents, ranking, explanations, vector/BM25 adapters | loan mutation |
 | `ai_assist` | grounded suggestion prompts/results | authoritative metadata writes without review |
-| `seed` | deterministic data import/refresh commands | runtime business decisions |
 | `audit` | append-only evidence | primary business state |
 
 ## Django layer contract
@@ -122,7 +132,8 @@ The bounded contexts are implementation modules, not distributed services. Cross
 
 ## Validation model
 
-Architecture is considered valid only when prose, generated tasks, source layout, and automated gates agree.
+Architecture is considered valid only when prose, generated tasks, source
+layout, and automated gates agree.
 
 Required validation once the application bootstrap exists:
 
@@ -144,7 +155,9 @@ npm run skills:lint
 npm run markdownlint
 ```
 
-The sandbox profile may be used only when the execution environment cannot install the required local tools. It is a constrained-environment waiver, not a project policy.
+The sandbox profile may be used only when the execution environment cannot
+install the required local tools. It is a constrained-environment waiver, not a
+project policy.
 
 ## Testing strategy derived from the architecture
 

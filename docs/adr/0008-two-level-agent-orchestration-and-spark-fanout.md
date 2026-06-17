@@ -2,8 +2,7 @@
 
 - Status: accepted
 - Date: 2026-06-14
-- Deciders: root coordinator, user
-- Supersedes: none
+- Deciders: Andrew Crozier
 
 ## Context
 
