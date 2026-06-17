@@ -6,6 +6,8 @@ from django.contrib import admin
 from django.http import HttpRequest, HttpResponse
 from django.urls import include, path
 
+from libraryops.api import api
+
 
 def health(_request: HttpRequest) -> HttpResponse:
     """Return a minimal health-check response for smoke tests and probes."""
@@ -14,6 +16,7 @@ def health(_request: HttpRequest) -> HttpResponse:
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", api.urls),
     path("accounts/", include("allauth.urls")),
     path("health/", health, name="health"),
     path("", include("libraryops.shell.urls")),
