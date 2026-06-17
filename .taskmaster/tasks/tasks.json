@@ -747,7 +747,7 @@
             "dependencies": [
               2
             ],
-            "details": "Implement the `build_search_documents` command in `management/commands/build_search_documents.py`. Use Sentence Transformers for embedding generation. Store embeddings locally and ensure they are not committed to git. Handle existing documents by checking freshness or using a dry-run option.",
+            "details": "Implement the `build_search_documents` command in `management/commands/build_search_documents.py`. Use Sentence Transformers for embedding generation. Store embeddings locally and ensure they are not committed to git. Handle existing documents by checking freshness or using a dry-run option.\n<info added on 2026-06-17T21:39:38.246Z>\nPending until release scope reconciliation. Consider deferrable if final evaluator cutline is narrowed away from AI/search and documented accordingly. Do not close or implement from this note alone.\n</info added on 2026-06-17T21:39:38.246Z>",
             "status": "pending",
             "testStrategy": null,
             "parentId": "10"
@@ -795,7 +795,7 @@
             "dependencies": [
               10
             ],
-            "details": "Install dependencies, configure environment variables securely, set up database migrations, and ensure secure secrets management.",
+            "details": "Install dependencies, configure environment variables securely, set up database migrations, and ensure secure secrets management.\n<info added on 2026-06-17T21:38:19.530Z>\nRender deployment is partially scaffolded but not complete. Branch now includes render.yaml, production WhiteNoise/gunicorn settings, Render smoke tests, and a live target service exists at https://library-ops.onrender.com. Current blockers: blueprint validation fails because the database stanza uses unsupported starter Postgres and Render reports need_payment_info; workspace selection in this Codex process requires normal ~/.render persistence or a repo-local CLI config workaround; live deployment proof (migrations, static assets, healthy URL) is still missing. Keep subtask pending until a real deploy path is proven.\n</info added on 2026-06-17T21:38:19.530Z>\n<info added on 2026-06-17T21:44:31Z>\nLibrary Ops release lesson: keep Render CLI state under `.codex/render-home/` and browser evidence under `output/playwright/`; both stay untracked. Treat the scaffolded Render target as provisional until a clean deploy proves migrations, static assets, and a healthy URL, and route any new blocker back into Task Master instead of widening scope.\n</info added on 2026-06-17T21:44:31Z>",
             "status": "pending",
             "testStrategy": "Verify deployment on Render by accessing the live URL and checking for static assets.",
             "parentId": "11"
@@ -832,7 +832,7 @@
             "dependencies": [
               10
             ],
-            "details": "Create a Git tag with a version number following SemVer format (e.g., v1.2.3) and update the `CHANGELOG.md` file.\n\nDurable release/governance state now folded into the repo:\n- `CHANGELOG.md` exists and is managed through Python Semantic Release.\n- `npm run release:check` verifies changelog/version readiness without publishing side effects.\n- the GitHub release workflow is a read-only readiness workflow.\n- Dependabot targets `development` and follows the documented integration path.\n- workflow security remains pinned and validated through `actionlint` and `zizmor`.",
+            "details": "Create a Git tag with a version number following SemVer format (e.g., v1.2.3) and update the `CHANGELOG.md` file.\n\nDurable release/governance state now folded into the repo:\n- `CHANGELOG.md` exists and is managed through Python Semantic Release.\n- `npm run release:check` verifies changelog/version readiness without publishing side effects.\n- the GitHub release workflow is a read-only readiness workflow.\n- Dependabot targets `development` and follows the documented integration path.\n- workflow security remains pinned and validated through `actionlint` and `zizmor`.\n<info added on 2026-06-17T21:38:56.281Z>\nThe release tag must remain pending until the following release surfaces are complete: README evaluator evidence, OpenAPI surface, deployment proof, and the demo script. The true release bundle is incomplete, and the final release PR should be refreshed from the actual development head before tagging from main.\n</info added on 2026-06-17T21:38:56.281Z>",
             "status": "pending",
             "testStrategy": "Verify that the release is tagged correctly and the changelog reflects the changes.",
             "parentId": "11"
@@ -844,7 +844,7 @@
             "dependencies": [
               10
             ],
-            "details": "Update the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements.",
+            "details": "Update the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements.\n<info added on 2026-06-17T21:39:35.411Z>\nRevised Subtask Details:\nUpdate the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements. This subtask is now critical for Task 11 acceptance and should be prioritized. Review the `src/libraryops/config/urls.py` file for any missing API routes and ensure that a NinjaAPI shell is present under `src/`.\n</info added on 2026-06-17T21:39:35.411Z>",
             "status": "pending",
             "testStrategy": "Test the generated OpenAPI documentation locally using tools like Swagger UI or Postman.",
             "parentId": "11"

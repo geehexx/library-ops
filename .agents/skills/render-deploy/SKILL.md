@@ -31,6 +31,13 @@ Activate this skill when users want to:
 - Host or publish their application on Render's cloud platform
 - Create databases, cron jobs, or other Render resources
 
+## Library Ops Notes
+
+- Current repo state is scaffolded but not deployment-proven end to end.
+- Known blockers to clear before calling deployment ready: the Render blueprint validation path is still blocked by the unsupported starter Postgres plan, Render may report `need_payment_info`, and the live service still needs proof for migrations, static assets, and a healthy URL.
+- Keep repo-local Render state under `.codex/render-home/` and browser evidence under `output/playwright/`; both are intentionally untracked.
+- Treat a scaffolded Render URL as provisional evidence only. Feed new blockers back into Task Master instead of widening the deployment surface.
+
 ## Happy Path (New Users)
 
 Use this short prompt sequence before deep analysis to reduce friction:
