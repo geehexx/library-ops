@@ -1,6 +1,7 @@
 """Browser smoke tests for the Phase 1 navigation surface."""
 
 from collections.abc import Callable
+from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import User
@@ -8,6 +9,16 @@ from django.core.management import call_command
 from playwright.sync_api import Page, expect
 from pytest_django.live_server_helper import LiveServer
 from tests.factories import LibrarianUserFactory, MemberUserFactory
+
+ARTIFACT_ROOT = Path("output/playwright/navigation")
+
+
+def _artifact_path(filename: str) -> Path:
+    """Return the on-disk path for a navigation screenshot artifact."""
+
+    path = ARTIFACT_ROOT / filename
+    path.parent.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 @pytest.mark.e2e
@@ -85,3 +96,4 @@ class TestNavigationE2E:
         expect(page.get_by_role("heading", name="Access denied")).to_be_visible()
         expect(page.get_by_text("You do not have permission")).to_be_visible()
         expect(page.get_by_role("link", name="Browse catalog")).to_be_visible()
+        page.screenshot(path=str(_artifact_path("denied/create-flow.png")), full_page=True)
