@@ -39,3 +39,8 @@ def build_required_database() -> dict[str, Any]:
 SECRET_KEY = require_env("SECRET_KEY")
 ALLOWED_HOSTS = parse_required_csv_env("DJANGO_ALLOWED_HOSTS")
 DATABASES = {"default": build_required_database()}
+MIDDLEWARE = ["whitenoise.middleware.WhiteNoiseMiddleware", *MIDDLEWARE]
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}

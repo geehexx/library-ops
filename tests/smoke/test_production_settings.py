@@ -93,5 +93,9 @@ def test_production_settings_use_explicit_secure_env(monkeypatch: pytest.MonkeyP
         "libraryops.example.com",
         "api.libraryops.example.com",
     ]
+    assert settings_module.MIDDLEWARE[0] == "whitenoise.middleware.WhiteNoiseMiddleware"
+    assert settings_module.STORAGES["staticfiles"]["BACKEND"] == (
+        "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )
     assert settings_module.DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql"
     assert settings_module.DATABASES["default"]["NAME"] == "libraryops_prod"
