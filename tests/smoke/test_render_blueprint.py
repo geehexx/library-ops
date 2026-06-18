@@ -16,8 +16,7 @@ def test_render_blueprint_defines_a_renderable_django_service() -> None:
     assert "plan: free" in contents
     assert (
         "buildCommand: python -m pip install uv && uv sync --frozen --no-dev && "
-        "uv run python manage.py collectstatic --noinput"
-        in contents
+        "uv run python manage.py collectstatic --noinput" in contents
     )
     assert "preDeployCommand: uv run python manage.py migrate --noinput" in contents
     assert "startCommand: uv run gunicorn libraryops.config.wsgi:application" in contents
