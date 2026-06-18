@@ -19,18 +19,6 @@
         ]
       }
     ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
-            "timeout": 10,
-            "statusMessage": "Checking symbolic-tool usage"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [

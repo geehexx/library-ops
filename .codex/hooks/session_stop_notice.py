@@ -13,22 +13,23 @@ import sys
 from pathlib import Path
 from typing import Any, cast
 
-VALIDATION_PHRASES = (
-    "test",
-    "tests",
-    "pytest",
-    "verify",
-    "validation",
-    "lint",
-    "pyright",
-    "check",
-)
 BLOCKER_PHRASES = (
     "blocked",
     "waiting on",
     "need user input",
     "need more info",
     "need more time",
+)
+HANDOFF_PHRASES = (
+    "planning session",
+    "handoff",
+    "implementation deferred",
+    "next session",
+    "plan-only",
+)
+IMPLEMENTATION_CHECKPOINT_PHRASES = (
+    "implementation checkpoint",
+    "owned implementation checkpoint",
 )
 
 
@@ -97,7 +98,9 @@ def should_block_stop(payload: dict[str, Any], dirty_entries: list[str]) -> str 
     message = normalize_message(payload.get("last_assistant_message"))
     if contains_any(message, BLOCKER_PHRASES):
         return None
-    if contains_any(message, VALIDATION_PHRASES):
+    if contains_any(message, HANDOFF_PHRASES):
+        return None
+    if contains_any(message, IMPLEMENTATION_CHECKPOINT_PHRASES):
         return None
     return build_block_reason(dirty_entries)
 

@@ -98,6 +98,11 @@ The MVP is:
 The primary bonus is not a broad chatbot. The primary bonus is **hybrid catalog search and AI-assisted
 metadata/search workflows that are grounded in stored records**.
 
+For the active release-finalization tranche, evaluator-critical work takes
+priority over bonus AI scope. Embeddings, AI metadata suggestions, and broader
+search experimentation stay deferred unless they are already merged, tested,
+and truthfully documented.
+
 ### 1.4 Success Metrics
 
 - Evaluator can run the app locally in under 10 minutes after prerequisites are installed.
@@ -395,14 +400,14 @@ Create a reproducible, agent-friendly project foundation.
 
 - **Description:** Configure Codex, Task Master, Spec Kit, Context7, Exa, RTK-aware operating rules, and bounded context budgets.
 - **Inputs:** `.codex/config.toml`, `AGENTS.md`, skills, MCP credentials in local environment only.
-- **Outputs:** Agent-compatible project workspace with secrets excluded and main-agent context contract set to 1M.
+- **Outputs:** Agent-compatible project workspace with secrets excluded and coordinator-root context contract set to `500,000` tokens.
 - **Behavior:** Agents can research current docs, inspect Task Master tasks, use design context, optimize noisy shell output with RTK, and preserve raw evidence.
 - **Acceptance criteria:**
   - MCP examples document required local authentication.
   - No real MCP keys are committed.
   - Repo wireframes remain the non-private implementation source.
   - `default_permissions` and root context settings remain root-scoped in `.codex/config.toml`.
-  - Main agent context contract is documented and validated as `1,000,000` tokens.
+  - Main agent context contract is documented and validated as `500,000` tokens.
   - Subagent context budgets are bounded and recursive fan-out remains disabled.
 
 #### Feature: C1.F5 Code-intelligence and Socratic tooling governance
@@ -797,7 +802,8 @@ Ship a live, reviewable product and documentation evidence.
 - **Acceptance criteria:**
   - Live URL loads.
   - Static assets are served.
-  - Database migrations run.
+  - Database migrations run through a deterministic host-appropriate path.
+  - Free-tier Render deployment does not rely on `preDeployCommand`.
 
 #### Feature: C10.F2 README evaluator evidence
 
@@ -2015,6 +2021,7 @@ A release is not evaluator-ready until the repo can show:
 - context-drift review for major revisions;
 - runbook for local setup, deployment, seed refresh, smoke tests, and rollback;
 - wireframes or implementation screenshots for key flows;
+- PR-attached screenshots and validation artifacts for key evaluator-visible flows;
 - CI results and test commands;
 - release tag and changelog when release automation exists.
 
@@ -2023,8 +2030,8 @@ A release is not evaluator-ready until the repo can show:
 Deployment work MUST cover application hosting and operational evidence:
 
 1. production Django settings;
-2. managed PostgreSQL connection with migration path;
-3. pgvector enablement or vector feature flag fallback;
+2. managed PostgreSQL connection with a deterministic migration path appropriate to host constraints;
+3. pgvector enablement or vector feature flag fallback when vector search is actually in scope for the release;
 4. static files through WhiteNoise or host-supported equivalent;
 5. media upload strategy for book covers;
 6. environment variables without committed secrets;

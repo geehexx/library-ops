@@ -94,6 +94,23 @@ require separate per-run activation. Serena's server starts from the current
 working directory via `.codex/config.toml`; using its `activate_project` tool is
  for symbol-aware work, not a prerequisite for ordinary Task Master operations.
 
+## Codex profile overlays
+
+`codex --profile <name>` resolves a user-local overlay at
+`~/.codex/<name>.config.toml`.
+
+That file is operator state, not a repo artifact. Keep committed config in
+`.codex/config.toml` and `.codex/agents/*.toml`, and use the local overlay only
+for machine-specific preferences that do not redefine repo-owned agents or MCPs.
+
+Expected overlay shape:
+
+- root-level Codex keys only
+- may override model, context, reasoning, approval, and permission defaults
+- should not redefine `[agents]`, `[mcp_servers]`, or repo paths
+- may point `default_permissions` at committed profiles such as `workspace` or
+  `coordinator_root`
+
 ## Recommended local profiles
 
 ### Profile A: proven low-memory local generation profile

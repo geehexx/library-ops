@@ -4,7 +4,6 @@ model = "gpt-5.4-mini"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
 sandbox_mode = "read-only"
 developer_instructions = """
 You keep Spec Kit process integrity.

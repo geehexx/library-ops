@@ -1,4 +1,4 @@
-"""Forms for the catalog presentation slice."""
+"""Foundation catalog form used by the protected create flow."""
 
 from __future__ import annotations
 

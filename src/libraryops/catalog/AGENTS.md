@@ -12,8 +12,8 @@ package.
 
 - `models.py`
 - `selectors.py`
-- `forms.py`
-- `views.py`
+- `forms/`
+- `views/`
 - `urls.py`
 - future catalog import/provenance management commands
 - any future catalog-specific services or helpers
@@ -35,11 +35,18 @@ package.
 
 - Keep core write orchestration on the owning manager/queryset when that keeps
   the flow idiomatic and reviewable.
+- Prefer manager or model methods for single-aggregate CRUD/archive behavior;
+  do not introduce `services.py` unless the write path truly spans multiple
+  aggregates or external policy boundaries.
 - Keep normalization logic near the model it protects.
 - Avoid scattering create-flow logic across free functions unless a later split
   yields a boundary with lower coupling and cleaner review ownership.
 - If manager responsibilities grow across unrelated flows, split them by
   behavior rather than by arbitrary file size.
+- When a Django module gets dense, split it into a package and re-export the
+  stable public surface from `__init__.py` with `__all__`.
+- If manager logic starts dominating the model declaration, move the manager
+  classes into `managers.py` instead of accumulating more file-local clutter.
 - Keep catalog import and provenance workflows app-owned; do not introduce a
   separate `seed` app just to contain them.
 

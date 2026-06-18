@@ -112,10 +112,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "libraryops.accounts",  # This must be before allauth to ensure our templates over-ride.
     "allauth",
     "allauth.account",
     "guardian",
-    "libraryops.accounts",
     "libraryops.catalog",
     "libraryops.inventory",
     "libraryops.circulation",

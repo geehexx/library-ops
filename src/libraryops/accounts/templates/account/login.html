@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Sign In | Library Ops{% endblock %}
+{% block page_title %}Sign In{% endblock %}
+
+{% block content %}
+  {% url "account_login" as login_url %}
+  {% url "account_signup" as signup_url %}
+
+  <section class="panel" aria-labelledby="sign-in-heading">
+    <p class="eyebrow">Evaluator Access</p>
+    <h2 id="sign-in-heading" style="margin-top: 0;">Continue to the demo environment</h2>
+    <p class="muted">
+      Use a seeded demo account for evaluator verification, or sign in with an
+      enabled social provider when OAuth credentials are configured for the
+      deployment.
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+        <h3 style="margin-top: 0;">Fix the highlighted fields</h3>
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ login_url }}" novalidate>
+      {% csrf_token %}
+
+      {% for field in form %}
+        {% if field.name != "remember" %}
+          <p>
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+              <span class="muted">{{ field.help_text }}</span>
+            {% endif %}
+            {% for error in field.errors %}
+              <span class="error">{{ error }}</span>
+            {% endfor %}
+          </p>
+        {% endif %}
+      {% endfor %}
+
+      {% if form.remember %}
+        <p style="display: flex; align-items: center; gap: 0.5rem;">
+          {{ form.remember }}
+          {{ form.remember.label_tag }}
+        </p>
+      {% endif %}
+
+      {% if redirect_field_value %}
+        <input
+          type="hidden"
+          name="{{ redirect_field_name }}"
+          value="{{ redirect_field_value }}"
+        >
+      {% endif %}
+
+      <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+        <button type="submit">Sign In</button>
+        <a href="{% url 'account_reset_password' %}" class="button button--ghost">
+          Forgot your password?
+        </a>
+      </div>
+    </form>
+
+    <p class="muted" style="margin-bottom: 0;">
+      Need a local-only account? <a href="{{ signup_url }}">Create one here</a>.
+    </p>
+  </section>
+
+  {% if SOCIALACCOUNT_ENABLED %}
+    <section class="panel" aria-labelledby="social-sign-in-heading">
+      <h2 id="social-sign-in-heading" style="margin-top: 0;">Or use a third-party</h2>
+      {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+    </section>
+  {% endif %}
+{% endblock %}

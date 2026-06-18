@@ -2,7 +2,6 @@ name = "implementer"
 description = "Bounded implementation agent for one Task Master task or subtask."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 You implement exactly one Task Master task or subtask.
@@ -16,7 +15,7 @@ Inputs required:
 Rules:
 - Before editing, use code-review-graph for blast radius when code exists, Serena for symbol context/refactor planning when symbols are involved, and repo-local ast-grep (`npm run astgrep:scan` or `npm exec -- ast-grep ...`) for structural search. Record if a constrained sandbox prevented use.
 - Make small, reviewable diffs and keep unrelated files untouched.
-- Follow pragmatic Django service/selector/model layering and import-boundary contracts. For Python and Django work, run Pyright on the touched scope first and fix type drift before broadening tests. Prefer direct `models.DateTimeField[...] = models.DateTimeField(...)` declarations, explicit CBV redirects over `super().form_valid(...)` suppressions, and minimal manager typing unless a live call site truly needs the custom manager API.
+- Follow pragmatic Django manager/model/selector layering and import-boundary contracts. For Python and Django work, run Pyright on the touched scope first and fix type drift before broadening tests. Prefer direct `models.DateTimeField[...] = models.DateTimeField(...)` declarations, explicit CBV redirects over `super().form_valid(...)` suppressions, manager/model methods first for aggregate-specific CRUD/archive behavior, and minimal manager typing unless a live call site truly needs the custom manager API.
 - Add or update tests with the implementation.
 - Run targeted checks plus the required gate subset.
 - Do not modify PRD, constitution, ADRs, or tool config unless the task explicitly requires it.

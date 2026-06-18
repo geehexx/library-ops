@@ -1,5 +1,5 @@
 # pyright: reportMissingTypeArgument=false
-"""Catalog presentation views for the foundation slice."""
+"""Shared catalog views for the foundation and manager slice."""
 
 from __future__ import annotations
 
@@ -65,3 +65,31 @@ class CatalogCreateView(CatalogManagerRequiredMixin, FormView):
         """Return the detail URL for the newly created foundation work."""
 
         return str(self.form_success_url)
+
+
+class CatalogMutationView(CatalogManagerRequiredMixin):
+    """Shared context helpers for manager-only catalog form pages."""
+
+    template_name = "catalog/form.html"
+    page_title = ""
+    submit_label = "Save changes"
+    back_label = "Back"
+    back_url_name = "catalog-index"
+
+    def get_back_url_kwargs(self) -> dict[str, Any]:
+        """Return the reverse kwargs for the back link."""
+
+        return {}
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        """Attach the shared form page labels and back link."""
+
+        context = super().get_context_data(**kwargs)
+        context.setdefault("page_title", self.page_title)
+        context.setdefault("submit_label", self.submit_label)
+        context.setdefault("back_label", self.back_label)
+        context.setdefault(
+            "back_url",
+            reverse(self.back_url_name, kwargs=self.get_back_url_kwargs()),
+        )
+        return context

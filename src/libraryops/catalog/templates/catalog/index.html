@@ -11,7 +11,10 @@
       contributor, edition, and copy relationships that later phases build on.
     </p>
     {% if can_manage_catalog %}
-      <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+      <div class="nav-actions">
+        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+        <a class="button button--ghost" href="{% url 'work-create' %}">Create work</a>
+      </div>
     {% else %}
       <p class="muted">Sign in as an Admin or Librarian to create foundation records.</p>
       <a class="button button--ghost" href="{% url 'account_login' %}">Sign in</a>

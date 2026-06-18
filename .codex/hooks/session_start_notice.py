@@ -15,13 +15,17 @@ from typing import Any, cast
 
 PUBLIC_INSTRUCTION_PATHS = [
     "AGENTS.md",
+    ".codex/config.toml",
     ".taskmaster/docs/prd.md",
     ".specify/memory/constitution.md",
     ".codex/agents/coordinator.toml",
+    ".codex/agents/devops-release-manager.toml",
+    ".codex/agents/planning-orchestrator.toml",
     ".codex/agents/implementer.toml",
     ".codex/agents/taskmaster-governor.toml",
     ".agents/skills/clarify-and-goal/SKILL.md",
     ".agents/skills/code-intelligence/SKILL.md",
+    "docs/process/quality-gates.md",
 ]
 
 

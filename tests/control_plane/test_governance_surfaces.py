@@ -27,6 +27,7 @@ RETIRED_DOC_SURFACES = {
     "docs/setup/",
 }
 APP_LOCAL_TEMPLATE_FILES = {
+    "src/libraryops/accounts/templates/account/login.html",
     "src/libraryops/shell/templates/base.html",
     "src/libraryops/shell/templates/403.html",
     "src/libraryops/catalog/templates/catalog/create.html",
@@ -91,9 +92,17 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "default coordinator" in coordinator_text
     assert "gpt-5.4-mini" in coordinator_text
     assert ".codex-session-notes/continuation.md" in coordinator_text
+    assert "Context7 first" in coordinator_text
     assert "Pyright" in implementer_text
     assert "Pyright" in django_skill_text
     assert "Pyright" in django_prompt_text
+    assert (
+        "Use manager/model methods first for aggregate-specific CRUD/archive" in django_skill_text
+    )
+    assert "manager/model methods first for aggregate-specific CRUD/archive behavior" in (
+        implementer_text
+    )
+    assert "service/selector/model layering" not in implementer_text
 
 
 def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() -> None:
@@ -107,16 +116,29 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
         encoding="utf-8"
     )
     root_agents_text = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    command_runner_text = (REPO_ROOT / ".codex" / "agents" / "command-runner.toml").read_text(
+        encoding="utf-8"
+    )
+    context_gatherer_text = (REPO_ROOT / ".codex" / "agents" / "context-gatherer.toml").read_text(
+        encoding="utf-8"
+    )
     coordinator_launcher_text = (REPO_ROOT / "scripts" / "codex-coordinator.sh").read_text(
         encoding="utf-8"
     )
     runtime_env_script = (REPO_ROOT / "scripts" / "codex-runtime-env.sh").read_text(
         encoding="utf-8"
     )
+    package_json_text = (REPO_ROOT / "package.json").read_text(encoding="utf-8")
+    quality_gates_text = (REPO_ROOT / "docs" / "process" / "quality-gates.md").read_text(
+        encoding="utf-8"
+    )
     policy_text = (REPO_ROOT / "policy" / "codex.rego").read_text(encoding="utf-8")
 
     assert agents["max_threads"] >= 12
     assert agents["max_depth"] == 2
+
+    workspace_roots = config["permissions"]["workspace"]["workspace_roots"]
+    assert workspace_roots["~/.render"] is True
 
     mcp_servers = config["mcp_servers"]
     for server_name in ("context7", "exa", "taskmaster-ai", "code-review-graph", "serena"):
@@ -135,7 +157,6 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     for expected_fragment in (
         ".codex/hooks/session_start_notice.py",
         '.codex/hooks/serena_hook.py\\" activate',
-        '.codex/hooks/serena_hook.py\\" remind',
         '.codex/hooks/serena_hook.py\\" cleanup',
         ".codex/hooks/session_stop_notice.py",
     ):
@@ -143,6 +164,9 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
 
     for expected_fragment in (
         "specialist packets",
+        "command_runner",
+        "context_gatherer",
+        "docs_researcher",
         "cache-sensitive shell commands",
         "broad root-local shell or file exploration",
     ):
@@ -153,6 +177,33 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
         'codex --cd "$ROOT_DIR" --strict-config',
     ):
         assert expected_fragment in coordinator_launcher_text
+
+    assert "Context7 first" in quality_gates_text
+    for expected_fragment in (
+        '"markdownlint": "bash scripts/codex-runtime-env.sh npx --yes markdownlint-cli2@0.22.1',
+        ".codex/.tmp",
+        ".codex/skills",
+    ):
+        assert expected_fragment in package_json_text
+    for expected_fragment in (
+        '"python:lint": "bash scripts/codex-runtime-env.sh bash -lc \'uv run ruff format --check .',
+        '"python:complexity": "bash scripts/codex-runtime-env.sh uv run ruff check --select C901',
+        "lint.mccabe.max-complexity = 6",
+        "npm run python:lint",
+    ):
+        assert expected_fragment in package_json_text
+    assert (
+        'docs:style": "vale --glob=\'!{.venv,.serena,.repomix,.code-review-graph,node_modules,'
+        ".agents/skills,.codex/.tmp,.codex/skills}/**' ." in package_json_text
+    )
+    assert (
+        "docs:spell\": \"cspell --no-progress --exclude '.agents/skills/**' --exclude "
+        "'.codex/.tmp/**' --exclude '.codex/skills/**' ." in package_json_text
+    )
+    assert (
+        '"skills:audit": "bash scripts/codex-runtime-env.sh npx --yes agent-skillforge@0.3.2 '
+        'lint .agents/skills --strict",'
+    ) in package_json_text
 
     for expected_fragment in (
         "scripts/codex-runtime-env.sh",
@@ -181,6 +232,11 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     ):
         assert expected_fragment in root_agents_text
 
+    assert "model_reasoning_summary" not in command_runner_text
+    assert 'model = "gpt-5.3-codex-spark"' in command_runner_text
+    assert 'model = "gpt-5.3-codex-spark"' in context_gatherer_text
+    assert "Spark repo and source-map collector for local evidence." in context_gatherer_text
+
     for expected_fragment in (
         "default_tools_approval_mode",
         "MCP server must default to approve",
@@ -196,9 +252,9 @@ def test_django_workaround_patterns_do_not_return() -> None:
         REPO_ROOT / "src" / "libraryops" / "circulation" / "models.py",
         REPO_ROOT / "src" / "libraryops" / "audit" / "models.py",
     ]
-    catalog_views_text = (REPO_ROOT / "src" / "libraryops" / "catalog" / "views.py").read_text(
-        encoding="utf-8"
-    )
+    catalog_views_text = (
+        REPO_ROOT / "src" / "libraryops" / "catalog" / "views" / "base.py"
+    ).read_text(encoding="utf-8")
     django_skill_text = (
         REPO_ROOT / ".agents" / "skills" / "django-feature" / "SKILL.md"
     ).read_text(encoding="utf-8")
@@ -216,6 +272,12 @@ def test_django_workaround_patterns_do_not_return() -> None:
     assert "Prefer explicit CBV redirects" in django_skill_text
     assert "Prefer direct `models.DateTimeField" in implementer_text
     assert "explicit CBV redirects" in implementer_text
+    assert (
+        "Use manager/model methods first for aggregate-specific CRUD/archive" in django_skill_text
+    )
+    assert "manager/model methods first for aggregate-specific CRUD/archive behavior" in (
+        implementer_text
+    )
 
 
 def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
@@ -234,6 +296,36 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
     assert "Escalation packet" in clarify_skill
     assert "code-review-graph" in code_intel_skill
     assert "ast-grep" in code_intel_skill
+
+
+def test_spark_policy_routes_command_and_exploration_work_to_micro_workers() -> None:
+    """Ensure the Spark policy explicitly routes commands and exploration to micro-workers."""
+    adr_text = (
+        REPO_ROOT / "docs" / "adr" / "0008-two-level-agent-orchestration-and-spark-fanout.md"
+    ).read_text(encoding="utf-8")
+    index_text = (REPO_ROOT / "docs" / "adr" / "index.md").read_text(encoding="utf-8")
+    coordinator_text = (REPO_ROOT / ".codex" / "agents" / "coordinator.toml").read_text(
+        encoding="utf-8"
+    )
+    root_agents_text = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
+
+    for expected_fragment in (
+        "Hybrid Direct-Specialist Orchestration With Spark Micro-Workers",
+        "command_runner",
+        "context_gatherer",
+        "researcher",
+        "docs_researcher",
+    ):
+        assert expected_fragment in adr_text
+    for expected_fragment in (
+        "command_runner",
+        "context_gatherer",
+        "researcher",
+        "docs_researcher",
+    ):
+        assert expected_fragment in coordinator_text or expected_fragment in root_agents_text
+
+    assert "Hybrid direct-specialist orchestration with Spark micro-workers." in index_text
 
 
 def test_retired_anchor_files_are_removed() -> None:
@@ -312,6 +404,14 @@ def test_templates_surface_stays_shared_only_at_repo_root() -> None:
         assert (REPO_ROOT / relative_path).exists()
 
 
+def test_hooks_json_does_not_register_pre_tool_use_reminder() -> None:
+    """Ensure the noisy PreToolUse Serena reminder is not wired back in."""
+    hooks_path = REPO_ROOT / ".codex" / "hooks.json"
+    hooks = json.loads(hooks_path.read_text(encoding="utf-8"))
+
+    assert "PreToolUse" not in hooks["hooks"]
+
+
 def test_adr_index_matches_committed_adr_files() -> None:
     """Ensure the ADR index stays aligned with committed ADR files."""
     adr_dir = REPO_ROOT / "docs" / "adr"
@@ -341,6 +441,35 @@ def test_docs_inclusive_and_repomix_cover_hub_indexes() -> None:
     for retired_surface in RETIRED_DOC_SURFACES:
         assert retired_surface not in docs_inclusive
         assert retired_surface not in include_entries
+
+
+def test_catalog_forms_and_views_are_package_reexports() -> None:
+    """Ensure the catalog presentation slice exposes package-level re-exports."""
+    from libraryops.catalog import forms as catalog_forms
+    from libraryops.catalog import views as catalog_views
+
+    assert catalog_forms.__all__ == [
+        "CatalogFoundationCreateForm",
+        "CopyForm",
+        "EditionForm",
+        "WorkForm",
+    ]
+    assert catalog_views.__all__ == [
+        "CatalogCreateView",
+        "CatalogDetailView",
+        "CatalogIndexView",
+        "CopyArchiveView",
+        "CopyCreateView",
+        "CopyUpdateView",
+        "EditionArchiveView",
+        "EditionCreateView",
+        "EditionUpdateView",
+        "WorkArchiveView",
+        "WorkCreateView",
+        "WorkUpdateView",
+    ]
+    assert not (REPO_ROOT / "src" / "libraryops" / "catalog" / "forms.py").exists()
+    assert not (REPO_ROOT / "src" / "libraryops" / "catalog" / "views.py").exists()
 
 
 def test_promptfoo_lane_routes_runtime_state_into_tmpdir() -> None:

@@ -97,16 +97,69 @@ def test_session_stop_notice_blocks_dirty_completion_without_validation(
     assert "validation" in reason
 
 
-def test_session_stop_notice_accepts_dirty_worktree_when_validation_is_reported(
+def test_session_stop_notice_blocks_dirty_worktree_even_if_message_mentions_validation(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Reported validation evidence should allow the stop to proceed."""
+    """Validation-like prose alone should not bypass a dirty-worktree block."""
     hook = load_hook_module()
     payload = {
         "cwd": str(REPO_ROOT),
         "hook_event_name": "Stop",
-        "last_assistant_message": "Tests passed and the changes are validated.",
+        "last_assistant_message": "Tests passed and the changes are fully validated.",
+        "stop_hook_active": False,
+    }
+
+    result = invoke_hook(
+        hook,
+        capsys,
+        monkeypatch,
+        payload,
+        [" M .codex/hooks/session_stop_notice.py"],
+    )
+
+    assert result["decision"] == "block"
+
+
+def test_session_stop_notice_accepts_dirty_worktree_for_planning_handoff(
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Planning and handoff checkpoints should not be re-blocked."""
+    hook = load_hook_module()
+    payload = {
+        "cwd": str(REPO_ROOT),
+        "hook_event_name": "Stop",
+        "last_assistant_message": (
+            "This planning session ended at a handoff checkpoint; "
+            "implementation is deferred to the next session."
+        ),
+        "stop_hook_active": False,
+    }
+
+    result = invoke_hook(
+        hook,
+        capsys,
+        monkeypatch,
+        payload,
+        [" M .codex/agents/coordinator.toml"],
+    )
+
+    assert result == {}
+
+
+def test_session_stop_notice_accepts_dirty_worktree_for_owned_implementation_checkpoint(
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Owned implementation checkpoints should be allowed to stop cleanly."""
+    hook = load_hook_module()
+    payload = {
+        "cwd": str(REPO_ROOT),
+        "hook_event_name": "Stop",
+        "last_assistant_message": (
+            "This is an owned implementation checkpoint for the current slice."
+        ),
         "stop_hook_active": False,
     }
 

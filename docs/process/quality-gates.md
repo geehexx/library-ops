@@ -32,6 +32,25 @@ npm run taskmaster:validate
 npm run verify:core
 ```
 
+### Control-plane bootstrap loop
+
+Run this before broad implementation when agent/config/hook surfaces changed:
+
+<!-- cspell:disable -->
+```bash
+python - <<'PY'
+import pathlib,tomllib
+paths=[pathlib.Path('.codex/config.toml'),*sorted(pathlib.Path('.codex/agents').glob('*.toml'))]
+for p in paths:
+    tomllib.loads(p.read_text())
+    print("OK", p)
+PY
+codex features list
+codex mcp list
+codex doctor --summary --ascii --no-color
+```
+<!-- cspell:enable -->
+
 ### Full local loop
 
 ```bash
@@ -43,6 +62,7 @@ npm run verify:all
 ```bash
 uv run ruff format --check .
 uv run ruff check .
+npm run python:lint
 uv run python manage.py check
 uv run python manage.py makemigrations --check --dry-run
 PYTHONPATH=src uv run lint-imports
@@ -64,6 +84,7 @@ uv run pytest tests/smoke tests/web tests/e2e
 - policy checks
 - release readiness
 - Ruff, Django `check`, Django `makemigrations --check --dry-run`, Pyright, pytest, and Import Linter
+- source complexity and docstring lint (`npm run python:lint`)
 - Task Master validation
 
 `npm run verify:all` adds:
@@ -85,6 +106,11 @@ npm run docstrings:lint
 - Use RTK for noisy exploratory output, not for final security or release proof.
 - Use graph/symbol tools for planning, then confirm with source inspection and
   tests.
+- Use Context7 first for official API, SDK, and library documentation; fall
+  back to Exa or web research for discovery, examples, and counter-evidence.
+- When a Django module grows into multiple behavior groups, split it into a
+  package and enforce the public surface with `__all__` re-exports plus a
+  governance test.
 - Preserve raw scanner output for security, supply chain, and release evidence.
 - Keep Task Master runtime/provider policy in `.taskmaster/docs/runtime-policy.md`.
 

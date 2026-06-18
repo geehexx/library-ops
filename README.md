@@ -92,11 +92,10 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-The release-evidence slice is not fully complete yet. The current Render
-deployment probe is timing out, so the live service is still unverified on
-this branch. The OpenAPI shell exists, and Render deployment is scaffolded on
-this branch, but the live service has not yet been proven end-to-end for this
-branch.
+The release-evidence slice now has a working live Render deployment on the
+active service. The most recent verified state showed `/health/` and `/`
+both returning `200` after the Render service settings were patched to the
+free-tier-safe build/start path and redeployed.
 
 Evaluator-facing expectations:
 
@@ -109,11 +108,11 @@ Evaluator-facing expectations:
 
 Known limitations:
 
-- live deployment proof is still pending for this branch;
-- migrations, static assets, and health checks have not yet been verified on the
-  live service here;
-- release tagging, demo script, and full evaluator-ready release evidence are
-  still pending.
+- release tagging, demo script, and any remaining evaluator-ready evidence are
+  still pending;
+- OpenAPI remains a shell rather than a final release artifact;
+- the deployment contract now targets the Render free-tier path, which means
+  migrations must be handled without `preDeployCommand`;
 
 The product work should continue from the canonical graph, while the control-
 plane state remains governed by the PRD, Task Master graph, agent config,

@@ -2,7 +2,6 @@ name = "qa_engineer"
 description = "Designs and verifies unit, integration, property-based, E2E, accessibility, and meta-system quality gates."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "high"
-model_reasoning_summary = "concise"
 sandbox_mode = "read-only"
 developer_instructions = """
 You design verification.

@@ -60,6 +60,11 @@ select = [
 ]
 ignore = []
 
+[tool.ruff.lint.per-file-ignores]
+"src/libraryops/catalog/forms/*.py" = ["TC002", "TC006", "RUF012"]
+"src/libraryops/catalog/views/*.py" = ["B009", "ARG002", "TC006"]
+"src/libraryops/inventory/models.py" = ["TC006"]
+
 [tool.pyright]
 include = ["src", "tests"]
 exclude = ["**/migrations", ".venv", "build", "dist"]

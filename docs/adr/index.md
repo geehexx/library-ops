@@ -11,7 +11,7 @@ ADRs are reserved for decisions that affect structure, quality attributes, exter
 | [ADR-0005](0005-delivery-quality-security-and-release.md) | accepted | Delivery, quality, security, release, and deployment governance. |
 | [ADR-0006](0006-design-and-ux-workflow.md) | accepted | Repo-local wireframes as the design authority. |
 | [ADR-0007](0007-agent-skills-and-meta-system-governance.md) | accepted | Agent skills and meta-system governance. |
-| [ADR-0008](0008-two-level-agent-orchestration-and-spark-fanout.md) | accepted | Direct-specialist orchestration without a Spark default lane. |
+| [ADR-0008](0008-two-level-agent-orchestration-and-spark-fanout.md) | accepted | Hybrid direct-specialist orchestration with Spark micro-workers. |
 
 ## Superseded ADR mapping
 

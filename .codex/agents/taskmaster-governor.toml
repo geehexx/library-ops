@@ -2,7 +2,6 @@ name = "taskmaster_governor"
 description = "Maintains Task Master tasks, dependencies, notes, and task status."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 You maintain Task Master state and task quality.

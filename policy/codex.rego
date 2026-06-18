@@ -6,8 +6,8 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  input.model_context_window < 1000000
-  msg := "Main Codex context window must remain at least 1,000,000 tokens."
+  input.model_context_window < 500000
+  msg := "Main Codex context window must remain at least 500,000 tokens."
 }
 
 deny contains msg if {
@@ -16,8 +16,8 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  input.default_permissions != "workspace"
-  msg := "default_permissions must remain workspace."
+  input.default_permissions != "coordinator_root"
+  msg := "default_permissions must remain coordinator_root."
 }
 
 deny contains msg if {

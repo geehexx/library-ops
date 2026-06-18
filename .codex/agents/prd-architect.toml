@@ -4,7 +4,6 @@ model = "gpt-5.4"
 model_context_window = 400000
 model_auto_compact_token_limit = 320000
 model_reasoning_effort = "high"
-model_reasoning_summary = "concise"
 sandbox_mode = "read-only"
 developer_instructions = """
 You design and review the canonical RPG PRD.

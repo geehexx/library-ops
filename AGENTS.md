@@ -22,17 +22,20 @@ and the required local toolchain.
 
 - The interactive root agent is always the coordinator by default.
 - Do not rely on a hidden `default-agent` setting to enforce that posture.
-- Spawn direct specialists for bounded work; do not let the root absorb broad
-  implementation or recursive fan-out by habit. If a specialist already owns a
-  slice, wait for its return or an explicit scope change.
+- Prefer direct specialists for bounded work; keep the root focused on
+  coordination and synthesis. If a specialist already owns a slice, wait for
+  its return or an explicit scope change.
 - Depth-2 delegation is allowed only when the root explicitly assigns a
   bounded sub-specialist chain. The root remains the only interactive
   coordinator and final decision owner.
 - Discovery is mandatory by default: start with skill discovery, then route the
   slice to the narrowest specialist or subagent before broad root-local tool
   use. If the root can keep widening the search, it is a coordination defect.
-- Broad direct shell or file exploration from the root is gated. Prefer
-  specialist packets or `scripts/codex-runtime-env.sh` for cache-sensitive
+- Route explicit command work and quick exploration to the Spark micro-workers
+  first: `command_runner` for commands, `context_gatherer` for local evidence,
+  and `researcher` / `docs_researcher` for source-backed lookups and summary.
+- Prefer specialist packets or `scripts/codex-runtime-env.sh` for broad direct
+  shell or file exploration from the root, especially for cache-sensitive
   commands such as `npm` and `gh` so home-directory cache writes do not become
   sandbox failures.
 - Keep root `AGENTS.md` lean. Shared clarification, escalation, tooling, and
@@ -89,6 +92,9 @@ and the required local toolchain.
   with a clear owner and return condition.
 - Do not duplicate or reclaim active owned slices early; wait for the owner to
   return, block, or hand back scope.
+- When combining slices or worktrees, force an explicit checkpoint review
+  before merging them together: inspect both diffs, confirm ownership overlap,
+  and verify the changed test surface instead of assuming the join is clean.
 - Prefer waiting or blocked status over silent local takeover when the critical
   path belongs to a specialist.
 - Treat root absorption of broad implementation after delegation as a process
@@ -114,6 +120,7 @@ Use these entry points:
 codex doctor --summary --ascii --no-color
 npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
 npm run checks:precommit
+npm run python:lint
 npm run verify:core
 npm run verify:all
 ```
@@ -139,6 +146,8 @@ workflow logic in untracked global wrappers.
 
 - Keep `.codex-session-notes/continuation.md` updated at major checkpoints.
 - Treat `.codex-session-notes/scratch.md` as disposable working notes only.
+- When a pattern proves durable, promote it into the relevant skill or repo
+  docs; do not leave it trapped as memory-only guidance.
 - Promote repeated lessons into tracked surfaces through
   `docs/process/retrospective.md` instead of letting memory-only instructions
   compound indefinitely.
