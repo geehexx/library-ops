@@ -90,9 +90,34 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 | Derived | `.taskmaster/tasks/tasks.json`, local Promptfoo results, Repomix packs, SBOMs, graph databases, validation transcripts | Regenerate, review, and commit only the derived artifacts the repo intentionally keeps. Most local outputs belong under ignored `reports/**` paths and should not be treated as primary truth. |
 | Operator-local | `.env*`, `.mcp.json`, `.taskmaster/config.json`, `.taskmaster/state.json`, OAuth/session state, local DBs, caches, `node_modules`, `.venv` | Never commit or package. |
 
-## Current implementation posture
+## Current release status
 
-The repository is now positioned to continue product implementation from the canonical graph. The next product-facing task is Task `3`, hardening the existing Django bootstrap and settings so the first domain-app slice can start from a verified baseline, while the control-plane state remains governed by the PRD, Task Master graph, agent config, skills, and thin durable docs.
+The release-evidence slice is not fully complete yet. The current Render
+deployment probe is timing out, so the live service is still unverified on
+this branch. The OpenAPI shell exists, and Render deployment is scaffolded on
+this branch, but the live service has not yet been proven end-to-end for this
+branch.
+
+Evaluator-facing expectations:
+
+- use the Render deployment path as the current review target;
+- sign in with the documented demo accounts after seeding or on the seeded live
+  environment;
+- expect password-based demo auth to work first; OAuth/social auth remains
+  optional and environment-driven;
+- expect OpenAPI to exist as a shell, not as final release evidence yet.
+
+Known limitations:
+
+- live deployment proof is still pending for this branch;
+- migrations, static assets, and health checks have not yet been verified on the
+  live service here;
+- release tagging, demo script, and full evaluator-ready release evidence are
+  still pending.
+
+The product work should continue from the canonical graph, while the control-
+plane state remains governed by the PRD, Task Master graph, agent config,
+skills, and thin durable docs.
 
 ## Documentation map
 

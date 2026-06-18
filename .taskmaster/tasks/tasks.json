@@ -327,7 +327,7 @@
         "dependencies": [
           "4"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -386,13 +386,14 @@
             "dependencies": [
               4
             ],
-            "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.\n<info added on 2026-06-17T12:27:57.951Z>\nEnsure `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment. Next steps include integrating OAuth provider toggles and completing the local demo configuration as per Task 5.\n</info added on 2026-06-17T12:27:57.951Z>",
-            "status": "pending",
+            "details": "Confirm that `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment.\n<info added on 2026-06-17T12:27:57.951Z>\nEnsure `django-allauth` is configured to allow local demo with username/password login as the primary default. Implement logic in `settings.py` to conditionally enable/disable OAuth providers (e.g., Google, GitHub) based on the presence of specific environment variables (e.g., `SOCIAL_AUTH_GOOGLE_KEY`, `SOCIAL_AUTH_GOOGLE_SECRET`). This ensures OAuth is only active when explicitly configured in the environment. Next steps include integrating OAuth provider toggles and completing the local demo configuration as per Task 5.\n</info added on 2026-06-17T12:27:57.951Z>\n<info added on 2026-06-17T20:03:26.520Z>\n```\nImplemented env-driven optional OAuth gating in `src/libraryops/config/settings/base.py`, covered by `tests/smoke/test_django_settings.py`, and documented in `env.example`. Validation passed.\n```\n</info added on 2026-06-17T20:03:26.520Z>",
+            "status": "done",
             "testStrategy": "Verify local username/password login works without any OAuth provider configured. Test with and without relevant environment variables set to ensure OAuth providers are conditionally enabled/disabled as expected. Attempt to access a social login endpoint when its provider is intentionally disabled to confirm it fails gracefully.",
-            "parentId": "5"
+            "parentId": "5",
+            "updatedAt": "2026-06-17T20:01:47.325Z"
           }
         ],
-        "updatedAt": "2026-06-17T12:27:01.354Z"
+        "updatedAt": "2026-06-17T20:01:47.325Z"
       },
       {
         "id": 6,
@@ -412,7 +413,7 @@
             "title": "Implement Public Catalog Browse and Detail Pages",
             "description": "Develop Django templates and views within the `web` module for listing works/editions and displaying detailed information, including availability and role-aware actions (C4.F1).",
             "dependencies": [],
-            "details": "Create `catalog/views.py` functions and corresponding templates in `web/templates/catalog/` for `Work` list, `Edition` list, `Work` detail, and `Edition` detail. Use `catalog.selectors` to fetch data. Ensure availability status is displayed and actions are conditional on user roles (e.g., 'borrow' button for members, 'edit' for librarians).\n<info added on 2026-06-17T12:44:39.471Z>\nRefactored presentation layout for foundation slice, moved catalog presentation into `src/libraryops/catalog/{forms.py,views.py,urls.py}`, and moved the dashboard into `src/libraryops/shell/{views.py,urls.py,apps.py,AGENTS.md}`. Switched `src/libraryops/config/urls.py` to thin include-based routing, updated `src/libraryops/config/settings/base.py` to install `libraryops.shell`, updated catalog/config/templates AGENTS files, moved the home template to `templates/shell/home.html`, removed the obsolete `src/libraryops/web` presentation modules, and updated import-linter contracts in `pyproject.toml` to cover `libraryops.shell`. All targeted checks passed after fixing the URL name namespace regression by removing `app_name` from the included catalog/shell URLConfs. Risk: `src/libraryops/web` now remains only as a legacy compatibility namespace and AGENTS note; if future work wants to delete it fully, do that as a separate cleanup slice.\n</info added on 2026-06-17T12:44:39.471Z>\n<info added on 2026-06-17T12:59:02.155Z>\nUpdated `catalog/views.py` functions to render app-owned HTML templates using Django's template engine, ensuring separation of concerns and maintainability. Moved catalog presentation into `src/libraryops/catalog/{views.py,urls.py}` and updated corresponding import paths in other modules. Refactored URL routing to use include-based approach for better organization and management. Updated settings to properly install and manage `libraryops.shell` application. Created new tests in `tests/control_plane/test_governance_surfaces.py` to verify that app-owned templates remain within their respective directories, enhancing security and adhering to project guidelines.\n</info added on 2026-06-17T12:59:02.155Z>",
+            "details": "Create `catalog/views.py` functions and corresponding templates in `web/templates/catalog/` for `Work` list, `Edition` list, `Work` detail, and `Edition` detail. Use `catalog.selectors` to fetch data. Ensure availability status is displayed and actions are conditional on user roles (e.g., 'borrow' button for members, 'edit' for librarians).\n<info added on 2026-06-17T12:44:39.471Z>\nRefactored presentation layout for foundation slice, moved catalog presentation into `src/libraryops/catalog/{forms.py,views.py,urls.py}`, and moved the dashboard into `src/libraryops/shell/{views.py,urls.py,apps.py,AGENTS.md}`. Switched `src/libraryops/config/urls.py` to thin include-based routing, updated `src/libraryops/config/settings/base.py` to install `libraryops.shell`, updated catalog/config/templates AGENTS files, moved the home template to `templates/shell/home.html`, removed the obsolete `src/libraryops/web` presentation modules, and updated import-linter contracts in `pyproject.toml` to cover `libraryops.shell`. All targeted checks passed after fixing the URL name namespace regression by removing `app_name` from the included catalog/shell URLConfs. Risk: `src/libraryops/web` now remains only as a legacy compatibility namespace and AGENTS note; if future work wants to delete it fully, do that as a separate cleanup slice.\n</info added on 2026-06-17T12:44:39.471Z>\n<info added on 2026-06-17T12:59:02.155Z>\nUpdated `catalog/views.py` functions to render app-owned HTML templates using Django's template engine, ensuring separation of concerns and maintainability. Moved catalog presentation into `src/libraryops/catalog/{views.py,urls.py}` and updated corresponding import paths in other modules. Refactored URL routing to use include-based approach for better organization and management. Updated settings to properly install and manage `libraryops.shell` application. Created new tests in `tests/control_plane/test_governance_surfaces.py` to verify that app-owned templates remain within their respective directories, enhancing security and adhering to project guidelines.\n</info added on 2026-06-17T12:59:02.155Z>\n<info added on 2026-06-17T22:12:12.116Z>\nAdded new test case `test_denied_flow_e2e` to `tests/e2e/test_navigation.py`. The test captures a screenshot of the Access denied surface after asserting the denial state during the create-flow e2e path and saves it as `output/playwright/navigation/denied/create-flow.png`. Updated validation run commands in user request section.\n</info added on 2026-06-17T22:12:12.116Z>",
             "status": "done",
             "testStrategy": "Write unit tests for views ensuring correct context data is passed to templates. Manually verify page rendering, data display, and link navigation in a browser for different user roles.",
             "parentId": "6",
@@ -746,7 +747,7 @@
             "dependencies": [
               2
             ],
-            "details": "Implement the `build_search_documents` command in `management/commands/build_search_documents.py`. Use Sentence Transformers for embedding generation. Store embeddings locally and ensure they are not committed to git. Handle existing documents by checking freshness or using a dry-run option.",
+            "details": "Implement the `build_search_documents` command in `management/commands/build_search_documents.py`. Use Sentence Transformers for embedding generation. Store embeddings locally and ensure they are not committed to git. Handle existing documents by checking freshness or using a dry-run option.\n<info added on 2026-06-17T21:39:38.246Z>\nPending until release scope reconciliation. Consider deferrable if final evaluator cutline is narrowed away from AI/search and documented accordingly. Do not close or implement from this note alone.\n</info added on 2026-06-17T21:39:38.246Z>",
             "status": "pending",
             "testStrategy": null,
             "parentId": "10"
@@ -794,7 +795,7 @@
             "dependencies": [
               10
             ],
-            "details": "Install dependencies, configure environment variables securely, set up database migrations, and ensure secure secrets management.",
+            "details": "Install dependencies, configure environment variables securely, set up database migrations, and ensure secure secrets management.\n<info added on 2026-06-17T21:38:19.530Z>\nRender deployment is partially scaffolded but not complete. Branch now includes render.yaml, production WhiteNoise/gunicorn settings, Render smoke tests, and a live target service points at https://library-ops.onrender.com, but current probes time out there. Current blockers: blueprint validation fails because the database stanza uses unsupported starter Postgres and Render reports need_payment_info; workspace selection in this Codex process requires normal ~/.render persistence or a repo-local CLI config workaround; live deployment proof (migrations, static assets, healthy URL) is still missing. Keep subtask pending until a real deploy path is proven.\n</info added on 2026-06-17T21:38:19.530Z>\n<info added on 2026-06-17T21:44:31Z>\nLibrary Ops release lesson: keep Render CLI state under `.codex/render-home/` and browser evidence under `output/playwright/`; both stay untracked. Treat the scaffolded Render target as provisional until a clean deploy proves migrations, static assets, and a healthy URL, and route any new blocker back into Task Master instead of widening scope.\n</info added on 2026-06-17T21:44:31Z>",
             "status": "pending",
             "testStrategy": "Verify deployment on Render by accessing the live URL and checking for static assets.",
             "parentId": "11"
@@ -806,7 +807,7 @@
             "dependencies": [
               10
             ],
-            "details": "Review and edit the `README.md` file to include all required details for the evaluation process.\n<info added on 2026-06-17T12:19:23.179Z>\nUpdate `README.md` to consolidate evaluator-facing and operator documentation, include product live URL, demo accounts, feature checklist, setup instructions, and known limitations. Address the repo-wide docs:quality failure on the unrelated `querysets` cspell warning.\n</info added on 2026-06-17T12:19:23.179Z>",
+            "details": "Review and edit the `README.md` file to include all required details for the evaluation process.\n<info added on 2026-06-17T12:19:23.179Z>\nUpdate `README.md` to consolidate evaluator-facing and operator documentation, include product live URL, demo accounts, feature checklist, setup instructions, and known limitations. Address the repo-wide docs:quality failure on the unrelated `querysets` cspell warning.\n</info added on 2026-06-17T12:19:23.179Z>\n<info added on 2026-06-17T22:11:13.841Z>\n2026-06-18: README updated for evaluator-facing release status. Added live URL, explicit auth/demo expectations, OpenAPI shell note, and current limitation regarding the Render scaffold/live service. Removed stale Task 3 posture claim.\n</info added on 2026-06-17T22:11:13.841Z>\n<info added on 2026-06-17T22:15:23.644Z>\n2026-06-18: Updated `README.md` based on validation results. Added notes on passed tests, denied-flow screenshot artifact locations, and addressed repo-wide docs:quality failure by fixing the `querysets` cspell warning. Remaining claim boundary: live Render/main deployment still not proven end-to-end for this branch.\n</info added on 2026-06-17T22:15:23.644Z>\n<info added on 2026-06-17T22:15:44.451Z>\nCorrections made on 2026-06-18:\n- `uv run pyright tests/e2e/test_navigation.py` passed\n- `uv run pytest -q tests/e2e/test_navigation.py` passed with 3 tests; denied-flow screenshot artifact exists at `output/playwright/navigation/denied/create-flow.png`\n- `codex doctor --summary --ascii --no-color` passed with warnings only\n- `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` passed\n- `npm run docs:quality` reached link checking but timed out on `https://library-ops.onrender.com/`\n- Remaining claim boundary: live Render/main deployment still not proven end-to-end for this branch\n</info added on 2026-06-17T22:15:44.451Z>",
             "status": "done",
             "testStrategy": "Verify that the updated `README.md` aligns with all assignment criteria and contains all necessary information.",
             "parentId": "11",
@@ -831,7 +832,7 @@
             "dependencies": [
               10
             ],
-            "details": "Create a Git tag with a version number following SemVer format (e.g., v1.2.3) and update the `CHANGELOG.md` file.\n\nDurable release/governance state now folded into the repo:\n- `CHANGELOG.md` exists and is managed through Python Semantic Release.\n- `npm run release:check` verifies changelog/version readiness without publishing side effects.\n- the GitHub release workflow is a read-only readiness workflow.\n- Dependabot targets `development` and follows the documented integration path.\n- workflow security remains pinned and validated through `actionlint` and `zizmor`.",
+            "details": "Create a Git tag with a version number following SemVer format (e.g., v1.2.3) and update the `CHANGELOG.md` file.\n\nDurable release/governance state now folded into the repo:\n- `CHANGELOG.md` exists and is managed through Python Semantic Release.\n- `npm run release:check` verifies changelog/version readiness without publishing side effects.\n- the GitHub release workflow is a read-only readiness workflow.\n- Dependabot targets `development` and follows the documented integration path.\n- workflow security remains pinned and validated through `actionlint` and `zizmor`.\n<info added on 2026-06-17T21:38:56.281Z>\nThe release tag must remain pending until the following release surfaces are complete: README evaluator evidence, OpenAPI surface, deployment proof, and the demo script. The true release bundle is incomplete, and the final release PR should be refreshed from the actual development head before tagging from main.\n</info added on 2026-06-17T21:38:56.281Z>",
             "status": "pending",
             "testStrategy": "Verify that the release is tagged correctly and the changelog reflects the changes.",
             "parentId": "11"
@@ -843,7 +844,7 @@
             "dependencies": [
               10
             ],
-            "details": "Update the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements.",
+            "details": "Update the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements.\n<info added on 2026-06-17T21:39:35.411Z>\nRevised Subtask Details:\nUpdate the `docs/api/docs` and `docs/api/openapi.json` files to include all API endpoints, request/response examples, and security requirements. This subtask is now critical for Task 11 acceptance and should be prioritized. Review the `src/libraryops/config/urls.py` file for any missing API routes and ensure that a NinjaAPI shell is present under `src/`.\n</info added on 2026-06-17T21:39:35.411Z>",
             "status": "pending",
             "testStrategy": "Test the generated OpenAPI documentation locally using tools like Swagger UI or Postman.",
             "parentId": "11"
@@ -923,13 +924,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-17T17:50:48.069Z",
+      "lastModified": "2026-06-17T20:01:47.332Z",
       "taskCount": 12,
-      "completedCount": 5,
+      "completedCount": 6,
       "tags": [
         "master"
       ],
-      "created": "2026-06-17T17:50:51.174Z",
+      "created": "2026-06-17T20:01:55.102Z",
       "description": "Tasks for master context"
     }
   }

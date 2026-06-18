@@ -30,6 +30,7 @@ npm-debug.log*
 .codex-local/
 .codex-log/
 .codex-session-notes/
+.codex/render-home/
 .mcp.json
 .codex.local.toml
 .codex/.runtime/
@@ -70,6 +71,7 @@ models/
 build/
 dist/
 coverage.xml
+output/playwright/
 reports/
 *.egg-info/
 

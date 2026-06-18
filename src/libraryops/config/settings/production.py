@@ -9,6 +9,7 @@ from typing import Any, cast
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
+from . import base as base_settings
 from .base import *  # noqa: F403
 
 DEBUG = False
@@ -39,3 +40,8 @@ def build_required_database() -> dict[str, Any]:
 SECRET_KEY = require_env("SECRET_KEY")
 ALLOWED_HOSTS = parse_required_csv_env("DJANGO_ALLOWED_HOSTS")
 DATABASES = {"default": build_required_database()}
+MIDDLEWARE = ["whitenoise.middleware.WhiteNoiseMiddleware", *base_settings.MIDDLEWARE]
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}

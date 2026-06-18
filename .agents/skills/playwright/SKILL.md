@@ -68,6 +68,12 @@ playwright-cli --help
 4. Re-snapshot after navigation or significant DOM changes.
 5. Capture artifacts (screenshot, pdf, traces) when useful.
 
+## Library Ops Evidence Notes
+
+- Use browser runs to capture evaluator-visible proof for live app behavior, especially smoke checks against the deployed Render URL.
+- Store screenshots and traces under `output/playwright/` only.
+- A browser artifact proves UI behavior, not deployment success. If the live service is blocked, route the blocker back into Task Master instead of treating the artifact as a release substitute.
+
 Minimal loop:
 
 ```bash
