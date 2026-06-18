@@ -1,0 +1,72 @@
+description: Library Ops Codex control-plane smoke evals
+providers:
+  - id: echo
+prompts:
+  - file://evals/control-plane/prompt-contract.md
+tests:
+  - description: source-of-truth and direct-tool contract is explicit
+    vars:
+      task: "Plan TM-001 foundation implementation"
+    assert:
+      - type: contains
+        value: "Source-of-truth order"
+      - type: contains
+        value: "Question packet"
+      - type: contains
+        value: "Escalation packet"
+      - type: contains
+        value: "/goal"
+      - type: contains
+        value: "validation evidence"
+      - type: contains
+        value: "npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'"
+  - description: artifact classes and exclusions are explicit
+    vars:
+      task: "Summarize current repo evidence"
+    assert:
+      - type: contains
+        value: "canonical artifacts"
+      - type: contains
+        value: "derived artifacts"
+      - type: contains
+        value: "operator-local artifacts"
+      - type: contains
+        value: "Never include `.env`"
+      - type: contains
+        value: "OAuth tokens"
+      - type: not-contains
+        value: "demo password literal"
+  - description: Task Master state is not overclaimed
+    vars:
+      task: "Generate Task Master task graph"
+    assert:
+      - type: contains
+        value: "`.taskmaster/config.json` is local-only"
+      - type: contains
+        value: "`.taskmaster/tasks/tasks.json` is a committed derived execution artifact"
+      - type: contains
+        value: "validated dependencies"
+      - type: not-contains
+        value: "commit `.taskmaster/config.json`"
+  - description: Codex Figma auth posture avoids token copying
+    vars:
+      task: "Use Figma MCP for wireframes"
+    assert:
+      - type: contains
+        value: "codex mcp login figma"
+      - type: contains
+        value: "do not copy raw OAuth tokens"
+      - type: not-contains
+        value: "Figma token assignment"
+  - description: eval lanes and direct-tool workflow are present
+    vars:
+      task: "Summarize control-plane verification"
+    assert:
+      - type: contains
+        value: "Promptfoo deterministic smoke"
+      - type: contains
+        value: "provider-backed semantic evals"
+      - type: contains
+        value: "red-team lanes"
+      - type: contains
+        value: "`codex doctor --summary --ascii --no-color`"

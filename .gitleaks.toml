@@ -1,0 +1,4 @@
+title = "Library Ops Gitleaks policy"
+
+[extend]
+useDefault = true

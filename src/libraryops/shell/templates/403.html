@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Access denied | Library Ops{% endblock %}
+{% block page_title %}Access denied{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <p class="eyebrow">Permission denied</p>
+    <p>
+      You do not have permission to create catalog foundation records.
+      Sign in with an Admin or Librarian account to continue.
+    </p>
+    <a class="button" href="/catalog/">Browse catalog</a>
+    {% if not user.is_authenticated %}
+      <a class="button button--ghost" href="/accounts/login/">Sign in</a>
+    {% endif %}
+  </section>
+{% endblock %}

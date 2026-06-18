@@ -1,0 +1,11 @@
+id: no-raw-ai-suggestion-apply
+language: Python
+severity: warning
+message: AI suggestions must be applied through reviewed services with provenance, not directly assigned.
+rule:
+  any:
+    - pattern: $OBJ.title = $SUGGESTION.title
+    - pattern: $OBJ.description = $SUGGESTION.description
+    - pattern: $OBJ.subjects = $SUGGESTION.subjects
+files:
+  - "src/libraryops/**/*.py"

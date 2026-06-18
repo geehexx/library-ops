@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Governance"
+  short_description: "Align GitHub controls with repo policy"
+  default_prompt: "Use $github-governance to tighten Library Ops branch protection, CODEOWNERS, CI, PR template, or release-governance settings without drifting from the documented flow."

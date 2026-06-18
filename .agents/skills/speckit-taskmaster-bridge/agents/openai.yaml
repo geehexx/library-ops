@@ -1,0 +1,10 @@
+interface:
+  display_name: "Spec Kit Bridge"
+  short_description: "Keep Spec Kit and Task Master aligned"
+  default_prompt: "Use $speckit-taskmaster-bridge to reconcile Library Ops Spec Kit artifacts, community-preset decisions, and the Task Master PRD/task graph without creating duplicate process truth."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "taskmaster-ai"
+      description: "Task Master MCP server for validating graph alignment with supporting artifacts"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Retrospective"
+  short_description: "Turn friction into concrete repo improvements"
+  default_prompt: "Use $retrospective to summarize this Library Ops session, identify the real friction, and propose the smallest durable process or tooling improvements."
