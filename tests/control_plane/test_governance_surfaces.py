@@ -234,7 +234,6 @@ def test_commitlint_scope_allows_render_deploy_platform() -> None:
     scopes = {token.strip().strip(", ").strip("'\"") for token in scope_block.split(",")}
     assert "render" in scopes
 
-
 def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
     """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
     root_agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
