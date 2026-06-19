@@ -258,7 +258,7 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     )
     assert (
         "docs:spell\": \"cspell --no-progress --exclude '.agents/skills/**' --exclude "
-        "'.codex/.tmp/**' --exclude '.codex/skills/**' ." in package_json_text
+        "'.codex/.tmp/**' --exclude '.codex/skills/**' --exclude 'tests/**' ." in package_json_text
     )
     assert (
         '"skills:audit": "bash scripts/codex-runtime-env.sh npx --yes agent-skillforge@0.3.2 '
@@ -646,6 +646,7 @@ def test_docs_inclusive_and_repomix_cover_hub_indexes() -> None:
 
     assert ".codex/agents" in docs_inclusive
     assert "llms.txt" in docs_inclusive
+    assert "tests" not in docs_inclusive
     assert ".codex/agents/**/*.toml" in include_entries
     assert "llms.txt" in include_entries
     assert "PACKAGE_MANIFEST.md" not in docs_inclusive
