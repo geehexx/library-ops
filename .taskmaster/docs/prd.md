@@ -1411,7 +1411,7 @@ For a recognizable 1,000-record demo corpus, prefer records that have:
 
 ### 14.1 Product Screens
 
-The MVP UI includes:
+The current route inventory includes:
 
 - public landing page;
 - login page;
@@ -1424,6 +1424,9 @@ The MVP UI includes:
 - member loans page;
 - admin/user role page;
 - evaluator help or release notes link if needed.
+
+This is the current route inventory for audit and evidence, not an aspirational
+screen map; only claim screens and routes that exist on the branch.
 
 ### 14.2 UX Principles
 
@@ -1905,8 +1908,8 @@ A release is not evaluator-ready until the repo can show:
 - research register showing material evidence and assumptions;
 - context-drift review for major revisions;
 - evaluator demo script and README sections for local setup, deployment, seed refresh, smoke tests, and rollback;
-- wireframes or implementation screenshots for key flows;
-- PR-attached screenshots and validation artifacts for key evaluator-visible flows;
+- manual UX audit notes, screenshot matrix, and implementation screenshots for key flows;
+- PR-attached screenshots, validation artifacts, and audit notes for key evaluator-visible flows;
 - CI results and test commands;
 - release tag and changelog when release automation exists.
 

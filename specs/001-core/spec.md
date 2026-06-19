@@ -41,6 +41,9 @@ by the repo-local source-of-truth surfaces.
 - Authorization is enforced server-side.
 - Presentation surfaces are owned by the relevant Django apps, not a single
   central shell or bad anchor surface.
+- The current route inventory is the truth source for closeout screenshots and
+  audit notes; do not overstate idealized screens or routes that do not exist
+  on the branch.
 - Tests follow a kind-first topology: model and constraint coverage first,
   request and integration coverage next, browser/E2E coverage only where user
   value requires it.
@@ -63,6 +66,8 @@ by the repo-local source-of-truth surfaces.
   slice.
 - Import Linter boundary checks.
 - CI green on PR.
+- Manual UX audit notes and screenshot matrix covering the current route
+  inventory and key evaluator-visible flows.
 - README/demo-script updates for local setup, demo-user usage, and proof surfaces where changed.
 - Task Master notes mapping work to PRD sections and checks.
 - Phase planning continues to expose the route through deployment and release.
