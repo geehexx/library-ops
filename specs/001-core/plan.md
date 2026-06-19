@@ -56,7 +56,8 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 ## Phase 6: AI assist, API, and UI polish
 
 - Add reviewed AI metadata suggestion flow.
-- Add Django Ninja endpoints.
+- Keep the product centered on Django templates and HTMX; no dedicated API
+  layer is planned in the current scope.
 - Complete HTMX flows, empty/error states, accessibility annotations, and Playwright tests.
 
 ## Phase 7: Deployment and release evidence

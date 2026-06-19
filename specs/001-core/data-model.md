@@ -15,7 +15,7 @@
 | AuditEvent | Append-only evidence for important actions. | Actor/action/target/timestamp immutable after write. |
 | SearchDocument | Denormalized search projection. | Rebuildable from authoritative records. |
 | MetadataSuggestion | AI-assisted recommendation. | Requires provenance, status, and review before applying. |
-| ImportBatch / ImportSource | Seed import provenance. | Records source, license, count, timestamps, errors. |
+| ExternalSourceRecord | Seed import provenance. | Records source, license, target object, and import timestamps. |
 
 ## Boundary notes
 

@@ -1,40 +1,36 @@
 # Library Ops Phase 3 PRD View
 
+Status: Cancelled / superseded by the trimmed release plan.
+
 Canonical source: `.taskmaster/docs/prd.md`
 
 ## Goal
 
-Add high-signal bonus features without destabilizing the assignment-complete app.
+Do not continue Phase 3 implementation work in the current release. Keep this
+file as a cancellation record only.
 
 ## Includes
 
 - complete `C8` beyond the Phase 1 role/demo-user seeds:
   - public-domain import commands
-  - search document rebuilds
   - richer demo circulation examples
-- complete `C7`:
-  - local embeddings
-  - AI-assisted metadata suggestions
-  - review/provenance/grounding safeguards
-- complete the remaining evaluator-facing `C9` slice:
-  - Django Ninja routes
-  - OpenAPI docs
-  - authorization-covered API behavior
+  - exact-search quality checks
+- keep `C7` as historical context only; do not schedule new implementation work for embeddings or AI-assisted metadata in this release
+- keep the evaluator-facing evidence and release surfaces coherent without
+  introducing a separate API layer
 - fold in the reusable evidence and documentation work from `C11` that keeps
   the bonus slice explainable and testable
 
 ## Entry criteria
 
 - Phase 2 assignment-complete flows are merged
-- search documents and catalog data model are stable enough to project
+- lexical search and catalog data model are stable enough to validate
 - demo data boundaries and provenance rules are already enforced in code
 
 ## Implementation notes
 
-- Keep AI strictly additive: suggestions may inform humans but may not invent
-  availability, records, or persisted metadata.
 - Prefer deterministic seed and import paths over large opaque fixtures.
-- Keep OpenAPI and API routes aligned with the same auth/permission helpers used
+- Keep evaluator evidence aligned with the same auth/permission helpers used
   by HTML flows.
 
 ## Out of scope
@@ -45,10 +41,7 @@ Add high-signal bonus features without destabilizing the assignment-complete app
 
 ## Exit criteria
 
-- seeded/demo data is reproducible
-- hybrid search and embeddings work on the seeded corpus
-- AI suggestions remain reviewed and grounded
-- OpenAPI docs load and E2E tests cover core flows
+- none; Phase 3 is cancelled and should not be regenerated into the active plan
 
 ## Suggested local regeneration command
 

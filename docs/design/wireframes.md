@@ -59,7 +59,6 @@ forms, and no unnecessary visual complexity.
 | Return | HTMX modal/panel | Admin, Librarian | Close an active loan. |
 | Loans | `/loans/` | Admin, Librarian, Member | View active/historical loans. |
 | Admin users | `/admin/users/` or Django Admin | Admin | Manage roles/users. |
-| API/docs | `/api/docs` or Django Ninja OpenAPI route | All | Verify the public API contract and protected mutations. |
 | AI metadata assist | HTMX panel | Admin, Librarian | Review suggested tags/description. |
 
 ## 1. Public landing
@@ -335,34 +334,34 @@ Implementation notes:
 - Persist provenance if suggestions are applied.
 - Do not generate availability or copy state.
 
-## 11. API/docs evaluator link
+## 11. Evidence and release checks
 
 ```text
 +---------------------------------------------------------------+
-| API docs                                                      |
-| OpenAPI schema  /api/openapi.json                              |
-| [Open docs] [Back to dashboard] [Back to catalog]             |
+| Release evidence                                               |
+| README, runbook, smoke tests                                   |
+| [Open README] [Back to dashboard] [Back to catalog]           |
 |                                                               |
 | Demo access: Admin, Librarian, Member labels only              |
-| Protected mutations require auth and role checks               |
+| Protected actions require auth and role checks                 |
 +---------------------------------------------------------------+
 ```
 
 Implementation notes:
 
-- Surface the OpenAPI UI or JSON route selected during implementation.
-- Keep the docs page visible to anonymous users, but block protected mutation
-  execution.
+- Surface README and runbook evidence alongside the app.
+- Keep the release-evidence page visible to anonymous users, but block
+  protected action execution.
 - Link back to the dashboard, catalog, and README evidence.
 
 States:
 
 | State | Requirement |
 |---|---|
-| Default | OpenAPI UI loads and includes catalog, loans, and auth-related endpoints. |
-| Unauthenticated | Read docs remain visible; protected endpoint execution is blocked by auth. |
+| Default | Release evidence loads and includes the app, README, and smoke-test links. |
+| Unauthenticated | Read evidence remains visible; protected action execution is blocked by auth. |
 | Permission denied | Error copy names the required role without exposing internals. |
-| Schema error | Show a concise failure banner and link to setup/quality checks. |
+| Smoke failure | Show a concise failure banner and link to setup/quality checks. |
 
 ## 12. Evaluator contract
 
@@ -378,8 +377,8 @@ States:
 | Run import/search-index actions | No | No | Yes, if enabled | Yes |
 | Review/apply AI metadata suggestions | No | No | Yes | Yes |
 | Manage users and roles | No | No | No | Yes |
-| Open API docs | Yes | Yes | Yes | Yes |
-| Execute protected API mutations | No | No | Yes | Yes |
+| Open release evidence | Yes | Yes | Yes | Yes |
+| Execute protected app mutations | No | No | Yes | Yes |
 
 ### State matrix
 
@@ -393,7 +392,7 @@ States:
 | Return | Button busy | No active loan | Conflict text | Action hidden | Loan closed and row refreshes |
 | Loans | Table spinner | No loans | Load banner | Member-only filter | Status update |
 | Admin users | Table spinner | No users | Validation summary | Denial page | Role change toast |
-| API/docs | OpenAPI loading | No schema | Schema load banner | Auth prompt | Endpoint response shown |
+| Release evidence | README loading | No docs | Evidence banner | Auth prompt | App route response shown |
 
 ### Accessibility contract
 
@@ -409,7 +408,7 @@ States:
 - Destructive actions require a keyboard-accessible confirmation.
 - Tables retain headers on narrow screens or collapse into labeled rows.
 - Playwright/a11y tests cover catalog search, create/edit validation, checkout
-  conflict, return conflict, member loans, admin denial, and API docs loading.
+  conflict, return conflict, member loans, and admin denial.
 
 ### Design token fallback
 
@@ -449,7 +448,7 @@ When extracting wireframes or implementation notes into code, capture:
 
 When extracting the evaluator contract, also capture:
 
-- API/docs route and auth behavior;
+- release evidence route and auth behavior;
 - role-specific admin and member states;
 - evaluator link targets back to README and canonical docs;
 - confirmation copy for protected admin mutations.

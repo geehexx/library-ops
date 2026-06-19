@@ -104,13 +104,15 @@ Evaluator-facing expectations:
   environment;
 - expect password-based demo auth to work first; OAuth/social auth remains
   optional and environment-driven;
-- expect OpenAPI to exist as a shell, not as final release evidence yet.
+- expect release evidence to come from the server-rendered app, README, and
+  smoke tests rather than a dedicated API/docs surface.
 
 Known limitations:
 
-- release tagging, demo script, and any remaining evaluator-ready evidence are
-  still pending;
-- OpenAPI remains a shell rather than a final release artifact;
+- release tagging and the final release PR are still pending;
+- the evaluator-facing demo script now lives at
+  [docs/evaluation/demo-script.md](docs/evaluation/demo-script.md);
+- the smoke surface now passes locally and on the live service;
 - the deployment contract now targets the Render free-tier path, which means
   migrations must be handled without `preDeployCommand`;
 
