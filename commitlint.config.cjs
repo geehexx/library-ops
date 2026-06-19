@@ -10,7 +10,7 @@ module.exports = {
     'scope-enum': [
       2,
       'always',
-      ['project', 'prd', 'adr', 'agents', 'deploy', 'codex', 'control-plane', 'speckit', 'taskmaster', 'catalog', 'circulation', 'search', 'seed', 'security', 'ci', 'release', 'render', 'docs', 'tooling']
+      ['project', 'prd', 'adr', 'agents', 'deploy', 'codex', 'control-plane', 'speckit', 'taskmaster', 'catalog', 'circulation', 'search', 'seed', 'security', 'ci', 'release', 'render', 'docs', 'tooling', 'auth', 'ux', 'ui', 'e2e', 'property', 'a11y']
     ],
     'subject-case': [0]
   }
