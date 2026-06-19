@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from io import BytesIO
 
-from django.core.management import call_command
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 from PIL import Image

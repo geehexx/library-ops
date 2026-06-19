@@ -8,9 +8,9 @@ from __future__ import annotations
 
 from typing import Final
 
-from django.core.exceptions import ValidationError
 from django.contrib.postgres.aggregates import StringAgg
 from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.core.exceptions import ValidationError
 from django.db import connection
 from django.db.models import (
     BooleanField,
@@ -36,8 +36,7 @@ from libraryops.catalog.models import (
     normalize_name,
 )
 from libraryops.circulation.models import Loan
-from libraryops.inventory.models import BookCopy
-from libraryops.inventory.models import BookCopyStatus
+from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 _EXTERNAL_IDENTIFIER_KEYS: Final[tuple[str, ...]] = (
     "openlibrary_work_id",

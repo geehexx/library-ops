@@ -5,13 +5,11 @@ from __future__ import annotations
 from datetime import timedelta
 from unittest.mock import patch
 
+import pytest
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
-
-from libraryops.circulation.models import Loan
-from libraryops.inventory.models import BookCopyStatus
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
@@ -21,6 +19,9 @@ from tests.factories import (
     WorkContributorFactory,
     build_isbn13,
 )
+
+from libraryops.circulation.models import Loan
+from libraryops.inventory.models import BookCopyStatus
 
 
 class CirculationServiceTests(TestCase):
@@ -74,7 +75,7 @@ class CirculationServiceTests(TestCase):
     def test_checkout_copy_requires_authorized_actor(self) -> None:
         """Members should not be able to checkout copies."""
 
-        with self.assertRaises(PermissionDenied):
+        with pytest.raises(PermissionDenied):
             Loan.objects.checkout_copy(
                 actor=self.member, copy=self.copy, borrower=self.other_member
             )
@@ -86,7 +87,7 @@ class CirculationServiceTests(TestCase):
         self.copy.status = BookCopyStatus.ON_LOAN.value
         self.copy.save(update_fields=["status"])
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Loan.objects.checkout_copy(actor=self.actor, copy=self.copy, borrower=self.other_member)
 
     def test_return_copy_closes_loan_and_restores_copy_availability(self) -> None:
@@ -120,5 +121,5 @@ class CirculationServiceTests(TestCase):
             returned_at=timezone.now() - timedelta(hours=1),
         )
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             Loan.objects.return_copy(actor=self.actor, loan=loan)

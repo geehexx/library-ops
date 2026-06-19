@@ -10,8 +10,8 @@ from django.urls import reverse
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
-    LoanFactory,
     LibrarianUserFactory,
+    LoanFactory,
     MemberUserFactory,
     WorkContributorFactory,
     build_isbn13,

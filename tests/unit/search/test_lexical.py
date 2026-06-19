@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch
 from typing import Any, cast
+from unittest.mock import patch
 
 from django.contrib.postgres.search import SearchRank
 from django.db.models import Case, FloatField, Value, When
 from django.test import TestCase
-
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
@@ -107,7 +106,7 @@ class CatalogLexicalSearchTests(TestCase):
     def test_exact_identifiers_rank_ahead_of_keyword_matches(self) -> None:
         """ISBN, barcode, Open Library, and Gutenberg hits should outrank keyword hits."""
 
-        def _keyword_rank_expression(query: str) -> Case:
+        def _keyword_rank_expression(_query: str) -> Case:
             return Case(
                 When(title__icontains=query, then=Value(1.0)),
                 default=Value(0.0),
@@ -129,9 +128,9 @@ class CatalogLexicalSearchTests(TestCase):
                 with self.subTest(query=query):
                     results = list(selectors.work_list(query=query))
                     assert results[0].pk == self.exact_work.pk
-                    assert cast(Any, results[0]).search_explanation == "Exact identifier match"
+                    assert cast("Any", results[0]).search_explanation == "Exact identifier match"
                     assert results[1].pk == self.broad_identifier_work.pk
-                    assert cast(Any, results[1]).search_explanation == "Keyword match"
+                    assert cast("Any", results[1]).search_explanation == "Keyword match"
 
     def test_exact_title_phrase_ranks_ahead_of_broader_title_text_hits(self) -> None:
         """An exact normalized title phrase should outrank a looser title match."""
@@ -139,9 +138,9 @@ class CatalogLexicalSearchTests(TestCase):
         results = list(selectors.work_list(query="Pride and Prejudice"))
 
         assert results[0].pk == self.exact_title_work.pk
-        assert cast(Any, results[0]).search_explanation == "Exact phrase match"
+        assert cast("Any", results[0]).search_explanation == "Exact phrase match"
         assert self.broad_title_work.pk in [work.pk for work in results]
-        assert cast(Any, results[1]).search_explanation == "Broad lexical match"
+        assert cast("Any", results[1]).search_explanation == "Broad lexical match"
 
     def test_exact_author_phrase_ranks_ahead_of_broader_author_text_hits(self) -> None:
         """An exact normalized contributor phrase should outrank a looser contributor match."""
@@ -149,15 +148,15 @@ class CatalogLexicalSearchTests(TestCase):
         results = list(selectors.work_list(query="Jane Austen"))
 
         assert results[0].pk == self.exact_author_work.pk
-        assert cast(Any, results[0]).search_explanation == "Exact phrase match"
+        assert cast("Any", results[0]).search_explanation == "Exact phrase match"
         assert self.broad_author_work.pk in [work.pk for work in results]
-        assert cast(Any, results[1]).search_explanation == "Broad lexical match"
+        assert cast("Any", results[1]).search_explanation == "Broad lexical match"
 
     @patch("libraryops.search.lexical.connection.vendor", "postgresql")
     def test_keyword_match_explanation_is_stable(self) -> None:
         """A keyword-ranked result should carry the keyword explanation text."""
 
-        def _keyword_rank_expression(query: str) -> Case:
+        def _keyword_rank_expression(_query: str) -> Case:
             return Case(
                 When(title__icontains="Annotated", then=Value(1.0)),
                 default=Value(0.0),
@@ -178,9 +177,9 @@ class CatalogLexicalSearchTests(TestCase):
             results = list(selectors.work_list(query="Pride and Prejudice"))
 
         assert results[0].pk == self.exact_title_work.pk
-        assert cast(Any, results[0]).search_explanation == "Exact phrase match"
+        assert cast("Any", results[0]).search_explanation == "Exact phrase match"
         assert results[1].pk == self.broad_title_work.pk
-        assert cast(Any, results[1]).search_explanation == "Keyword match"
+        assert cast("Any", results[1]).search_explanation == "Keyword match"
 
     def test_facets_filter_live_catalog_inventory_and_provenance_state(self) -> None:
         """Facet helpers should filter by live catalog, inventory, and provenance data."""

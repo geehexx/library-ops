@@ -5,14 +5,15 @@ from __future__ import annotations
 from dataclasses import replace
 from unittest.mock import patch
 
+import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 
 from libraryops.catalog.management.commands.import_public_domain_catalog import (
-    ImportedPublicDomainRecord,
     SOURCE_GUTENBERG,
     SOURCE_OPENLIBRARY,
+    ImportedPublicDomainRecord,
 )
 from libraryops.catalog.models import BibliographicWork, BookEdition, ExternalSourceRecord
 
@@ -223,7 +224,7 @@ class ImportPublicDomainCatalogCommandTests(TestCase):
         work = BibliographicWork.objects.create(title="Target Work")
         edition = BookEdition.objects.create(work=work, isbn="9780141439563")
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             ExternalSourceRecord(
                 source_name="openlibrary",
                 source_identifier="dup-1",
@@ -231,7 +232,7 @@ class ImportPublicDomainCatalogCommandTests(TestCase):
                 license_note="demo",
             ).full_clean()
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             ExternalSourceRecord(
                 source_name="openlibrary",
                 source_identifier="dup-1",
@@ -249,7 +250,7 @@ class ImportPublicDomainCatalogCommandTests(TestCase):
             edition=edition,
         )
 
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             ExternalSourceRecord(
                 source_name="openlibrary",
                 source_identifier="dup-1",

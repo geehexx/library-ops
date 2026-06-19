@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
 from pathlib import Path
-from uuid import uuid4
 from typing import Any, ClassVar
+from uuid import uuid4
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -17,7 +18,7 @@ EDITION_COVER_ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
 EDITION_COVER_MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 
 
-def edition_cover_upload_to(instance: "BookEdition", filename: str) -> str:
+def edition_cover_upload_to(instance: BookEdition, filename: str) -> str:
     """Build a stable storage path for an uploaded edition cover."""
 
     suffix = Path(filename).suffix.lower()
@@ -61,10 +62,8 @@ def validate_cover_image_format(value: Any) -> None:
         except AttributeError:
             file_obj = getattr(value, "file", None)
             if file_obj is not None:
-                try:
+                with suppress(AttributeError):
                     file_obj.seek(0)
-                except AttributeError:
-                    pass
 
     if image_format not in EDITION_COVER_ALLOWED_FORMATS:
         raise ValidationError("Upload a JPEG, PNG, or WebP cover image.")
@@ -281,17 +280,6 @@ class BookEdition(models.Model):
 
         return f"{self.work} ({self.isbn or 'no-isbn'})"
 
-    @property
-    def cover_preview_url(self) -> str | None:
-        """Return the best available cover preview URL for UI consumption."""
-
-        if self.cover_image:
-            try:
-                return self.cover_image.url
-            except ValueError:
-                return None
-        return self.cover_url or None
-
     def save(self, *args: object, **kwargs: object) -> None:
         """Persist the edition after validation."""
 
@@ -303,6 +291,17 @@ class BookEdition(models.Model):
 
         if self.isbn:
             self.isbn = clean_isbn(self.isbn)
+
+    @property
+    def cover_preview_url(self) -> str | None:
+        """Return the best available cover preview URL for UI consumption."""
+
+        if self.cover_image:
+            try:
+                return self.cover_image.url
+            except ValueError:
+                return None
+        return self.cover_url or None
 
 
 class ExternalSourceRecord(models.Model):

@@ -18,8 +18,8 @@ from libraryops.catalog.management.commands.import_public_domain_catalog import 
 )
 from libraryops.circulation.management.commands.seed_circulation_examples import (
     EXAMPLE_ACTOR_EMAILS,
-    EXAMPLE_MEMBER_EMAIL,
     EXAMPLE_LOAN_PLANS,
+    EXAMPLE_MEMBER_EMAIL,
 )
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
@@ -61,7 +61,7 @@ class SeedCirculationExamplesCommandTests(TestCase):
         for plan in EXAMPLE_LOAN_PLANS:
             copy = BookCopy.objects.select_related("edition").get(barcode=plan.barcode)
             loan = Loan.objects.select_related("copy", "borrower").get(copy=copy)
-            borrower = cast(Any, loan.borrower)
+            borrower = cast("Any", loan.borrower)
             assert borrower.email == EXAMPLE_MEMBER_EMAIL
             if plan.returned_days_ago is None:
                 assert loan.returned_at is None

@@ -6,10 +6,10 @@ from io import BytesIO
 from typing import TYPE_CHECKING
 
 import pytest
-from django.core.management import call_command
 from django.core.files.uploadedfile import SimpleUploadedFile
-from playwright.sync_api import Page, expect
+from django.core.management import call_command
 from PIL import Image
+from playwright.sync_api import Page, expect
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,

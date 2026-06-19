@@ -2,19 +2,21 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import FormView, TemplateView
-from django.db.models import QuerySet
 from django.utils import timezone
+from django.views.generic import FormView, TemplateView
 
 from libraryops.accounts.permissions import RoleContextMixin
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 from libraryops.circulation.forms import CheckoutForm, ReturnForm
 from libraryops.circulation.models import Loan
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 
 def _workflow_response(request: Any, redirect_url: str) -> HttpResponse:
@@ -100,7 +102,7 @@ class CirculationWorkflowView(
 
         if getattr(self.request, "htmx", False):
             return [self.fragment_template_name]
-        return [cast(str, self.template_name)]
+        return [cast("str", self.template_name)]
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         """Attach the shared workflow labels and back link."""
@@ -120,6 +122,7 @@ class CirculationWorkflowView(
     def form_valid(self, form: Any) -> HttpResponse:
         """Redirect to the dashboard after a workflow succeeds."""
 
+        _ = form
         return _workflow_response(self.request, self.get_success_url())
 
 

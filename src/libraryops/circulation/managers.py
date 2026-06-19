@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from django.contrib.auth.models import User
 
 from libraryops.audit.models import AuditEvent
 from libraryops.circulation import models as circulation_models
@@ -25,7 +28,7 @@ def _require_loan_manager(actor: User) -> None:
 def _loan_checkout_metadata(loan: circulation_models.Loan) -> dict[str, object]:
     """Return the audit payload for a checkout event."""
 
-    copy = cast(BookCopy, loan.copy)
+    copy = cast("BookCopy", loan.copy)
     return {
         "loan_id": loan.pk,
         "copy_id": copy.pk,
@@ -39,7 +42,7 @@ def _loan_checkout_metadata(loan: circulation_models.Loan) -> dict[str, object]:
 def _loan_return_metadata(loan: circulation_models.Loan) -> dict[str, object]:
     """Return the audit payload for a return event."""
 
-    copy = cast(BookCopy, loan.copy)
+    copy = cast("BookCopy", loan.copy)
     returned_at = loan.returned_at
     return {
         "loan_id": loan.pk,
@@ -122,7 +125,7 @@ class LoanManager(models.Manager["circulation_models.Loan"]):
         loan.returned_at = returned_at
         loan.save(update_fields=["returned_at"])
 
-        copy = cast(BookCopy, loan.copy)
+        copy = cast("BookCopy", loan.copy)
         copy.status = BookCopyStatus.AVAILABLE.value
         copy.save(update_fields=["status", "updated_at"])
 

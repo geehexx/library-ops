@@ -159,8 +159,7 @@ def _get_or_create_work(record: ImportedPublicDomainRecord, refresh: bool) -> Bi
             work = candidate
             break
     if work is None:
-        work = BibliographicWork.objects.create(title=record.title, description=record.description)
-        return work
+        return BibliographicWork.objects.create(title=record.title, description=record.description)
     if refresh:
         work.title = record.title
         work.description = record.description
@@ -264,8 +263,8 @@ class Command(BaseCommand):
     def handle(self, *_args: str, **options: object) -> None:
         """Import the selected public-domain source slice."""
 
-        source = cast(str, options["source"])
-        limit = cast(int, options["limit"])
+        source = cast("str", options["source"])
+        limit = cast("int", options["limit"])
         if limit <= 0:
             raise CommandError("--limit must be a positive integer.")
 

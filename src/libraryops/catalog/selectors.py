@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import cast
 
-from django.db.models import Q, QuerySet  # noqa: TC002
+from django.db.models import Q, QuerySet
 from django.http import Http404
 
 from libraryops.catalog.models import (
@@ -121,7 +121,7 @@ def copy_detail(copy_id: int) -> BookCopy:
         raise Http404("Copy not found.") from exc
 
 
-def _availability_options(queryset: QuerySet[BibliographicWork]) -> list[str]:
+def _availability_options(_queryset: QuerySet[BibliographicWork]) -> list[str]:
     """Return the live availability states present in one queryset."""
 
     # Keep the UI minimal: surface the two stable states regardless of the
@@ -139,13 +139,13 @@ def _collect_subject_values(queryset: QuerySet[BibliographicWork]) -> list[str]:
     ).values_list("external_identifiers", flat=True):
         if not isinstance(identifiers, dict):
             continue
-        identifiers_dict = cast(dict[str, object], identifiers)
+        identifiers_dict = cast("dict[str, object]", identifiers)
         raw_subjects: object = identifiers_dict.get("subjects", ())
         if isinstance(raw_subjects, str):
             raw_subjects = (raw_subjects,)
         if not isinstance(raw_subjects, Iterable):
             continue
-        for subject in cast(Iterable[object], raw_subjects):
+        for subject in cast("Iterable[object]", raw_subjects):
             if isinstance(subject, str) and subject.strip():
                 subjects.add(subject.strip())
     return sorted(subjects, key=str.casefold)

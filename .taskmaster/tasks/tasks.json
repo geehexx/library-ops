@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "Project Repository and Initial Toolchain Setup",
         "description": "Initialize the Python/Django repository baseline, dependency toolchain, and direct validation path. This includes the foundational `pyproject.toml`, `uv.lock`, repo-local Node tooling, and `.gitignore` coverage for generated artifacts.",
         "details": "As per Capability C1.F1, this task establishes Python 3.12+, Node 22+, uv, npm, and the direct-tool workflow used by the repo. Ensure `uv sync --all-groups`, `npm ci`, `codex doctor --summary --ascii --no-color`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` all succeed. `.pytest_cache`, `.venv`, corpora, model caches, and secrets must remain untracked. The project structure from section 6.1 should be present without relying on custom verifier scripts.",
@@ -83,7 +83,7 @@
         "updatedAt": "2026-06-16T08:10:23.795Z"
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "Configure Core Quality and Agent Tooling",
         "description": "Configure static analysis, testing, and agent-specific tools for predictable development. This includes Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint, and the agent stack like Codex, Task Master, Spec Kit, Context7, Exa, RTK, code-review-graph, Serena, ast-grep, and Repomix.",
         "details": "This task aligns with Capability C1.F3, C1.F4, and C1.F5. Configure `pyproject.toml` for Ruff, Pyright (strict defaults), pytest (with Hypothesis), Import Linter (for module boundaries once apps exist), coverage, pip-audit, and markdownlint. For agent tooling, set up `.codex/config.toml`, `AGENTS.md`, and relevant skills to enable Context7, Exa, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix. Ensure no real MCP keys are committed and the project permission profile stays on the current workspace-scoped model. Validate with direct-tool commands rather than custom readiness scripts.",
@@ -155,7 +155,7 @@
         "updatedAt": "2026-06-16T08:10:23.837Z"
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "Harden Existing Django Bootstrap and Settings",
         "description": "Harden the existing Django project structure and configure settings for local development, testing, and production environments without re-bootstraping the project tree.",
         "details": "This covers Capability C1.F2. Treat the committed Django bootstrap as current reality: root `manage.py`, `src/libraryops/config/settings/base.py`, `local.py`, and `test.py`. Strengthen that bootstrap with real `DATABASE_URL` handling, explicit production env requirements, smoke-testable URLs, and CI parity so the repo is ready for the first domain-app implementation slice rather than a second `django-admin startproject` pass.",
@@ -237,7 +237,7 @@
         "updatedAt": "2026-06-17T12:26:54.904Z"
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "Implement Core Library Domain Models",
         "description": "Define the Django models representing the core library domain, including works, editions, copies, loans, audit events, and external source records.",
         "status": "done",
@@ -318,7 +318,7 @@
         "updatedAt": "2026-06-17T12:26:58.856Z"
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "Configure Authentication and Role-Based Access Control",
         "description": "Set up user authentication, define role-based access control (RBAC) using Django groups and permissions, and integrate `django-allauth` for optional OAuth readiness.",
         "details": "This task aligns with Capability C3. Use Django's built-in authentication system. Create `Admin`, `Librarian`, and `Member` groups and assign default permissions as per the RBAC matrix (section 17.1). Develop server-side authorization services (`accounts` module) that provide permission checks (e.g., `require_librarian`, `can_manage_catalog`) for views, APIs, and services (FR-011, NFR-003). Integrate `django-allauth` for OAuth-ready SSO, ensuring local demo can run with username/password and OAuth is environment-driven and optional (C3.F3).",
@@ -396,7 +396,7 @@
         "updatedAt": "2026-06-17T20:01:47.325Z"
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "Implement Catalog Management UI and API",
         "description": "Develop user-facing catalog browse and detail pages, forms for creating/editing/archiving works, editions, and copies, cover image support, and configure Django Admin for internal management. Keep catalog management server-rendered through Django views, forms, selectors, and templates.",
         "details": "This task covers Capability C4. Create Django templates and views (`web` module) for catalog list and detail pages (C4.F1), showing availability and role-aware actions. Implement forms for `Admin`/`Librarian` to create, edit, and archive works, editions, and copies (C4.F2). Integrate cover image support, allowing external URLs or uploaded files with validation (C4.F3). Configure Django Admin (`admin.py` in `catalog`, `inventory` apps) for internal management, including list filters and search (C4.F4). Ensure audit events are recorded for all mutations (FR-001, FR-002, FR-003, NFR-010).",
@@ -484,7 +484,7 @@
         "updatedAt": "2026-06-19T09:33:32.671Z"
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "Implement Circulation System",
         "description": "Implement the core checkout/borrow and checkin/return lifecycle services, transactional integrity, UI workflows for librarians/admins, and a loan dashboard.",
         "details": "This task addresses Capability C5. Develop `checkout_copy` and `return_copy` services within the `circulation` module, ensuring they are transactional (NFR-005) and enforce the 'only one active loan per copy' invariant (FR-006, NFR-006). Implement UI workflows (`web` module) for `Librarians`/`Admins` to perform checkout/return actions, potentially using HTMX modals (C5.F3). Create a loan dashboard (`web` module) to display active, overdue, and recent loans, with role-based visibility (C5.F4). Ensure audit events are recorded for all circulation actions (NFR-010).",
@@ -576,7 +576,7 @@
         "updatedAt": "2026-06-19T13:43:38.932Z"
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Implement Render-native Lexical Search",
         "description": "Implement exact-identifier-first lexical catalog search with PostgreSQL full-text ranking, faceted filtering, and deterministic result ordering.",
         "details": "This task covers Capability C6. Implement exact identifier search for ISBNs, barcodes, and external IDs (C6.F1). Configure PostgreSQL full-text search using weighted `tsvector` for keyword searches (C6.F2, section 12.2). Add filters/facets for availability, contributor, subject, language, and source (C6.F3). Implement deterministic ranking and human-readable explanations so exact identifiers outrank keyword matches and relevant lexical matches are understandable (C6.F4, section 12.3). No `SearchDocument` projection, embeddings, ParadeDB/BM25 adapter, or semantic/vector search is in scope for the current release.",
@@ -644,7 +644,7 @@
         "updatedAt": "2026-06-19T13:24:54.833Z"
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "Superseded Product AI Scope",
         "description": "Historical placeholder for vector/AI release ideas that are not part of the current release.",
         "details": "This task exists only to record that the product AI and vector-search path was intentionally removed from the current release scope. Do not implement embeddings, metadata suggestions, semantic search, or related management commands for this release.",
@@ -706,7 +706,7 @@
         ]
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "Implement Reproducible Seed Data and Demo Corpus",
         "description": "Create app-owned Django management commands to seed demo roles, users, import a public-domain catalog, generate copies, and create example loan states for a reproducible demo dataset.",
         "details": "This task covers Capability C8. Implement management commands as outlined in section 13.1, keeping the work in the owning app modules instead of a standalone `seed` package: `seed_roles`, `seed_demo_users` (with password reset, FR-012), `import_public_domain_catalog` (from Open Library/Project Gutenberg, FR-013), and `seed_circulation_examples`. Commands MUST be idempotent and support refresh/dry-run options. Seed Admin, Librarian, and Member demo accounts with documented credentials (C8.F1, section 13.2). Import curated public-domain records (up to 1,000) with provenance (C8.F2, FR-013). Generate realistic copies and example loans (C8.F3). Ensure imported corpora and downloaded dumps are not committed (section 13.3).\n<info added on 2026-06-17T13:29:42Z>\nRemoved the empty seed package anchor, removed import-linter references, and reworded the PRD/spec planning surfaces to keep seed behavior in app-owned management-command workflows. Validated with import-linter, ast-grep, and import smoke checks.\n</info added on 2026-06-17T13:29:42Z>",
@@ -793,7 +793,7 @@
         "updatedAt": "2026-06-19T11:49:21.953Z"
       },
       {
-        "id": 11,
+        "id": "11",
         "title": "Prepare for Deployment and Generate Demo Evidence",
         "description": "Configure the Django application for live deployment, update evaluation-facing documentation, create a demo script, and tag a release to deliver a complete, reviewable product.",
         "details": "This task covers Capability C10 and C11. Configure Django app for deployment to Render or equivalent (C10.F1, section 24.6). Ensure production environment variables are managed securely and database migrations run. Update `README.md` (C10.F2) with the live URL, demo accounts, a feature checklist, setup instructions, and known limitations (section 19.3, 24.5). Prepare a Loom/demo script covering product, architecture, tests, and tradeoffs (C10.F3, section 16.2). Tag a SemVer release from `main` (C10.F3, section 16.4). Keep evaluator-facing documentation in the canonical README, runbook, and release surfaces rather than reviving deleted evidence-doc trees or a dedicated API surface.",
@@ -892,7 +892,7 @@
         "updatedAt": "2026-06-19T14:42:01.621Z"
       },
       {
-        "id": 12,
+        "id": "12",
         "title": "Finalize Control-Plane Consolidation",
         "description": "Collapse remaining duplicate and stale control-plane documentation into the right source-of-truth surfaces, reconcile Task Master and Spec Kit artifacts to the implemented command/runtime model, and keep the repo in a coherent low-drift state while product implementation begins.",
         "details": "This task covers the remaining meta/control-plane work after Tasks 1 and 2. Focus on reducing duplicated human-facing docs, reconciling supporting Spec Kit artifacts with the implemented externalized Task Master/runtime model, simplifying stale or overlapping skill/agent instructions, and keeping release/governance surfaces aligned with the actual packaging flow. Do not reintroduce historical transcript-like notes; prefer concise durable summaries and current command surfaces.",
@@ -961,7 +961,7 @@
         "updatedAt": "2026-06-16T09:24:09.797Z"
       },
       {
-        "id": 13,
+        "id": "13",
         "title": "Codify Coordinator Handoff Policy",
         "description": "Ensure Spark-first coordinator handoff, batch reasoning before tools, and bounded recursive child-worker fan-out are explicitly documented across repo-local agent, config, hook, docs, and notes surfaces.",
         "status": "done",
@@ -1075,7 +1075,7 @@
         "updatedAt": "2026-06-19T13:02:53.712Z"
       },
       {
-        "id": 14,
+        "id": "14",
         "title": "Finalize Branch Landing and Release Polish",
         "description": "Stabilize the current release branch, remove remaining drift, and make the branch merge-ready without expanding product scope.",
         "details": "Use this task for the final narrow pass over code, tests, generated artifacts, and review leftovers after Task 13. Normalize stale branch notes, resolve residual lint or test failures, remove diff noise, and ensure the branch tip is the exact release candidate intended for merge and tagging. Record final merge-ready evidence.",
@@ -1123,25 +1123,27 @@
             "title": "Record merge-ready evidence",
             "description": "Append concise Task Master notes with files changed, checks run, and merge-readiness.",
             "details": "Capture files touched, validation commands, and residual risk so later sessions do not repeat the same closure scan.\n<info added on 2026-06-19T18:14:45.151Z>\n2026-06-20 seed/import readiness audit: `uv run python manage.py check` passed, and the management-command surface is present for `seed_roles`, `seed_demo_users`, `import_public_domain_catalog`, and `seed_circulation_examples`. Effective local defaults point at SQLite `db.sqlite3`. Command readiness is partly proved: `import_public_domain_catalog --source openlibrary --limit 1 --dry-run` succeeded; `seed_demo_users`, `seed_roles`, and `seed_circulation_examples` exist and are invokable but do not expose `--dry-run`. This is not yet product-state proof: no evidence in this run shows books actually imported or demo users/circulation examples actually seeded into a disposable database. Remaining required evidence is a full seeded-environment pass plus row/entity validation before claiming product completion.\n</info added on 2026-06-19T18:14:45.151Z>\n<info added on 2026-06-19T18:15:29.670Z>\n2026-06-20 search readiness audit: targeted search coverage passed with `uv run pytest tests/unit/search/test_lexical.py` (`7 passed`) and `uv run pytest tests/integration/web/test_foundation_ui.py -k \"CatalogSearchTests and q_parameter or facets_filter\"` (`2 passed, 6 deselected`). What is now proved: exact identifier ranking, exact title/author phrase ranking, explanation labels (`Exact identifier match`, `Exact phrase match`, `Keyword match`, `Broad lexical match`), and availability/source/facet filtering at unit+integration level. What remains unproved before claiming completion: seeded real-browser search UX, mobile/desktop rendering behavior, and PostgreSQL-specific ranking semantics under a live seeded environment.\n</info added on 2026-06-19T18:15:29.670Z>\n<info added on 2026-06-19T18:19:01.305Z>\nUpdate merge-ready evidence interpretation to distinguish between:\n- What is now proved (real seed/import/circulation command execution in a throwaway DB, plus targeted search tests)\n- What remains open (seeded browser/manual UX evidence, screenshot matrix, and PostgreSQL/live-environment search behavior)\n</info added on 2026-06-19T18:19:01.305Z>",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 14,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-19T18:54:07.809Z"
           },
           {
             "id": 5,
             "title": "Simplify historical control-plane tests",
             "description": "Remove or rewrite legacy prose-heavy tests under tests/control_plane so the suite only keeps durable governance assertions; keep the docs/spell boundary work separate in the existing release-polish gate slice.",
-            "details": "<info added on 2026-06-19T18:05:26.194Z>\nSimplify historical/prose-oriented assertions in tests/control_plane; keep docs/spell boundary work separate in Task 14.3.\n</info added on 2026-06-19T18:05:26.194Z>",
+            "details": "<info added on 2026-06-19T18:05:26.194Z>\nSimplify historical/prose-oriented assertions in tests/control_plane; keep docs/spell boundary work separate in Task 14.3.\n</info added on 2026-06-19T18:05:26.194Z>\n<info added on 2026-06-19T18:39:28.699Z>\nReview the current state of test coverage in `tests/property/` and `tests/unit/`. Ensure that all invariant-heavy generated coverage is being tracked and updated. Coordinate with Task 14.3 for docs/spell boundary work.\n</info added on 2026-06-19T18:39:28.699Z>",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 14
+            "parentTaskId": 14,
+            "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-19T17:38:36.190Z"
+        "updatedAt": "2026-06-19T18:54:07.809Z"
       },
       {
-        "id": 15,
+        "id": "15",
         "title": "Close Dependabot Queue",
         "description": "Drain the dependency-update queue, merge safe bumps, and confirm dependency hygiene stays green.",
         "details": "Inventory open dependency-update PRs, group them by risk, land safe updates, and resolve resulting lockfile or config drift. Keep updates aligned with the repo pinned tooling and validation model and end with every open dependency PR merged or explicitly closed.",
@@ -1195,7 +1197,7 @@
         ]
       },
       {
-        "id": 16,
+        "id": "16",
         "title": "Reconcile Docs, Specs, and Constitution",
         "description": "Bring README, PRD, Spec Kit artifacts, constitution, and durable docs back into one aligned source-of-truth set after the final polish pass.",
         "details": "Update durable documentation surfaces so they agree on current branch policy, release evidence, deployment path, auth posture, and current scope boundaries. Remove stale references to retired workflows and ensure the PRD, specs, constitution, and docs do not contradict the implemented state.",
@@ -1220,19 +1222,21 @@
             "id": 2,
             "title": "Reconcile Task Master and Spec Kit validation",
             "description": "Re-run dependency validation and compare generated tasks against the canonical PRD and seed list so any omitted cleanup or finalization work is surfaced as explicit Task Master follow-on items.",
-            "details": "<info added on 2026-06-19T18:05:31.548Z>\nReconcile Task Master and Spec Kit validation using specs/001-core/tasks.md T010 and .taskmaster/docs/prd.md as the baseline. Compare the current Task Master graph and dependency validation output against the seed list, then surface any omitted cleanup/finalization work as explicit follow-on items instead of hidden debt.\n</info added on 2026-06-19T18:05:31.548Z>",
+            "details": "<info added on 2026-06-19T18:05:31.548Z>\nReconcile Task Master and Spec Kit validation using specs/001-core/tasks.md T010 and .taskmaster/docs/prd.md as the baseline. Compare the current Task Master graph and dependency validation output against the seed list, then surface any omitted cleanup/finalization work as explicit follow-on items instead of hidden debt.\n</info added on 2026-06-19T18:05:31.548Z>\n<info added on 2026-06-19T18:39:39.218Z>\nReconcile property-based invariant coverage with PRD expectations by adding tests from `tests/property/`. Ensure browser-backed evaluator proof is stronger than current tree, addressing gaps identified in circulation browser flows and exact-identifier search proof. Compare current test topology against PRD sections to claim release complete only after thorough validation.\n</info added on 2026-06-19T18:39:39.218Z>",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           },
           {
             "id": 3,
             "title": "End-to-end manual UX audit and screenshot review",
             "description": "Review every user-visible surface end to end, capture screenshot-worthy states, and file any iterative follow-on fixes needed for release evidence and final polish.",
-            "details": "<info added on 2026-06-19T18:06:13.613Z>\nBounded closeout evidence: this is the evaluator-facing UX pass for release evidence only. Use it to review all user-visible surfaces, capture screenshot-worthy states, and log iterative follow-on fixes back into the final polish/reconciliation tasks instead of widening scope. Align with specs/001-core/tasks.md T010 and the PRD's release-evidence expectations.\n</info added on 2026-06-19T18:06:13.613Z>\n<info added on 2026-06-19T18:06:21.593Z>\nAudit scope must cover every current user-visible route and screenshot-worthy state, including anonymous/public, authenticated member, librarian/admin management, success/empty/error/permission-denied states, and evaluator-facing demo evidence surfaces. Use manual review plus browser-assisted verification as needed, then convert any durable UX/design/evidence gaps into bounded follow-on tasks and reconcile resulting truth changes back into PRD/spec/docs surfaces.\n</info added on 2026-06-19T18:06:21.593Z>\n<info added on 2026-06-19T18:06:55.431Z>\nCurrent repo-grounded surface inventory for the UX/screenshot audit: routes in `src/libraryops/config/urls.py` expose `/`, `/accounts/*`, `/health/`, `/catalog/*`, `/circulation/*`, and `/admin/`; current templates include `shell/home.html`, `account/login.html`, `catalog/index.html`, `catalog/detail.html`, `catalog/create.html`, `catalog/form.html`, `circulation/loan_dashboard.html`, `circulation/workflow_form.html`, `circulation/_workflow_form.html`, and `shell/403.html`. Existing evaluator-facing E2E coverage lives in `tests/e2e/test_navigation.py`, `test_auth_surface.py`, and `test_catalog_navigation.py`; use those plus manual browser review to drive the screenshot/state checklist.\n</info added on 2026-06-19T18:06:55.431Z>\n<info added on 2026-06-19T18:07:22.976Z>\nReview UX planning findings for high-risk drift points including route/surface discrepancies, search fidelity gaps, missing destructive confirmation, HTMX accessibility risks, terminology inconsistencies, and thin loading/error-state coverage. Use the screenshot matrix across anonymous/member/librarian/admin for `/`, `/accounts/login/`, `/catalog/`, `/catalog/<work_id>/`, manager forms, `/circulation/`, `/circulation/checkout/`, `/circulation/return/`, `/admin/`, and allauth auxiliary pages.\n</info added on 2026-06-19T18:07:22.976Z>",
+            "details": "<info added on 2026-06-19T18:06:13.613Z>\nBounded closeout evidence: this is the evaluator-facing UX pass for release evidence only. Use it to review all user-visible surfaces, capture screenshot-worthy states, and log iterative follow-on fixes back into the final polish/reconciliation tasks instead of widening scope. Align with specs/001-core/tasks.md T010 and the PRD's release-evidence expectations.\n</info added on 2026-06-19T18:06:13.613Z>\n<info added on 2026-06-19T18:06:21.593Z>\nAudit scope must cover every current user-visible route and screenshot-worthy state, including anonymous/public, authenticated member, librarian/admin management, success/empty/error/permission-denied states, and evaluator-facing demo evidence surfaces. Use manual review plus browser-assisted verification as needed, then convert any durable UX/design/evidence gaps into bounded follow-on tasks and reconcile resulting truth changes back into PRD/spec/docs surfaces.\n</info added on 2026-06-19T18:06:21.593Z>\n<info added on 2026-06-19T18:06:55.431Z>\nCurrent repo-grounded surface inventory for the UX/screenshot audit: routes in `src/libraryops/config/urls.py` expose `/`, `/accounts/*`, `/health/`, `/catalog/*`, `/circulation/*`, and `/admin/`; current templates include `shell/home.html`, `account/login.html`, `catalog/index.html`, `catalog/detail.html`, `catalog/create.html`, `catalog/form.html`, `circulation/loan_dashboard.html`, `circulation/workflow_form.html`, `circulation/_workflow_form.html`, and `shell/403.html`. Existing evaluator-facing E2E coverage lives in `tests/e2e/test_navigation.py`, `test_auth_surface.py`, and `test_catalog_navigation.py`; use those plus manual browser review to drive the screenshot/state checklist.\n</info added on 2026-06-19T18:06:55.431Z>\n<info added on 2026-06-19T18:07:22.976Z>\nReview UX planning findings for high-risk drift points including route/surface discrepancies, search fidelity gaps, missing destructive confirmation, HTMX accessibility risks, terminology inconsistencies, and thin loading/error-state coverage. Use the screenshot matrix across anonymous/member/librarian/admin for `/`, `/accounts/login/`, `/catalog/`, `/catalog/<work_id>/`, manager forms, `/circulation/`, `/circulation/checkout/`, `/circulation/return/`, `/admin/`, and allauth auxiliary pages.\n</info added on 2026-06-19T18:07:22.976Z>\n<info added on 2026-06-19T18:39:50.724Z>\nAudit evidence for social-auth provider surfaces must include verification of GitHub and Google login functionality under a live server session and on Render. Additionally, review the anonymous home page's prose to ensure it accurately reflects the app's current capabilities, capturing catalog counts and circulation previews. Document any necessary copy/prose polish in follow-on tasks for final release evidence.\n</info added on 2026-06-19T18:39:50.724Z>\n<info added on 2026-06-19T18:41:40.697Z>\nLocal social-auth verification update:\n- Full browser/provider handshake and callback success under a live local/Render host.\n- End-to-end execution evidence required rather than just app-layer redirects.\n- Document any necessary follow-on tasks for final release evidence.\n</info added on 2026-06-19T18:41:40.697Z>",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -1241,21 +1245,20 @@
             "details": "",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           }
         ]
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-19T17:38:36.190Z",
+      "lastModified": "2026-06-19T18:54:07.810Z",
       "taskCount": 16,
       "completedCount": 12,
       "tags": [
         "master"
-      ],
-      "created": "2026-06-19T17:48:37.481Z",
-      "description": "Tasks for master context"
+      ]
     }
   },
   "rpg": {

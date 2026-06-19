@@ -23,9 +23,9 @@ class CheckoutForm(forms.Form):
         """Refresh the dynamic querysets used by the workflow."""
 
         super().__init__(*args, **kwargs)
-        copy_field = cast(Any, self.fields["copy"])
+        copy_field = cast("Any", self.fields["copy"])
         copy_field.queryset = selectors.copy_list().filter(status=BookCopyStatus.AVAILABLE)
-        borrower_field = cast(Any, self.fields["borrower"])
+        borrower_field = cast("Any", self.fields["borrower"])
         borrower_field.queryset = (
             User.objects.filter(groups__name=ROLE_MEMBER).order_by("email").distinct()
         )
@@ -33,8 +33,8 @@ class CheckoutForm(forms.Form):
     def apply(self, *, actor: User) -> Loan:
         """Persist the checkout through the loan manager."""
 
-        copy = cast(BookCopy, self.cleaned_data["copy"])
-        borrower = cast(User, self.cleaned_data["borrower"])
+        copy = cast("BookCopy", self.cleaned_data["copy"])
+        borrower = cast("User", self.cleaned_data["borrower"])
         return Loan.objects.checkout_copy(actor=actor, copy=copy, borrower=borrower)
 
 
@@ -47,7 +47,7 @@ class ReturnForm(forms.Form):
         """Refresh the dynamic loan queryset used by the workflow."""
 
         super().__init__(*args, **kwargs)
-        loan_field = cast(Any, self.fields["loan"])
+        loan_field = cast("Any", self.fields["loan"])
         loan_field.queryset = (
             Loan.objects.select_related("copy__edition__work", "borrower")
             .filter(returned_at__isnull=True)
@@ -57,5 +57,5 @@ class ReturnForm(forms.Form):
     def apply(self, *, actor: User) -> Loan:
         """Persist the return through the loan manager."""
 
-        loan = cast(Loan, self.cleaned_data["loan"])
+        loan = cast("Loan", self.cleaned_data["loan"])
         return Loan.objects.return_copy(actor=actor, loan=loan)
