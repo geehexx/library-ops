@@ -224,15 +224,16 @@ def test_commitlint_scope_allows_render_deploy_platform() -> None:
 
     assert "scope-enum" in commitlint_text
     match = re.search(
-        r"'scope-enum': \[\s*2,\s*'always',\s*\[(.*?)\]\s*\]",
+        r'["\']scope-enum["\']\s*:\s*\[[\s\S]*?"subject-case"',
         commitlint_text,
         re.S,
     )
     assert match is not None
 
-    scope_block = match.group(1)
-    scopes = {token.strip().strip(", ").strip("'\"") for token in scope_block.split(",")}
+    scope_block = match.group(0).split(":", 1)[1].split('"subject-case"', 1)[0]
+    scopes = {match[0] or match[1] for match in re.findall(r'"([^"]+)"|\'([^\']+)\'', scope_block)}
     assert "render" in scopes
+
 
 def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
     """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
