@@ -1219,7 +1219,7 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=23.0,<24.0" },
     { name = "pgvector", specifier = ">=0.3,<1.0" },
     { name = "pillow", specifier = ">=12.2,<13.0" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4.0" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.4,<4.0" },
     { name = "pydantic", specifier = ">=2.10,<3.0" },
     { name = "python-dotenv", specifier = ">=1.0,<2.0" },
     { name = "whitenoise", specifier = ">=6.8,<7.0" },
