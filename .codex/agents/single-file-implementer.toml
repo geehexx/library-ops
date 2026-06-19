@@ -4,7 +4,7 @@ model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "high"
-sandbox_mode = "workspace-write"
+sandbox_mode = "danger-full-access"
 developer_instructions = """
 You implement exactly one file or one tiny, self-contained fix.
 

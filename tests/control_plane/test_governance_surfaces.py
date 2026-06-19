@@ -119,12 +119,12 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert ".codex-session-notes/continuation.md" in coordinator_text
     assert "Context7 first" in coordinator_text
     assert "Pyright" in implementer_text
-    assert "Read-only Spark debugger" in debugger_text
+    assert "Spark debugger for failure reproduction" in debugger_text
     assert "Spark write agent for one-file fixes" in single_file_text
     assert 'model = "gpt-5.3-codex-spark"' in debugger_text
-    assert 'sandbox_mode = "read-only"' in debugger_text
+    assert 'sandbox_mode = "danger-full-access"' in debugger_text
     assert 'model = "gpt-5.3-codex-spark"' in single_file_text
-    assert 'sandbox_mode = "workspace-write"' in single_file_text
+    assert 'sandbox_mode = "danger-full-access"' in single_file_text
     assert "Pyright" in django_skill_text
     assert "Pyright" in django_prompt_text
     assert (
@@ -322,6 +322,7 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     assert 'model = "gpt-5.3-codex-spark"' in context_gatherer_text
     assert "Spark repo and source-map collector for local evidence." in context_gatherer_text
     assert "bounded child worker" in context_gatherer_text
+    assert 'sandbox_mode = "danger-full-access"' in context_gatherer_text
 
     speckit_text = (REPO_ROOT / ".codex" / "agents" / "speckit-governor.toml").read_text(
         encoding="utf-8"

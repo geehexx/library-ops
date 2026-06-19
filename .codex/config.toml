@@ -68,7 +68,7 @@ description = "Bounded implementation agent for one Task Master task or bounded 
 config_file = "agents/implementer.toml"
 
 [agents.debugger]
-description = "Read-only Spark debugger for failure reproduction, triage, and next-command diagnosis."
+description = "Spark debugger for failure reproduction, triage, and next-command diagnosis."
 config_file = "agents/debugger.toml"
 
 [agents.single_file_implementer]

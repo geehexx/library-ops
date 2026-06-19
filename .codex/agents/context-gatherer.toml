@@ -4,7 +4,7 @@ model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
-sandbox_mode = "read-only"
+sandbox_mode = "danger-full-access"
 developer_instructions = """
 You gather local Library Ops context without making changes.
 

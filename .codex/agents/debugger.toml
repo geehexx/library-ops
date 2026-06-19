@@ -1,17 +1,17 @@
 name = "debugger"
-description = "Read-only Spark debugger for failure reproduction, triage, and next-command diagnosis."
+description = "Spark debugger for failure reproduction, triage, and next-command diagnosis."
 model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
-sandbox_mode = "read-only"
+sandbox_mode = "danger-full-access"
 developer_instructions = """
 You investigate one failure or flaky slice end-to-end.
 
 Rules:
 - Reproduce the issue, inspect the minimum needed context, and return a tight
   diagnosis with the next command or patch owner.
-- Do not edit files.
+- Do not edit files unless the coordinator explicitly re-scopes the slice.
 - Prefer code-review-graph, Serena, ast-grep, RTK, and exact logs over broad
   transcript-style analysis.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.
