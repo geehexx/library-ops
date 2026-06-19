@@ -47,6 +47,7 @@ def _oversized_cover_upload() -> SimpleUploadedFile:
         content_type=upload_content_type,
     )
 
+
 VALID_ISBN_CASES = [
     ("0743273567", "9780743273565"),
     ("0-7432-7356-7", "9780743273565"),
@@ -81,7 +82,9 @@ class BookEditionModelTests(TestCase):
         """Ensure only JPEG, PNG, and WebP uploads are accepted."""
 
         with pytest.raises(ValidationError):
-            BookEdition.objects.create(work=self.work, cover_image=_cover_upload("cover.gif", "GIF"))
+            BookEdition.objects.create(
+                work=self.work, cover_image=_cover_upload("cover.gif", "GIF")
+            )
 
     def test_book_edition_rejects_oversized_cover_images(self) -> None:
         """Ensure oversized cover uploads fail before persistence."""

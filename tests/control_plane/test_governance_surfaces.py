@@ -88,9 +88,9 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     debugger_text = (REPO_ROOT / ".codex" / "agents" / "debugger.toml").read_text(
         encoding="utf-8",
     )
-    single_file_text = (
-        REPO_ROOT / ".codex" / "agents" / "single-file-implementer.toml"
-    ).read_text(encoding="utf-8")
+    single_file_text = (REPO_ROOT / ".codex" / "agents" / "single-file-implementer.toml").read_text(
+        encoding="utf-8"
+    )
     django_skill_text = (
         REPO_ROOT / ".agents" / "skills" / "django-feature" / "SKILL.md"
     ).read_text(encoding="utf-8")
@@ -429,9 +429,9 @@ def test_review_taskmaster_and_prd_skills_make_test_rigor_explicit() -> None:
     review_text = (REPO_ROOT / ".agents" / "skills" / "review" / "SKILL.md").read_text(
         encoding="utf-8"
     )
-    define_goal_text = (
-        REPO_ROOT / ".agents" / "skills" / "define-goal" / "SKILL.md"
-    ).read_text(encoding="utf-8")
+    define_goal_text = (REPO_ROOT / ".agents" / "skills" / "define-goal" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
     taskmaster_text = (REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md").read_text(
         encoding="utf-8"
     )

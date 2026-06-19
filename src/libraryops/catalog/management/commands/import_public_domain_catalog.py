@@ -187,9 +187,7 @@ def _upsert_record(
             return "skipped", False
         edition = existing.edition
         if edition is None:
-            raise CommandError(
-                "Existing provenance rows must still point at an edition target."
-            )
+            raise CommandError("Existing provenance rows must still point at an edition target.")
         work = existing.work or edition.work
         work.title = record.title
         work.description = record.description
@@ -271,7 +269,9 @@ class Command(BaseCommand):
         if limit <= 0:
             raise CommandError("--limit must be a positive integer.")
 
-        loader = load_openlibrary_records if source == SOURCE_OPENLIBRARY else load_gutenberg_records
+        loader = (
+            load_openlibrary_records if source == SOURCE_OPENLIBRARY else load_gutenberg_records
+        )
         records = loader(limit)
 
         created = 0
@@ -295,9 +295,7 @@ class Command(BaseCommand):
 
         if bool(options["dry_run"]):
             self.stdout.write(
-                self.style.SUCCESS(
-                    f"Dry run: would import {skipped} record(s) from {source}."
-                )
+                self.style.SUCCESS(f"Dry run: would import {skipped} record(s) from {source}.")
             )
             return
 

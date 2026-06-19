@@ -73,7 +73,12 @@ class LoanManager(models.Manager["circulation_models.Loan"]):
         copy = BookCopy.objects.select_for_update().get(pk=copy.pk)
         if copy.archived_at is not None or copy.status != BookCopyStatus.AVAILABLE.value:
             raise ValidationError("Copy must be available before checkout.")
-        if self.get_queryset().select_for_update().filter(copy=copy, returned_at__isnull=True).exists():
+        if (
+            self.get_queryset()
+            .select_for_update()
+            .filter(copy=copy, returned_at__isnull=True)
+            .exists()
+        ):
             raise ValidationError("Copy already has an active loan.")
 
         loan = self.create(

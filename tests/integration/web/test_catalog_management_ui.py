@@ -112,9 +112,7 @@ class CatalogManagementUiTests(TestCase):
         edition_isbn = build_isbn13(702)
         copy_barcode = "BC-0702"
 
-        create_page = self.client.get(
-            reverse("edition-create", kwargs={"work_id": self.work.pk})
-        )
+        create_page = self.client.get(reverse("edition-create", kwargs={"work_id": self.work.pk}))
         assert create_page.status_code == 200
         self.assertContains(create_page, 'enctype="multipart/form-data"')
 

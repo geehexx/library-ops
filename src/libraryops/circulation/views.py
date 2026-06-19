@@ -72,8 +72,7 @@ class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
                 "recent_returns": recent_returns,
                 "recent_return_count": len(recent_returns),
                 "can_manage_loans": bool(self.request.user.has_perm("circulation.change_loan")),
-                "show_borrower_column": self.get_user_role()
-                in (ROLE_ADMIN, ROLE_LIBRARIAN),
+                "show_borrower_column": self.get_user_role() in (ROLE_ADMIN, ROLE_LIBRARIAN),
             }
         )
         return context

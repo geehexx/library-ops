@@ -166,7 +166,9 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
-MEDIA_ROOT = Path(os.getenv("DJANGO_MEDIA_ROOT", str(Path(tempfile.gettempdir()) / "libraryops-media")))
+MEDIA_ROOT = Path(
+    os.getenv("DJANGO_MEDIA_ROOT", str(Path(tempfile.gettempdir()) / "libraryops-media"))
+)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SITE_ID = 1
 LOGIN_REDIRECT_URL = "home"

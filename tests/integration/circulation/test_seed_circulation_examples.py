@@ -52,9 +52,9 @@ class SeedCirculationExamplesCommandTests(TestCase):
     def _assert_example_snapshot(self) -> None:
         """Assert the command produced the expected circulation states."""
 
-        assert BookCopy.objects.filter(barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]).count() == len(
-            EXAMPLE_LOAN_PLANS
-        )
+        assert BookCopy.objects.filter(
+            barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]
+        ).count() == len(EXAMPLE_LOAN_PLANS)
         assert Loan.objects.count() == len(EXAMPLE_LOAN_PLANS)
 
         now = timezone.now()
@@ -76,21 +76,25 @@ class SeedCirculationExamplesCommandTests(TestCase):
             assert loan.returned_at < now
             assert loan.due_at < now
 
-        assert get_user_model().objects.filter(email__in=EXAMPLE_ACTOR_EMAILS).count() == len(EXAMPLE_ACTOR_EMAILS)
+        assert get_user_model().objects.filter(email__in=EXAMPLE_ACTOR_EMAILS).count() == len(
+            EXAMPLE_ACTOR_EMAILS
+        )
 
     def test_seed_command_is_idempotent_and_creates_realistic_states(self) -> None:
         """The command should create one active, one overdue, and one returned loan."""
 
         call_command("seed_circulation_examples")
         first_snapshot = {
-            plan.barcode: Loan.objects.get(copy__barcode=plan.barcode).pk for plan in EXAMPLE_LOAN_PLANS
+            plan.barcode: Loan.objects.get(copy__barcode=plan.barcode).pk
+            for plan in EXAMPLE_LOAN_PLANS
         }
 
         call_command("seed_circulation_examples")
 
         self._assert_example_snapshot()
         second_snapshot = {
-            plan.barcode: Loan.objects.get(copy__barcode=plan.barcode).pk for plan in EXAMPLE_LOAN_PLANS
+            plan.barcode: Loan.objects.get(copy__barcode=plan.barcode).pk
+            for plan in EXAMPLE_LOAN_PLANS
         }
         assert first_snapshot == second_snapshot
 

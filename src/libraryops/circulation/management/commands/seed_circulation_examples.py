@@ -102,7 +102,9 @@ def _load_editions() -> list[BookEdition]:
 def _clear_example_snapshot() -> None:
     """Remove the dedicated demo circulation rows before rebuilding them."""
 
-    example_copies = BookCopy.objects.filter(barcode__in={plan.barcode for plan in EXAMPLE_LOAN_PLANS})
+    example_copies = BookCopy.objects.filter(
+        barcode__in={plan.barcode for plan in EXAMPLE_LOAN_PLANS}
+    )
     Loan.objects.filter(copy__in=example_copies).delete()
     example_copies.delete()
 

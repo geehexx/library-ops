@@ -75,7 +75,9 @@ class CirculationServiceTests(TestCase):
         """Members should not be able to checkout copies."""
 
         with self.assertRaises(PermissionDenied):
-            Loan.objects.checkout_copy(actor=self.member, copy=self.copy, borrower=self.other_member)
+            Loan.objects.checkout_copy(
+                actor=self.member, copy=self.copy, borrower=self.other_member
+            )
 
     def test_checkout_copy_rejects_unavailable_copy(self) -> None:
         """Checkout should fail when the copy already has an active loan."""

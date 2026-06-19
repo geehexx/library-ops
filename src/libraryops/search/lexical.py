@@ -60,7 +60,9 @@ def search_catalog(
 ) -> QuerySet[BibliographicWork]:
     """Return ranked catalog works for one lexical search string."""
 
-    base_queryset = queryset if queryset is not None else BibliographicWork.objects.foundation_index()
+    base_queryset = (
+        queryset if queryset is not None else BibliographicWork.objects.foundation_index()
+    )
     queryset = _apply_facets(
         base_queryset,
         availability=availability,
@@ -172,7 +174,13 @@ def _apply_facets(
                 BookEdition.objects.filter(
                     work=OuterRef("pk"),
                     archived_at__isnull=True,
-                ).filter(**{f"external_identifiers__subjects__{subject_lookup}": [subject] if subject_lookup == "contains" else subject})
+                ).filter(
+                    **{
+                        f"external_identifiers__subjects__{subject_lookup}": [subject]
+                        if subject_lookup == "contains"
+                        else subject
+                    }
+                )
             )
         )
     if language:
@@ -209,17 +217,21 @@ def _apply_availability_filter(
         edition__work=OuterRef("pk"),
         archived_at__isnull=True,
     )
-    available_copy_qs = active_copy_qs.filter(
-        status=BookCopyStatus.AVAILABLE.value,
-    ).annotate(
-        has_active_loan=Exists(
-            Loan.objects.filter(
-                copy=OuterRef("pk"),
-                returned_at__isnull=True,
+    available_copy_qs = (
+        active_copy_qs.filter(
+            status=BookCopyStatus.AVAILABLE.value,
+        )
+        .annotate(
+            has_active_loan=Exists(
+                Loan.objects.filter(
+                    copy=OuterRef("pk"),
+                    returned_at__isnull=True,
+                )
             )
         )
-    ).filter(
-        has_active_loan=False,
+        .filter(
+            has_active_loan=False,
+        )
     )
     queryset = queryset.annotate(
         search_has_active_copy=Exists(active_copy_qs),
@@ -350,9 +362,7 @@ def _contributor_phrase_hit(normalized_phrase: str):
 def _title_broad_hit(query: str):
     """Return a boolean expression for broader title text hits."""
 
-    return Exists(
-        BibliographicWork.objects.filter(pk=OuterRef("pk"), title__icontains=query)
-    )
+    return Exists(BibliographicWork.objects.filter(pk=OuterRef("pk"), title__icontains=query))
 
 
 def _contributor_broad_hit(query: str):

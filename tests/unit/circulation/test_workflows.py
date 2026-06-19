@@ -110,7 +110,9 @@ class CirculationWorkflowViewTests(TestCase):
         """Return workflow should render with the active loan selector."""
 
         self.client.force_login(self.librarian)
-        Loan.objects.checkout_copy(actor=self.librarian, copy=self.return_copy, borrower=self.member)
+        Loan.objects.checkout_copy(
+            actor=self.librarian, copy=self.return_copy, borrower=self.member
+        )
 
         response = self.client.get(reverse("loan-return"))
 
@@ -123,7 +125,9 @@ class CirculationWorkflowViewTests(TestCase):
         """Return workflow should swap in the fragment when loaded through HTMX."""
 
         self.client.force_login(self.librarian)
-        Loan.objects.checkout_copy(actor=self.librarian, copy=self.return_copy, borrower=self.member)
+        Loan.objects.checkout_copy(
+            actor=self.librarian, copy=self.return_copy, borrower=self.member
+        )
 
         response = self.client.get(reverse("loan-return"), HTTP_HX_REQUEST="true")
 
@@ -135,7 +139,9 @@ class CirculationWorkflowViewTests(TestCase):
         """Submitting the return form should close the loan and restore availability."""
 
         self.client.force_login(self.librarian)
-        loan = Loan.objects.checkout_copy(actor=self.librarian, copy=self.return_copy, borrower=self.member)
+        loan = Loan.objects.checkout_copy(
+            actor=self.librarian, copy=self.return_copy, borrower=self.member
+        )
 
         response = self.client.post(
             reverse("loan-return"),
@@ -156,7 +162,9 @@ class CirculationWorkflowViewTests(TestCase):
         """HTMX return submissions should redirect the client back to the dashboard."""
 
         self.client.force_login(self.librarian)
-        loan = Loan.objects.checkout_copy(actor=self.librarian, copy=self.return_copy, borrower=self.member)
+        loan = Loan.objects.checkout_copy(
+            actor=self.librarian, copy=self.return_copy, borrower=self.member
+        )
 
         response = self.client.post(
             reverse("loan-return"),
