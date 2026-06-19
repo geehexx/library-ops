@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@ast-grep/cli": "0.43.0",
-    "@commitlint/cli": "^19.6.0",
+    "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^19.6.0",
     "@upstash/context7-mcp": "3.2.1",
     "alex": "^11.0.1",

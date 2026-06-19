@@ -1090,10 +1090,12 @@
             "id": 1,
             "title": "Sweep residual diff noise",
             "description": "Normalize formatting, generated artifacts, and stale notes in the current release branch.",
-            "details": "Remove accidental formatting drift, reconcile generated files, and keep only intentional release-finalization changes.",
-            "status": "pending",
+            "details": "Remove accidental formatting drift, reconcile generated files, and keep only intentional release-finalization changes.\n<info added on 2026-06-19T17:28:03.994Z>\nMerged origin/development into feature/TM-11-release-foundation-main. Resolved the conflict set and verified the resolved files with git diff --check, uv run pytest -q tests/control_plane/test_session_stop_notice.py tests/smoke/test_render_blueprint.py, and uv run pyright .codex/hooks/session_stop_notice.py tests/control_plane/test_session_stop_notice.py.\n</info added on 2026-06-19T17:28:03.994Z>",
+            "status": "done",
             "dependencies": [],
-            "parentTaskId": 14
+            "parentTaskId": 14,
+            "updatedAt": "2026-06-19T17:25:18.963Z",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -1102,7 +1104,8 @@
             "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 14
+            "parentTaskId": 14,
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -1111,7 +1114,8 @@
             "details": "Use the canonical quality gates for the touched files and fix only failures attributable to this branch-finalization tranche.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 14
+            "parentTaskId": 14,
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -1120,10 +1124,11 @@
             "details": "Capture files touched, validation commands, and residual risk so later sessions do not repeat the same closure scan.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 14
+            "parentTaskId": 14,
+            "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-19T16:54:53.936Z"
+        "updatedAt": "2026-06-19T17:25:18.963Z"
       },
       {
         "id": 15,
@@ -1144,7 +1149,8 @@
             "details": "Use live PR state to group open dependency updates by ecosystem and failure mode before making changes.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 15
+            "parentTaskId": 15,
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -1153,7 +1159,8 @@
             "details": "Merge merge-ready dependency updates before touching blocked batches so the queue shrinks without avoidable churn.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 15
+            "parentTaskId": 15,
+            "parentId": "undefined"
           },
           {
             "id": 3,
@@ -1162,7 +1169,8 @@
             "details": "Fix shared policy or workflow problems once in the repo, then use that to clear the blocked dependency PR batches with minimal repeated work.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 15
+            "parentTaskId": 15,
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -1171,7 +1179,8 @@
             "details": "Verify lockfiles, dependency tree, and release gates after each batch, then close or merge every remaining dependency PR with rationale.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 15
+            "parentTaskId": 15,
+            "parentId": "undefined"
           }
         ]
       },
@@ -1194,20 +1203,21 @@
             "details": "Align the canonical planning surfaces so they describe the same release boundary, search posture, and governance model.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           }
         ]
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-19T16:54:53.936Z",
+      "lastModified": "2026-06-19T17:25:18.968Z",
       "taskCount": 16,
       "completedCount": 12,
       "tags": [
         "master"
       ],
-      "created": "2026-06-19T16:55:14.126Z",
+      "created": "2026-06-19T17:25:39.632Z",
       "description": "Tasks for master context"
     }
   },
