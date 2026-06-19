@@ -47,7 +47,9 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Checkout copy")
         self.assertContains(response, "Copy")
         self.assertContains(response, "Borrower")
-        self.assertContains(response, "Start typing a barcode, title, borrower name, or patron code.")
+        self.assertContains(
+            response, "Start typing a barcode, title, borrower name, or patron code."
+        )
         self.assertContains(response, 'list="checkout-copy-options"')
         self.assertContains(response, 'list="checkout-borrower-options"')
         self.assertContains(response, self.checkout_copy.barcode)
@@ -124,7 +126,9 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Return copy")
         self.assertContains(response, "Loan")
         self.assertContains(response, 'list="return-loan-options"')
-        self.assertContains(response, "Start typing a barcode, title, borrower name, or patron code.")
+        self.assertContains(
+            response, "Start typing a barcode, title, borrower name, or patron code."
+        )
         self.assertContains(response, self.return_copy.barcode)
         self.assertContains(response, "Ada Lovelace")
 

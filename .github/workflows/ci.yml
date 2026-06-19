@@ -145,6 +145,14 @@ jobs:
             echo "Python tests not bootstraped yet; pytest gate activates when tests exist."
           fi
 
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b54005f4e6b2d7f9f9f8b2336 # v4.6.0
+        with:
+          name: playwright-artifacts
+          path: output/playwright/**
+          if-no-files-found: ignore
+
   workflow-security:
     name: workflow-security
     runs-on: ubuntu-latest

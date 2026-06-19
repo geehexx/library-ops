@@ -51,20 +51,19 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 ## Phase 5: Seed and search
 
 - Implement catalog-owned public-domain import commands with provenance.
-- Build search documents, exact/FTS/vector ranking, result explanations, and tests.
+- Build search documents, exact/FTS ranking, result explanations, and tests.
 
-## Phase 6: AI assist, API, and UI polish
+## Phase 6: API and UI polish
 
-- Add reviewed AI metadata suggestion flow.
 - Keep the product centered on Django templates and HTMX; no dedicated API
   layer is planned in the current scope.
 - Complete HTMX flows, empty/error states, accessibility annotations, and Playwright tests.
 
 ## Phase 7: Deployment and release evidence
 
-- Deploy to Render with managed Postgres/pgvector.
-- Run seed refresh, smoke tests, and release gates.
-- Update README with evaluator evidence.
+- Deploy to Render with managed Postgres.
+- Run seed refresh, smoke tests, and release gates on the active branch.
+- Update README with evaluator evidence that matches the route inventory and screenshots actually present on the branch.
 
 ## Cross-cutting gates
 

@@ -40,11 +40,11 @@ class _AutocompleteTextInput(forms.TextInput):
         input_html = super().render(name, value, attrs=attrs, renderer=renderer)
         options_html = format_html_join(
             "",
-            "<option value=\"{}\"></option>",
+            '<option value="{}"></option>',
             ((option,) for option in self.options),
         )
         return format_html(
-            "{}<datalist id=\"{}\">{}</datalist>",
+            '{}<datalist id="{}">{}</datalist>',
             input_html,
             self.datalist_id,
             options_html,
@@ -270,9 +270,13 @@ class CheckoutForm(forms.Form):
         """Refresh the dynamic querysets used by the workflow."""
 
         super().__init__(*args, **kwargs)
-        copy_queryset = selectors.copy_list().filter(status=BookCopyStatus.AVAILABLE).order_by(
-            "edition__work__title",
-            "barcode",
+        copy_queryset = (
+            selectors.copy_list()
+            .filter(status=BookCopyStatus.AVAILABLE)
+            .order_by(
+                "edition__work__title",
+                "barcode",
+            )
         )
         borrower_queryset = (
             User.objects.filter(groups__name=ROLE_MEMBER).order_by("email").distinct()

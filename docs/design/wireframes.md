@@ -26,8 +26,8 @@ forms, and no unnecessary visual complexity.
    and tests.
 2. **Role clarity.** Admin, Librarian, Member, and anonymous users should see
    different affordances, but server-side authorization remains authoritative.
-3. **Search confidence.** Results should explain whether they matched exact IDs,
-   keyword/full-text, or filters so the ranking remains understandable.
+3. **Search confidence.** Results should explain whether they matched exact IDs
+   first, then lexical keywords or filters, so the ranking remains understandable.
 4. **HTMX pragmatism.** Interactions should be server-rendered and enhanced with
    HTMX where it reduces page reload friction.
 5. **Accessible defaults.** Keyboard navigation, focus order, error text,
@@ -68,7 +68,8 @@ forms, and no unnecessary visual complexity.
 +---------------------------------------------------------------+
 | Mini Library Management System                                |
 | A deployed, tested Django demo for catalog, circulation,       |
-| lexical search, RBAC, seed data, and release evidence.        |
+| exact-identifier-first lexical search, RBAC, seed data, and   |
+| release evidence.                                              |
 |                                                               |
 | [Browse catalog] [Sign in as demo user]                       |
 |                                                               |
@@ -150,7 +151,7 @@ Accessibility notes:
 +-------------+-------------------------------------------------+
 | Nav         | Catalog                                         |
 |             | [ Search title, author, ISBN, subject...      ] |
-|             | [Search] [Exact IDs and keywords]              |
+|             | [Search] [Exact IDs first, then lexical]      |
 |             |                                                 |
 |             | Filters                                         |
 |             | Availability [Any v]  Subject [Any v]          |
@@ -169,8 +170,10 @@ Accessibility notes:
 
 Implementation notes:
 
-- Exact ISBN/barcode results should short-circuit or rank first.
-- Result rows include match explanation from search service.
+- Exact ISBN/barcode results should short-circuit or rank first, ahead of other
+  lexical matches.
+- Result rows include match explanation from the search service, with exact
+  identifier matches clearly distinguished from lexical matches.
 - Role-aware actions: anonymous/member see details; librarian/admin see checkout.
 - HTMX can update result list and filters without full reload.
 
