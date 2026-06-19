@@ -10,11 +10,10 @@
 
   <section class="panel" aria-labelledby="sign-in-heading">
     <p class="eyebrow">Evaluator Access</p>
-    <h2 id="sign-in-heading" style="margin-top: 0;">Continue to the demo environment</h2>
-    <p class="muted">
-      Use a seeded demo account for evaluator verification, or sign in with an
-      enabled social provider when OAuth credentials are configured for the
-      deployment.
+    <h2 id="sign-in-heading" style="margin-top: 0;">Continue to the live demo workflow</h2>
+    <p class="muted lede" style="margin-bottom: 0;">
+      Use a seeded demo account for evaluator verification, or continue with a
+      configured social provider when the deployment exposes OAuth.
     </p>
 
     {% if form.non_field_errors %}
@@ -71,7 +70,7 @@
   </section>
 
   {% if SOCIALACCOUNT_ENABLED %}
-    <section class="panel" aria-labelledby="social-sign-in-heading">
+    <section class="panel provider-panel" aria-labelledby="social-sign-in-heading">
       {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
     </section>
   {% endif %}

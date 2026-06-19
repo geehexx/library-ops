@@ -65,7 +65,7 @@ class TestCirculationAndSearchE2E:
         login_to_live_server(librarian)
         page.goto(f"{live_server.url}/circulation/")
 
-        expect(page.get_by_role("heading", name="Loan Dashboard")).to_be_visible()
+        expect(page.get_by_role("heading", name="Circulation Dashboard")).to_be_visible()
         expect(page.get_by_text("No active loans are visible.")).to_be_visible()
         expect(page.get_by_text("No recent returns are visible.")).to_be_visible()
 
@@ -82,9 +82,7 @@ class TestCirculationAndSearchE2E:
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
         expect(
-            page.get_by_text(
-                "Visible loans: 1 | Active: 1 | Overdue: 0 | Recent returns: 0"
-            )
+            page.get_by_text("Visible loans: 1 | Active: 1 | Overdue: 0 | Recent returns: 0")
         ).to_be_visible()
         expect(
             page.get_by_role("cell", name=f"{copy.barcode} - Browser Circulation Work")
@@ -99,9 +97,7 @@ class TestCirculationAndSearchE2E:
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
         expect(
-            page.get_by_text(
-                "Visible loans: 1 | Active: 0 | Overdue: 0 | Recent returns: 1"
-            )
+            page.get_by_text("Visible loans: 1 | Active: 0 | Overdue: 0 | Recent returns: 1")
         ).to_be_visible()
         expect(
             page.get_by_role("cell", name=f"{copy.barcode} - Browser Circulation Work")

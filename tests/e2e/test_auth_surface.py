@@ -59,10 +59,12 @@ class TestAuthSurfaceE2E:
 
         page.goto(live_server.url)
 
-        expect(page.get_by_role("heading", name="Foundation Dashboard")).to_be_visible()
+        expect(page.get_by_role("heading", name="Library Dashboard")).to_be_visible()
         primary_nav = page.get_by_role("navigation", name="Primary")
         expect(primary_nav.get_by_role("link", name="Sign in")).to_be_visible()
-        expect(page.get_by_role("main").get_by_role("link", name="Sign in")).to_be_visible()
+        expect(
+            page.get_by_role("main").get_by_role("link", name="Sign in to the demo")
+        ).to_be_visible()
         page.screenshot(path=str(_artifact_path("default/home.png")), full_page=True)
 
         primary_nav.get_by_role("link", name="Sign in").click()

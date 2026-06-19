@@ -36,7 +36,7 @@ class TestNavigationE2E:
         page.goto(live_server.url)
 
         primary_nav = page.get_by_role("navigation", name="Primary")
-        expect(page.get_by_role("heading", name="Foundation Dashboard")).to_be_visible()
+        expect(page.get_by_role("heading", name="Library Dashboard")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Sign in")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Create foundation record")).to_have_count(0)
 
@@ -98,7 +98,7 @@ class TestNavigationE2E:
         primary_nav.get_by_role("link", name="Loans").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
-        expect(page.get_by_role("heading", name="Loan Dashboard")).to_be_visible()
+        expect(page.get_by_role("heading", name="Circulation Dashboard")).to_be_visible()
 
     def test_member_sees_denied_state_for_create_flow(
         self,

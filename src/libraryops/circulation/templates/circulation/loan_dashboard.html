@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}Loans | Library Ops{% endblock %}
-{% block page_title %}Loan Dashboard{% endblock %}
+{% block page_title %}Circulation Dashboard{% endblock %}
 
 {% block content %}
   <section class="panel">
@@ -14,9 +14,12 @@
         overdue loans, and recent returns.
       {% endif %}
     </p>
-    <p class="muted">
-      Visible loans: {{ visible_loan_count }} | Active: {{ active_loan_count }} | Overdue: {{ overdue_loan_count }} | Recent returns: {{ recent_return_count }}
-    </p>
+    <div class="pill-row">
+      <span class="pill">Visible loans: {{ visible_loan_count }}</span>
+      <span class="pill">Active: {{ active_loan_count }}</span>
+      <span class="pill">Overdue: {{ overdue_loan_count }}</span>
+      <span class="pill">Recent returns: {{ recent_return_count }}</span>
+    </div>
     {% if can_manage_loans %}
       <div class="nav-actions" style="justify-content: flex-start;">
         <a
@@ -114,7 +117,10 @@
           <tbody>
             {% for loan in recent_returns %}
               <tr>
-                <td>{{ loan.copy.barcode }} - {{ loan.copy.edition.work.title }}</td>
+                <td>
+                  <strong>{{ loan.copy.barcode }}</strong><br>
+                  <span class="muted">{{ loan.copy.edition.work.title }}</span>
+                </td>
                 {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
                 <td>{{ loan.returned_at|date:"Y-m-d H:i" }}</td>
               </tr>
