@@ -1101,7 +1101,7 @@
             "id": 2,
             "title": "Resolve review leftovers and ownership gaps",
             "description": "Close remaining PR, review, and branch-policy mismatches.",
-            "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.\n<info added on 2026-06-19T17:48:54.492Z>\n2026-06-20: control-plane permissiveness cleanup finished for AGENTS, .codex config/agents/hooks/rules, and control-plane tests. Validation: uv run pytest -q tests/control_plane/test_governance_surfaces.py tests/control_plane/test_session_start_notice.py; git diff --check. Missing follow-on Task Master additions: control-plane test-cleanup, coordinator_root/workspace-capable reconciliation, and remaining cache/workaround wording cleanup.\n</info added on 2026-06-19T17:48:54.492Z>",
+            "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.\n<info added on 2026-06-19T17:48:54.492Z>\n2026-06-20: control-plane permissiveness cleanup finished for AGENTS, .codex config/agents/hooks/rules, and control-plane tests. Validation: uv run pytest -q tests/control_plane/test_governance_surfaces.py tests/control_plane/test_session_start_notice.py; git diff --check. Missing follow-on Task Master additions: control-plane test-cleanup, coordinator_root/workspace-capable reconciliation, and remaining cache/workaround wording cleanup.\n</info added on 2026-06-19T17:48:54.492Z>\n<info added on 2026-06-19T18:05:08.848Z>\nFollow-on work now includes:\n1. Simplify historical control-plane tests (Task 14.5)\n2. Reconcile Task Master and Spec Kit validation (Task 16.2)\n</info added on 2026-06-19T18:05:08.848Z>",
             "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 14,
@@ -1127,6 +1127,15 @@
             "dependencies": [],
             "parentTaskId": 14,
             "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Simplify historical control-plane tests",
+            "description": "Remove or rewrite legacy prose-heavy tests under tests/control_plane so the suite only keeps durable governance assertions; keep the docs/spell boundary work separate in the existing release-polish gate slice.",
+            "details": "<info added on 2026-06-19T18:05:26.194Z>\nSimplify historical/prose-oriented assertions in tests/control_plane; keep docs/spell boundary work separate in Task 14.3.\n</info added on 2026-06-19T18:05:26.194Z>",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 14
           }
         ],
         "updatedAt": "2026-06-19T17:38:36.190Z"
@@ -1147,7 +1156,7 @@
             "id": 1,
             "title": "Inventory and classify open dependency PRs",
             "description": "Separate merge-ready dependency PRs from blocked or stale ones.",
-            "details": "Use live PR state to group open dependency updates by ecosystem and failure mode before making changes.",
+            "details": "Use live PR state to group open dependency updates by ecosystem and failure mode before making changes.\n<info added on 2026-06-19T18:07:48.517Z>\nPR #21 remains the active landing head and is `MERGEABLE` with `mergeStateStatus=UNSTABLE`; `quality` is still running while `commitlint`, `workflow-security`, `security`, and `policy` are green. Requested Dependabot queue is all mergeable but check-blocked: `#7`, `#11`, `#14`, `#15`, `#17`, and `#18` are blocked by `commitlint` `body-max-line-length`; `#12` and `#16` are blocked by `quality` because `npm audit` reports high-severity `undici` vulnerabilities under `@upstash/context7-mcp`; `#8` is blocked by commitlint plus Go toolchain minimums for vale/actionlint/conftest. Post-#21 merge order should prioritize the commitlint-only set, then the shared `undici` bucket, then `#8` if Go-toolchain fixes are fully absorbed.\n</info added on 2026-06-19T18:07:48.517Z>",
             "status": "pending",
             "dependencies": [],
             "parentTaskId": 15,
@@ -1201,11 +1210,38 @@
             "id": 1,
             "title": "Reconcile PRD, specs, and constitution",
             "description": "Make the canonical PRD, Spec Kit artifacts, and constitution agree on the current release truth.",
-            "details": "Align the canonical planning surfaces so they describe the same release boundary, search posture, and governance model.",
+            "details": "Align the canonical planning surfaces so they describe the same release boundary, search posture, and governance model.\n<info added on 2026-06-19T18:04:01.813Z>\n\"End-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout.\"\n</info added on 2026-06-19T18:04:01.813Z>",
             "status": "pending",
             "dependencies": [],
             "parentTaskId": 16,
             "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Reconcile Task Master and Spec Kit validation",
+            "description": "Re-run dependency validation and compare generated tasks against the canonical PRD and seed list so any omitted cleanup or finalization work is surfaced as explicit Task Master follow-on items.",
+            "details": "<info added on 2026-06-19T18:05:31.548Z>\nReconcile Task Master and Spec Kit validation using specs/001-core/tasks.md T010 and .taskmaster/docs/prd.md as the baseline. Compare the current Task Master graph and dependency validation output against the seed list, then surface any omitted cleanup/finalization work as explicit follow-on items instead of hidden debt.\n</info added on 2026-06-19T18:05:31.548Z>",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16
+          },
+          {
+            "id": 3,
+            "title": "End-to-end manual UX audit and screenshot review",
+            "description": "Review every user-visible surface end to end, capture screenshot-worthy states, and file any iterative follow-on fixes needed for release evidence and final polish.",
+            "details": "<info added on 2026-06-19T18:06:13.613Z>\nBounded closeout evidence: this is the evaluator-facing UX pass for release evidence only. Use it to review all user-visible surfaces, capture screenshot-worthy states, and log iterative follow-on fixes back into the final polish/reconciliation tasks instead of widening scope. Align with specs/001-core/tasks.md T010 and the PRD's release-evidence expectations.\n</info added on 2026-06-19T18:06:13.613Z>\n<info added on 2026-06-19T18:06:21.593Z>\nAudit scope must cover every current user-visible route and screenshot-worthy state, including anonymous/public, authenticated member, librarian/admin management, success/empty/error/permission-denied states, and evaluator-facing demo evidence surfaces. Use manual review plus browser-assisted verification as needed, then convert any durable UX/design/evidence gaps into bounded follow-on tasks and reconcile resulting truth changes back into PRD/spec/docs surfaces.\n</info added on 2026-06-19T18:06:21.593Z>\n<info added on 2026-06-19T18:06:55.431Z>\nCurrent repo-grounded surface inventory for the UX/screenshot audit: routes in `src/libraryops/config/urls.py` expose `/`, `/accounts/*`, `/health/`, `/catalog/*`, `/circulation/*`, and `/admin/`; current templates include `shell/home.html`, `account/login.html`, `catalog/index.html`, `catalog/detail.html`, `catalog/create.html`, `catalog/form.html`, `circulation/loan_dashboard.html`, `circulation/workflow_form.html`, `circulation/_workflow_form.html`, and `shell/403.html`. Existing evaluator-facing E2E coverage lives in `tests/e2e/test_navigation.py`, `test_auth_surface.py`, and `test_catalog_navigation.py`; use those plus manual browser review to drive the screenshot/state checklist.\n</info added on 2026-06-19T18:06:55.431Z>\n<info added on 2026-06-19T18:07:22.976Z>\nReview UX planning findings for high-risk drift points including route/surface discrepancies, search fidelity gaps, missing destructive confirmation, HTMX accessibility risks, terminology inconsistencies, and thin loading/error-state coverage. Use the screenshot matrix across anonymous/member/librarian/admin for `/`, `/accounts/login/`, `/catalog/`, `/catalog/<work_id>/`, manager forms, `/circulation/`, `/circulation/checkout/`, `/circulation/return/`, `/admin/`, and allauth auxiliary pages.\n</info added on 2026-06-19T18:07:22.976Z>",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16
+          },
+          {
+            "id": 4,
+            "title": "Circulation dialog accessibility and audit evidence",
+            "description": "Manually review circulation dialogs for keyboard, focus, labeling, and screen-reader access, then capture evidence and any bounded fixes needed for the closeout pass.",
+            "details": "",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 16
           }
         ]
       }
