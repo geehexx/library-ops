@@ -68,10 +68,8 @@ be captured in Task Master tasks and subtasks before implementation begins.
 - Keep thread headroom available by closing completed agents promptly and
   reusing live agents by role before spawning another one. A saturated pool is
   a process defect, not a reason to absorb the work back into the root.
-- Keep root-local broad shell or file exploration off the default path. Use
-  `scripts/codex-runtime-env.sh` only for narrow cache-sensitive commands
-  inside an already owned slice so home-directory cache writes do not become
-  sandbox failures.
+- Use `scripts/codex-runtime-env.sh` for cache-sensitive commands when you
+  want controlled cache roots or predictable tool state.
 - Keep root `AGENTS.md` lean. Shared clarification, escalation, tooling, and
   continuation mechanics belong in `.codex/agents/*.toml` and the explicit
   repo-local skill entrypoints under `.agents/skills/`.

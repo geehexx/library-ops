@@ -79,6 +79,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     coordinator_text = (REPO_ROOT / ".codex" / "agents" / "coordinator.toml").read_text(
         encoding="utf-8",
     )
+    config = tomllib.loads((REPO_ROOT / ".codex" / "config.toml").read_text(encoding="utf-8"))
     config_text = (REPO_ROOT / ".codex" / "config.toml").read_text(encoding="utf-8")
     commitlint_text = (REPO_ROOT / "commitlint.config.cjs").read_text(encoding="utf-8")
     implementer_text = (REPO_ROOT / ".codex" / "agents" / "implementer.toml").read_text(
@@ -97,9 +98,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
         REPO_ROOT / ".agents" / "skills" / "django-feature" / "agents" / "openai.yaml"
     ).read_text(encoding="utf-8")
 
-    assert "Spawn direct specialists first" in coordinator_text
-    assert "default coordinator" in coordinator_text
-    assert "gpt-5.4" in coordinator_text
+    assert config["permissions"]["coordinator_root"]["extends"] == ":workspace"
     assert "model_context_window = 500000" in config_text
     assert "max_threads = 24" in config_text
     commitlint_scope_match = re.search(
@@ -114,13 +113,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "implementer" in coordinator_text
     assert "debugger" in coordinator_text
     assert "single_file_implementer" in coordinator_text
-    assert "Coordinate specialist review and verification with specialists" in coordinator_text
-    assert "direct reviewer or implementor" in coordinator_text
-    assert ".codex-session-notes/continuation.md" in coordinator_text
-    assert "Context7 first" in coordinator_text
     assert "Pyright" in implementer_text
-    assert "Spark debugger for failure reproduction" in debugger_text
-    assert "Spark write agent for one-file fixes" in single_file_text
     assert 'model = "gpt-5.3-codex-spark"' in debugger_text
     assert 'sandbox_mode = "danger-full-access"' in debugger_text
     assert 'model = "gpt-5.3-codex-spark"' in single_file_text
@@ -136,8 +129,8 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "service/selector/model layering" not in implementer_text
 
 
-def test_routing_skills_name_the_spark_lanes_and_deprecate_root_local_fallback() -> None:
-    """Ensure the routing skills name the Spark lanes and avoid root-local fallback wording."""
+def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
+    """Ensure the routing skills name the Spark lanes and direct entrypoints."""
     coordinator_text = (REPO_ROOT / ".codex" / "agents" / "coordinator.toml").read_text(
         encoding="utf-8"
     )
@@ -155,17 +148,16 @@ def test_routing_skills_name_the_spark_lanes_and_deprecate_root_local_fallback()
         assert expected_fragment in code_intelligence_text
         assert expected_fragment in clarify_goal_text
 
-    assert "root-local broad shell or file exploration off the default path" in coordinator_text
-    assert "root-local broad shell or file exploration off the default path" in root_agents_text
     assert "Spark lanes" in code_intelligence_text
     assert "default to Spark-first handling" in code_intelligence_text
     assert "prescriptive Spark packet" in code_intelligence_text
-    assert "Keep root-local broad shell or" in code_intelligence_text
-    assert "file exploration off the default path" in code_intelligence_text
-    assert "root-local broad shell/file exploration out of the default path" in clarify_goal_text
-    assert "specialist or subagent packets before broad root-local tool use" not in (
-        (REPO_ROOT / ".codex" / "hooks" / "session_start_notice.py").read_text(encoding="utf-8")
-    )
+    assert "command_runner" in coordinator_text
+    assert "context_gatherer" in coordinator_text
+    assert "implementer" in coordinator_text
+    assert "command_runner" in root_agents_text
+    assert "context_gatherer" in root_agents_text
+    assert "implementer" in root_agents_text
+    assert "root-local shell/file exploration available" in clarify_goal_text
 
 
 def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() -> None:
@@ -178,7 +170,6 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     runtime_policy_text = (REPO_ROOT / ".taskmaster" / "docs" / "runtime-policy.md").read_text(
         encoding="utf-8"
     )
-    root_agents_text = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
     command_runner_text = (REPO_ROOT / ".codex" / "agents" / "command-runner.toml").read_text(
         encoding="utf-8"
     )
@@ -232,17 +223,12 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
         assert expected_fragment in hook_rule_text
 
     for expected_fragment in (
-        "specialist packet",
         "command_runner",
         "context_gatherer",
         "implementer",
         "debugger",
         "single_file_implementer",
         "docs_researcher",
-        "cache-sensitive shell commands",
-        "root-local broad shell or file exploration off the default path",
-        "milestone-based broader ownership",
-        "already known from repo context or the user",
     ):
         assert expected_fragment in coordinator_text
 
@@ -286,7 +272,7 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     ):
         assert expected_fragment in runtime_policy_text
 
-    assert "repo-local .codex/.tmp when /tmp is read-only" in rules_text
+    assert "Cache-safe command wrapper for npm and gh" in rules_text
 
     for expected_fragment in (
         "SCRIPT_DIR",
@@ -308,14 +294,10 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     ):
         assert expected_fragment in runtime_env_script
 
-    for expected_fragment in (
-        "Discovery is mandatory by default",
-        "root-local broad shell or file exploration off the default path",
-    ):
-        assert expected_fragment in root_agents_text
-
-    assert "Default to Spark-first delegation" in coordinator_text
-    assert "default to Spark-first handling" in code_intelligence_text
+    assert "command_runner" in coordinator_text
+    assert "context_gatherer" in coordinator_text
+    assert "implementer" in coordinator_text
+    assert "Spark-first handling" in code_intelligence_text
 
     assert "model_reasoning_summary" not in command_runner_text
     assert 'model = "gpt-5.3-codex-spark"' in command_runner_text

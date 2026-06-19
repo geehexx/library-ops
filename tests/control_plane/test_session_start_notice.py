@@ -64,7 +64,6 @@ def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
     assert "debugger" in output
     assert "single_file_implementer" in output
     assert "implementer" in output
-    assert "before any root-local shell or file exploration" in output
     assert "make the delegate packet prescriptive" in output
     assert "Batch reasoning before any tool or agent call" in output
     assert "choose the narrowest Spark action" in output

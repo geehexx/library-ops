@@ -123,7 +123,7 @@ prefix_rule(
 prefix_rule(
     pattern = ["scripts/codex-runtime-env.sh"],
     decision = "allow",
-    justification = "Cache-safe command wrapper for npm and gh so shell tools do not default to home-directory cache paths; falls back to repo-local .codex/.tmp when /tmp is read-only.",
+    justification = "Cache-safe command wrapper for npm and gh so shell tools do not default to home-directory cache paths.",
 )
 
 prefix_rule(

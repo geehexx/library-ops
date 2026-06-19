@@ -24,7 +24,8 @@ root-local pass.
 
 Use `command_runner`, `context_gatherer`, and `implementer` as the first
 delegation lanes for command, evidence, and small implementation slices; keep
-root-local broad shell/file exploration out of the default path.
+root-local shell/file exploration available when the coordinator owns the
+slice or when a direct pass is the clearest proof path.
 
 ## Current sources
 

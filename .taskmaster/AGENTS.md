@@ -20,9 +20,9 @@
   creation/removal, and file generation route through the pinned CLI instead of
   the MCP surface to keep interactive context leaner while preserving full
   functionality.
-- The committed example runtime profile is local-first:
+- The committed example runtime profile is the default local path:
   `qwen2.5-coder:7b-instruct` as main/research and `qwen3:latest` as fallback.
-  Use remote providers only as explicit rescue lanes when the local path cannot
-  prove the required operation.
+  Use remote providers when they are the better fit for the slice or when the
+  local path cannot prove the required operation.
 - Subagent task blockers must be recorded as Escalation packets.
 - Do not mark tasks done while a Question packet remains unanswered.

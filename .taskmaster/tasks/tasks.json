@@ -1101,11 +1101,12 @@
             "id": 2,
             "title": "Resolve review leftovers and ownership gaps",
             "description": "Close remaining PR, review, and branch-policy mismatches.",
-            "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.",
-            "status": "pending",
+            "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.\n<info added on 2026-06-19T17:48:54.492Z>\n2026-06-20: control-plane permissiveness cleanup finished for AGENTS, .codex config/agents/hooks/rules, and control-plane tests. Validation: uv run pytest -q tests/control_plane/test_governance_surfaces.py tests/control_plane/test_session_start_notice.py; git diff --check. Missing follow-on Task Master additions: control-plane test-cleanup, coordinator_root/workspace-capable reconciliation, and remaining cache/workaround wording cleanup.\n</info added on 2026-06-19T17:48:54.492Z>",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 14,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-19T17:38:36.190Z"
           },
           {
             "id": 3,
@@ -1128,7 +1129,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-19T17:25:18.963Z"
+        "updatedAt": "2026-06-19T17:38:36.190Z"
       },
       {
         "id": 15,
@@ -1211,13 +1212,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-19T17:25:18.968Z",
+      "lastModified": "2026-06-19T17:38:36.190Z",
       "taskCount": 16,
       "completedCount": 12,
       "tags": [
         "master"
       ],
-      "created": "2026-06-19T17:25:39.632Z",
+      "created": "2026-06-19T17:48:37.481Z",
       "description": "Tasks for master context"
     }
   },

@@ -17,7 +17,8 @@ Operating rules:
   slice is complete.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.
 - Prefer RTK for noisy shell commands; use explicit `rtk` if auto-rewrite is absent.
-- If RTK is missing in a constrained sandbox, run the raw command and report that the required local optimization was unavailable.
+- If RTK is unavailable, run the raw command and report the missing
+  optimization.
 - For exact diagnostics, release evidence, ambiguous failures, security results, or final verification, preserve raw output or point to the full log.
 - Use the repo fast path when the assigned goal is local hygiene rather than full release evidence: `npm run checks:precommit` before broader `verify:core` or `verify:all`.
 - Broaden the command set only as needed to ground the requested result.

@@ -7,7 +7,7 @@ description: Use when a task mentions RTK, code graph, code-review-graph, Serena
 
 ## Purpose
 
-Use this skill to reduce context waste while improving code understanding and evidence quality. The selected local toolchain is required for implementation environments. Missing tools are blockers unless the run is explicitly using the constrained sandbox profile and the limitation is recorded.
+Use this skill to reduce context waste while improving code understanding and evidence quality. The selected local toolchain is required for implementation environments. Missing tools are blockers only when they prevent the slice; otherwise record the limitation and continue with the narrowest viable path.
 
 Batch reasoning before tools: identify the likely branch points and evidence needs before the first shell, graph, or symbol call.
 
@@ -101,12 +101,13 @@ can act without re-reading filler.
 
 When shell inspection is appropriate, route the slice through the Spark lanes
 or another explicitly owned specialist first. Keep root-local broad shell or
-file exploration off the default path; batch related reads into a small number
-of focused commands when they are still needed. Avoid repetitive one-file
-shell reads when Serena, code-review-graph, or one broader shell pass would
-answer faster with less context waste. For a one-file fix, a failing-test
-debugger pass, or a log-only investigation, stay inside the Spark lane until
-you have either a patch or a blocker.
+file exploration available when it is the clearest proof or patch path; batch
+related reads into a small number of focused commands when they are still
+needed. Avoid repetitive one-file shell reads when Serena,
+code-review-graph, or one broader shell pass would answer faster with less
+context waste. For a one-file fix, a failing-test debugger pass, or a
+log-only investigation, stay inside the Spark lane until you have either a
+patch or a blocker.
 
 ## RTK rules
 

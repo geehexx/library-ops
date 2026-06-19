@@ -24,7 +24,7 @@ last_reviewed: 2026-06-17
 - [9. Requirements](#9-requirements)
 - [10. Architecture](#10-architecture)
 - [11. Data Model](#11-data-model)
-- [12. Search and AI Design](#12-search-and-ai-design)
+- [12. Lexical Search Design](#12-lexical-search-design)
 - [13. Seed Data and Demo Corpus](#13-seed-data-and-demo-corpus)
 - [14. UX and Accessibility Workflow](#14-ux-and-accessibility-workflow)
 - [15. Agent System and MCP Workflow](#15-agent-system-and-mcp-workflow)

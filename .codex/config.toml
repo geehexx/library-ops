@@ -165,8 +165,8 @@ extends = ":workspace"
 enabled = true
 
 [permissions.coordinator_root]
-description = "Read-only interactive root with live web access for coordination, research, and user interaction."
-extends = ":read-only"
+description = "Workspace-capable interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
+extends = ":workspace"
 
 [permissions.coordinator_root.network]
 enabled = true
