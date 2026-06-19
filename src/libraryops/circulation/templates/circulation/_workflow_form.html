@@ -1,0 +1,38 @@
+<section class="panel" role="dialog" aria-labelledby="workflow-title">
+  {% if back_url %}
+    <p><a href="{{ back_url }}">&larr; {{ back_label }}</a></p>
+  {% endif %}
+  <p class="eyebrow">Circulation workflow</p>
+  <h2 id="workflow-title" style="margin-top: 0;">{{ page_title }}</h2>
+  <p class="muted">
+    {% if page_title == "Checkout copy" %}
+      Assign an available copy to a member and open a new loan.
+    {% else %}
+      Select an active loan and close it to return the copy.
+    {% endif %}
+  </p>
+  {% if form.errors %}
+    <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+      <h3 style="margin-top: 0;">Fix the highlighted fields</h3>
+      {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+      {% endif %}
+    </div>
+  {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <p>
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+          <span class="muted">{{ field.help_text }}</span>
+        {% endif %}
+        {% for error in field.errors %}
+          <span class="error">{{ error }}</span>
+        {% endfor %}
+      </p>
+    {% endfor %}
+    <button type="submit">{{ submit_label }}</button>
+  </form>
+</section>

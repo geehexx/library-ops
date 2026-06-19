@@ -25,7 +25,7 @@ class BookCopyManagerTests(TestCase):
     def test_create_copy_records_audit_state_and_defaults(self) -> None:
         """Creating a copy should persist defaults and emit a compact audit payload."""
 
-        with patch("libraryops.inventory.models.record_audit_event") as record_audit_event:
+        with patch("libraryops.audit.models.AuditEventManager.record_event") as record_audit_event:
             copy = BookCopy.objects.create_copy(
                 actor=self.actor,
                 edition=self.edition,
@@ -57,13 +57,13 @@ class BookCopyManagerTests(TestCase):
             condition_note="",
         )
 
-        with patch("libraryops.inventory.models.record_audit_event") as record_audit_event:
+        with patch("libraryops.audit.models.AuditEventManager.record_event") as record_audit_event:
             unchanged = BookCopy.objects.update_copy(actor=self.actor, copy=copy)
 
         assert unchanged.pk == copy.pk
         record_audit_event.assert_not_called()
 
-        with patch("libraryops.inventory.models.record_audit_event") as record_audit_event:
+        with patch("libraryops.audit.models.AuditEventManager.record_event") as record_audit_event:
             updated = BookCopy.objects.update_copy(
                 actor=self.actor,
                 copy=copy,
@@ -97,7 +97,7 @@ class BookCopyManagerTests(TestCase):
             condition_note="",
         )
 
-        with patch("libraryops.inventory.models.record_audit_event") as record_audit_event:
+        with patch("libraryops.audit.models.AuditEventManager.record_event") as record_audit_event:
             archived = BookCopy.objects.archive_copy(actor=self.actor, copy=copy)
 
         assert archived.status == BookCopyStatus.ARCHIVED
@@ -108,7 +108,7 @@ class BookCopyManagerTests(TestCase):
             "status": BookCopyStatus.ARCHIVED.value,
         }
 
-        with patch("libraryops.inventory.models.record_audit_event") as record_audit_event:
+        with patch("libraryops.audit.models.AuditEventManager.record_event") as record_audit_event:
             archived_again = BookCopy.objects.archive_copy(actor=self.actor, copy=archived)
 
         assert archived_again.archived_at == archived.archived_at

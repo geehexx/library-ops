@@ -16,6 +16,12 @@ class EditionForm(forms.ModelForm):
     """Collect edition metadata for create and update flows."""
 
     work = forms.ModelChoiceField(queryset=selectors.work_list(), label="Work")
+    cover_url = forms.URLField(required=False, label="External cover URL")
+    cover_image = forms.ImageField(
+        required=False,
+        label="Uploaded cover image",
+        help_text="JPEG, PNG, or WebP up to 5 MB.",
+    )
 
     class Meta:
         """Bind the form to the catalog edition model."""
@@ -27,6 +33,8 @@ class EditionForm(forms.ModelForm):
             "publication_year",
             "language",
             "isbn",
+            "cover_url",
+            "cover_image",
             "description",
             "external_identifiers",
         )
@@ -36,6 +44,8 @@ class EditionForm(forms.ModelForm):
             "publication_year": "Publication year",
             "language": "Language",
             "isbn": "ISBN",
+            "cover_url": "External cover URL",
+            "cover_image": "Uploaded cover image",
             "description": "Description",
             "external_identifiers": "External identifiers (JSON)",
         }
@@ -59,6 +69,8 @@ class EditionForm(forms.ModelForm):
         publication_year = self.cleaned_data["publication_year"]
         language = str(self.cleaned_data["language"])
         isbn = self.cleaned_data["isbn"] or None
+        cover_url = self.cleaned_data["cover_url"] or ""
+        cover_image = self.cleaned_data["cover_image"] or None
         description = str(self.cleaned_data["description"])
         external_identifiers = cast(
             dict[str, Any],
@@ -75,6 +87,8 @@ class EditionForm(forms.ModelForm):
                 publication_year=publication_year,
                 language=language,
                 isbn=isbn,
+                cover_url=cover_url,
+                cover_image=cover_image,
                 description=description,
                 external_identifiers=external_identifiers,
             )
@@ -85,6 +99,8 @@ class EditionForm(forms.ModelForm):
             publication_year=publication_year,
             language=language,
             isbn=isbn,
+            cover_url=cover_url,
+            cover_image=cover_image,
             description=description,
             external_identifiers=external_identifiers,
         )

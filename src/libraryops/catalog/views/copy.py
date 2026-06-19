@@ -22,6 +22,7 @@ class CopyCreateView(CatalogMutationView, FormView):
 
     form_class = CopyForm
     page_title = "Create copy"
+    back_url_name = "catalog-detail"
     submit_label = "Create copy"
 
     def get_initial(self) -> dict[str, Any]:
@@ -48,6 +49,7 @@ class CopyUpdateView(CatalogMutationView, UpdateView):
 
     form_class = CopyForm
     page_title = "Edit copy"
+    back_url_name = "catalog-detail"
     pk_url_kwarg = "copy_id"
     submit_label = "Save copy"
     context_object_name = "copy"

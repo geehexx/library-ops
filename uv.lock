@@ -554,19 +554,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-ninja"
-version = "1.6.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "pydantic" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/7c/3307e17b872f545c88314b2737a22f965785dfb5a120d739b0131d0492c3/django_ninja-1.6.2.tar.gz", hash = "sha256:d56ae5aa4791068ef4ac9a66cfdf2fc11f507413ded35abb79c51d0d52ad6412", size = 3685599, upload-time = "2026-03-18T20:06:47.284Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/21/0c/25f72060a39632fbd2d90e9c8b6052a09cd45b0598fc06c0758d313f0052/django_ninja-1.6.2-py3-none-any.whl", hash = "sha256:20095f5900bada22ea00cf1a58af50bdb285b2354c61a9d9b47d0dc89ac462d6", size = 2374994, upload-time = "2026-03-18T20:06:45.676Z" },
-]
-
-[[package]]
 name = "django-stubs"
 version = "5.2.9"
 source = { registry = "https://pypi.org/simple" }
@@ -1186,7 +1173,6 @@ dependencies = [
     { name = "django-allauth", extra = ["socialaccount"] },
     { name = "django-guardian" },
     { name = "django-htmx" },
-    { name = "django-ninja" },
     { name = "django-unfold" },
     { name = "gunicorn" },
     { name = "pgvector" },
@@ -1229,7 +1215,6 @@ requires-dist = [
     { name = "django-allauth", extras = ["socialaccount"], specifier = ">=65.0,<66.0" },
     { name = "django-guardian", specifier = ">=3.2,<4.0" },
     { name = "django-htmx", specifier = ">=1.20,<2.0" },
-    { name = "django-ninja", specifier = ">=1.4,<2.0" },
     { name = "django-unfold", specifier = ">=0.76,<1.0" },
     { name = "gunicorn", specifier = ">=23.0,<24.0" },
     { name = "pgvector", specifier = ">=0.3,<1.0" },

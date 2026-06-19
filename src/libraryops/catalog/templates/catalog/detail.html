@@ -47,6 +47,15 @@
       <p><strong>ISBN:</strong> {{ edition.isbn|default:"Not set" }}</p>
       <p><strong>Publisher:</strong> {{ edition.publisher|default:"Not set" }}</p>
       <p><strong>Language:</strong> {{ edition.language }}</p>
+      {% if edition.cover_preview_url %}
+        <figure class="panel" style="margin: 1rem 0 0; padding: 0.75rem; max-width: 280px;">
+          <img
+            alt="Cover preview for {{ work.title }}"
+            src="{{ edition.cover_preview_url }}"
+            style="display: block; max-width: 100%; height: auto;"
+          >
+        </figure>
+      {% endif %}
       <p class="eyebrow">Copies</p>
       <ul class="clean">
         {% for copy in edition.copies.all %}

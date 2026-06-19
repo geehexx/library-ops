@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from django import forms
 
-from libraryops.catalog.models import CatalogFoundationData, ContributorRole
+from libraryops.catalog.managers import CatalogFoundationData
+from libraryops.catalog.models import ContributorRole
 
 
 class CatalogFoundationCreateForm(forms.Form):

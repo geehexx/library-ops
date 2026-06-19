@@ -1,6 +1,6 @@
 # Application code agent rules
 
-- Follow pragmatic Django layering: models, domain helpers, services, selectors, forms, views/API, tasks, tests.
+- Follow pragmatic Django layering: models, domain helpers, services, selectors, forms, views, tasks, tests.
 - Preserve Import Linter boundaries.
 - Use Serena and code-review-graph before cross-context refactors.
 - Keep non-obvious normalization or checksum helpers small, commented, and

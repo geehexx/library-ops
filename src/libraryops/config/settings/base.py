@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from pathlib import Path
 from typing import Any, cast
 
@@ -130,6 +131,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -163,6 +165,8 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = Path(os.getenv("DJANGO_MEDIA_ROOT", str(Path(tempfile.gettempdir()) / "libraryops-media")))
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SITE_ID = 1
 LOGIN_REDIRECT_URL = "home"

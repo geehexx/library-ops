@@ -26,7 +26,29 @@ class CatalogIndexView(RoleContextMixin, ListView):
     def get_queryset(self) -> Any:
         """Return the read-optimized foundation queryset."""
 
-        return selectors.work_list()
+        request = self.request
+        return selectors.work_list(
+            query=request.GET.get("q"),
+            availability=request.GET.get("availability") or None,
+            contributor=request.GET.get("contributor") or None,
+            subject=request.GET.get("subject") or None,
+            language=request.GET.get("language") or None,
+            source=request.GET.get("source") or None,
+        )
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        """Attach the current search query for the index form."""
+
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        context["search_query"] = (request.GET.get("q") or "").strip()
+        context["selected_availability"] = request.GET.get("availability") or ""
+        context["selected_contributor"] = request.GET.get("contributor") or ""
+        context["selected_subject"] = request.GET.get("subject") or ""
+        context["selected_language"] = request.GET.get("language") or ""
+        context["selected_source"] = request.GET.get("source") or ""
+        context["facet_options"] = selectors.work_facet_options(query=context["search_query"])
+        return context
 
 
 class CatalogDetailView(RoleContextMixin, DetailView):

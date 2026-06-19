@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+from io import BytesIO
+
 from django.core.management import call_command
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from PIL import Image
 from tests.factories import (
     BibliographicWorkFactory,
     BookEditionFactory,
@@ -14,6 +18,18 @@ from tests.factories import (
 from libraryops.audit.models import AuditEvent
 from libraryops.catalog.forms import CopyForm, EditionForm, WorkForm
 from libraryops.inventory.models import BookCopyStatus
+
+
+def _cover_upload(filename: str, format_name: str = "PNG") -> SimpleUploadedFile:
+    """Build one valid in-memory cover upload."""
+
+    buffer = BytesIO()
+    Image.new("RGB", (8, 8), color=(48, 72, 144)).save(buffer, format=format_name)
+    return SimpleUploadedFile(
+        filename,
+        buffer.getvalue(),
+        content_type=f"image/{format_name.lower()}",
+    )
 
 
 class WorkFormTests(TestCase):
@@ -82,6 +98,7 @@ class EditionFormTests(TestCase):
                 "publication_year": "1995",
                 "language": "en",
                 "isbn": "",
+                "cover_url": "",
                 "description": "",
                 "external_identifiers": "",
             }
@@ -100,14 +117,18 @@ class EditionFormTests(TestCase):
                 "publication_year": "1995",
                 "language": "en",
                 "isbn": "0-7432-7356-7",
+                "cover_url": "https://example.com/foundation.jpg",
                 "description": "Classic edition",
                 "external_identifiers": "{}",
-            }
+            },
+            files={"cover_image": _cover_upload("foundation.png")},
         )
         assert form.is_valid()
 
         edition = form.apply(actor=self.actor)
         assert edition.isbn == "9780743273565"
+        assert edition.cover_url == "https://example.com/foundation.jpg"
+        assert edition.cover_image.name
 
         update_form = EditionForm(
             instance=edition,
@@ -117,6 +138,7 @@ class EditionFormTests(TestCase):
                 "publication_year": "1996",
                 "language": "fr",
                 "isbn": build_isbn13(905),
+                "cover_url": "https://example.com/foundation-updated.jpg",
                 "description": "Updated edition",
                 "external_identifiers": "{}",
             },
@@ -126,6 +148,8 @@ class EditionFormTests(TestCase):
         updated = update_form.apply(actor=self.actor)
         assert updated.publisher == "Vintage Classics"
         assert updated.language == "fr"
+        assert updated.cover_url == "https://example.com/foundation-updated.jpg"
+        assert updated.cover_image.name == edition.cover_image.name
 
         archived = update_form.archive(actor=self.actor)
         assert archived.archived_at is not None

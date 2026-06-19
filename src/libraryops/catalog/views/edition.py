@@ -21,6 +21,7 @@ class EditionCreateView(CatalogMutationView, FormView):
 
     form_class = EditionForm
     page_title = "Create edition"
+    back_url_name = "catalog-detail"
     submit_label = "Create edition"
 
     def get_initial(self) -> dict[str, Any]:
@@ -45,6 +46,7 @@ class EditionUpdateView(CatalogMutationView, UpdateView):
 
     form_class = EditionForm
     page_title = "Edit edition"
+    back_url_name = "catalog-detail"
     pk_url_kwarg = "edition_id"
     submit_label = "Save edition"
     context_object_name = "edition"

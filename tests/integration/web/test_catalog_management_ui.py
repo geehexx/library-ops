@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from io import BytesIO
+
 from django.core.management import call_command
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
+from PIL import Image
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
@@ -17,6 +21,18 @@ from tests.factories import (
 from libraryops.audit.models import AuditEvent
 from libraryops.catalog.models import BibliographicWork
 from libraryops.inventory.models import BookCopyStatus
+
+
+def _cover_upload(filename: str, format_name: str = "PNG") -> SimpleUploadedFile:
+    """Build one small in-memory cover upload for the UI tests."""
+
+    buffer = BytesIO()
+    Image.new("RGB", (8, 8), color=(48, 72, 144)).save(buffer, format=format_name)
+    return SimpleUploadedFile(
+        filename,
+        buffer.getvalue(),
+        content_type=f"image/{format_name.lower()}",
+    )
 
 
 class CatalogManagementUiTests(TestCase):
@@ -96,6 +112,12 @@ class CatalogManagementUiTests(TestCase):
         edition_isbn = build_isbn13(702)
         copy_barcode = "BC-0702"
 
+        create_page = self.client.get(
+            reverse("edition-create", kwargs={"work_id": self.work.pk})
+        )
+        assert create_page.status_code == 200
+        self.assertContains(create_page, 'enctype="multipart/form-data"')
+
         create_edition_response = self.client.post(
             reverse("edition-create", kwargs={"work_id": self.work.pk}),
             data={
@@ -104,12 +126,16 @@ class CatalogManagementUiTests(TestCase):
                 "publication_year": "1995",
                 "language": "en",
                 "isbn": edition_isbn,
+                "cover_url": "https://example.com/ui-cover.jpg",
+                "cover_image": _cover_upload("ui-cover.png"),
                 "description": "New edition",
                 "external_identifiers": "{}",
             },
         )
         assert create_edition_response.status_code == 302
         edition = self.work.editions.get(isbn=edition_isbn)
+        assert edition.cover_url == "https://example.com/ui-cover.jpg"
+        assert edition.cover_image.name
 
         create_copy_response = self.client.post(
             reverse("copy-create", kwargs={"edition_id": edition.pk}),
@@ -132,6 +158,7 @@ class CatalogManagementUiTests(TestCase):
                 "publication_year": "1996",
                 "language": "fr",
                 "isbn": edition_isbn,
+                "cover_url": "https://example.com/ui-cover-updated.jpg",
                 "description": "Updated edition",
                 "external_identifiers": "{}",
             },
@@ -140,6 +167,7 @@ class CatalogManagementUiTests(TestCase):
         edition.refresh_from_db()
         assert edition.publisher == "Vintage Classics"
         assert edition.language == "fr"
+        assert edition.cover_url == "https://example.com/ui-cover-updated.jpg"
 
         edit_copy_response = self.client.post(
             reverse("copy-edit", kwargs={"copy_id": copy.pk}),

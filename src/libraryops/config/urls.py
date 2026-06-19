@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static  # pyright: ignore[reportUnknownVariableType]
 from django.http import HttpRequest, HttpResponse
 from django.urls import include, path
-
-from libraryops.api import api
 
 
 def health(_request: HttpRequest) -> HttpResponse:
@@ -16,9 +16,11 @@ def health(_request: HttpRequest) -> HttpResponse:
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", api.urls),
     path("accounts/", include("allauth.urls")),
     path("health/", health, name="health"),
     path("", include("libraryops.shell.urls")),
+    path("circulation/", include("libraryops.circulation.urls")),
     path("catalog/", include("libraryops.catalog.urls")),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

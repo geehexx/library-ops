@@ -11,7 +11,7 @@ from django.db import models, transaction
 from django.utils import timezone
 
 from libraryops.accounts.roles import CATALOG_CREATE_PERMISSIONS
-from libraryops.audit.services import record_audit_event
+from libraryops.audit.models import AuditEvent
 
 
 class BookCopyStatus(models.TextChoices):
@@ -70,7 +70,7 @@ class BookCopyManager(models.Manager["BookCopy"]):
             shelf_location=shelf_location,
             condition_note=condition_note,
         )
-        record_audit_event(
+        AuditEvent.objects.record_event(
             actor=actor,
             action="catalog.copy.create",
             target=copy,
@@ -108,7 +108,7 @@ class BookCopyManager(models.Manager["BookCopy"]):
         changes = _changed_fields(before, after)
         if changes:
             copy.save()
-            record_audit_event(
+            AuditEvent.objects.record_event(
                 actor=actor,
                 action="catalog.copy.update",
                 target=copy,
@@ -128,7 +128,7 @@ class BookCopyManager(models.Manager["BookCopy"]):
             archived_at = copy.archived_at or timezone.now()
             copy.mark_archived(archived_at=archived_at)
             copy.save()
-            record_audit_event(
+            AuditEvent.objects.record_event(
                 actor=actor,
                 action="catalog.copy.archive",
                 target=copy,

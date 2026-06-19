@@ -2,20 +2,72 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import Enum
+from pathlib import Path
+from uuid import uuid4
 from typing import Any, ClassVar
 
-from django.contrib.auth.models import Group, User
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import models, transaction
-from django.db.models import Prefetch
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
+from PIL import Image, UnidentifiedImageError
 
-from libraryops.accounts.roles import CATALOG_CREATE_PERMISSIONS, iter_role_definitions
-from libraryops.audit.services import record_audit_event
-from libraryops.inventory.models import BookCopy, BookCopyStatus
+from libraryops.catalog.managers import BibliographicWorkManager, BookEditionManager
+
+EDITION_COVER_ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
+EDITION_COVER_MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+
+
+def edition_cover_upload_to(instance: "BookEdition", filename: str) -> str:
+    """Build a stable storage path for an uploaded edition cover."""
+
+    suffix = Path(filename).suffix.lower()
+    work_id = getattr(instance, "work_id", None) or "new"
+    return f"catalog/edition-covers/work-{work_id}/{uuid4().hex}{suffix}"
+
+
+def validate_cover_image_size(value: Any) -> None:
+    """Reject oversized cover uploads before storage writes the file."""
+
+    size = getattr(value, "size", None)
+    if size is None or size <= EDITION_COVER_MAX_UPLOAD_BYTES:
+        return
+    raise ValidationError(
+        f"Cover images must be {EDITION_COVER_MAX_UPLOAD_BYTES // (1024 * 1024)} MB or smaller."
+    )
+
+
+def validate_cover_image_format(value: Any) -> None:
+    """Allow only JPEG, PNG, or WebP cover uploads."""
+
+    if value in (None, ""):
+        return
+
+    image_format = ""
+    try:
+        try:
+            value.seek(0)
+        except AttributeError:
+            file_obj = getattr(value, "file", None)
+            if file_obj is not None:
+                file_obj.seek(0)
+        with Image.open(value) as image:
+            image.verify()
+            image_format = (image.format or "").upper()
+    except (OSError, UnidentifiedImageError) as exc:
+        raise ValidationError("Upload a JPEG, PNG, or WebP cover image.") from exc
+    finally:
+        try:
+            value.seek(0)
+        except AttributeError:
+            file_obj = getattr(value, "file", None)
+            if file_obj is not None:
+                try:
+                    file_obj.seek(0)
+                except AttributeError:
+                    pass
+
+    if image_format not in EDITION_COVER_ALLOWED_FORMATS:
+        raise ValidationError("Upload a JPEG, PNG, or WebP cover image.")
 
 
 def normalize_name(value: str) -> str:
@@ -67,106 +119,6 @@ def clean_isbn(value: str) -> str:
     raise ValidationError("Enter a valid ISBN-10 or ISBN-13 value.")
 
 
-def _require_catalog_manager(actor: User) -> None:
-    """Reject users that cannot manage catalog records."""
-
-    if not actor.is_authenticated or not actor.has_perms(CATALOG_CREATE_PERMISSIONS):
-        raise PermissionDenied("Catalog mutations require librarian or admin access.")
-
-
-def _json_safe(value: object) -> object:
-    """Convert audit metadata values to JSON-friendly primitives."""
-
-    if isinstance(value, Enum):
-        return value.value
-    return value
-
-
-def _changed_fields(
-    before: dict[str, object],
-    after: dict[str, object],
-) -> dict[str, dict[str, object]]:
-    """Return a compact field-change payload."""
-
-    changes: dict[str, dict[str, object]] = {}
-    for key, new_value in after.items():
-        old_value = before.get(key)
-        if old_value == new_value:
-            continue
-        changes[key] = {"from": _json_safe(old_value), "to": _json_safe(new_value)}
-    return changes
-
-
-def _edition_state(edition: BookEdition) -> dict[str, object]:
-    """Capture the fields that matter for edition mutation auditing."""
-
-    return {
-        "work_id": edition.work.pk,
-        "publisher": edition.publisher,
-        "publication_year": edition.publication_year,
-        "language": edition.language,
-        "isbn": edition.isbn,
-        "description": edition.description,
-        "external_identifiers": edition.external_identifiers,
-    }
-
-
-def _apply_edition_updates(
-    edition: BookEdition,
-    *,
-    work: BibliographicWork | None = None,
-    publisher: str | None = None,
-    publication_year: int | None = None,
-    language: str | None = None,
-    isbn: str | None = None,
-    description: str | None = None,
-    external_identifiers: dict[str, object] | None = None,
-) -> None:
-    """Apply edition updates in place before persistence."""
-
-    for field_name, value in (
-        ("work", work),
-        ("publisher", publisher),
-        ("publication_year", publication_year),
-        ("language", language),
-        ("isbn", isbn),
-        ("description", description),
-        ("external_identifiers", external_identifiers),
-    ):
-        if value is not None:
-            setattr(edition, field_name, value)
-
-
-def _matching_object_permission_codenames(role_definition: Any, obj: models.Model) -> list[str]:
-    """Return the object permission codenames that apply to one object."""
-
-    model_name = obj._meta.model_name or ""
-    codenames: list[str] = []
-    for permission_name in role_definition.object_permissions:
-        permission_app_label, permission_codename = permission_name.split(".", maxsplit=1)
-        if permission_app_label != obj._meta.app_label:
-            continue
-        if not permission_codename.endswith(model_name):
-            continue
-        codenames.append(permission_codename)
-    return codenames
-
-
-@dataclass(frozen=True, slots=True)
-class CatalogFoundationData:
-    """Validated input for the Phase 1 catalog create flow."""
-
-    title: str
-    contributor_name: str
-    contributor_role: str
-    isbn: str
-    barcode: str
-    publisher: str
-    publication_year: int | None
-    language: str
-    shelf_location: str
-
-
 class ContributorRole(models.TextChoices):
     """Supported contributor roles for a work relation."""
 
@@ -175,170 +127,6 @@ class ContributorRole(models.TextChoices):
     TRANSLATOR = "translator", "Translator"
     ILLUSTRATOR = "illustrator", "Illustrator"
     OTHER = "other", "Other"
-
-
-class BibliographicWorkQuerySet(models.QuerySet["BibliographicWork"]):
-    """Query helpers for foundation catalog views."""
-
-    def active(self) -> BibliographicWorkQuerySet:
-        """Return only non-archived works."""
-
-        return self.filter(archived_at__isnull=True)
-
-    def with_foundation_graph(self) -> BibliographicWorkQuerySet:
-        """Prefetch the related foundation graph for evaluator-facing pages."""
-
-        contributor_queryset = WorkContributor.objects.select_related("contributor").order_by(
-            "sort_order",
-            "id",
-        )
-        edition_queryset = BookEdition.objects.filter(archived_at__isnull=True).prefetch_related(
-            Prefetch(
-                "copies",
-                queryset=BookCopy.objects.filter(archived_at__isnull=True),
-            )
-        )
-        return self.prefetch_related(
-            Prefetch("work_contributors", queryset=contributor_queryset),
-            Prefetch("editions", queryset=edition_queryset),
-        )
-
-
-class BibliographicWorkManager(models.Manager["BibliographicWork"]):
-    """Own write orchestration and read-optimized catalog query helpers."""
-
-    def get_queryset(self) -> BibliographicWorkQuerySet:
-        """Return the project queryset with catalog-specific helpers."""
-
-        return BibliographicWorkQuerySet(self.model, using=self._db)
-
-    def foundation_index(self) -> BibliographicWorkQuerySet:
-        """Return the read-optimized queryset for foundation pages."""
-
-        return self.get_queryset().with_foundation_graph().active()
-
-    @transaction.atomic
-    def create_work(
-        self,
-        *,
-        actor: User,
-        title: str,
-        description: str = "",
-    ) -> BibliographicWork:
-        """Create one work and record the mutation."""
-
-        _require_catalog_manager(actor)
-        work = self.create(title=title, description=description)
-        record_audit_event(
-            actor=actor,
-            action="catalog.work.create",
-            target=work,
-            metadata={"title": work.title, "description": work.description},
-        )
-        return work
-
-    @transaction.atomic
-    def update_work(
-        self,
-        *,
-        actor: User,
-        work: BibliographicWork,
-        title: str | None = None,
-        description: str | None = None,
-    ) -> BibliographicWork:
-        """Update one work and record the mutation."""
-
-        _require_catalog_manager(actor)
-        before: dict[str, object] = {"title": work.title, "description": work.description}
-        if title is not None:
-            work.title = title
-        if description is not None:
-            work.description = description
-        after: dict[str, object] = {"title": work.title, "description": work.description}
-        changes = _changed_fields(before, after)
-        if changes:
-            work.save()
-            record_audit_event(
-                actor=actor,
-                action="catalog.work.update",
-                target=work,
-                metadata={"changes": changes},
-            )
-        return work
-
-    @transaction.atomic
-    def archive_work(self, *, actor: User, work: BibliographicWork) -> BibliographicWork:
-        """Archive one work and record the mutation."""
-
-        _require_catalog_manager(actor)
-        if work.archived_at is None:
-            archived_at = timezone.now()
-            work.archived_at = archived_at
-            work.save()
-            record_audit_event(
-                actor=actor,
-                action="catalog.work.archive",
-                target=work,
-                metadata={"archived_at": archived_at.isoformat()},
-            )
-        return work
-
-    @transaction.atomic
-    def create_foundation_record(
-        self,
-        *,
-        actor: User,
-        data: CatalogFoundationData,
-    ) -> BibliographicWork:
-        """Create the Phase 1 work, contributor, edition, copy, and audit event atomically."""
-
-        work = self.create(title=data.title)
-        contributor, _ = Contributor.objects.get_or_create(
-            normalized_name=normalize_name(data.contributor_name),
-            defaults={"name": data.contributor_name},
-        )
-        WorkContributor.objects.create(
-            work=work,
-            contributor=contributor,
-            role=data.contributor_role,
-        )
-        edition = BookEdition.objects.create(
-            work=work,
-            isbn=data.isbn,
-            publisher=data.publisher,
-            publication_year=data.publication_year,
-            language=data.language,
-        )
-        copy = BookCopy.objects.create(
-            edition=edition,
-            barcode=data.barcode,
-            shelf_location=data.shelf_location,
-            status=BookCopyStatus.AVAILABLE,
-        )
-        self._assign_object_permissions(work, edition, copy)
-        record_audit_event(
-            actor=actor,
-            action="catalog.foundation.create",
-            target=work,
-            metadata={
-                "edition_id": edition.pk,
-                "copy_id": copy.pk,
-                "contributor_id": contributor.pk,
-            },
-        )
-        return work
-
-    def _assign_object_permissions(self, *objects: models.Model) -> None:
-        """Grant object permissions to the committed role groups."""
-
-        for role_definition in iter_role_definitions():
-            for group in Group.objects.filter(name=role_definition.name):
-                for obj in objects:
-                    for permission_codename in _matching_object_permission_codenames(
-                        role_definition,
-                        obj,
-                    ):
-                        assign_perm(permission_codename, group, obj)
 
 
 class BibliographicWork(models.Model):
@@ -375,102 +163,6 @@ class BibliographicWork(models.Model):
 
         self.normalized_title = normalize_name(self.title)
         super().save(*args, **kwargs)
-
-
-class BookEditionManager(models.Manager["BookEdition"]):
-    """Own edition CRUD and archive logic."""
-
-    @transaction.atomic
-    def create_edition(
-        self,
-        *,
-        actor: User,
-        work: BibliographicWork,
-        publisher: str = "",
-        publication_year: int | None = None,
-        language: str = "en",
-        isbn: str | None = None,
-        description: str = "",
-        external_identifiers: dict[str, object] | None = None,
-    ) -> BookEdition:
-        """Create one edition and record the mutation."""
-
-        _require_catalog_manager(actor)
-        edition = self.create(
-            work=work,
-            publisher=publisher,
-            publication_year=publication_year,
-            language=language,
-            isbn=isbn,
-            description=description,
-            external_identifiers=external_identifiers or {},
-        )
-        record_audit_event(
-            actor=actor,
-            action="catalog.edition.create",
-            target=edition,
-            metadata={"work_id": work.pk, "isbn": edition.isbn},
-        )
-        return edition
-
-    @transaction.atomic
-    def update_edition(
-        self,
-        *,
-        actor: User,
-        edition: BookEdition,
-        work: BibliographicWork | None = None,
-        publisher: str | None = None,
-        publication_year: int | None = None,
-        language: str | None = None,
-        isbn: str | None = None,
-        description: str | None = None,
-        external_identifiers: dict[str, object] | None = None,
-    ) -> BookEdition:
-        """Update one edition and record the mutation."""
-
-        _require_catalog_manager(actor)
-        if edition.pk is None:
-            raise ValueError("Cannot update an unsaved edition.")
-        edition = self.get(pk=edition.pk)
-        before = _edition_state(edition)
-        _apply_edition_updates(
-            edition,
-            work=work,
-            publisher=publisher,
-            publication_year=publication_year,
-            language=language,
-            isbn=isbn,
-            description=description,
-            external_identifiers=external_identifiers,
-        )
-        changes = _changed_fields(before, _edition_state(edition))
-        if changes:
-            edition.save()
-            record_audit_event(
-                actor=actor,
-                action="catalog.edition.update",
-                target=edition,
-                metadata={"changes": changes},
-            )
-        return edition
-
-    @transaction.atomic
-    def archive_edition(self, *, actor: User, edition: BookEdition) -> BookEdition:
-        """Archive one edition and record the mutation."""
-
-        _require_catalog_manager(actor)
-        if edition.archived_at is None:
-            archived_at = timezone.now()
-            edition.archived_at = archived_at
-            edition.save()
-            record_audit_event(
-                actor=actor,
-                action="catalog.edition.archive",
-                target=edition,
-                metadata={"archived_at": archived_at.isoformat()},
-            )
-        return edition
 
 
 class Contributor(models.Model):
@@ -559,6 +251,13 @@ class BookEdition(models.Model):
         unique=True,
         null=True,
     )
+    cover_url: models.URLField[str, str] = models.URLField(blank=True)
+    cover_image: models.ImageField = models.ImageField(
+        blank=True,
+        null=True,
+        upload_to=edition_cover_upload_to,
+        validators=[validate_cover_image_size, validate_cover_image_format],
+    )
     description: models.TextField[str, str] = models.TextField(blank=True)
     external_identifiers: models.JSONField[dict[str, object], dict[str, object]] = models.JSONField(
         default=dict,
@@ -581,6 +280,17 @@ class BookEdition(models.Model):
         """Return a human-readable edition label."""
 
         return f"{self.work} ({self.isbn or 'no-isbn'})"
+
+    @property
+    def cover_preview_url(self) -> str | None:
+        """Return the best available cover preview URL for UI consumption."""
+
+        if self.cover_image:
+            try:
+                return self.cover_image.url
+            except ValueError:
+                return None
+        return self.cover_url or None
 
     def save(self, *args: object, **kwargs: object) -> None:
         """Persist the edition after validation."""

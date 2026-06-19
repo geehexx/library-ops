@@ -10,6 +10,83 @@
       The catalog view is intentionally small in Phase 1: it proves the work,
       contributor, edition, and copy relationships that later phases build on.
     </p>
+    <form class="stack" method="get" action="{% url 'catalog-index' %}">
+      <label class="stack">
+        <span class="muted">Search catalog</span>
+        <input
+          aria-label="Search catalog"
+          name="q"
+          placeholder="ISBN, barcode, title, or author"
+          value="{{ search_query }}"
+        >
+      </label>
+      <div class="stack">
+        <label class="stack">
+          <span class="muted">Availability</span>
+          <select name="availability" aria-label="Availability">
+            <option value="">Any availability</option>
+            {% for availability in facet_options.availability %}
+              <option value="{{ availability }}" {% if selected_availability == availability %}selected{% endif %}>
+                {{ availability|capfirst }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="stack">
+          <span class="muted">Contributor</span>
+          <select name="contributor" aria-label="Contributor">
+            <option value="">Any contributor</option>
+            {% for contributor in facet_options.contributors %}
+              <option value="{{ contributor }}" {% if selected_contributor == contributor %}selected{% endif %}>
+                {{ contributor }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="stack">
+          <span class="muted">Subject</span>
+          <select name="subject" aria-label="Subject">
+            <option value="">Any subject</option>
+            {% for subject in facet_options.subjects %}
+              <option value="{{ subject }}" {% if selected_subject == subject %}selected{% endif %}>
+                {{ subject }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="stack">
+          <span class="muted">Language</span>
+          <select name="language" aria-label="Language">
+            <option value="">Any language</option>
+            {% for language in facet_options.languages %}
+              <option value="{{ language }}" {% if selected_language == language %}selected{% endif %}>
+                {{ language }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="stack">
+          <span class="muted">Source</span>
+          <select name="source" aria-label="Source">
+            <option value="">Any source</option>
+            {% for source in facet_options.sources %}
+              <option value="{{ source }}" {% if selected_source == source %}selected{% endif %}>
+                {{ source }}
+              </option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <div class="nav-actions">
+        <button class="button" type="submit">Search</button>
+        {% if search_query or selected_availability or selected_contributor or selected_subject or selected_language or selected_source %}
+          <a class="button button--ghost" href="{% url 'catalog-index' %}">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+    {% if search_query %}
+      <p class="muted">Showing results for "{{ search_query }}"</p>
+    {% endif %}
     {% if can_manage_catalog %}
       <div class="nav-actions">
         <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
@@ -27,6 +104,9 @@
         {% for work in works %}
           <li>
             <a href="{% url 'catalog-detail' work_id=work.pk %}"><strong>{{ work.title }}</strong></a>
+            {% if search_query and work.search_explanation %}
+              <div class="muted">Match: {{ work.search_explanation }}</div>
+            {% endif %}
             <div class="muted">
               {% for relation in work.work_contributors.all %}
                 {{ relation.contributor.name }} ({{ relation.get_role_display }}){% if not forloop.last %}, {% endif %}

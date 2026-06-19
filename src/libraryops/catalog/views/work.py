@@ -35,6 +35,7 @@ class WorkUpdateView(CatalogMutationView, UpdateView):
 
     form_class = WorkForm
     page_title = "Edit work"
+    back_url_name = "catalog-detail"
     pk_url_kwarg = "work_id"
     submit_label = "Save work"
     context_object_name = "work"
