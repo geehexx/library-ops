@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING
 import pytest
 from django.core.management import call_command
 from playwright.sync_api import Page, expect
+from tests.e2e.visual_regression import assert_visual_snapshot
 
 from libraryops.accounts.management.commands.seed_demo_users import DEMO_ACCESS_CODE_ENV_VAR
-from tests.e2e.visual_regression import assert_visual_snapshot
 
 if TYPE_CHECKING:
     from pytest_django.live_server_helper import LiveServer

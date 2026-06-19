@@ -2,19 +2,23 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, cast
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import QuerySet
 from django.utils.html import format_html, format_html_join
-from django.utils.safestring import SafeString
 
 from libraryops.accounts.roles import ROLE_MEMBER
 from libraryops.catalog import selectors
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from django.db.models import QuerySet
+    from django.utils.safestring import SafeString
 
 
 class _AutocompleteTextInput(forms.TextInput):
@@ -54,7 +58,7 @@ class _AutocompleteTextInput(forms.TextInput):
 class AutocompleteLookupField(forms.Field):
     """Resolve one text choice from a queryset using a searchable label."""
 
-    default_error_messages = {
+    default_error_messages: ClassVar[Any] = {
         "invalid": "Select a valid choice from the suggestions.",
     }
 

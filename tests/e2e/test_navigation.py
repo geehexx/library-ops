@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from playwright.sync_api import Page, expect
 from pytest_django.live_server_helper import LiveServer
-from tests.factories import LibrarianUserFactory, MemberUserFactory
 from tests.e2e.visual_regression import assert_visual_snapshot
+from tests.factories import LibrarianUserFactory, MemberUserFactory
 
 
 @pytest.mark.e2e

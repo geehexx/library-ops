@@ -5,9 +5,12 @@ from __future__ import annotations
 import os
 import shutil
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from PIL import Image, ImageChops, ImageOps
-from playwright.sync_api import Page
+
+if TYPE_CHECKING:
+    from playwright.sync_api import Page
 
 ARTIFACT_ROOT = Path("output/playwright")
 BASELINE_ROOT = Path(__file__).resolve().parent / "visual_baselines"
