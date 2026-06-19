@@ -48,8 +48,8 @@ class TestCirculationAndSearchE2E:
         """Verify the checkout and return workflow updates the dashboard state."""
 
         call_command("seed_roles")
-        librarian = LibrarianUserFactory()
-        member = MemberUserFactory()
+        librarian = LibrarianUserFactory(first_name="Grace", last_name="Hopper")
+        member = MemberUserFactory(first_name="Ada", last_name="Lovelace")
 
         work_contributor = WorkContributorFactory(
             work__title="Browser Circulation Work",
@@ -74,34 +74,40 @@ class TestCirculationAndSearchE2E:
         expect(checkout_dialog).to_be_visible()
         expect(checkout_dialog.get_by_label("Copy")).to_be_visible()
         expect(checkout_dialog.get_by_label("Borrower")).to_be_visible()
+        expect(
+            checkout_dialog.get_by_text(
+                "Start typing a barcode, title, borrower name, or patron code."
+            )
+        ).to_be_visible()
         page.screenshot(path=str(_artifact_path("checkout-form.png")), full_page=True)
 
-        checkout_dialog.get_by_label("Copy").select_option(label=copy.barcode)
-        checkout_dialog.get_by_label("Borrower").select_option(label=member.email)
+        checkout_dialog.get_by_label("Copy").fill(copy.barcode)
+        checkout_dialog.get_by_label("Borrower").fill("Ada Lovelace")
         page.get_by_role("button", name="Checkout copy").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
         expect(
-            page.get_by_text("Visible loans: 1 | Active: 1 | Overdue: 0 | Recent returns: 0")
+            page.get_by_text("Visible loans: 1 Active: 1 Overdue: 0 Recent returns: 0")
         ).to_be_visible()
-        expect(
-            page.get_by_role("cell", name=f"{copy.barcode} - Browser Circulation Work")
-        ).to_be_visible()
+        expect(page.get_by_text("Browser Circulation Work")).to_be_visible()
 
         page.get_by_role("link", name="Return copy").click()
         return_dialog = page.get_by_role("dialog", name="Return copy")
         expect(return_dialog).to_be_visible()
         expect(return_dialog.get_by_label("Loan")).to_be_visible()
-        return_dialog.get_by_label("Loan").select_option(label=f"{copy.barcode} -> {member.email}")
+        expect(
+            return_dialog.get_by_text(
+                "Start typing a barcode, title, borrower name, or patron code."
+            )
+        ).to_be_visible()
+        return_dialog.get_by_label("Loan").fill(copy.barcode)
         page.get_by_role("button", name="Return copy").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
         expect(
-            page.get_by_text("Visible loans: 1 | Active: 0 | Overdue: 0 | Recent returns: 1")
+            page.get_by_text("Visible loans: 1 Active: 0 Overdue: 0 Recent returns: 1")
         ).to_be_visible()
-        expect(
-            page.get_by_role("cell", name=f"{copy.barcode} - Browser Circulation Work")
-        ).to_be_visible()
+        expect(page.get_by_text("Browser Circulation Work")).to_be_visible()
         expect(page.get_by_role("cell", name=member.email)).to_be_visible()
         page.screenshot(path=str(_artifact_path("checkout-return-dashboard.png")), full_page=True)
 
@@ -138,11 +144,13 @@ class TestCirculationAndSearchE2E:
 
         expect(page.get_by_role("heading", name="Catalog Foundation")).to_be_visible()
         expect(page.get_by_text('Showing results for "9780141439518"')).to_be_visible()
+        expect(page.get_by_text("Exact identifier hit")).to_be_visible()
         expect(page.get_by_text("Match: Exact identifier match")).to_be_visible()
 
         results = page.locator("section.panel").nth(1).locator("li")
         expect(results).to_have_count(2)
         expect(results.nth(0)).to_contain_text("Exact Search Work")
+        expect(results.nth(0)).to_contain_text("Exact identifier hit")
         expect(results.nth(0)).to_contain_text("Match: Exact identifier match")
         expect(results.nth(1)).to_contain_text("Reference 9780141439518 BC-1001 OL1W")
         page.screenshot(path=str(_artifact_path("exact-isbn-ranking.png")), full_page=True)

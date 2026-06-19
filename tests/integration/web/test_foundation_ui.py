@@ -265,6 +265,7 @@ class FoundationCatalogSearchTests(TestCase):
         self.assertContains(response, 'name="q"', status_code=200)
         self.assertContains(response, 'value="9780141439518"', status_code=200)
         self.assertContains(response, "Showing results for", status_code=200)
+        self.assertContains(response, "Exact identifier hit", status_code=200)
         self.assertContains(response, "Match: Exact identifier match", status_code=200)
 
     def test_catalog_index_facets_filter_result_set_and_render_controls(self) -> None:

@@ -26,8 +26,8 @@ class CirculationWorkflowViewTests(TestCase):
         """Seed a minimal circulation graph for the workflow tests."""
 
         call_command("seed_roles")
-        cls.librarian = LibrarianUserFactory()
-        cls.member = MemberUserFactory()
+        cls.librarian = LibrarianUserFactory(first_name="Grace", last_name="Hopper")
+        cls.member = MemberUserFactory(first_name="Ada", last_name="Lovelace")
         work_contributor = WorkContributorFactory(
             work__title="The Dispossessed",
             contributor__name="Ursula K. Le Guin",
@@ -47,8 +47,12 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Checkout copy")
         self.assertContains(response, "Copy")
         self.assertContains(response, "Borrower")
+        self.assertContains(response, "Start typing a barcode, title, borrower name, or patron code.")
+        self.assertContains(response, 'list="checkout-copy-options"')
+        self.assertContains(response, 'list="checkout-borrower-options"')
         self.assertContains(response, self.checkout_copy.barcode)
-        self.assertContains(response, self.member.email)
+        self.assertContains(response, "Ada Lovelace")
+        self.assertContains(response, f"PATRON-{self.member.pk:04d}")
 
     def test_checkout_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Checkout workflow should swap in the fragment when loaded through HTMX."""
@@ -69,8 +73,8 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-checkout"),
             data={
-                "copy": self.checkout_copy.pk,
-                "borrower": self.member.pk,
+                "copy": self.checkout_copy.barcode,
+                "borrower": "Ada Lovelace",
             },
         )
 
@@ -91,8 +95,8 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-checkout"),
             data={
-                "copy": self.checkout_copy.pk,
-                "borrower": self.member.pk,
+                "copy": self.checkout_copy.barcode,
+                "borrower": "Ada Lovelace",
             },
             HTTP_HX_REQUEST="true",
         )
@@ -119,7 +123,10 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Return copy")
         self.assertContains(response, "Loan")
+        self.assertContains(response, 'list="return-loan-options"')
+        self.assertContains(response, "Start typing a barcode, title, borrower name, or patron code.")
         self.assertContains(response, self.return_copy.barcode)
+        self.assertContains(response, "Ada Lovelace")
 
     def test_return_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Return workflow should swap in the fragment when loaded through HTMX."""
@@ -146,7 +153,7 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-return"),
             data={
-                "loan": loan.pk,
+                "loan": self.return_copy.barcode,
             },
         )
 
@@ -169,7 +176,7 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-return"),
             data={
-                "loan": loan.pk,
+                "loan": self.return_copy.barcode,
             },
             HTTP_HX_REQUEST="true",
         )
