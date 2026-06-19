@@ -7,9 +7,10 @@ description: Help the user define a concrete, measurable goal before starting wo
 
 ## Overview
 
-Shape the user's intent into an objective an agent can pursue honestly. Prefer measurable outcomes, explicit evidence, and bounded scope over activity descriptions.
+Shape the user's intent into an objective an agent can pursue honestly. Prefer measurable outcomes, explicit evidence, and bounded scope over activity descriptions. Keep the goal broad and stable; use Task Master for implementation detail, new findings, and follow-on slices so the goal does not need constant rewrites.
 
 This skill covers goal definition and goal-tool creation only. Do not create intermediate planning artifacts, durable snapshots, ledgers, decision logs, or resume files from this skill.
+Broad goals stay broad and measurable. Concrete implementation detail belongs in Task Master tasks, subtasks, or notes before coding. If new slices appear, promote them into Task Master instead of widening the goal.
 
 ## Workflow
 

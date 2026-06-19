@@ -7,13 +7,11 @@
 # not a user-local `--profile` overlay, and `.codex/agents/*.toml` contains
 # agent configs rather than permission profiles.
 model = "gpt-5.4-mini"
-model_context_window = 500000
-model_auto_compact_token_limit = 400000
 model_reasoning_effort = "high"
 model_reasoning_summary = "auto"
 plan_mode_reasoning_effort = "xhigh"
-model_verbosity = "low"
-review_model = "gpt-5.4-mini"
+review_model = "gpt-5.4"
+model_context_window = 500000
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 default_permissions = "coordinator_root"
@@ -33,8 +31,11 @@ tool_call_mcp_elicitation = true
 # read-only so planning, synthesis, and user interaction remain separate from
 # write-capable implementation agents. Depth-2 delegation stays available for
 # explicit expert-panel or micro-worker chains, not habitual recursive fan-out.
+# The thread budget is sized for active fan-out plus a few completed-but-not-yet-
+# closed workers; if the pool starts to saturate, close finished agents first
+# and reuse live agents by role before widening the pool further.
 [agents]
-max_threads = 12
+max_threads = 24
 max_depth = 2
 job_max_runtime_seconds = 1800
 
@@ -63,8 +64,16 @@ description = "Plans and verifies RTK, code graph, symbol, AST, MCP, and context
 config_file = "agents/code-intelligence-architect.toml"
 
 [agents.implementer]
-description = "Bounded implementation agent for one Task Master task or subtask."
+description = "Bounded implementation agent for one Task Master task or bounded multi-file slice."
 config_file = "agents/implementer.toml"
+
+[agents.debugger]
+description = "Read-only Spark debugger for failure reproduction, triage, and next-command diagnosis."
+config_file = "agents/debugger.toml"
+
+[agents.single_file_implementer]
+description = "Spark write agent for one-file fixes and simple end-to-end patches."
+config_file = "agents/single-file-implementer.toml"
 
 [agents.reviewer]
 description = "Read-only reviewer focused on correctness, security, tests, traceability, and architecture boundaries."
@@ -217,3 +226,12 @@ tool_timeout_sec = 90
 
 [projects."~/projects/library-ops"]
 trust_level = "trusted"
+
+[mcp_servers.render]
+enabled = true
+url = "https://mcp.render.com/mcp"
+bearer_token_env_var = "RENDER_API_KEY"
+required = true
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 45
+tool_timeout_sec = 120

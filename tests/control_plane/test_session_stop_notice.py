@@ -9,11 +9,11 @@ from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+import pytest
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from types import ModuleType
-
-    import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HOOK_PATH = REPO_ROOT / ".codex" / "hooks" / "session_stop_notice.py"
@@ -67,132 +67,49 @@ def test_session_stop_notice_accepts_stop_when_worktree_clean(
     assert result == {}
 
 
-def test_session_stop_notice_blocks_dirty_completion_without_validation(
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Dirty worktrees should force continuation when validation is missing."""
-    hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": "I have completed the refactoring.",
-        "stop_hook_active": False,
-    }
-
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [
-            " M .codex/hooks/session_stop_notice.py",
-            " M tests/control_plane/test_session_stop_notice.py",
-        ],
-    )
-
-    assert result["decision"] == "block"
-    reason = str(result["reason"])
-    assert "uncommitted changes" in reason
-    assert "validation" in reason
-
-
-def test_session_stop_notice_blocks_dirty_worktree_even_if_message_mentions_validation(
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Validation-like prose alone should not bypass a dirty-worktree block."""
-    hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": "Tests passed and the changes are fully validated.",
-        "stop_hook_active": False,
-    }
-
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [" M .codex/hooks/session_stop_notice.py"],
-    )
-
-    assert result["decision"] == "block"
-
-
-def test_session_stop_notice_accepts_dirty_worktree_for_planning_handoff(
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Planning and handoff checkpoints should not be re-blocked."""
-    hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": (
-            "This planning session ended at a handoff checkpoint; "
-            "implementation is deferred to the next session."
+@pytest.mark.parametrize(
+    ("payload", "dirty_entries"),
+    [
+        (
+            {
+                "cwd": str(REPO_ROOT),
+                "hook_event_name": "Stop",
+                "last_assistant_message": "I have completed the refactoring.",
+                "stop_hook_active": False,
+            },
+            [" M .codex/hooks/session_stop_notice.py"],
         ),
-        "stop_hook_active": False,
-    }
-
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [" M .codex/agents/coordinator.toml"],
-    )
-
-    assert result == {}
-
-
-def test_session_stop_notice_accepts_dirty_worktree_for_owned_implementation_checkpoint(
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Owned implementation checkpoints should be allowed to stop cleanly."""
-    hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": (
-            "This is an owned implementation checkpoint for the current slice."
+        (
+            {
+                "cwd": str(REPO_ROOT),
+                "hook_event_name": "Stop",
+                "last_assistant_message": "We are pursuing goals and working toward the objective.",
+                "stop_hook_active": False,
+            },
+            [" M .codex/hooks/session_stop_notice.py"],
         ),
-        "stop_hook_active": False,
-    }
-
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [" M .codex/hooks/session_stop_notice.py"],
-    )
-
-    assert result == {}
-
-
-def test_session_stop_notice_accepts_after_forced_continuation(
+        (
+            {
+                "cwd": str(REPO_ROOT),
+                "hook_event_name": "Stop",
+                "last_assistant_message": "This is a progress update and coordination checkpoint.",
+                "stop_hook_active": True,
+            },
+            [" M .codex/hooks/session_stop_notice.py"],
+        ),
+    ],
+)
+def test_session_stop_notice_emits_notice_for_dirty_worktree(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
+    payload: Mapping[str, object],
+    dirty_entries: list[str],
 ) -> None:
-    """The hook should not re-block after it has already forced continuation."""
+    """Dirty worktrees should emit a notice without blocking stop requests."""
     hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": "I have completed the refactoring.",
-        "stop_hook_active": True,
-    }
+    result = invoke_hook(hook, capsys, monkeypatch, payload, dirty_entries)
 
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [" M .codex/hooks/session_stop_notice.py"],
+    assert "decision" not in result
+    assert (
+        result["notice"] == "Worktree has uncommitted changes: .codex/hooks/session_stop_notice.py."
     )
-
-    assert result == {}

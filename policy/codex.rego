@@ -33,8 +33,8 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  input.agents.max_threads > 12
-  msg := "agents.max_threads must remain <= 12."
+  input.agents.max_threads != 24
+  msg := "agents.max_threads must remain 24 for the current higher-parallelism posture."
 }
 
 deny contains msg if {

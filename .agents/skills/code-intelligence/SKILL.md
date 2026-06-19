@@ -9,8 +9,20 @@ description: Use when a task mentions RTK, code graph, code-review-graph, Serena
 
 Use this skill to reduce context waste while improving code understanding and evidence quality. The selected local toolchain is required for implementation environments. Missing tools are blockers unless the run is explicitly using the constrained sandbox profile and the limitation is recorded.
 
+Batch reasoning before tools: identify the likely branch points and evidence needs before the first shell, graph, or symbol call.
+
 Choose the next skill or tool by capability and trigger match first, not by
 file name familiarity or habit.
+
+For delegated slices, default to Spark-first handling of trivial, noisy, or
+obviously bounded work. Reuse live agent history when the next path can share
+context and stay on the same role/model; spawn a clean agent when the role or
+model should change.
+When a slice branches, the owning coordinator or specialist should hand off a
+bounded child worker rather than flattening the work into a wider local pass.
+If context is still incomplete, stop and form a prescriptive Spark packet
+before another shell, graph, or symbol call; let the delegated lane fan out
+bounded child workers if the slice branches again.
 
 ## Current sources
 
@@ -19,13 +31,20 @@ Treat these as the durable repo-local sources for control-plane work:
 - `AGENTS.md` for coordinator posture and source order.
 - `.taskmaster/docs/prd.md`, `specs/001-core/`, and current Task Master state.
 - `.codex/agents/*.toml` for agent routing metadata.
-- `.agents/skills/*/SKILL.md` for explicit capability entrypoints.
+- `.agents/skills/*/SKILL.md` for explicit capability entrypoints. Read the
+  relevant `SKILL.md` directly to select the skill; Serena only comes after
+  that choice for symbol-aware context.
 - `docs/process/quality-gates.md` for the validation ladder.
 
 ## Required stack
 
 - RTK for noisy first-pass command output.
 - Raw output for exact diagnostics, audits, scanners, and release evidence.
+- Spark lanes: `command_runner` for commands and quick fixes,
+  `context_gatherer` for local evidence, debugger transcripts, and log triage,
+  `debugger` for read-only repro/triage, `single_file_implementer` for
+  one-file fixes, `implementer` for bounded implementation or multi-file
+  slices.
 - `code-review-graph` for blast radius and changed-code context.
 - Serena for symbol-aware retrieval and refactor planning.
 - `ast-grep` for syntax-aware structural search.
@@ -53,10 +72,18 @@ an escalation instead of broadening the search or implementation scope.
 
 Pause for user input only when the choice changes credentials, cost, hosted/remote code transfer, irreversible repository state, or explicit project scope. Do not pause merely because a local required tool needs to be run, configured, or smoke-tested.
 
+## Subagent envelopes
+
+Ask subagents for short, structured bubble-up reports. Use `status`,
+`evidence`, `gaps`, and `next_step` or an equivalent compact envelope.
+Require evidence over narrative, and keep reports terse enough that the root
+can act without re-reading filler.
+
 ## Tool ladder
 
 1. `code-review-graph` for structure, blast radius, and review focus.
-2. Serena for symbol-level understanding.
+2. Serena for symbol-level understanding after the right skill has already
+   been chosen.
 3. `ast-grep` for syntax-aware search or codemod checks.
 4. RTK for noisy exploratory shell work.
 5. Raw commands for exact evidence.
@@ -72,10 +99,14 @@ Pause for user input only when the choice changes credentials, cost, hosted/remo
 5. Community/anecdotal sources only as hypothesis seeds, not acceptance evidence.
 6. Spark summarization only after source URLs, dates, and claims are separated from primary evidence.
 
-When shell inspection is appropriate, batch related reads into a small number of
-focused commands. Avoid repetitive one-file shell reads when Serena,
-code-review-graph, or one broader shell pass would answer faster with less
-context waste.
+When shell inspection is appropriate, route the slice through the Spark lanes
+or another explicitly owned specialist first. Keep root-local broad shell or
+file exploration off the default path; batch related reads into a small number
+of focused commands when they are still needed. Avoid repetitive one-file
+shell reads when Serena, code-review-graph, or one broader shell pass would
+answer faster with less context waste. For a one-file fix, a failing-test
+debugger pass, or a log-only investigation, stay inside the Spark lane until
+you have either a patch or a blocker.
 
 ## RTK rules
 

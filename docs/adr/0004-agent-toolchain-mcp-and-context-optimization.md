@@ -51,6 +51,9 @@ ask the user to run those commands when interactive login is required.
 - The selected local toolchain is not “optional” in real implementation environments.
 - A constrained sandbox may validate configuration and report missing binaries, but should not normalize skipping required tools.
 - Agent instructions should route broad tools to the roles that own the work.
+- The agent catalog includes dedicated Spark lanes for read-only debugging and
+  one-file quick fixes; the general implementer lane stays for broader bounded
+  slices.
 - MCP trust is explicit: stdio MCPs run local processes with user permissions; remote MCPs require token and data-flow review.
 
 ## Validation

@@ -24,7 +24,7 @@ file pattern.
   `managers.py` and keep the model declaration readable.
 - Use forms for server-side validation in template flows; do not depend on
   client-side checks for correctness.
-- Use Django Ninja or API modules only when the feature actually exposes an API.
+- Use Django Ninja or API modules only when the feature actually exposes an API; otherwise prefer server-rendered views, forms, selectors, managers, and HTMX for this repo's current slice.
 - Keep views thin, but do not invent extra layers merely to satisfy a pattern.
 - Prefer the smallest structure that preserves correctness, testability, and
   future extension.
@@ -46,6 +46,9 @@ file pattern.
 
 - Treat Pyright as the first static-analysis pass for Python and Django edits.
 - Fix type drift on the touched scope before widening to broader pytest or lint gates.
+- Do not invent a mypy-style stub overlay just to mirror `django-stubs`; if the repo
+  already has strict `pyproject.toml` pyright and locked stubs, prefer source typing
+  fixes over `typings/` or `stubPath` unless there is a real handwritten local stub need.
 - Prefer direct `models.DateTimeField[...] = models.DateTimeField(...)` field declarations.
 - Prefer manager or model methods for aggregate-specific CRUD/archive behavior; use
   `services.py` only when logic truly spans multiple aggregates or external policy

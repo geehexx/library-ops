@@ -16,15 +16,20 @@ from typing import Any, cast
 PUBLIC_INSTRUCTION_PATHS = [
     "AGENTS.md",
     ".codex/config.toml",
+    ".codex/agents/command-runner.toml",
+    ".codex/agents/context-gatherer.toml",
+    ".codex/agents/debugger.toml",
+    ".codex/agents/implementer.toml",
+    ".codex/agents/single-file-implementer.toml",
     ".taskmaster/docs/prd.md",
     ".specify/memory/constitution.md",
     ".codex/agents/coordinator.toml",
     ".codex/agents/devops-release-manager.toml",
     ".codex/agents/planning-orchestrator.toml",
-    ".codex/agents/implementer.toml",
     ".codex/agents/taskmaster-governor.toml",
     ".agents/skills/clarify-and-goal/SKILL.md",
     ".agents/skills/code-intelligence/SKILL.md",
+    "docs/process/retrospective.md",
     "docs/process/quality-gates.md",
 ]
 
@@ -98,6 +103,13 @@ def load_config(root: Path) -> dict[str, Any]:
         return tomllib.load(fh)
 
 
+def normalize_message(value: Any) -> str:
+    """Return a lowercase string for hook-message checks."""
+    if not value:
+        return ""
+    return str(value).strip().lower()
+
+
 def mcp_summary(config: dict[str, Any]) -> str:
     """Summarize configured MCP servers for the startup message.
 
@@ -137,6 +149,15 @@ def runtime_cache_hint() -> str:
         f"npm_config_cache={tmpdir / 'codex-npm-cache'};"
         f"XDG_CACHE_HOME={tmpdir / 'codex-xdg-cache'}"
     )
+
+
+def hook_event_label(payload: dict[str, Any]) -> str:
+    """Return a normalized hook event label when Codex provides one."""
+    for key in ("hook_event_name", "hookEventName", "event_name", "eventName", "matcher"):
+        value = normalize_message(payload.get(key))
+        if value:
+            return value
+    return "startup"
 
 
 def task_graph_status(root: Path) -> str:
@@ -182,6 +203,7 @@ def main() -> int:
     cwd = Path(payload.get("cwd") or os.getcwd()).resolve()
     root = repo_root(cwd)
     config = load_config(root)
+    event_label = hook_event_label(payload)
     branch = run_text(["git", "branch", "--show-current"], root) or "detached-or-unavailable"
     status = run_text(["git", "status", "--short"], root)
     dirty_count = 0 if status in {"", "unavailable"} else len(status.splitlines())
@@ -193,18 +215,50 @@ def main() -> int:
     fingerprints = "; ".join(file_fingerprint(root, path) for path in PUBLIC_INSTRUCTION_PATHS)
     permission_profile = str(config.get("default_permissions", "unconfigured"))
 
-    print(
-        "Library Ops startup context (redacted): "
-        f"cwd={cwd}; repo={root}; branch={branch}; dirty_files={dirty_count}; "
-        f"task_graph={task_graph_status(root)}; permission_profile={permission_profile}; "
-        f"features={','.join(enabled_features) or 'none'}; mcps={mcp_summary(config)}; "
-        f"{runtime_cache_hint()}; "
-        f"instructions={fingerprints}. "
-        "Read source-of-truth docs and relevant skills before editing. "
-        "Use specialist or subagent packets before broad root-local tool use. "
-        "OAuth/provider setup is operator-local; if a required login is missing, "
-        "ask the user to run the official login/setup command."
-    )
+    if "resume" in event_label:
+        print(
+            "Library Ops resume context (redacted): "
+            f"branch={branch}; dirty_files={dirty_count}; "
+            f"task_graph={task_graph_status(root)}; "
+            "continuation=.codex-session-notes/continuation.md. "
+            "Re-open the continuation note and the relevant SKILL.md "
+            "entrypoint(s) before editing."
+        )
+    else:
+        print(
+            "Library Ops startup context (redacted): "
+            f"cwd={cwd}; repo={root}; branch={branch}; dirty_files={dirty_count}; "
+            f"task_graph={task_graph_status(root)}; permission_profile={permission_profile}; "
+            f"features={','.join(enabled_features) or 'none'}; mcps={mcp_summary(config)}; "
+            f"{runtime_cache_hint()}; "
+            f"instructions={fingerprints}. "
+            "Read source-of-truth docs and relevant skills before editing. "
+            "Treat broad long-horizon goals as planning envelopes: only concrete, "
+            "implementable work should be captured in Task Master tasks/subtasks "
+            "before implementation. Promote any new findings into Task Master or "
+            "its notes. Batch reasoning before any tool or agent call: identify "
+            "the likely branch points first, then choose the narrowest Spark "
+            "action or prescriptive specialist handoff. If context is thin, "
+            "make the delegate packet prescriptive before the first tool call: "
+            "name the Spark lane, the matching skill, the owned files or "
+            "modules, and the evidence you need back. "
+            "If a slice branches, fan out bounded child workers from the owning "
+            "coordinator or specialist slice instead of widening the root search. "
+            "The stop hook emits JSON only; a dirty-worktree warning is "
+            "advisory, not a stop block. "
+            "Use the Spark lanes `command_runner`, `context_gatherer`, "
+            "`debugger`, `single_file_implementer`, and `implementer` "
+            "before any root-local shell or file exploration. Spark lanes stay "
+            "first for noisy or bounded work, and bounded child-worker fan-out "
+            "stays allowed when a slice branches. "
+            "Community shorthand 'Ralph loop' means the repo's bounded "
+            "continuation loop: continue, checkpoint, evidence, handoff. "
+            "If a workspace default or other operational default is already "
+            "known from repo context or the user, use it directly instead of "
+            "re-asking. "
+            "OAuth/provider setup is operator-local; if a required login is missing, "
+            "ask the user to run the official login/setup command."
+        )
     return 0
 
 

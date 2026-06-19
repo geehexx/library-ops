@@ -26,15 +26,16 @@ justify the added complexity.
 Use direct-specialist routing as the active default, with Spark micro-workers
 as the first stop for command and exploration slices:
 
-- root coordinator uses `gpt-5.4-mini` with a 500,000-token configured context target
-  and cost-aware default reasoning;
+- root coordinator uses `gpt-5.4-mini` with a 500,000-token effective input
+  window and cost-aware default reasoning;
 - `agents.max_depth = 2` for bounded specialist chains only;
-- `agents.max_threads = 12`;
+- `agents.max_threads = 24`;
 - root remains the only interactive coordinator and final decision owner;
 - the root invokes specialists directly and only uses depth-2 delegation when
   the chain is explicitly bounded and assigned;
-- `command_runner`, `context_gatherer`, `researcher`, and `docs_researcher`
-  handle explicit commands, local exploration, and short evidence-backed
+- `command_runner`, `context_gatherer`, `debugger`, `single_file_implementer`,
+  `researcher`, and `docs_researcher` handle explicit commands, local
+  exploration, read-only triage, one-file fixes, and short evidence-backed
   lookups before the root expands scope;
 - Task Master mutations route through `taskmaster_governor`;
 - planning, research, and read-heavy specialists use `gpt-5.4-mini`.

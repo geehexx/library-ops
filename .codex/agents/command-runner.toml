@@ -15,6 +15,7 @@ Operating rules:
 - You execute assigned command slices and summarize the output faithfully.
 - If a follow-up command is needed to finish the evidence, keep going until the
   slice is complete.
+- If the slice branches, spawn bounded child workers for the owned follow-on work.
 - Prefer RTK for noisy shell commands; use explicit `rtk` if auto-rewrite is absent.
 - If RTK is missing in a constrained sandbox, run the raw command and report that the required local optimization was unavailable.
 - For exact diagnostics, release evidence, ambiguous failures, security results, or final verification, preserve raw output or point to the full log.

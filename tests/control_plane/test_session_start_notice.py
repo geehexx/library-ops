@@ -29,7 +29,7 @@ def test_task_graph_status_reports_task_count_for_current_repo() -> None:
     """Ensure the startup notice reports the current Task Master graph size."""
     hook: Any = load_hook_module()
 
-    assert hook.task_graph_status(REPO_ROOT) == "present:tasks=12"
+    assert hook.task_graph_status(REPO_ROOT) == "present:tasks=16"
 
 
 def test_mcp_summary_mentions_required_servers() -> None:
@@ -46,10 +46,10 @@ def test_mcp_summary_mentions_required_servers() -> None:
     assert "serena(" in summary
 
 
-def test_startup_notice_mentions_cache_safe_defaults_and_specialist_routing(
+def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
     monkeypatch: Any, capsys: Any
 ) -> None:
-    """Ensure the startup notice advertises cache-safe defaults and delegation."""
+    """Ensure the startup notice advertises cache-safe defaults and Spark lanes."""
     hook: Any = load_hook_module()
     monkeypatch.setattr(hook.sys, "stdin", StringIO(json.dumps({"cwd": str(REPO_ROOT)})))
 
@@ -59,4 +59,36 @@ def test_startup_notice_mentions_cache_safe_defaults_and_specialist_routing(
     assert "approval=approve" in output
     assert "npm_config_cache=" in output
     assert "XDG_CACHE_HOME=" in output
-    assert "specialist or subagent packets" in output
+    assert "command_runner" in output
+    assert "context_gatherer" in output
+    assert "debugger" in output
+    assert "single_file_implementer" in output
+    assert "implementer" in output
+    assert "before any root-local shell or file exploration" in output
+    assert "make the delegate packet prescriptive" in output
+    assert "Batch reasoning before any tool or agent call" in output
+    assert "choose the narrowest Spark action" in output
+    assert "fan out bounded child workers" in output
+    assert "stop hook emits JSON only" in output
+    assert "already known from repo context or the user" in output
+
+
+def test_resume_notice_is_more_compact_and_continuation_focused(
+    monkeypatch: Any, capsys: Any
+) -> None:
+    """Ensure the resume notice is shorter and centered on continuation context."""
+    hook: Any = load_hook_module()
+    payload = {
+        "cwd": str(REPO_ROOT),
+        "hook_event_name": "resume",
+    }
+    monkeypatch.setattr(hook.sys, "stdin", StringIO(json.dumps(payload)))
+
+    assert hook.main() == 0
+    output = capsys.readouterr().out
+
+    assert "resume context" in output
+    assert "continuation=.codex-session-notes/continuation.md" in output
+    assert "instructions=" not in output
+    assert "cache_hint=" not in output
+    assert "mcps=" not in output

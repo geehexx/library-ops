@@ -13,6 +13,8 @@ related_prd: ./prd.md
 Keep Task Master-specific runtime guidance under `.taskmaster/` instead of
 spreading machine-specific provider setup, dependency tactics, and commit rules
 through the general repo docs.
+Long-horizon goals stay broad and outcome-based. Any implementable work must
+be captured in Task Master before implementation begins.
 
 ## Repo contract
 
@@ -38,7 +40,9 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
 1. `.taskmaster/docs/prd.md` is the canonical Task Master input.
 2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact.
 3. Generated tasks must still be reconciled against `specs/001-core/tasks.md`
-   and the active ADR set before implementation.
+   and the active ADR set before implementation, and new findings or
+   follow-on slices should be captured in Task Master tasks, subtasks, or
+   notes before implementation begins.
 4. `.taskmaster/docs/phases/*.md` are derived PRD slices for local-model
    regeneration and benchmarking only; they do not replace the canonical PRD.
 
