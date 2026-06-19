@@ -179,12 +179,12 @@ The repository SHOULD avoid a sprawling documentation tree. Durable docs are lim
 - `AGENTS.md` for agent workflow;
 - `.specify/memory/constitution.md` for governance;
 - `.taskmaster/docs/prd.md` for product/architecture/execution;
-- `docs/runbook.md` for setup/deployment/operations;
+- `docs/evaluation/demo-script.md` for evaluator walk-through and proof sequence;
 - `docs/design/wireframes.md` for implementation-ready UX guidance;
 - `docs/adr/*.md` for decision records when a decision deserves independent review.
 
 New docs require a PRD or ADR justification. Routine details should go into code comments, tests, the PRD,
-the research/evidence register, or the runbook instead of new standalone documents.
+the research/evidence register, or the maintained README/demo surfaces instead of new standalone documents.
 
 ## 3. Standards Profile
 
@@ -712,7 +712,7 @@ Create reproducible demo data with recognized public-domain works and disposable
 
 ### Capability: C9 Release Evidence and Review Surfaces
 
-Keep evaluator-facing evidence in the README, runbook, deployment checks, demo materials, and review
+Keep evaluator-facing evidence in the README, deployment checks, demo materials, and review
 tracking. No dedicated API layer is planned in the current scope.
 
 ### Capability: C10 Deployment and Demo Evidence
@@ -757,7 +757,7 @@ Ship a live, reviewable product and documentation evidence.
 - **Purpose:** Maintain evaluator-facing and agent-facing documentation that proves what was planned,
   researched, implemented, tested, deployed, and learned.
 - **Depends on:** [C1]
-- **Priority:** P1 throughout the project; P0 for README/runbook essentials.
+- **Priority:** P1 throughout the project; P0 for README/demo essentials.
 
 #### Feature: C11.F1 Research and evidence discipline
 
@@ -775,7 +775,7 @@ Ship a live, reviewable product and documentation evidence.
 
 #### Feature: C11.F3 Deployment evidence package
 
-- **Description:** Keep README/runbook evidence current with live URL, demo credentials, smoke-test checklist,
+- **Description:** Keep README/demo evidence current with live URL, demo credentials, smoke-test checklist,
   quality gates, release tag, and known limitations.
 - **Acceptance:** An evaluator can verify the deployed app and understand how it was built without reading the
   entire PRD.
@@ -783,7 +783,7 @@ Ship a live, reviewable product and documentation evidence.
 #### Feature: C11.F4 Reusable SDLC pattern
 
 - **Description:** Document the governance pattern—constitution, RPG PRD, Task Master, Spec Kit, ADRs, CI gates,
-  research register, and runbook—so it can scale to other projects.
+  research register, and demo script—so it can scale to other projects.
 - **Acceptance:** The project explains which process artifacts are project-specific and which can be reused.
 
 ### Capability: C12 Context Recovery and Planning Hygiene
@@ -832,7 +832,7 @@ library-ops/
   .taskmaster/tasks/                  # derived execution graph; tasks.json is committed, runtime notes stay local
   .codex/config.toml
   .agents/skills/
-  docs/runbook.md
+  docs/evaluation/demo-script.md
   docs/design/wireframes.md
   docs/adr/
   src/libraryops/
@@ -984,7 +984,7 @@ lose the path to a deployed demo.
 
 **Tasks:**
 
-- update PRD, constitution, AGENTS, runbook, design notes;
+- update PRD, constitution, AGENTS, demo/evidence notes, design notes;
 - remove generated junk from repo;
 - verify scripts and CI are accurate;
 - initialize Task Master and Spec Kit in-place;
@@ -1148,7 +1148,7 @@ The key words `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`, `MAY`, and `OPTIONAL` 
 | Auth/SSO/roles bonus | C3 | allauth-ready auth and RBAC tests |
 | AI bonus | C7 | historical context only; not part of the current release |
 | Creativity | C6, C8 | lexical search, seed corpus, provenance |
-| Product quality | C1, C15, C18 equivalent sections | CI, tests, ADRs, runbook |
+| Product quality | C1, C15, C18 equivalent sections | CI, tests, ADRs, evaluator docs |
 | Usability | C4, C5, C6, C14 equivalent sections | wireframes, accessibility, HTMX UI |
 
 ## 10. Architecture
@@ -1737,7 +1737,7 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 |---|---|---|
 | ADR-0001 | Source of truth and planning model: PRD + Spec Kit + Task Master + ADR/supporting docs. | Accepted |
 | ADR-0002 | Application architecture: C4 views, arc42 quality/risk framing, pragmatic domain boundaries, Django service/selector layering. | Accepted |
-| ADR-0003 | Search, AI assistance, and data provenance: exact + FTS + vector baseline, AI suggestions reviewed, deterministic seed import. | Accepted |
+| ADR-0003 | Search and data provenance scope: exact identifiers plus PostgreSQL FTS, deterministic seed import, and no active AI-assist scope in the current release. | Superseded and reconciled |
 | ADR-0004 | Agent toolchain, MCP, and context optimization: required Codex/RTK/code-review-graph/Serena/ast-grep/Repomix stack. | Accepted |
 | ADR-0005 | Delivery, quality, security, and release governance: CI, branches, quality gates, security, release, deployment. | Accepted |
 | ADR-0006 | Design and UX workflow: repo-local wireframes as the design authority. | Accepted |
@@ -1835,7 +1835,7 @@ Exa, or web research before making version-sensitive implementation changes.
 ### 24.1 Current Artifact Review Status
 
 The current archive has been reviewed as a **governed control-plane package bootstrap**. It contains PRD, constitution,
-agent configuration, ADRs, CI bootstraping, runbook, and wireframes. It does not yet contain the completed
+agent configuration, ADRs, CI bootstraping, evaluator demo surfaces, and wireframes. It does not yet contain the completed
 Django application. The PRD and agent instructions MUST therefore describe the app as planned, not as
 already implemented.
 
@@ -1858,7 +1858,7 @@ The updated control-plane package preserved the prior strategic decisions:
 - deterministic seed-data management commands;
 - reviewed-PR, CI, Conventional Commits, and SemVer workflow.
 
-The updated control-plane package added repo-local wireframes, UX design skill/agent, runbook, deterministic-seed ADR,
+The updated control-plane package added repo-local wireframes, UX design skill/agent, evaluator demo surfaces, deterministic-seed ADR,
 evidence register, and context-drift review. It removed committed `.pytest_cache` artifacts.
 
 ### 24.3 Connector Verification Policy
@@ -1904,7 +1904,7 @@ A release is not evaluator-ready until the repo can show:
 - AGENTS instructions for repeatable agent work;
 - research register showing material evidence and assumptions;
 - context-drift review for major revisions;
-- runbook for local setup, deployment, seed refresh, smoke tests, and rollback;
+- evaluator demo script and README sections for local setup, deployment, seed refresh, smoke tests, and rollback;
 - wireframes or implementation screenshots for key flows;
 - PR-attached screenshots and validation artifacts for key evaluator-visible flows;
 - CI results and test commands;

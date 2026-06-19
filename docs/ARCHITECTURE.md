@@ -58,9 +58,8 @@ Evaluator / Admin / Librarian / Member
         v
 Library Ops web application
         |
-        +-- PostgreSQL + pgvector
+        +-- PostgreSQL
         +-- optional external metadata APIs for public-domain import
-        +-- optional hosted AI provider for grounded metadata suggestions
         +-- GitHub Actions / Render for delivery
 ```
 
@@ -69,8 +68,8 @@ Library Ops web application
 ```text
 Browser
   -> Django web + HTMX templates
-  -> PostgreSQL + pgvector
-  -> background/management commands for seed import and search document refresh
+  -> PostgreSQL
+  -> background/management commands for seed import and search refresh
   -> CI/CD and deployment runtime
 ```
 
@@ -82,8 +81,7 @@ catalog         works, editions, contributors, subjects, cover metadata
 inventory       physical/digital copies and availability projection
 circulation     checkout, return, renewal, loan invariants
 audit           append-only user/action evidence
-search          exact, FTS, vector, fusion, result explanations
-ai_assist       grounded metadata suggestion boundary
+search          exact identifier search, lexical ranking, result explanations
 web             templates, HTMX endpoints, and request/response orchestration
 ```
 
@@ -111,8 +109,7 @@ decision changes deployment topology.
 | `catalog` | work/edition/contributor/subject metadata | copy availability, active loans |
 | `inventory` | copies, copy status, location, availability projection | member borrowing rules |
 | `circulation` | loan workflow, transactional checkout/return/renewal | search ranking, metadata import |
-| `search` | search documents, ranking, explanations, vector/BM25 adapters | loan mutation |
-| `ai_assist` | grounded suggestion prompts/results | authoritative metadata writes without review |
+| `search` | exact identifiers, lexical ranking, filters, explanations | loan mutation |
 | `audit` | append-only evidence | primary business state |
 
 ## Django layer contract
@@ -145,7 +142,7 @@ project policy.
 | Domain invariants | unit/property | checkout cannot create duplicate active loans; return is idempotent only where specified |
 | Transactions | integration | concurrent checkout races; copy state and loan state commit/rollback together |
 | Authorization | integration/E2E | member cannot manage catalog; librarian can checkout/return; admin can manage users |
-| Search ranking | unit/integration/property | exact ISBN wins; subject search finds seeded works; semantic result cannot outrank exact identifier |
+| Search ranking | unit/integration/property | exact ISBN wins; subject search finds seeded works; keyword ranking remains explainable |
 | Seed import | unit/integration | provenance captured; `--limit` respected; refresh is idempotent |
 | UI contract | integration/schema | Server-rendered forms and views match PRD acceptance examples |
 | UI flows | Playwright | login, add book, search, checkout, return, role boundary |
