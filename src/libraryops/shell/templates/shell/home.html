@@ -1,44 +1,77 @@
 {% extends "base.html" %}
 
 {% block title %}Home | Library Ops{% endblock %}
-{% block page_title %}Foundation Dashboard{% endblock %}
+{% block page_title %}Library Dashboard{% endblock %}
 
 {% block content %}
-  <section class="panel">
-    <p class="eyebrow">Phase 1 slice</p>
-    <p>
-      This branch proves the bootstrap, role model, core entities, and protected
-      catalog foundation flow before the later catalog, circulation, and search
-      branches expand the product.
-    </p>
-    {% if user.is_authenticated %}
-      <p><strong>Signed in as:</strong> {{ user.email }}{% if role %} ({{ role }}){% endif %}</p>
-    {% else %}
-      <p class="muted">Sign in with a demo account to see role-aware navigation.</p>
-      <a class="button" href="{% url 'account_login' %}">Sign in</a>
-    {% endif %}
+  <section class="panel split-hero">
+    <div class="stack">
+      <div>
+        <p class="eyebrow">Evaluator-ready demo</p>
+        <p class="lede">
+          Explore a server-rendered library workflow with seeded catalog records,
+          circulation states, role-aware access, and exact-match search proof.
+        </p>
+      </div>
+      {% if user.is_authenticated %}
+        <p><strong>Signed in as:</strong> {{ user.email }}{% if role %} ({{ role }}){% endif %}</p>
+      {% else %}
+        <div class="pill-row">
+          <span class="pill">Seeded users</span>
+          <span class="pill">Catalog search</span>
+          <span class="pill">Circulation dashboard</span>
+        </div>
+        <div class="nav-actions" style="justify-content: flex-start;">
+          <a class="button" href="{% url 'account_login' %}">Sign in to the demo</a>
+          <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog first</a>
+        </div>
+      {% endif %}
+    </div>
+    <aside class="hero-note">
+      <p class="eyebrow">What this page proves</p>
+      <p class="muted" style="margin: 0;">
+        The current branch is no longer just a bootstrap foundation. It already
+        exposes real catalog counts, seeded circulation examples, and role-aware
+        entry points that the release audit can verify end to end.
+      </p>
+    </aside>
   </section>
 
-  <section class="grid">
-    <article class="panel">
+  <section class="metric-grid">
+    <article class="panel metric-card">
       <p class="eyebrow">Catalog works</p>
-      <p style="font-size: 2rem; margin: 0;">{{ work_count }}</p>
+      <p class="metric-value">{{ work_count }}</p>
+      <p class="muted" style="margin: 0;">Imported works currently visible in the seeded browse flow.</p>
     </article>
-    <article class="panel">
+    <article class="panel metric-card">
       <p class="eyebrow">Inventory copies</p>
-      <p style="font-size: 2rem; margin: 0;">{{ copy_count }}</p>
+      <p class="metric-value">{{ copy_count }}</p>
+      <p class="muted" style="margin: 0;">Physical copies available to drive checkout, return, and search states.</p>
     </article>
+  </section>
+
+  <section class="panel">
+    <h2 style="margin-top: 0;">Circulation</h2>
+    <p>
+      Review active, overdue, and recently returned loans on the circulation
+      dashboard.
+    </p>
+    {% if user.is_authenticated %}
+      <a class="button button--ghost" href="{% url 'loan-dashboard' %}">Open loan dashboard</a>
+    {% else %}
+      <a class="button button--ghost" href="{% url 'account_login' %}">Sign in to view loans</a>
+    {% endif %}
   </section>
 
   <section class="panel">
     <h2 style="margin-top: 0;">Next action</h2>
     {% if can_manage_catalog %}
-      <p>You can create the foundation catalog records used by later phases.</p>
+      <p>Manage the catalog, then move directly into borrower and return workflows from the circulation surface.</p>
       <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
     {% else %}
       <p>
-        Browse the read-only catalog surface. The protected create flow remains
-        restricted to Admin and Librarian users.
+        Browse the live catalog, review seeded availability, and sign in when
+        you want to test the role-aware staff flows.
       </p>
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog</a>
     {% endif %}

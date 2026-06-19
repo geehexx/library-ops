@@ -11,12 +11,14 @@ from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
     LibrarianUserFactory,
+    LoanFactory,
     MemberUserFactory,
     WorkContributorFactory,
+    build_isbn13,
 )
 
 from libraryops.audit.models import AuditEvent
-from libraryops.catalog.models import BibliographicWork, ContributorRole
+from libraryops.catalog.models import BibliographicWork, ContributorRole, ExternalSourceRecord
 
 
 class _BookCopyLike(Protocol):
@@ -202,3 +204,94 @@ class FoundationCatalogPagesTests(TestCase):
         assert detail_response.status_code == 200
         self.assertContains(detail_response, "BC-0001", status_code=200)
         self.assertContains(detail_response, "9780141439518", status_code=200)
+
+
+class FoundationCatalogSearchTests(TestCase):
+    """Cover the query-param search flow on the catalog index."""
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        """Seed one exact identifier hit and one title-text distractor."""
+
+        cls.exact_work = WorkContributorFactory(
+            work__title="Exact Search Work",
+            contributor__name="Exact Search Author",
+        ).work
+        cls.exact_edition = BookEditionFactory(
+            work=cls.exact_work,
+            isbn="9780141439518",
+            language="en",
+            external_identifiers={
+                "openlibrary_work_id": "OL1W",
+                "subjects": ["Classics"],
+            },
+        )
+        BookCopyFactory(edition=cls.exact_edition, barcode="BC-1001")
+        ExternalSourceRecord.objects.create(
+            source_name="openlibrary",
+            source_identifier="OL1W",
+            source_url="https://openlibrary.org/works/OL1W",
+            work=cls.exact_work,
+        )
+
+        cls.title_work = WorkContributorFactory(
+            work__title="Reference 9780141439518 BC-1001 OL1W",
+            contributor__name="Reference Author",
+        ).work
+        cls.title_edition = BookEditionFactory(
+            work=cls.title_work,
+            isbn=build_isbn13(2),
+            language="fr",
+            external_identifiers={"subjects": ["History"]},
+        )
+        cls.title_copy = BookCopyFactory(edition=cls.title_edition, barcode="BC-2001")
+        LoanFactory(copy=cls.title_copy)
+        ExternalSourceRecord.objects.create(
+            source_name="gutenberg",
+            source_identifier="2001",
+            source_url="https://www.gutenberg.org/ebooks/2001",
+            edition=cls.title_edition,
+        )
+
+    def test_catalog_index_q_parameter_ranks_exact_identifier_first(self) -> None:
+        """The index should accept q and keep exact identifier hits ahead of title text."""
+
+        response = self.client.get(reverse("catalog-index"), data={"q": "9780141439518"})
+
+        assert response.status_code == 200
+        works = list(response.context["works"])
+        assert works[0].pk == self.exact_work.pk
+        assert self.title_work.pk in [work.pk for work in works]
+        self.assertContains(response, 'name="q"', status_code=200)
+        self.assertContains(response, 'value="9780141439518"', status_code=200)
+        self.assertContains(response, "Showing results for", status_code=200)
+        self.assertContains(response, "Exact identifier hit", status_code=200)
+        self.assertContains(response, "Match: Exact identifier match", status_code=200)
+
+    def test_catalog_index_facets_filter_result_set_and_render_controls(self) -> None:
+        """The index should filter by the selected facets and preserve the form state."""
+
+        response = self.client.get(
+            reverse("catalog-index"),
+            data={
+                "availability": "available",
+                "contributor": "Exact Search Author",
+                "subject": "Classics",
+                "language": "en",
+                "source": "openlibrary",
+            },
+        )
+
+        assert response.status_code == 200
+        works = list(response.context["works"])
+        assert [work.pk for work in works] == [self.exact_work.pk]
+        self.assertContains(response, 'name="availability"', status_code=200)
+        self.assertContains(response, 'name="contributor"', status_code=200)
+        self.assertContains(response, 'name="subject"', status_code=200)
+        self.assertContains(response, 'name="language"', status_code=200)
+        self.assertContains(response, 'name="source"', status_code=200)
+        self.assertContains(response, 'value="available" selected', status_code=200)
+        self.assertContains(response, 'value="Exact Search Author" selected', status_code=200)
+        self.assertContains(response, 'value="Classics" selected', status_code=200)
+        self.assertContains(response, 'value="en" selected', status_code=200)
+        self.assertContains(response, 'value="openlibrary" selected', status_code=200)

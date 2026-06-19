@@ -9,12 +9,11 @@ description = "Spec-driven Django library management demo with Codex agent gover
 requires-python = ">=3.12"
 dependencies = [
   "django>=5.2,<6.0",
-  "django-ninja>=1.4,<2.0",
   "django-allauth[socialaccount]>=65.0,<66.0",
   "django-guardian>=3.2,<4.0",
   "django-unfold>=0.76,<1.0",
   "django-htmx>=1.20,<2.0",
-  "dj-database-url>=3.1.2,<4.0",
+  "dj-database-url>=2.2,<3.0",
   "gunicorn>=23.0,<24.0",
   "cryptography>=48.0.1,<49.0.0",
   "psycopg[binary]>=3.2,<4.0",
@@ -39,7 +38,7 @@ dev = [
   "pyright>=1.1",
   "pip-audit>=2.7",
   "python-semantic-release>=10.0",
-  "django-stubs>=6.0.5,<7.0",
+  "django-stubs>=5.2,<6.0",
   "schemathesis>=4.0",
   "mutmut>=3.2",
   "interrogate>=1.7",
@@ -59,6 +58,11 @@ select = [
   "E", "F", "I", "B", "UP", "SIM", "C4", "DTZ", "DJ", "TCH", "RUF", "PT", "ARG", "RET"
 ]
 ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"src/libraryops/catalog/forms/*.py" = ["TC002", "TC006", "RUF012"]
+"src/libraryops/catalog/views/*.py" = ["B009", "ARG002", "TC006"]
+"src/libraryops/inventory/models.py" = ["TC006"]
 
 [tool.pyright]
 include = ["src", "tests"]

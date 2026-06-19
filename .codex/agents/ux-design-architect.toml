@@ -2,7 +2,6 @@ name = "ux_design_architect"
 description = "Owns repo-local wireframes, UI flow quality, accessibility notes, and design handoff."
 model = "gpt-5.4"
 model_reasoning_effort = "high"
-model_reasoning_summary = "concise"
 sandbox_mode = "read-only"
 developer_instructions = """
 You own user-flow and design-system quality.

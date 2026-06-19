@@ -22,6 +22,7 @@ The skills maintenance skill provides a structured workflow for auditing and imp
 ## Usage
 
 Invoke this skill when you need to audit the skills catalog or when a retrospective identifies skill confusion or duplication. The skills maintenance agent should operate in read–write mode only when explicitly permitted by the coordinator. Otherwise, it should report suggested changes for a human or implementer agent to apply.
+Audit skill entrypoints for explicit batch-reasoning-before-tools cues, Spark-first bounded delegation, and bounded child-worker fan-out when a workflow branches.
 
 ## Guidelines
 
@@ -34,6 +35,7 @@ Invoke this skill when you need to audit the skills catalog or when a retrospect
   (`.agents/skills/*/SKILL.md` or an equivalent entrypoint-only finder). Do not
   broaden linting to reference markdown or other leaf docs.
 * **Progressive disclosure**: Use references and scripts to avoid one giant file, but do not optimize for thinness. Important recurring workflows should keep enough top-level context that Codex does not repeatedly miss the right path.
+  When a workflow branches, keep the entrypoint explicit about the bounded child-worker handoff instead of flattening the guidance into a wider local pass.
 * **References**: Keep reference files only when they provide concrete progressive-disclosure material linked from `SKILL.md`; remove placeholder-only reference directories and avoid separate leaf docs when the `SKILL.md` can hold the durable guidance directly.
 * **Metadata richness**: Add `agents/openai.yaml` when it improves discovery, default prompting, or machine-readable dependency declaration.
 * **Out-of-the-box first**: Before adding a new repo-local skill, check whether an existing system/plugin/curated skill already covers the need well enough.

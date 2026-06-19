@@ -1,16 +1,20 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
 # Project-local Codex configuration. Root-scoped keys MUST stay before any table.
-# Credentials remain in user-local environment variables; the selected local MCP/tool stack is declared here.
-model = "gpt-5.4"
-model_context_window = 1000000
-model_auto_compact_token_limit = 850000
-model_reasoning_effort = "medium"
-model_verbosity = "low"
+# Credentials remain in user-local environment variables; the selected local
+# MCP/tool stack is declared here.
+# This file defines the repo-owned root session and permission profiles. It is
+# not a user-local `--profile` overlay, and `.codex/agents/*.toml` contains
+# agent configs rather than permission profiles.
+model = "gpt-5.4-mini"
+model_reasoning_effort = "high"
+model_reasoning_summary = "auto"
+plan_mode_reasoning_effort = "xhigh"
 review_model = "gpt-5.4"
+model_context_window = 500000
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
-default_permissions = "workspace"
+default_permissions = "coordinator_root"
 project_root_markers = [".git", ".taskmaster", ".specify"]
 project_doc_fallback_filenames = []
 project_doc_max_bytes = 98304
@@ -23,13 +27,15 @@ multi_agent = true
 goals = true
 tool_call_mcp_elicitation = true
 
-# Root coordinator plus direct specialists. The root remains the only
-# interactive coordinator; depth-2 delegation is allowed only for explicitly
-# assigned bounded specialist chains, not habitual recursive fan-out.
-# Broad root-local exploration should stay routed through specialists or cache
-# safe wrappers when a narrower owned slice exists.
+# Root coordinator plus direct specialists. The default root session stays
+# read-only so planning, synthesis, and user interaction remain separate from
+# write-capable implementation agents. Depth-2 delegation stays available for
+# explicit expert-panel or micro-worker chains, not habitual recursive fan-out.
+# The thread budget is sized for active fan-out plus a few completed-but-not-yet-
+# closed workers; if the pool starts to saturate, close finished agents first
+# and reuse live agents by role before widening the pool further.
 [agents]
-max_threads = 12
+max_threads = 24
 max_depth = 2
 job_max_runtime_seconds = 1800
 
@@ -58,8 +64,16 @@ description = "Plans and verifies RTK, code graph, symbol, AST, MCP, and context
 config_file = "agents/code-intelligence-architect.toml"
 
 [agents.implementer]
-description = "Bounded implementation agent for one Task Master task or subtask."
+description = "Bounded implementation agent for one Task Master task or bounded multi-file slice."
 config_file = "agents/implementer.toml"
+
+[agents.debugger]
+description = "Spark debugger for failure reproduction, triage, and next-command diagnosis."
+config_file = "agents/debugger.toml"
+
+[agents.single_file_implementer]
+description = "Spark write agent for one-file fixes and simple end-to-end patches."
+config_file = "agents/single-file-implementer.toml"
 
 [agents.reviewer]
 description = "Read-only reviewer focused on correctness, security, tests, traceability, and architecture boundaries."
@@ -118,7 +132,6 @@ description = "Workspace editing with repo secrets denied; external cache/networ
 extends = ":workspace"
 
 [permissions.workspace.filesystem]
-glob_scan_max_depth = 5
 ":slash_tmp" = "write"
 ":tmpdir" = "write"
 
@@ -129,6 +142,9 @@ glob_scan_max_depth = 5
 "~/.config/gh" = true
 "~/.local/share/uv" = true
 "~/.npm" = true
+"~/.render" = true
+"~/.semgrep" = true
+"~/.codex" = true
 
 [permissions.workspace.filesystem.":workspace_roots"]
 "." = "write"
@@ -148,55 +164,19 @@ glob_scan_max_depth = 5
 [permissions.workspace.network]
 enabled = true
 
-[permissions.workspace.network.domains]
-"api.openai.com" = "allow"
-"mcp.context7.com" = "allow"
-"mcp.exa.ai" = "allow"
-"registry.npmjs.org" = "allow"
-"pypi.org" = "allow"
-"files.pythonhosted.org" = "allow"
-"github.com" = "allow"
-"objects.githubusercontent.com" = "allow"
-"raw.githubusercontent.com" = "allow"
-"developers.openai.com" = "allow"
-"docs.task-master.dev" = "allow"
-"github.github.com" = "allow"
-"docs.djangoproject.com" = "allow"
-"django-ninja.dev" = "allow"
-"www.postgresql.org" = "allow"
-"docs.astral.sh" = "allow"
-"playwright.dev" = "allow"
-"docs.github.com" = "allow"
-"render.com" = "allow"
-"www.rtk-ai.app" = "allow"
-"code-review-graph.com" = "allow"
-"modelcontextprotocol.io" = "allow"
-"ast-grep.github.io" = "allow"
-"repomix.com" = "allow"
-"oraios.github.io" = "allow"
-"tree-sitter.github.io" = "allow"
-"semgrep.dev" = "allow"
-"docs.zizmor.sh" = "allow"
-"www.conftest.dev" = "allow"
-"cyclonedx.org" = "allow"
-"mutmut.readthedocs.io" = "allow"
-"schemathesis.readthedocs.io" = "allow"
-"alexjs.com" = "allow"
-"lychee.cli.rs" = "allow"
-"cspell.org" = "allow"
-"vale.sh" = "allow"
-"martinfowler.com" = "allow"
-"c4model.com" = "allow"
-"arc42.org" = "allow"
-"diataxis.fr" = "allow"
-"www.promptfoo.dev" = "allow"
+[permissions.coordinator_root]
+description = "Workspace-capable interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
+extends = ":workspace"
+
+[permissions.coordinator_root.network]
+enabled = true
 
 [permissions.command-runner]
-description = "Workspace command execution without broad network; filesystem policy is inherited."
+description = "High-trust command micro-worker for explicit execution slices."
 extends = ":workspace"
 
 [permissions.command-runner.network]
-enabled = false
+enabled = true
 
 [mcp_servers.context7]
 command = "node"
@@ -243,3 +223,15 @@ required = true
 default_tools_approval_mode = "approve"
 startup_timeout_sec = 30
 tool_timeout_sec = 90
+
+[projects."~/projects/library-ops"]
+trust_level = "trusted"
+
+[mcp_servers.render]
+enabled = true
+url = "https://mcp.render.com/mcp"
+bearer_token_env_var = "RENDER_API_KEY"
+required = true
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 45
+tool_timeout_sec = 120

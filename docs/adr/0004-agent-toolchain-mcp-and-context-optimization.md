@@ -6,7 +6,7 @@
 
 ## Context
 
-The user explicitly wants RTK deeply integrated and wants code-review-graph plus current MCP/tool alternatives reviewed and integrated rather than treated as vague optional enhancements. The project targets Codex CLI with a 1M-token main context, specialist agents, skills, hooks, MCPs, and strict quality gates. Large context does not remove the need for context quality, tool discipline, or raw evidence.
+The user explicitly wants RTK deeply integrated and wants code-review-graph plus current MCP/tool alternatives reviewed and integrated rather than treated as vague optional enhancements. The project targets Codex CLI with a 500,000-token coordinator-root context, specialist agents, skills, hooks, MCPs, and strict quality gates. Large context does not remove the need for context quality, tool discipline, or raw evidence.
 
 ## Decision
 
@@ -50,12 +50,16 @@ ask the user to run those commands when interactive login is required.
 
 - The selected local toolchain is not “optional” in real implementation environments.
 - A constrained sandbox may validate configuration and report missing binaries, but should not normalize skipping required tools.
-- Agent instructions must restrict broad tools to roles that need them.
+- Agent instructions should route broad tools to the roles that own the work.
+- The agent catalog includes dedicated Spark lanes for read-only debugging and
+  one-file quick fixes; the general implementer lane stays for broader bounded
+  slices.
 - MCP trust is explicit: stdio MCPs run local processes with user permissions; remote MCPs require token and data-flow review.
 
 ## Validation
 
-- `.codex/config.toml` declares the selected MCPs and 1M main context contract.
+- `.codex/config.toml` declares the selected MCPs, the coordinator-root permission profile, and the committed 500,000-token root context contract.
+- `codex --profile <name>` overlays are user-local files under `~/.codex/<name>.config.toml`; they are operator state, not repo-owned config.
 - `codex doctor`, `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'`, and direct tool probes report/fail on missing runtime or tooling prerequisites.
 - The remaining repo checks should stay thin and favor direct tool invocation over custom verifier wrappers.
 - `.code-review-graphignore`, `repomix.config.json`, `sgconfig.yml`, `.gitleaks.toml`, `.semgrep.yml`, and policy files define tool behavior.

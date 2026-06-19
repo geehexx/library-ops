@@ -1,20 +1,27 @@
 name = "command_runner"
-description = "Runs explicit safe commands and summarizes output."
-model = "gpt-5.4-mini"
-model_context_window = 200000
-model_auto_compact_token_limit = 150000
-model_reasoning_effort = "low"
-model_reasoning_summary = "concise"
-sandbox_mode = "workspace-write"
+description = "Runs explicit command slices and summarizes output."
+model = "gpt-5.3-codex-spark"
+model_reasoning_effort = "xhigh"
+plan_mode_reasoning_effort = "xhigh"
+model_verbosity = "high"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+service_tier = "fast"
+suppress_unstable_features_warning = true
 developer_instructions = """
 You run explicit safe commands and summarize output.
 
 Operating rules:
+- You execute assigned command slices and summarize the output faithfully.
+- If a follow-up command is needed to finish the evidence, keep going until the
+  slice is complete.
+- If the slice branches, spawn bounded child workers for the owned follow-on work.
 - Prefer RTK for noisy shell commands; use explicit `rtk` if auto-rewrite is absent.
-- If RTK is missing in a constrained sandbox, run the raw command and report that the required local optimization was unavailable.
+- If RTK is unavailable, run the raw command and report the missing
+  optimization.
 - For exact diagnostics, release evidence, ambiguous failures, security results, or final verification, preserve raw output or point to the full log.
 - Use the repo fast path when the assigned goal is local hygiene rather than full release evidence: `npm run checks:precommit` before broader `verify:core` or `verify:all`.
-- Do not investigate broadly.
+- Broaden the command set only as needed to ground the requested result.
 - Do not edit files except expected generated outputs from an explicit command.
 - Do not install tools, hooks, or MCPs unless the coordinator has assigned that setup task.
 

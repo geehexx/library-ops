@@ -26,9 +26,9 @@ Core domain split:
 | Catalog | Works, editions, authors, subjects, identifiers | Collapsing editions/copies into a single book record. |
 | Inventory | Physical/digital copies, barcodes, availability state | Treating availability as a manually edited flag. |
 | Circulation | Holds, loans, renewals, returns, fines/fees if added | State transitions bypassing transactional services. |
-| Search | Exact/FTS/vector/BM25 ranking and facets | Vector-only or availability-unaware results. |
+| Search | Exact-identifier-first lexical ranking and facets | Vector-only or availability-unaware results. |
 | Accounts | Staff/member roles and demo auth | Client-side or template-only authorization. |
-| Audit | Important user/admin/system events | Missing traceability for circulation and AI actions. |
+| Audit | Important user/admin/system events | Missing traceability for circulation and other critical actions. |
 | Seed/import | Reproducible demo data and provenance | Unlicensed or non-reproducible imported records. |
 
 ## Alternatives considered

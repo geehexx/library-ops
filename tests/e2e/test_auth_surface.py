@@ -4,28 +4,19 @@ from __future__ import annotations
 
 import os
 import re
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 from django.core.management import call_command
 from playwright.sync_api import Page, expect
+from tests.e2e.visual_regression import assert_visual_snapshot
 
 from libraryops.accounts.management.commands.seed_demo_users import DEMO_ACCESS_CODE_ENV_VAR
 
 if TYPE_CHECKING:
     from pytest_django.live_server_helper import LiveServer
 
-ARTIFACT_ROOT = Path("output/playwright/auth")
 DEMO_ACCESS_CODE = "library-ops-demo-access-code"
-
-
-def _artifact_path(filename: str) -> Path:
-    """Return the on-disk path for an auth screenshot artifact."""
-
-    path = ARTIFACT_ROOT / filename
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
 
 
 def _social_providers_enabled() -> bool:
@@ -59,11 +50,13 @@ class TestAuthSurfaceE2E:
 
         page.goto(live_server.url)
 
-        expect(page.get_by_role("heading", name="Foundation Dashboard")).to_be_visible()
+        expect(page.get_by_role("heading", name="Library Dashboard")).to_be_visible()
         primary_nav = page.get_by_role("navigation", name="Primary")
         expect(primary_nav.get_by_role("link", name="Sign in")).to_be_visible()
-        expect(page.get_by_role("main").get_by_role("link", name="Sign in")).to_be_visible()
-        page.screenshot(path=str(_artifact_path("default/home.png")), full_page=True)
+        expect(
+            page.get_by_role("main").get_by_role("link", name="Sign in to the demo")
+        ).to_be_visible()
+        assert_visual_snapshot(page, "auth_surface", "default/home.png")
 
         primary_nav.get_by_role("link", name="Sign in").click()
         expect(page).to_have_url(f"{live_server.url}/accounts/login/")
@@ -71,7 +64,7 @@ class TestAuthSurfaceE2E:
         expect(page.locator('input[type="email"]')).to_be_visible()
         expect(page.locator('input[type="password"]')).to_be_visible()
         expect(page.get_by_role("button", name="Sign In")).to_be_visible()
-        page.screenshot(path=str(_artifact_path("default/login.png")), full_page=True)
+        assert_visual_snapshot(page, "auth_surface", "default/login.png")
 
         page.locator('input[type="email"]').fill("librarian@libraryops.demo")
         page.locator('input[type="password"]').fill(DEMO_ACCESS_CODE)
@@ -81,7 +74,7 @@ class TestAuthSurfaceE2E:
         primary_nav = page.get_by_role("navigation", name="Primary")
         expect(primary_nav.get_by_role("link", name="Sign out")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Create foundation record")).to_be_visible()
-        page.screenshot(path=str(_artifact_path("default/signed-in.png")), full_page=True)
+        assert_visual_snapshot(page, "auth_surface", "default/signed-in.png")
 
     @pytest.mark.skipif(
         not _social_providers_enabled(),
@@ -102,4 +95,4 @@ class TestAuthSurfaceE2E:
         expect(page.get_by_role("link", name=re.compile("GitHub", re.IGNORECASE))).to_be_visible()
         expect(page.locator('input[type="email"]')).to_be_visible()
         expect(page.locator('input[type="password"]')).to_be_visible()
-        page.screenshot(path=str(_artifact_path("providers/login.png")), full_page=True)
+        assert_visual_snapshot(page, "auth_surface", "providers/login.png")

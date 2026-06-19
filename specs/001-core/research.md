@@ -10,11 +10,11 @@ The implementation environment requires Codex CLI, Task Master, Spec Kit, RTK, c
 
 ## Search
 
-Exact identifier ranking is mandatory. PostgreSQL full-text search and pgvector form the baseline. ParadeDB/BM25 remains an adapter because deployment support must be confirmed. Test strategy should stay kind-first: lower-level invariants before request and browser coverage.
+Exact identifier ranking is mandatory. PostgreSQL full-text search is the current lexical baseline, with SQLite-safe fallback behavior where needed for local tests. ParadeDB/BM25 and semantic/vector layers are out of the current release scope. Test strategy should stay kind-first: lower-level invariants before request and browser coverage.
 
 ## Data provenance
 
-Public-domain imports must record source, license notes, identifiers, import batch, and refresh behavior. AI-assisted metadata is suggestion/provenance data until reviewed and applied through services.
+Public-domain imports must record source, license notes, identifiers, import batch, and refresh behavior. AI-assisted metadata is not in the current release scope; if it returns later, it must come back through a new PRD/task slice with explicit provenance rules.
 
 ## Evidence sources
 

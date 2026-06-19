@@ -15,16 +15,17 @@ Create and maintain a Task Master-friendly RPG PRD.
 - Uses capabilities as top-level task candidates.
 - Uses features as subtask candidates.
 - Defines explicit dependencies and phases.
-- Includes acceptance criteria, tests, risks, ADRs, and source register.
+- Includes explicit acceptance criteria, pass/fail evidence, tests, risks, ADRs, and source register.
 - Keeps sections navigable and avoids duplicate docs.
 
 ## Process
 
 1. Identify the changed decision or feature.
 2. Update capability tree and dependency graph.
-3. Update acceptance criteria and test strategy.
-4. Update ADR register if architecture/process significant.
-5. Check Task Master parsing implications.
+3. Update acceptance criteria, test strategy, and pass/fail evidence.
+4. If test-quality expectations are ambiguous, route them through `$clarify-and-goal` before finalizing.
+5. Update ADR register if architecture/process significant.
+6. Check Task Master parsing implications.
 
 ## Output
 

@@ -31,6 +31,13 @@ npm-debug.log*
 .codex-log/
 .codex-session-notes/
 .codex/render-home/
+.codex/.tmp/
+.codex/tmp/
+.codex/*.sqlite
+.codex/*.sqlite-shm
+.codex/*.sqlite-wal
+.codex/installation_id
+.codex/skills/
 .mcp.json
 .codex.local.toml
 .codex/.runtime/

@@ -38,8 +38,8 @@ Finish the required assignment product flows: catalog management, circulation,
   must not outrank ISBN, barcode, or external ID matches.
 - Keep circulation writes transactional and continue to derive availability from
   database state instead of presentation flags.
-- Add Django Ninja catalog/circulation endpoints only after the corresponding
-  server-side services and selectors are stable.
+- Keep the product on server-rendered Django views and HTMX for the Phase 2
+  assignment slice; do not add a separate API surface.
 
 ## Out of scope
 

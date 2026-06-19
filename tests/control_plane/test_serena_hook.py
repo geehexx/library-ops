@@ -1,11 +1,10 @@
-"""Tests for the Serena exploration reminder hook."""
+"""Tests for the Serena session-start and cleanup hook."""
 
 from __future__ import annotations
 
 import importlib.util
 import json
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -101,78 +100,6 @@ def test_serena_hook_activate_emits_session_start_context(
     assert "activate_project" in output["hookSpecificOutput"]["additionalContext"]
 
 
-def test_serena_hook_remind_resets_on_symbolic_tool(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """Ensure symbolic Serena use resets the reminder counters.
-
-    Args:
-        monkeypatch: Pytest patch helper.
-        tmp_path: Temporary path used for isolated runtime state.
-    """
-    hook: Any = load_hook_module()
-    monkeypatch.setattr(hook, "STATE_ROOT", tmp_path)
-
-    grep_payload = {
-        "session_id": "session-1",
-        "tool_name": "Bash",
-        "tool_input": {"cmd": "rg Task Master README.md"},
-    }
-    symbolic_payload = {
-        "session_id": "session-1",
-        "tool_name": "mcp__serena.find_symbol",
-        "tool_input": {"relative_path": "README.md"},
-    }
-
-    monkeypatch.setattr(sys, "argv", ["serena_hook.py", "remind"])
-    monkeypatch.setattr(sys, "stdin", FakeStdin(json.dumps(grep_payload)))
-    assert hook.main() == 0
-
-    state = hook.load_state("session-1")
-    assert state.grep_uses == 1
-
-    monkeypatch.setattr(sys, "stdin", FakeStdin(json.dumps(symbolic_payload)))
-    assert hook.main() == 0
-    state = hook.load_state("session-1")
-    assert state.grep_uses == 0
-    assert state.non_symbolic_uses == 0
-
-
-def test_serena_hook_remind_denies_after_repeated_greps(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
-) -> None:
-    """Ensure repeated grep-style shell use triggers the reminder deny path.
-
-    Args:
-        monkeypatch: Pytest patch helper.
-        tmp_path: Temporary path used for isolated runtime state.
-        capsys: Pytest capture fixture for stdout assertions.
-    """
-    hook: Any = load_hook_module()
-    monkeypatch.setattr(hook, "STATE_ROOT", tmp_path)
-    payload = {
-        "session_id": "session-2",
-        "tool_name": "Bash",
-        "tool_input": {"cmd": "rg --files docs"},
-    }
-
-    monkeypatch.setattr(sys, "argv", ["serena_hook.py", "remind"])
-    for _ in range(hook.GREP_THRESHOLD - 1):
-        monkeypatch.setattr(sys, "stdin", FakeStdin(json.dumps(payload)))
-        assert hook.main() == 0
-        assert capsys.readouterr().out == ""
-
-    monkeypatch.setattr(sys, "stdin", FakeStdin(json.dumps(payload)))
-    assert hook.main() == 0
-    output = json.loads(capsys.readouterr().out)
-    reason = output["hookSpecificOutput"]["permissionDecisionReason"]
-    assert "Too many consecutive grep-style shell searches" in reason
-    state = hook.load_state("session-2")
-    assert state.grep_uses == 0
-    assert state.non_symbolic_uses == 0
-    assert state.last_deny_at is not None
-
-
 def test_serena_hook_cleanup_removes_state(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Ensure cleanup removes persisted hook state for a session.
 
@@ -183,12 +110,10 @@ def test_serena_hook_cleanup_removes_state(monkeypatch: pytest.MonkeyPatch, tmp_
     hook: Any = load_hook_module()
     monkeypatch.setattr(hook, "STATE_ROOT", tmp_path)
     session_id = "session-cleanup"
-    state = hook.ToolUseState(
-        grep_uses=1,
-        last_grep_at=datetime.now(UTC).isoformat(),
-    )
-    hook.save_state(session_id, state)
-    assert hook.state_path(session_id).exists()
+    state_file = hook.state_path(session_id)
+    state_file.parent.mkdir(parents=True, exist_ok=True)
+    state_file.write_text('{"stale": true}', encoding="utf-8")
+    assert state_file.exists()
 
     payload = {"session_id": session_id}
     monkeypatch.setattr(sys, "argv", ["serena_hook.py", "cleanup"])

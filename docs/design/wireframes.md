@@ -26,8 +26,8 @@ forms, and no unnecessary visual complexity.
    and tests.
 2. **Role clarity.** Admin, Librarian, Member, and anonymous users should see
    different affordances, but server-side authorization remains authoritative.
-3. **Search confidence.** Results should explain whether they matched exact IDs,
-   keyword/full-text, semantic similarity, or fused ranking.
+3. **Search confidence.** Results should explain whether they matched exact IDs
+   first, then lexical keywords or filters, so the ranking remains understandable.
 4. **HTMX pragmatism.** Interactions should be server-rendered and enhanced with
    HTMX where it reduces page reload friction.
 5. **Accessible defaults.** Keyboard navigation, focus order, error text,
@@ -59,8 +59,6 @@ forms, and no unnecessary visual complexity.
 | Return | HTMX modal/panel | Admin, Librarian | Close an active loan. |
 | Loans | `/loans/` | Admin, Librarian, Member | View active/historical loans. |
 | Admin users | `/admin/users/` or Django Admin | Admin | Manage roles/users. |
-| API/docs | `/api/docs` or Django Ninja OpenAPI route | All | Verify the public API contract and protected mutations. |
-| AI metadata assist | HTMX panel | Admin, Librarian | Review suggested tags/description. |
 
 ## 1. Public landing
 
@@ -70,14 +68,15 @@ forms, and no unnecessary visual complexity.
 +---------------------------------------------------------------+
 | Mini Library Management System                                |
 | A deployed, tested Django demo for catalog, circulation,       |
-| search, RBAC, seed data, and grounded AI assistance.           |
+| exact-identifier-first lexical search, RBAC, seed data, and   |
+| release evidence.                                              |
 |                                                               |
 | [Browse catalog] [Sign in as demo user]                       |
 |                                                               |
 | Assignment checklist                                          |
 | [x] Book management      [x] Borrow/return                    |
 | [x] Search               [x] README + deployment              |
-| [x] Auth/RBAC            [x] AI/search extras                 |
+| [x] Auth/RBAC            [x] Demo evidence                    |
 +---------------------------------------------------------------+
 ```
 
@@ -103,7 +102,7 @@ Accessibility notes:
 | Pass  [______________]   | Librarian: librarian@...           |
 | [Sign in]                | Member: member@...                 |
 |                          | Password: <local-demo-password-from-seed-command>      |
-| [Continue with Google]   |                                    |
+| [Continue with provider] |                                    |
 +--------------------------+------------------------------------+
 ```
 
@@ -152,7 +151,7 @@ Accessibility notes:
 +-------------+-------------------------------------------------+
 | Nav         | Catalog                                         |
 |             | [ Search title, author, ISBN, subject...      ] |
-|             | [Search] [Semantic: on/off]                    |
+|             | [Search] [Exact IDs first, then lexical]      |
 |             |                                                 |
 |             | Filters                                         |
 |             | Availability [Any v]  Subject [Any v]          |
@@ -171,8 +170,10 @@ Accessibility notes:
 
 Implementation notes:
 
-- Exact ISBN/barcode results should short-circuit or rank first.
-- Result rows include match explanation from search service.
+- Exact ISBN/barcode results should short-circuit or rank first, ahead of other
+  lexical matches.
+- Result rows include match explanation from the search service, with exact
+  identifier matches clearly distinguished from lexical matches.
 - Role-aware actions: anonymous/member see details; librarian/admin see checkout.
 - HTMX can update result list and filters without full reload.
 
@@ -314,55 +315,34 @@ Implementation notes:
 - Member sees only own loans.
 - Librarian/Admin see all loans.
 
-## 10. AI metadata assist
+## 10. Evidence and release checks
 
 ```text
 +---------------------------------------------------------------+
-| AI suggestions                                                |
-| Source fields: title, contributor, description                |
-|                                                               |
-| Suggested subjects: [Classic] [Social class] [Marriage]       |
-| Suggested summary: ...                                        |
-| Confidence / notes: grounded in provided fields only          |
-|                                                               |
-| [Apply selected] [Dismiss]                                    |
-+---------------------------------------------------------------+
-```
-
-Implementation notes:
-
-- Suggestions are structured output and human-reviewed.
-- Persist provenance if suggestions are applied.
-- Do not generate availability or copy state.
-
-## 11. API/docs evaluator link
-
-```text
-+---------------------------------------------------------------+
-| API docs                                                      |
-| OpenAPI schema  /api/openapi.json                              |
-| [Open docs] [Back to dashboard] [Back to catalog]             |
+| Release evidence                                               |
+| README, demo script, smoke tests                               |
+| [Open README] [Back to dashboard] [Back to catalog]           |
 |                                                               |
 | Demo access: Admin, Librarian, Member labels only              |
-| Protected mutations require auth and role checks               |
+| Protected actions require auth and role checks                 |
 +---------------------------------------------------------------+
 ```
 
 Implementation notes:
 
-- Surface the OpenAPI UI or JSON route selected during implementation.
-- Keep the docs page visible to anonymous users, but block protected mutation
-  execution.
+- Surface README and demo-script evidence alongside the app.
+- Keep the release-evidence page visible to anonymous users, but block
+  protected action execution.
 - Link back to the dashboard, catalog, and README evidence.
 
 States:
 
 | State | Requirement |
 |---|---|
-| Default | OpenAPI UI loads and includes catalog, loans, and auth-related endpoints. |
-| Unauthenticated | Read docs remain visible; protected endpoint execution is blocked by auth. |
+| Default | Release evidence loads and includes the app, README, and smoke-test links. |
+| Unauthenticated | Read evidence remains visible; protected action execution is blocked by auth. |
 | Permission denied | Error copy names the required role without exposing internals. |
-| Schema error | Show a concise failure banner and link to setup/quality checks. |
+| Smoke failure | Show a concise failure banner and link to setup/quality checks. |
 
 ## 12. Evaluator contract
 
@@ -376,10 +356,9 @@ States:
 | Create/edit/archive catalog record | No | No | Yes | Yes |
 | Checkout/return copy | No | No | Yes | Yes |
 | Run import/search-index actions | No | No | Yes, if enabled | Yes |
-| Review/apply AI metadata suggestions | No | No | Yes | Yes |
 | Manage users and roles | No | No | No | Yes |
-| Open API docs | Yes | Yes | Yes | Yes |
-| Execute protected API mutations | No | No | Yes | Yes |
+| Open release evidence | Yes | Yes | Yes | Yes |
+| Execute protected app mutations | No | No | Yes | Yes |
 
 ### State matrix
 
@@ -393,7 +372,7 @@ States:
 | Return | Button busy | No active loan | Conflict text | Action hidden | Loan closed and row refreshes |
 | Loans | Table spinner | No loans | Load banner | Member-only filter | Status update |
 | Admin users | Table spinner | No users | Validation summary | Denial page | Role change toast |
-| API/docs | OpenAPI loading | No schema | Schema load banner | Auth prompt | Endpoint response shown |
+| Release evidence | README loading | No docs | Evidence banner | Auth prompt | App route response shown |
 
 ### Accessibility contract
 
@@ -409,7 +388,7 @@ States:
 - Destructive actions require a keyboard-accessible confirmation.
 - Tables retain headers on narrow screens or collapse into labeled rows.
 - Playwright/a11y tests cover catalog search, create/edit validation, checkout
-  conflict, return conflict, member loans, admin denial, and API docs loading.
+  conflict, return conflict, member loans, and admin denial.
 
 ### Design token fallback
 
@@ -449,7 +428,7 @@ When extracting wireframes or implementation notes into code, capture:
 
 When extracting the evaluator contract, also capture:
 
-- API/docs route and auth behavior;
+- release evidence route and auth behavior;
 - role-specific admin and member states;
 - evaluator link targets back to README and canonical docs;
 - confirmation copy for protected admin mutations.

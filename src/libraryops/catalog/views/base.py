@@ -1,5 +1,5 @@
 # pyright: reportMissingTypeArgument=false
-"""Catalog presentation views for the foundation slice."""
+"""Shared catalog views for the foundation and manager slice."""
 
 from __future__ import annotations
 
@@ -26,7 +26,29 @@ class CatalogIndexView(RoleContextMixin, ListView):
     def get_queryset(self) -> Any:
         """Return the read-optimized foundation queryset."""
 
-        return selectors.work_list()
+        request = self.request
+        return selectors.work_list(
+            query=request.GET.get("q"),
+            availability=request.GET.get("availability") or None,
+            contributor=request.GET.get("contributor") or None,
+            subject=request.GET.get("subject") or None,
+            language=request.GET.get("language") or None,
+            source=request.GET.get("source") or None,
+        )
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        """Attach the current search query for the index form."""
+
+        context = super().get_context_data(**kwargs)
+        request = self.request
+        context["search_query"] = (request.GET.get("q") or "").strip()
+        context["selected_availability"] = request.GET.get("availability") or ""
+        context["selected_contributor"] = request.GET.get("contributor") or ""
+        context["selected_subject"] = request.GET.get("subject") or ""
+        context["selected_language"] = request.GET.get("language") or ""
+        context["selected_source"] = request.GET.get("source") or ""
+        context["facet_options"] = selectors.work_facet_options(query=context["search_query"])
+        return context
 
 
 class CatalogDetailView(RoleContextMixin, DetailView):
@@ -65,3 +87,31 @@ class CatalogCreateView(CatalogManagerRequiredMixin, FormView):
         """Return the detail URL for the newly created foundation work."""
 
         return str(self.form_success_url)
+
+
+class CatalogMutationView(CatalogManagerRequiredMixin):
+    """Shared context helpers for manager-only catalog form pages."""
+
+    template_name = "catalog/form.html"
+    page_title = ""
+    submit_label = "Save changes"
+    back_label = "Back"
+    back_url_name = "catalog-index"
+
+    def get_back_url_kwargs(self) -> dict[str, Any]:
+        """Return the reverse kwargs for the back link."""
+
+        return {}
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        """Attach the shared form page labels and back link."""
+
+        context = super().get_context_data(**kwargs)
+        context.setdefault("page_title", self.page_title)
+        context.setdefault("submit_label", self.submit_label)
+        context.setdefault("back_label", self.back_label)
+        context.setdefault(
+            "back_url",
+            reverse(self.back_url_name, kwargs=self.get_back_url_kwargs()),
+        )
+        return context

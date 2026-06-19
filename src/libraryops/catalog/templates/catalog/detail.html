@@ -15,7 +15,15 @@
       {% endfor %}
     </p>
     {% if can_manage_catalog %}
-      <a class="button" href="{% url 'catalog-create' %}">Create another foundation record</a>
+      <div class="nav-actions">
+        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+        <a class="button button--ghost" href="{% url 'work-edit' work_id=work.pk %}">Edit work</a>
+        <form method="post" action="{% url 'work-archive' work_id=work.pk %}">
+          {% csrf_token %}
+          <button class="button button--ghost" type="submit">Archive work</button>
+        </form>
+        <a class="button button--ghost" href="{% url 'edition-create' work_id=work.pk %}">Add edition</a>
+      </div>
     {% else %}
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Back to catalog</a>
     {% endif %}
@@ -23,14 +31,46 @@
 
   {% for edition in work.editions.all %}
     <section class="panel">
-      <h2 style="margin-top: 0;">Edition {{ forloop.counter }}</h2>
+      <div class="nav-actions" style="justify-content: space-between; align-items: flex-start;">
+        <h2 style="margin: 0;">Edition {{ forloop.counter }}</h2>
+        {% if can_manage_catalog %}
+          <div class="nav-actions">
+            <a class="button button--ghost" href="{% url 'edition-edit' edition_id=edition.pk %}">Edit edition</a>
+            <form method="post" action="{% url 'edition-archive' edition_id=edition.pk %}">
+              {% csrf_token %}
+              <button class="button button--ghost" type="submit">Archive edition</button>
+            </form>
+            <a class="button button--ghost" href="{% url 'copy-create' edition_id=edition.pk %}">Add copy</a>
+          </div>
+        {% endif %}
+      </div>
       <p><strong>ISBN:</strong> {{ edition.isbn|default:"Not set" }}</p>
       <p><strong>Publisher:</strong> {{ edition.publisher|default:"Not set" }}</p>
       <p><strong>Language:</strong> {{ edition.language }}</p>
+      {% if edition.cover_preview_url %}
+        <figure class="panel" style="margin: 1rem 0 0; padding: 0.75rem; max-width: 280px;">
+          <img
+            alt="Cover preview for {{ work.title }}"
+            src="{{ edition.cover_preview_url }}"
+            style="display: block; max-width: 100%; height: auto;"
+          >
+        </figure>
+      {% endif %}
       <p class="eyebrow">Copies</p>
       <ul class="clean">
         {% for copy in edition.copies.all %}
-          <li>{{ copy.barcode }} — {{ copy.get_status_display }}{% if copy.shelf_location %} — shelf {{ copy.shelf_location }}{% endif %}</li>
+          <li>
+            {{ copy.barcode }} — {{ copy.get_status_display }}{% if copy.shelf_location %} — shelf {{ copy.shelf_location }}{% endif %}
+            {% if can_manage_catalog %}
+              <span class="muted">
+                <a href="{% url 'copy-edit' copy_id=copy.pk %}">Edit</a>
+                <form method="post" action="{% url 'copy-archive' copy_id=copy.pk %}" style="display: inline;">
+                  {% csrf_token %}
+                  <button class="button button--ghost" type="submit" style="padding: 0.25rem 0.5rem; margin-left: 0.25rem;">Archive</button>
+                </form>
+              </span>
+            {% endif %}
+          </li>
         {% empty %}
           <li>No copies linked.</li>
         {% endfor %}

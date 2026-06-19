@@ -37,7 +37,6 @@ prefix_rule(
     match = [
         "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
         "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
-        "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" remind",
         "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
         "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
     ],
@@ -93,6 +92,10 @@ prefix_rule(
     match = [
         "npm run verify:all",
         "npm run verify:core",
+        "npm run python:lint",
+        "npm run python:complexity",
+        "npm run docstrings:lint",
+        "npm run docstrings:coverage",
         "npm run deps:tree",
         "npm run markdownlint",
         "npm run docs:quality:offline",

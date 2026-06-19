@@ -9,11 +9,11 @@ from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+import pytest
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from types import ModuleType
-
-    import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HOOK_PATH = REPO_ROOT / ".codex" / "hooks" / "session_stop_notice.py"
@@ -67,79 +67,49 @@ def test_session_stop_notice_accepts_stop_when_worktree_clean(
     assert result == {}
 
 
-def test_session_stop_notice_blocks_dirty_completion_without_validation(
+@pytest.mark.parametrize(
+    ("payload", "dirty_entries"),
+    [
+        (
+            {
+                "cwd": str(REPO_ROOT),
+                "hook_event_name": "Stop",
+                "last_assistant_message": "I have completed the refactoring.",
+                "stop_hook_active": False,
+            },
+            [" M .codex/hooks/session_stop_notice.py"],
+        ),
+        (
+            {
+                "cwd": str(REPO_ROOT),
+                "hook_event_name": "Stop",
+                "last_assistant_message": "We are pursuing goals and working toward the objective.",
+                "stop_hook_active": False,
+            },
+            [" M .codex/hooks/session_stop_notice.py"],
+        ),
+        (
+            {
+                "cwd": str(REPO_ROOT),
+                "hook_event_name": "Stop",
+                "last_assistant_message": "This is a progress update and coordination checkpoint.",
+                "stop_hook_active": True,
+            },
+            [" M .codex/hooks/session_stop_notice.py"],
+        ),
+    ],
+)
+def test_session_stop_notice_emits_notice_for_dirty_worktree(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
+    payload: Mapping[str, object],
+    dirty_entries: list[str],
 ) -> None:
-    """Dirty worktrees should force continuation when validation is missing."""
+    """Dirty worktrees should emit a notice without blocking stop requests."""
     hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": "I have completed the refactoring.",
-        "stop_hook_active": False,
-    }
+    result = invoke_hook(hook, capsys, monkeypatch, payload, dirty_entries)
 
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [
-            " M .codex/hooks/session_stop_notice.py",
-            " M tests/control_plane/test_session_stop_notice.py",
-        ],
+    assert "decision" not in result
+    assert (
+        result["notice"] == "Worktree has uncommitted changes: .codex/hooks/session_stop_notice.py."
     )
-
-    assert result["decision"] == "block"
-    reason = str(result["reason"])
-    assert "uncommitted changes" in reason
-    assert "validation" in reason
-
-
-def test_session_stop_notice_accepts_dirty_worktree_when_validation_is_reported(
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Reported validation evidence should allow the stop to proceed."""
-    hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": "Tests passed and the changes are validated.",
-        "stop_hook_active": False,
-    }
-
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [" M .codex/hooks/session_stop_notice.py"],
-    )
-
-    assert result == {}
-
-
-def test_session_stop_notice_accepts_after_forced_continuation(
-    capsys: pytest.CaptureFixture[str],
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """The hook should not re-block after it has already forced continuation."""
-    hook = load_hook_module()
-    payload = {
-        "cwd": str(REPO_ROOT),
-        "hook_event_name": "Stop",
-        "last_assistant_message": "I have completed the refactoring.",
-        "stop_hook_active": True,
-    }
-
-    result = invoke_hook(
-        hook,
-        capsys,
-        monkeypatch,
-        payload,
-        [" M .codex/hooks/session_stop_notice.py"],
-    )
-
-    assert result == {}
