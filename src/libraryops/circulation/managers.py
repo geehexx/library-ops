@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
@@ -13,6 +11,11 @@ from django.utils import timezone
 from libraryops.audit.models import AuditEvent
 from libraryops.circulation import models as circulation_models
 from libraryops.inventory.models import BookCopy, BookCopyStatus
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from django.contrib.auth.models import User
 
 
 def _require_loan_manager(actor: User) -> None:
