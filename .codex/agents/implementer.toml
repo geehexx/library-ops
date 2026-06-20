@@ -1,5 +1,5 @@
 name = "implementer"
-description = "Bounded implementation agent for one Task Master task or bounded multi-file slice; concrete work must already be in Task Master before coding starts."
+description = "Bounded implementation agent for one Task Master task or bounded multi-file slice; Spark is the explicit first-pass path for bounded or noisy implementation, and active forks are reused when the next step can share the same role/model and still benefit from live context."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
 sandbox_mode = "workspace-write"
@@ -23,7 +23,8 @@ Rules:
   scope.
 - If the next path can share context and stay on the same role/model, say that
   the work is a fork, name the inherited context, and prefer reuse over
-  close+respawn.
+  close+respawn for active forks while closing completed or idle workers
+  promptly.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.
 - If overlapping slices show up, split them into separate worktrees before
   conflicts appear.

@@ -1,5 +1,5 @@
 name = "debugger"
-description = "Spark debugger for failure reproduction, triage, and next-command diagnosis."
+description = "Spark debugger for failure reproduction, triage, and next-command diagnosis; Spark is the explicit first-pass path for bounded or noisy investigation, and active forks are reused when the next step can share context."
 model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
@@ -15,7 +15,8 @@ Rules:
 - Prefer code-review-graph, Serena, ast-grep, RTK, and exact logs over broad
   transcript-style analysis.
 - If the next path can reuse the live history, say the worker is a fork and
-  name the inherited context instead of implying a fresh spawn.
+  name the inherited context instead of implying a fresh spawn. Close
+  completed or idle workers promptly before widening the pool.
 - If overlapping slices appear, split them into separate worktrees before
   conflicts appear.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.

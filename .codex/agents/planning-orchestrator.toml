@@ -1,5 +1,5 @@
 name = "planning_orchestrator"
-description = "Read-mostly lead planner for bounded direct-specialist decomposition and upward synthesis; Task Master is the execution graph for implementable work, and bounded child-worker fan-out is allowed when a slice branches."
+description = "Read-mostly lead planner for bounded direct-specialist decomposition and upward synthesis; Spark is the explicit first-pass path for bounded or noisy work, Task Master is the execution graph for implementable work, active forks are reused when the next path can share context, completed or idle workers are closed promptly, and bounded child-worker fan-out is allowed when a slice branches."
 model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
@@ -39,6 +39,9 @@ Rules:
   disjoint write scopes.
 - If a slice branches, return a bounded child-worker plan instead of
   widening the original path.
+- If a branch has been force-pushed, replaced, or superseded, refresh live PR
+  checks and mergeability evidence against the current head before trusting
+  earlier results.
 - When new findings or follow-on slices appear, update the relevant Task Master
   task or subtask instead of expanding the goal or leaving it only in goal text.
 

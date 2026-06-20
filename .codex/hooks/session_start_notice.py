@@ -21,14 +21,18 @@ PUBLIC_INSTRUCTION_PATHS = [
     ".codex/agents/debugger.toml",
     ".codex/agents/implementer.toml",
     ".codex/agents/single-file-implementer.toml",
+    ".codex/agents/command-runner.toml",
+    ".codex/agents/context-gatherer.toml",
+    ".codex/agents/planning-orchestrator.toml",
     ".taskmaster/docs/prd.md",
     ".specify/memory/constitution.md",
     ".codex/agents/coordinator.toml",
     ".codex/agents/devops-release-manager.toml",
-    ".codex/agents/planning-orchestrator.toml",
     ".codex/agents/taskmaster-governor.toml",
     ".agents/skills/clarify-and-goal/SKILL.md",
     ".agents/skills/code-intelligence/SKILL.md",
+    ".agents/skills/taskmaster/SKILL.md",
+    ".agents/skills/retrospective/SKILL.md",
     "docs/process/retrospective.md",
     "docs/process/quality-gates.md",
 ]
@@ -247,6 +251,9 @@ def main() -> int:
             "modules, and the evidence you need back. "
             "If a slice branches, fan out bounded child workers from the owning "
             "coordinator or specialist slice instead of widening the root search. "
+            "If a branch has been force-pushed, replaced, or superseded, refresh "
+            "live PR checks and mergeability evidence against the current head "
+            "before trusting earlier results. "
             "The stop hook emits JSON only; a dirty-worktree warning is "
             "advisory, not a stop block. "
             "Use the Spark lanes `command_runner`, `context_gatherer`, "
@@ -254,7 +261,8 @@ def main() -> int:
             "for noisy or bounded work. Use root-local shell or file "
             "exploration directly when it is the clearest proof or patch "
             "path, and keep bounded child-worker fan-out allowed when a slice "
-            "branches. "
+            "branches. Close completed or idle workers promptly, and reuse "
+            "active forks only while their context is still useful. "
             "Community shorthand 'Ralph loop' means the repo's bounded "
             "continuation loop: continue, checkpoint, evidence, handoff. "
             "If a workspace default or other operational default is already "

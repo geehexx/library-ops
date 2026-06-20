@@ -115,12 +115,19 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "implementer" in coordinator_text
     assert "debugger" in coordinator_text
     assert "single_file_implementer" in coordinator_text
+    assert "Spark lanes are the default first" in config_text
+    assert "pass for bounded or noisy work" in config_text
+    assert "close completed or idle" in config_text
+    assert "workers promptly and reuse active forks with useful context" in config_text
     assert "fork or a" in coordinator_text
     assert "fresh spawn" in coordinator_text
     assert "inherited context" in coordinator_text
     assert "close+respawn" in coordinator_text
     assert "separate worktrees before conflicts appear" in coordinator_text
     assert "expected commit scope plus local gate list before push" in coordinator_text
+    assert "force-pushed, replaced, or superseded, refresh live PR" in coordinator_text
+    assert "checks and mergeability evidence against the current head" in coordinator_text
+    assert "Close completed or idle workers promptly" in coordinator_text
     assert "Pyright" in implementer_text
     assert "work is a fork" in implementer_text
     assert "inherited context" in implementer_text
@@ -184,6 +191,8 @@ def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
     assert "worktrees before conflicts appear" in code_intelligence_text
     assert "include the expected" in code_intelligence_text
     assert "local gate list before push" in code_intelligence_text
+    assert "force-pushed, replaced, or superseded, refresh live PR" in code_intelligence_text
+    assert "checks and mergeability evidence against the current head" in code_intelligence_text
 
 
 def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() -> None:
@@ -325,7 +334,10 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     assert "model_reasoning_summary" not in command_runner_text
     assert 'model = "gpt-5.3-codex-spark"' in command_runner_text
     assert 'model = "gpt-5.3-codex-spark"' in context_gatherer_text
-    assert "Spark repo and source-map collector for local evidence." in context_gatherer_text
+    assert "Spark repo and source-map collector for local evidence;" in context_gatherer_text
+    assert (
+        "explicit first-pass path for bounded or noisy evidence gathering" in context_gatherer_text
+    )
     assert "bounded child worker" in context_gatherer_text
     assert 'sandbox_mode = "danger-full-access"' in context_gatherer_text
 
@@ -544,6 +556,8 @@ def test_spark_policy_routes_command_and_exploration_work_to_micro_workers() -> 
     assert "Batch reasoning before tools" in coordinator_text
     assert "Batch reasoning before tools" in root_agents_text
     assert "bounded child-worker fan-out" in coordinator_text
+    assert "force-pushed, replaced, or superseded, refresh live PR" in coordinator_text
+    assert "checks and mergeability evidence against the current head" in coordinator_text
 
 
 def test_retired_anchor_files_are_removed() -> None:

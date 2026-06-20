@@ -42,6 +42,9 @@ This repo does not use Task Master in isolation. Pair it with:
 8. If the subtask is blocked on a decision or another agent-owned slice, stop,
    record the blocker, and return an Escalation packet instead of branching into
    adjacent work.
+9. If a branch is force-pushed, replaced, or superseded, refresh the relevant
+   checks and mergeability evidence against the current head before marking the
+   task done.
 
 ## Library Ops MCP posture
 

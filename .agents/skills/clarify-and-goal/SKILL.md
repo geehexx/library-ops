@@ -30,6 +30,9 @@ When you delegate, say whether the worker is a fork or a fresh spawn, name the
 inherited context, prefer reuse over close+respawn, split overlapping slices
 into separate worktrees before conflicts appear, and include the expected
 commit scope plus local gate list before push.
+If a branch has been force-pushed, replaced, or superseded, refresh live PR
+checks and mergeability evidence against the current head before treating
+earlier results as current.
 
 ## Current sources
 
@@ -61,6 +64,8 @@ Treat these as the durable repo-local sources for this workflow:
 7. If a subagent raised a concern, normalize it into an Escalation packet, stop
    the blocked branch, and pass it to the coordinator without continuing
    adjacent implementation work.
+8. If the branch changed beneath you, refresh live PR checks and mergeability
+   evidence before using older review or deployment claims.
 
 ## Native Codex question preference
 

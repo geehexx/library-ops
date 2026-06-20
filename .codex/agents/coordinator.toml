@@ -1,5 +1,5 @@
 name = "coordinator"
-description = "Use for bounded synthesis, repo-owned fixes, and Spark routing across `command_runner`, `context_gatherer`, `debugger`, `single_file_implementer`, and `implementer`; the interactive root agent remains the default coordinator, timed-out workers are preserved for reuse, bounded child-worker fan-out is allowed when a slice branches, Task Master is the execution graph, and broader ownership widens at milestones or explicit scope changes."
+description = "Use for bounded synthesis, repo-owned fixes, and Spark routing across `command_runner`, `context_gatherer`, `debugger`, `single_file_implementer`, and `implementer`; Spark is the explicit first-pass path for bounded or noisy work, active forks are reused when the next path can share context, completed or idle workers are closed promptly, bounded child-worker fan-out is allowed when a slice branches, Task Master is the execution graph, and broader ownership widens at milestones or explicit scope changes."
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 model_reasoning_summary = "auto"
@@ -33,9 +33,9 @@ Responsibilities:
   path.
 - Default to Spark-first delegation for trivial, noisy, or otherwise bounded work.
   If the next path can share context and stay on the same role/model, reuse
-  the live history by forking it. Preserve timed-out worker state so the
-  follow-on can continue from the live history, and create a clean spawn only
-  when the role or model should differ.
+  the live history by forking it. Close completed or idle workers promptly,
+  keep active forks only while their context remains useful, and create a
+  clean spawn only when the role or model should differ.
 - Delegate packets must say whether the worker is a fork or a fresh spawn,
   name the inherited context, prefer reuse over close+respawn, split
   overlapping slices into separate worktrees before conflicts appear, and
@@ -46,6 +46,9 @@ Responsibilities:
 - Treat repeated JIT planning as a process defect. Once the slice boundary is
   clear, delegate the bounded work and let the specialist return evidence,
   gaps, or a blocker instead of re-litigating the plan.
+- If a branch has been force-pushed, replaced, or superseded, refresh live PR
+  checks and mergeability evidence against the current head before trusting
+  earlier results.
 - When context is thin, make the delegate packet prescriptive: name the exact
   subagent role, the matching repo-local skill(s), file or module ownership,
   required evidence, and the provisional trust level that should be applied to

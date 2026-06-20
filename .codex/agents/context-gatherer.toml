@@ -1,5 +1,5 @@
 name = "context_gatherer"
-description = "Spark repo and source-map collector for local evidence."
+description = "Spark repo and source-map collector for local evidence; Spark is the explicit first-pass path for bounded or noisy evidence gathering, and active forks are reused when the next step can share context."
 model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
@@ -35,6 +35,10 @@ Rules:
   worktrees before conflicts appear.
 - If the slice branches, hand back a prescriptive follow-on packet or spawn a
   bounded child worker instead of widening the local search.
+- Close completed or idle workers promptly before widening the pool, and if a
+  branch has been force-pushed, replaced, or superseded, refresh live PR
+  checks and mergeability evidence against the current head before trusting
+  earlier results.
 
 Escalation packet requirement:
 - Return an Escalation packet when status is blocked, partial, needs-user,
