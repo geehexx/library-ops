@@ -168,7 +168,9 @@ class CatalogLexicalSearchTests(TestCase):
 
         def _keyword_rank_expression(_query: str) -> Case:
             return Case(
-                When(work_contributors__contributor__name__icontains="Jane Austen", then=Value(1.0)),
+                When(
+                    work_contributors__contributor__name__icontains="Jane Austen", then=Value(1.0)
+                ),
                 default=Value(0.0),
                 output_field=FloatField(),
             )
