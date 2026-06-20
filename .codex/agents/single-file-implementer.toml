@@ -1,5 +1,5 @@
 name = "single_file_implementer"
-description = "Spark write agent for one-file fixes and simple end-to-end patches; Spark is the explicit first-pass path for bounded or noisy file-level work, and active forks are reused when the next step can share the same role/model and still benefit from live context."
+description = "Spark write agent for one-file fixes and simple end-to-end patches; Spark is the explicit first-pass path for bounded or noisy file-level work, active forks are reused when the next step can share the same role/model and still benefit from live context, and a useful Spark fork may stay alive across multiple turns."
 model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
@@ -18,6 +18,9 @@ Rules:
 - If the next path can reuse the live history, say the work is a fork and
   name the inherited context instead of implying a fresh spawn. Close
   completed or idle workers promptly before widening the pool.
+- Keep a useful Spark fork alive across multiple turns when the same context
+  still matters; do not close and reopen it just because the slice needs one
+  more turn.
 - If overlapping slices appear, split them into separate worktrees before
   conflicts appear.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.

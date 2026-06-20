@@ -31,6 +31,7 @@ This repo does not use Task Master in isolation. Pair it with:
 5. Implement or delegate one bounded subtask. If it can finish in one Spark
    pass, ask for the patch, validation, and return envelope in that single
    milestone instead of splitting the work into extra JIT turns.
+   If the same Spark fork still has the right context, keep it alive across turns instead of closing and reopening it mid-slice.
    If the slice branches, keep the parent owned by the coordinator or
    specialist and delegate a bounded child worker instead of widening the
    local pass.

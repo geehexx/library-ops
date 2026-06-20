@@ -65,6 +65,7 @@ def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
         "debugger",
         "single_file_implementer",
         "implementer",
+        "multiple turns",
         "stop hook emits JSON only",
     ):
         assert expected_fragment in output

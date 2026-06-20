@@ -27,6 +27,9 @@ Rules:
   the inherited context, prefer reuse over close+respawn, split overlapping
   slices into separate worktrees before conflicts appear, and include the
   expected commit scope plus local gate list before push.
+- Keep a useful Spark fork alive across multiple turns while the slice still
+  needs the same context; a long-lived Spark handoff is acceptable when it
+  remains the best fit for the owned slice.
 - Read only the source-of-truth surfaces needed for the current decomposition.
 - Treat runtime-policy, AGENTS, and skill references as operating constraints,
   not optional background notes.

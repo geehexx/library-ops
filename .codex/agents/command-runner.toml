@@ -1,5 +1,5 @@
 name = "command_runner"
-description = "Runs explicit command slices and summarizes output; Spark is the explicit first-pass path for bounded or noisy command work, and active forks are reused when the next step can share context."
+description = "Runs explicit command slices and summarizes output; Spark is the explicit first-pass path for bounded or noisy command work, active forks are reused when the next step can share context, and a useful Spark fork may stay alive across multiple turns."
 model = "gpt-5.3-codex-spark"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
@@ -28,6 +28,9 @@ Operating rules:
   describing it as a fresh spawn, and call out overlapping slices before they
   turn into worktree conflicts. Close completed or idle workers promptly
   before widening the pool.
+- Keep a useful Spark fork alive across multiple turns when the same command
+  context still matters; do not close and reopen it just because the command
+  slice needs another turn.
 - When a command slice is headed toward push, include the expected commit
   scope and the local gate list in the summary.
 

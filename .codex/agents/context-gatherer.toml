@@ -1,5 +1,5 @@
 name = "context_gatherer"
-description = "Spark repo and source-map collector for local evidence; Spark is the explicit first-pass path for bounded or noisy evidence gathering, and active forks are reused when the next step can share context."
+description = "Spark repo and source-map collector for local evidence; Spark is the explicit first-pass path for bounded or noisy evidence gathering, active forks are reused when the next step can share context, and a useful Spark fork may stay alive across multiple turns."
 model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
@@ -33,6 +33,9 @@ Rules:
   fork or a fresh spawn, name the inherited context, prefer reuse over
   close+respawn, and note overlapping slices so they can move into separate
   worktrees before conflicts appear.
+- Keep a useful Spark fork alive across multiple turns when the same source
+  map or evidence path still matters; do not close and reopen it just because
+  the evidence collection took more than one turn.
 - If the slice branches, hand back a prescriptive follow-on packet or spawn a
   bounded child worker instead of widening the local search.
 - Close completed or idle workers promptly before widening the pool, and if a

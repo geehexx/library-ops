@@ -25,6 +25,7 @@ Rules:
   the work is a fork, name the inherited context, and prefer reuse over
   close+respawn for active forks while closing completed or idle workers
   promptly.
+- If the same Spark worker still has the right context, keep a useful Spark fork alive across multiple turns instead of closing and reopening it mid-slice.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.
 - If overlapping slices show up, split them into separate worktrees before
   conflicts appear.

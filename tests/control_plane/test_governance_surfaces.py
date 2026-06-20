@@ -119,6 +119,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "pass for bounded or noisy work" in config_text
     assert "close completed or idle" in config_text
     assert "workers promptly and reuse active forks with useful context" in config_text
+    assert "useful Spark fork alive across multiple turns" in coordinator_text
     assert "fork or a" in coordinator_text
     assert "fresh spawn" in coordinator_text
     assert "inherited context" in coordinator_text
@@ -134,6 +135,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "separate worktrees before" in implementer_text
     assert "conflicts appear" in implementer_text
     assert "expected commit scope and local gate list" in implementer_text
+    assert "useful Spark fork alive across multiple turns" in implementer_text
     assert 'model = "gpt-5.3-codex-spark"' in debugger_text
     assert 'sandbox_mode = "danger-full-access"' in debugger_text
     assert "worker is a fork" in debugger_text
@@ -143,6 +145,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "expected commit scope and local gate list" in debugger_text
     assert 'model = "gpt-5.3-codex-spark"' in single_file_text
     assert 'sandbox_mode = "danger-full-access"' in single_file_text
+    assert "useful Spark fork alive across multiple turns" in single_file_text
     assert "work is a fork" in single_file_text
     assert "fresh spawn" in single_file_text
     assert "separate worktrees before" in single_file_text
@@ -150,6 +153,9 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "expected commit scope and local gate list" in single_file_text
     assert "Pyright" in django_skill_text
     assert "Pyright" in django_prompt_text
+    assert "keep it alive across turns" in (
+        REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md"
+    ).read_text(encoding="utf-8")
     assert (
         "Use manager/model methods first for aggregate-specific CRUD/archive" in django_skill_text
     )
