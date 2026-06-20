@@ -62,17 +62,21 @@ class TestCirculationAndSearchE2E:
         page.get_by_role("link", name="Checkout copy").click()
         checkout_dialog = page.get_by_role("dialog", name="Checkout copy")
         expect(checkout_dialog).to_be_visible()
-        expect(checkout_dialog.get_by_label("Copy")).to_be_visible()
-        expect(checkout_dialog.get_by_label("Borrower")).to_be_visible()
+        expect(checkout_dialog.get_by_role("combobox", name="Copy:")).to_be_visible()
+        expect(checkout_dialog.get_by_role("combobox", name="Borrower:")).to_be_visible()
         expect(
             checkout_dialog.get_by_text(
-                "Start typing a barcode, title, borrower name, or patron code."
+                "Search first, then choose from the filtered select lists below."
             )
         ).to_be_visible()
         assert_visual_snapshot(page, "circulation_search", "checkout-form.png")
 
-        checkout_dialog.get_by_label("Copy").fill(copy.barcode)
-        checkout_dialog.get_by_label("Borrower").fill("Ada Lovelace")
+        checkout_dialog.get_by_role("combobox", name="Copy:").select_option(
+            label=f"{copy.barcode} · Browser Circulation Work"
+        )
+        checkout_dialog.get_by_role("combobox", name="Borrower:").select_option(
+            label=f"Ada Lovelace (PATRON-{member.pk:04d})"
+        )
         page.get_by_role("button", name="Checkout copy").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
@@ -84,13 +88,15 @@ class TestCirculationAndSearchE2E:
         page.get_by_role("link", name="Return copy").click()
         return_dialog = page.get_by_role("dialog", name="Return copy")
         expect(return_dialog).to_be_visible()
-        expect(return_dialog.get_by_label("Loan")).to_be_visible()
+        expect(return_dialog.get_by_role("combobox", name="Loan:")).to_be_visible()
         expect(
             return_dialog.get_by_text(
-                "Start typing a barcode, title, borrower name, or patron code."
+                "Search first, then choose from the filtered select lists below."
             )
         ).to_be_visible()
-        return_dialog.get_by_label("Loan").fill(copy.barcode)
+        return_dialog.get_by_role("combobox", name="Loan:").select_option(
+            label=f"BC-BROWSER-001 · Browser Circulation Work · Ada Lovelace (PATRON-{member.pk:04d})"
+        )
         page.get_by_role("button", name="Return copy").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")

@@ -4,7 +4,7 @@
 {% block page_title %}Circulation Dashboard{% endblock %}
 
 {% block content %}
-  <section class="panel">
+  <section class="panel stack">
     <p class="eyebrow">Circulation</p>
     <p>
       {% if role == "Member" %}
@@ -50,83 +50,121 @@
     </section>
   {% endif %}
 
-  <section class="grid">
-    <article class="panel">
-      <h2 style="margin-top: 0;">Active loans</h2>
+  <section class="grid dashboard-grid">
+    <article class="panel stack">
+      <header class="dashboard-panel-head">
+        <div>
+          <h2>Active loans</h2>
+          <p class="muted">Operational rows sorted by nearest due date.</p>
+        </div>
+        <span class="pill">{{ active_loan_count }} rows</span>
+      </header>
       {% if active_loans %}
-        <table>
-          <thead>
-            <tr>
-              <th>Copy</th>
-              {% if show_borrower_column %}<th>Borrower</th>{% endif %}
-              <th>Due</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for loan in active_loans %}
+        <div class="dashboard-table-wrap">
+          <table class="dashboard-table">
+            <thead>
               <tr>
-                <td>{{ loan.copy.barcode }} - {{ loan.copy.edition.work.title }}</td>
-                {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
-                <td>{{ loan.due_at|date:"Y-m-d" }}</td>
+                <th>Copy</th>
+                {% if show_borrower_column %}<th>Borrower</th>{% endif %}
+                <th>Due</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for loan in active_loans %}
+                <tr>
+                  <td>
+                    <div class="dashboard-copy">
+                      <span class="dashboard-copy-title">{{ loan.copy.barcode }}</span>
+                      <span class="dashboard-copy-subtitle">{{ loan.copy.edition.work.title }}</span>
+                    </div>
+                  </td>
+                  {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
+                  <td><time class="dashboard-datetime" datetime="{{ loan.due_at|date:'c' }}">{{ loan.due_at|date:"Y-m-d" }}</time></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
         <p class="muted">No active loans are visible.</p>
       {% endif %}
     </article>
 
-    <article class="panel">
-      <h2 style="margin-top: 0;">Overdue loans</h2>
+    <article class="panel stack">
+      <header class="dashboard-panel-head">
+        <div>
+          <h2>Overdue loans</h2>
+          <p class="muted">Items needing the most immediate attention.</p>
+        </div>
+        <span class="pill">{{ overdue_loan_count }} rows</span>
+      </header>
       {% if overdue_loans %}
-        <table>
-          <thead>
-            <tr>
-              <th>Copy</th>
-              {% if show_borrower_column %}<th>Borrower</th>{% endif %}
-              <th>Due</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for loan in overdue_loans %}
+        <div class="dashboard-table-wrap">
+          <table class="dashboard-table">
+            <thead>
               <tr>
-                <td>{{ loan.copy.barcode }} - {{ loan.copy.edition.work.title }}</td>
-                {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
-                <td>{{ loan.due_at|date:"Y-m-d" }}</td>
+                <th>Copy</th>
+                {% if show_borrower_column %}<th>Borrower</th>{% endif %}
+                <th>Due</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for loan in overdue_loans %}
+                <tr>
+                  <td>
+                    <div class="dashboard-copy">
+                      <span class="dashboard-copy-title">{{ loan.copy.barcode }}</span>
+                      <span class="dashboard-copy-subtitle">{{ loan.copy.edition.work.title }}</span>
+                    </div>
+                  </td>
+                  {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
+                  <td><time class="dashboard-datetime" datetime="{{ loan.due_at|date:'c' }}">{{ loan.due_at|date:"Y-m-d" }}</time></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
         <p class="muted">No overdue loans are visible.</p>
       {% endif %}
     </article>
 
-    <article class="panel">
-      <h2 style="margin-top: 0;">Recent returns</h2>
+    <article class="panel stack dashboard-grid--full">
+      <header class="dashboard-panel-head">
+        <div>
+          <h2>Recent returns</h2>
+          <p class="muted">Most recent returns first, with the returned timestamp preserved.</p>
+        </div>
+        <span class="pill">{{ recent_return_count }} rows</span>
+      </header>
       {% if recent_returns %}
-        <table>
-          <thead>
-            <tr>
-              <th>Copy</th>
-              {% if show_borrower_column %}<th>Borrower</th>{% endif %}
-              <th>Returned</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for loan in recent_returns %}
+        <div class="dashboard-table-wrap">
+          <table class="dashboard-table">
+            <thead>
               <tr>
-                <td>
-                  <strong>{{ loan.copy.barcode }}</strong><br>
-                  <span class="muted">{{ loan.copy.edition.work.title }}</span>
-                </td>
-                {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
-                <td>{{ loan.returned_at|date:"Y-m-d H:i" }}</td>
+                <th>Copy</th>
+                {% if show_borrower_column %}<th>Borrower</th>{% endif %}
+                <th>Returned</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for loan in recent_returns %}
+                <tr>
+                  <td>
+                    <div class="dashboard-copy">
+                      <span class="dashboard-copy-title">{{ loan.copy.barcode }}</span>
+                      <span class="dashboard-copy-subtitle">{{ loan.copy.edition.work.title }}</span>
+                    </div>
+                  </td>
+                  {% if show_borrower_column %}<td>{{ loan.borrower.email }}</td>{% endif %}
+                  <td>
+                    <time class="dashboard-datetime" datetime="{{ loan.returned_at|date:'c' }}">{{ loan.returned_at|date:"Y-m-d H:i" }}</time>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       {% else %}
         <p class="muted">No recent returns are visible.</p>
       {% endif %}
