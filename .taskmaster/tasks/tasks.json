@@ -1206,6 +1206,18 @@
             "dependencies": [],
             "parentTaskId": 14,
             "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "Clear baseline python:complexity blockers exposed by pre-push",
+            "description": "Trim the four functions flagged by checks:prepush without widening scope.",
+            "details": "Adopted checks:prepush now fails on python:complexity in src/libraryops/catalog/management/commands/import_public_domain_catalog.py:263 handle, src/libraryops/catalog/models.py:40 validate_cover_image_format, src/libraryops/catalog/selectors.py:132 _collect_subject_values, and src/libraryops/circulation/forms.py:170 _match_choice. This subtask owns the smallest code changes needed to bring those functions under the baseline threshold so the new pre-push gate can pass honestly. Keep the work bounded to these functions and their immediate tests; do not expand into generic style cleanup or unrelated refactors.",
+            "status": "pending",
+            "dependencies": [
+              "14.9"
+            ],
+            "parentTaskId": 14,
+            "parentId": "undefined"
           }
         ],
         "updatedAt": "2026-06-20T15:12:20.660Z",
@@ -1476,11 +1488,12 @@
             "id": 18,
             "title": "Circulation forms/views architectural review and split",
             "description": "Review the circulation forms/views boundary and separate form construction, query or policy logic, and response rendering where the current implementation still couples them too tightly.",
-            "details": "Focus on src/libraryops/circulation/forms.py, src/libraryops/circulation/views.py, and any helpers they still share. Decide whether common behavior should move into a helper, service, or module boundary, then update the relevant tests and notes so the split is explicit. Keep user-visible behavior unchanged while the boundary is clarified.\n<info added on 2026-06-20T15:36:12.641Z>\n2026-06-20 note: This is the circulation forms/views package-boundary refinement follow-on from the completed circulation architecture review. Keep it separate from the UX tasks in 16.12/16.13 and keep the scope on forms/views boundary clarification, shared helper extraction if needed, and the related test/note updates. Gate expectation: use the standard Task Master dependency validation plus the smallest relevant Python test/lint surface for the touched boundary, and do not expand into UX polish or unrelated circulation features.\n</info added on 2026-06-20T15:36:12.641Z>",
-            "status": "pending",
+            "details": "Focus on src/libraryops/circulation/forms.py, src/libraryops/circulation/views.py, and any helpers they still share. Decide whether common behavior should move into a helper, service, or module boundary, then update the relevant tests and notes so the split is explicit. Keep user-visible behavior unchanged while the boundary is clarified.\n<info added on 2026-06-20T15:36:12.641Z>\n2026-06-20 note: This is the circulation forms/views package-boundary refinement follow-on from the completed circulation architecture review. Keep it separate from the UX tasks in 16.12/16.13 and keep the scope on forms/views boundary clarification, shared helper extraction if needed, and the related test/note updates. Gate expectation: use the standard Task Master dependency validation plus the smallest relevant Python test/lint surface for the touched boundary, and do not expand into UX polish or unrelated circulation features.\n</info added on 2026-06-20T15:36:12.641Z>\n<info added on 2026-06-20T17:41:43.824Z>\nImplemented the circulation forms/views boundary split by moving read/query/lookup behavior into src/libraryops/circulation/selectors.py and HTMX/browser redirect selection into src/libraryops/circulation/responses.py. forms.py now only owns field construction and submit orchestration, and views.py now only owns page orchestration and delegates dashboard slicing/redirect rendering to helpers. Files changed: src/libraryops/circulation/forms.py, src/libraryops/circulation/views.py, src/libraryops/circulation/selectors.py, src/libraryops/circulation/responses.py, tests/unit/circulation/test_boundary_helpers.py. Validation: uv run pyright src/libraryops/circulation/forms.py src/libraryops/circulation/views.py src/libraryops/circulation/selectors.py src/libraryops/circulation/responses.py tests/unit/circulation/test_boundary_helpers.py; uv run ruff check src/libraryops/circulation/forms.py src/libraryops/circulation/views.py src/libraryops/circulation/selectors.py src/libraryops/circulation/responses.py tests/unit/circulation/test_boundary_helpers.py; uv run pytest -q tests/unit/circulation/test_boundary_helpers.py tests/unit/circulation/test_workflows.py tests/unit/circulation/test_views.py; git diff --check. Behavior unchanged.\n</info added on 2026-06-20T17:41:43.824Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T17:41:43.971Z"
           },
           {
             "id": 19,
@@ -1507,7 +1520,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T17:30:21.104Z",
+        "updatedAt": "2026-06-20T17:41:43.971Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
@@ -1528,7 +1541,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T17:30:21.105Z",
+      "lastModified": "2026-06-20T17:41:43.972Z",
       "taskCount": 17,
       "completedCount": 13,
       "tags": [

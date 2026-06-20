@@ -2,29 +2,21 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import FormView, TemplateView
 
 from libraryops.accounts.permissions import RoleContextMixin
-from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 from libraryops.circulation.forms import CheckoutForm, ReturnForm
-from libraryops.circulation.models import Loan
+from libraryops.circulation.responses import workflow_response
+from libraryops.circulation.selectors import loan_dashboard_context
 
-
-def _workflow_response(request: Any, redirect_url: str) -> HttpResponse:
-    """Return a browser redirect or HTMX redirect for workflow submissions."""
-
-    if getattr(request, "htmx", False):
-        response = HttpResponse(status=204)
-        response["HX-Redirect"] = redirect_url
-        return response
-    return HttpResponseRedirect(redirect_url)
+if TYPE_CHECKING:
+    from django.http import HttpResponse
 
 
 class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
@@ -32,49 +24,19 @@ class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
 
     template_name = "circulation/loan_dashboard.html"
 
-    def get_visible_loans(self):
-        """Return the loans visible to the current user."""
-
-        loans = Loan.objects.select_related(
-            "copy__edition__work",
-            "borrower",
-            "copy",
-            "copy__edition",
-        ).order_by("-checked_out_at")
-        if self.get_user_role() == ROLE_MEMBER:
-            return loans.filter(borrower=self.request.user)
-        return loans
-
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         """Attach the active, overdue, and recent loan slices."""
 
         context = super().get_context_data(**kwargs)
-        now = timezone.now()
-        visible_loans = self.get_visible_loans()
-        active_loans = visible_loans.filter(returned_at__isnull=True).order_by(
-            "due_at",
-            "-checked_out_at",
-        )
-        overdue_loans = active_loans.filter(due_at__lt=now)
-        recent_returns = list(
-            visible_loans.filter(returned_at__isnull=False).order_by(
-                "-returned_at",
-                "-checked_out_at",
-            )[:5]
-        )
+        role = self.get_user_role() or ""
         context.update(
-            {
-                "visible_loan_count": visible_loans.count(),
-                "active_loans": active_loans,
-                "active_loan_count": active_loans.count(),
-                "overdue_loans": overdue_loans,
-                "overdue_loan_count": overdue_loans.count(),
-                "recent_returns": recent_returns,
-                "recent_return_count": len(recent_returns),
-                "can_manage_loans": bool(self.request.user.has_perm("circulation.change_loan")),
-                "show_borrower_column": self.get_user_role() in (ROLE_ADMIN, ROLE_LIBRARIAN),
-            }
+            loan_dashboard_context(
+                self.request.user,
+                role=role,
+                now=timezone.now(),
+            )
         )
+        context["can_manage_loans"] = bool(self.request.user.has_perm("circulation.change_loan"))
         return context
 
 
@@ -124,7 +86,7 @@ class CirculationWorkflowView(
         """Redirect to the dashboard after a workflow succeeds."""
 
         _ = form
-        return _workflow_response(self.request, self.get_success_url())
+        return workflow_response(self.request, self.get_success_url())
 
 
 class LoanCheckoutView(CirculationWorkflowView):
