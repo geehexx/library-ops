@@ -2,22 +2,19 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, cast
+from collections.abc import Callable
+from typing import Any, ClassVar, cast
 
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db.models import QuerySet
+from django.utils.safestring import SafeString
 from django.utils.html import format_html, format_html_join
 
 from libraryops.accounts.roles import ROLE_MEMBER
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
-    from django.db.models import QuerySet
-    from django.utils.safestring import SafeString
 
 
 class _AutocompleteTextInput(forms.TextInput):
