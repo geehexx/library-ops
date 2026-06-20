@@ -251,7 +251,16 @@ class FoundationCatalogSearchTests(TestCase):
         assert self.title_work.pk in [work.pk for work in works]
         self.assertContains(response, 'name="q"', status_code=200)
         self.assertContains(response, 'value="9780141439518"', status_code=200)
-        self.assertContains(response, "Showing results for", status_code=200)
+        self.assertContains(
+            response,
+            'role="status" aria-live="polite"',
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            'Showing 2 results for "9780141439518"',
+            status_code=200,
+        )
         self.assertContains(response, "Exact identifier hit", status_code=200)
         self.assertContains(response, "Matched identifier: 9780141439518", status_code=200)
         self.assertContains(response, "Availability: Available", status_code=200)
@@ -274,6 +283,12 @@ class FoundationCatalogSearchTests(TestCase):
         assert response.status_code == 200
         works = list(response.context["works"])
         assert [work.pk for work in works] == [self.exact_work.pk]
+        self.assertContains(
+            response,
+            'role="status" aria-live="polite"',
+            status_code=200,
+        )
+        self.assertContains(response, "Showing 1 result", status_code=200)
         self.assertContains(response, 'name="availability"', status_code=200)
         self.assertContains(response, 'name="contributor"', status_code=200)
         self.assertContains(response, 'name="subject"', status_code=200)

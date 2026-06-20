@@ -89,8 +89,10 @@
         </div>
       </fieldset>
     </form>
-    {% if search_query %}
-      <p class="muted">Showing results for "{{ search_query }}"</p>
+    {% if search_active %}
+      <p class="muted" role="status" aria-live="polite">
+        Showing {{ result_count }} result{{ result_count|pluralize }}{% if search_query %} for "{{ search_query }}"{% endif %}
+      </p>
     {% endif %}
     {% if can_manage_catalog %}
       <div class="nav-actions">
@@ -148,6 +150,9 @@
           </li>
         {% endfor %}
       </ul>
+    {% elif search_active %}
+      <p role="status" aria-live="polite">No matching books found.</p>
+      <p class="muted">Try a title, author, ISBN, or broader subject term.</p>
     {% else %}
       <p>No foundation records exist yet.</p>
     {% endif %}
