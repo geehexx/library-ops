@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
@@ -16,6 +15,9 @@ from libraryops.accounts.permissions import RoleContextMixin
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 from libraryops.circulation.forms import CheckoutForm, ReturnForm
 from libraryops.circulation.models import Loan
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 
 def _workflow_response(request: Any, redirect_url: str) -> HttpResponse:
