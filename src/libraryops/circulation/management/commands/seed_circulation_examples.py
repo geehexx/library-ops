@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
@@ -15,6 +14,9 @@ from django.utils import timezone
 from libraryops.catalog.models import BookEdition
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
 
 EXAMPLE_MEMBER_EMAIL = "member@libraryops.demo"
 EXAMPLE_ACTOR_EMAILS = ("librarian@libraryops.demo", "admin@libraryops.demo")
