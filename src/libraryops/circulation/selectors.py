@@ -74,11 +74,15 @@ def checkout_copy_queryset(query: str | None = None) -> Any:
 def checkout_borrower_queryset(query: str | None = None) -> Any:
     """Return the borrowers a checkout workflow may select."""
 
-    queryset = User.objects.filter(groups__name=ROLE_MEMBER).order_by(
-        "last_name",
-        "first_name",
-        "email",
-    ).distinct()
+    queryset = (
+        User.objects.filter(groups__name=ROLE_MEMBER)
+        .order_by(
+            "last_name",
+            "first_name",
+            "email",
+        )
+        .distinct()
+    )
     search = _search_term(query)
     if not search:
         return queryset
