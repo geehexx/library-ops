@@ -29,8 +29,9 @@ tool_call_mcp_elicitation = true
 
 # Root coordinator plus direct specialists. The default root session stays
 # read-only so planning, synthesis, and user interaction remain separate from
-# write-capable implementation agents. Depth-2 delegation stays available for
-# explicit expert-panel or micro-worker chains, not habitual recursive fan-out.
+# command, implementation, and monitoring work that should go to specialists.
+# Depth-2 delegation stays available for explicit expert-panel or
+# micro-worker chains, not habitual recursive fan-out.
 # The thread budget is sized for active fan-out plus a few completed-but-not-yet-
 # closed workers; if the pool starts to saturate, close finished agents first
 # and reuse live agents by role before widening the pool further.
@@ -40,7 +41,7 @@ max_depth = 2
 job_max_runtime_seconds = 1800
 
 [agents.coordinator]
-description = "Coordinates source-of-truth alignment, Task Master sequencing, Spec Kit governance, decision gates, and final judgment."
+description = "Read-mostly coordinator for source-of-truth alignment, Task Master sequencing, Spec Kit governance, decision gates, and final judgment."
 config_file = "agents/coordinator.toml"
 
 [agents.prd_architect]
