@@ -176,8 +176,8 @@ Implementation notes:
 - Exact ISBN/barcode results should short-circuit or rank first, ahead of other
   lexical matches.
 - Result rows include match explanation from the search service, with exact
-  identifier matches clearly distinguished from lexical matches and the matched
-  identifier value surfaced directly on the card.
+  identifier matches shown as a distinct result state from lexical matches and
+  the matched identifier value surfaced directly on the card.
 - Role-aware actions: anonymous/member see details; librarian/admin see checkout.
 - HTMX can update result list and filters without full reload.
 

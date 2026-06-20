@@ -637,7 +637,7 @@ Provide exact-identifier-first lexical catalog search with PostgreSQL full-text 
 - **Acceptance criteria:**
   - Exact ISBN ranks first.
   - Exact barcode routes directly to copy/edition context.
-  - Exact-identifier results surface the matched identifier value and current availability clearly in the rendered UI.
+  - Exact-identifier results surface the matched identifier value and current availability in a visible, evaluator-readable position in the rendered UI.
 
 #### Feature: C6.F2 PostgreSQL full-text search
 
