@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from django.core.management import call_command
-from django.test import TestCase
+from django.core.exceptions import ImproperlyConfigured
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from tests.factories import (
     BookCopyFactory,
@@ -14,7 +15,9 @@ from tests.factories import (
     build_isbn13,
 )
 
+from libraryops.circulation.forms import CheckoutForm
 from libraryops.circulation.models import Loan
+from libraryops.circulation.views import CirculationWorkflowView
 from libraryops.inventory.models import BookCopyStatus
 
 
@@ -69,6 +72,22 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Ada Lovelace")
         self.assertContains(response, f"PATRON-{self.member.pk:04d}")
 
+    def test_autocomplete_widget_renders_datalist_markup(self) -> None:
+        """Autocomplete widgets should keep the datalist markup intact."""
+
+        form = CheckoutForm()
+        widget = form.fields["copy"].widget
+        widget.options = ["BC-WF-001 · The Dispossessed"]
+
+        rendered = widget.render("copy", "BC-WF-001")
+
+        self.assertIn('list="checkout-copy-options"', rendered)
+        self.assertIn('<datalist id="checkout-copy-options">', rendered)
+        self.assertIn(
+            '<option value="BC-WF-001 · The Dispossessed"></option>',
+            rendered,
+        )
+
     def test_checkout_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Checkout workflow should swap in the fragment when loaded through HTMX."""
 
@@ -80,6 +99,20 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertTemplateUsed(response, "circulation/_workflow_form.html")
         self.assertContains(response, "Checkout copy")
         self.assertContains(response, 'aria-modal="true"')
+
+    def test_workflow_template_names_require_a_template_configuration(self) -> None:
+        """Workflow views should fail fast when the page template is missing."""
+
+        request = RequestFactory().get("/")
+        view = type(
+            "MissingTemplateWorkflowView",
+            (CirculationWorkflowView,),
+            {"template_name": None},
+        )()
+        view.request = request
+
+        with self.assertRaises(ImproperlyConfigured):
+            view.get_template_names()
 
     def test_checkout_workflow_persists_a_loan(self) -> None:
         """Submitting the checkout form should create a loan and mark the copy on loan."""
