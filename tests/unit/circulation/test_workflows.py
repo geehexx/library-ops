@@ -16,6 +16,7 @@ from tests.factories import (
     build_isbn13,
 )
 
+from libraryops.circulation.forms import CheckoutForm
 from libraryops.circulation.models import Loan
 from libraryops.circulation.views import CirculationWorkflowView
 from libraryops.inventory.models import BookCopyStatus
@@ -94,6 +95,19 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "The Dispossessed")
         self.assertNotContains(response, self.return_copy.barcode)
         self.assertNotContains(response, "<datalist")
+
+    def test_autocomplete_widget_renders_datalist_markup(self) -> None:
+        """Autocomplete widgets should keep the datalist markup intact."""
+
+        form = CheckoutForm()
+        widget = form.fields["copy"].widget
+        widget.options = ["BC-WF-001 · The Dispossessed"]
+
+        rendered = widget.render("copy", "BC-WF-001")
+
+        assert 'list="checkout-copy-options"' in rendered
+        assert '<datalist id="checkout-copy-options">' in rendered
+        assert '<option value="BC-WF-001 · The Dispossessed"></option>' in rendered
 
     def test_checkout_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Checkout workflow should swap in the fragment when loaded through HTMX."""
