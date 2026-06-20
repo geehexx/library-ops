@@ -1101,7 +1101,7 @@
             "id": 2,
             "title": "Resolve review leftovers and ownership gaps",
             "description": "Close remaining PR, review, and branch-policy mismatches.",
-            "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.\n<info added on 2026-06-19T17:48:54.492Z>\n2026-06-20: control-plane permissiveness cleanup finished for AGENTS, .codex config/agents/hooks/rules, and control-plane tests. Validation: uv run pytest -q tests/control_plane/test_governance_surfaces.py tests/control_plane/test_session_start_notice.py; git diff --check. Missing follow-on Task Master additions: control-plane test-cleanup, coordinator_root/workspace-capable reconciliation, and remaining cache/workaround wording cleanup.\n</info added on 2026-06-19T17:48:54.492Z>\n<info added on 2026-06-19T18:05:08.848Z>\nFollow-on work now includes:\n1. Simplify historical control-plane tests (Task 14.5)\n2. Reconcile Task Master and Spec Kit validation (Task 16.2)\n</info added on 2026-06-19T18:05:08.848Z>\n<info added on 2026-06-19T19:00:31.328Z>\n2026-06-20: Added bounded property coverage under tests/property only, without touching src/libraryops/**, tests/unit/search/test_lexical.py, or tests/control_plane/**. New files: tests/property/circulation/test_loan_invariants.py and tests/property/search/test_lexical_normalization.py. Coverage added: checkout/return state-machine consistency, unavailable checkout rejection, return-without-active-loan failure via closed-loan retry, and whitespace-normalization idempotence for catalog search. Validation passed: uv run pyright tests/property/circulation/test_loan_invariants.py tests/property/search/test_lexical_normalization.py; uv run pytest -q tests/property/circulation/test_loan_invariants.py tests/property/search/test_lexical_normalization.py. No unit-file migration was needed for this slice.\n</info added on 2026-06-19T19:00:31.328Z>",
+            "details": "Account for late review feedback, stale TODOs, or wording that still implies unfinished work.\n<info added on 2026-06-19T17:48:54.492Z>\n2026-06-20: control-plane permissiveness cleanup finished for AGENTS, .codex config/agents/hooks/rules, and control-plane tests. Validation: uv run pytest -q tests/control_plane/test_governance_surfaces.py tests/control_plane/test_session_start_notice.py; git diff --check. Missing follow-on Task Master additions: control-plane test-cleanup, coordinator_root/workspace-capable reconciliation, and remaining cache/workaround wording cleanup.\n</info added on 2026-06-19T17:48:54.492Z>\n<info added on 2026-06-19T18:05:08.848Z>\nFollow-on work now includes:\n1. Simplify historical control-plane tests (Task 14.5)\n2. Reconcile Task Master and Spec Kit validation (Task 16.2)\n</info added on 2026-06-19T18:05:08.848Z>\n<info added on 2026-06-19T19:00:31.328Z>\n2026-06-20: Added bounded property coverage under tests/property only, without touching src/libraryops/**, tests/unit/search/test_lexical.py, or tests/control_plane/**. New files: tests/property/circulation/test_loan_invariants.py and tests/property/search/test_lexical_normalization.py. Coverage added: checkout/return state-machine consistency, unavailable checkout rejection, return-without-active-loan failure via closed-loan retry, and whitespace-normalization idempotence for catalog search. Validation passed: uv run pyright tests/property/circulation/test_loan_invariants.py tests/property/search/test_lexical_normalization.py; uv run pytest -q tests/property/circulation/test_loan_invariants.py tests/property/search/test_lexical_normalization.py. No unit-file migration was needed for this slice.\n</info added on 2026-06-19T19:00:31.328Z>\n<info added on 2026-06-20T07:10:01.396Z>\n2026-06-20: architecture-contract fix completed in the narrow search/circulation slice. Kept `src/libraryops/search/lexical.py` free of `circulation` imports, removed the `circulation.forms -> catalog.selectors -> search` detour by building the checkout available-copy queryset directly from `BookCopy`, and updated unit coverage in `tests/unit/search/test_lexical.py` and `tests/unit/circulation/test_workflows.py`. Validation passed: `PYTHONPATH=src uv run lint-imports`, `uv run pytest -q tests/unit/search/test_lexical.py tests/unit/circulation/test_workflows.py`.\n</info added on 2026-06-20T07:10:01.396Z>",
             "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 14,
@@ -1148,7 +1148,7 @@
         "description": "Drain the dependency-update queue, merge safe bumps, and confirm dependency hygiene stays green.",
         "details": "Inventory open dependency-update PRs, group them by risk, land safe updates, and resolve resulting lockfile or config drift. Keep updates aligned with the repo pinned tooling and validation model and end with every open dependency PR merged or explicitly closed.",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "14"
         ],
@@ -1178,11 +1178,12 @@
             "id": 3,
             "title": "Fix blocked dependency batches",
             "description": "Address shared commitlint and workflow issues in the blocked dependency PR set.",
-            "details": "Fix shared policy or workflow problems once in the repo, then use that to clear the blocked dependency PR batches with minimal repeated work.\n<info added on 2026-06-19T18:18:09.545Z>\nOverride `undici` version in lockfile to resolve dependency issue in PR #21.\n</info added on 2026-06-19T18:18:09.545Z>",
-            "status": "pending",
+            "details": "Fix shared policy or workflow problems once in the repo, then use that to clear the blocked dependency PR batches with minimal repeated work.\n<info added on 2026-06-19T18:18:09.545Z>\nOverride `undici` version in lockfile to resolve dependency issue in PR #21.\n</info added on 2026-06-19T18:18:09.545Z>\n<info added on 2026-06-20T07:08:34.072Z>\nCommit and push the changes, then confirm the affected Dependabot PR quality jobs rerun green.\n</info added on 2026-06-20T07:08:34.072Z>",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 15,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T07:08:25.751Z"
           },
           {
             "id": 4,
@@ -1194,7 +1195,8 @@
             "parentTaskId": 15,
             "parentId": "undefined"
           }
-        ]
+        ],
+        "updatedAt": "2026-06-20T07:08:25.751Z"
       },
       {
         "id": 16,
@@ -1256,7 +1258,8 @@
             "details": "",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           },
           {
             "id": 6,
@@ -1265,7 +1268,8 @@
             "details": "",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           },
           {
             "id": 7,
@@ -1274,7 +1278,8 @@
             "details": "",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 16
+            "parentTaskId": 16,
+            "parentId": "undefined"
           }
         ],
         "updatedAt": "2026-06-20T06:52:46.128Z"
@@ -1282,13 +1287,13 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T06:52:46.129Z",
+      "lastModified": "2026-06-20T07:08:25.751Z",
       "taskCount": 16,
       "completedCount": 12,
       "tags": [
         "master"
       ],
-      "created": "2026-06-20T06:53:54.825Z",
+      "created": "2026-06-20T07:08:25.828Z",
       "description": "Tasks for master context"
     }
   },
