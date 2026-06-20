@@ -135,7 +135,8 @@ class CatalogLexicalSearchTests(TestCase):
 
     @patch("libraryops.search.lexical.connection.vendor", "postgresql")
     def test_exact_title_phrase_ranks_ahead_of_broader_title_text_hits(self) -> None:
-        """An exact normalized title phrase should keep the exact label while looser hits stay keyword-ranked."""
+        """An exact normalized title phrase should keep the exact label while
+        looser hits stay keyword-ranked."""
 
         def _keyword_rank_expression(_query: str) -> Case:
             return Case(
@@ -164,7 +165,8 @@ class CatalogLexicalSearchTests(TestCase):
 
     @patch("libraryops.search.lexical.connection.vendor", "postgresql")
     def test_exact_author_phrase_ranks_ahead_of_broader_author_text_hits(self) -> None:
-        """An exact normalized contributor phrase should keep the exact label while looser hits stay keyword-ranked."""
+        """An exact normalized contributor phrase should keep the exact label
+        while looser hits stay keyword-ranked."""
 
         def _keyword_rank_expression(_query: str) -> Case:
             return Case(
