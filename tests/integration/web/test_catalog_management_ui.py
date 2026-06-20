@@ -70,7 +70,10 @@ class CatalogManagementUiTests(TestCase):
         self.assertContains(response, "You do not have access to this page", status_code=403)
         self.assertContains(
             response,
-            "Use an account with the right role, or contact an administrator if you expected access.",
+            (
+                "Use an account with the right role, or contact an administrator "
+                "if you expected access."
+            ),
             status_code=403,
         )
         self.assertContains(response, reverse("home"), status_code=403)
