@@ -94,7 +94,10 @@ class FoundationNavigationTests(TestCase):
         )
         self.assertContains(
             forbidden_response,
-            "Use an account with the right role, or contact an administrator if you expected access.",
+            (
+                "Use an account with the right role, or contact an administrator "
+                "if you expected access."
+            ),
             status_code=403,
         )
         self.assertContains(forbidden_response, reverse("home"), status_code=403)

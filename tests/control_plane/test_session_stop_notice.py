@@ -9,11 +9,11 @@ from io import StringIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-import pytest
-
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from types import ModuleType
+
+    import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 HOOK_PATH = REPO_ROOT / ".codex" / "hooks" / "session_stop_notice.py"
