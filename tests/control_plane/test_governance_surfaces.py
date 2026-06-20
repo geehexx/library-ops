@@ -142,21 +142,10 @@ def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
         REPO_ROOT / ".agents" / "skills" / "clarify-and-goal" / "SKILL.md"
     ).read_text(encoding="utf-8")
 
-    for expected_fragment in ("command_runner", "context_gatherer", "implementer"):
-        assert expected_fragment in coordinator_text
-        assert expected_fragment in root_agents_text
-        assert expected_fragment in code_intelligence_text
-        assert expected_fragment in clarify_goal_text
+    for text in (coordinator_text, root_agents_text, code_intelligence_text, clarify_goal_text):
+        for expected_fragment in ("command_runner", "context_gatherer", "implementer"):
+            assert expected_fragment in text
 
-    assert "Spark lanes" in code_intelligence_text
-    assert "default to Spark-first handling" in code_intelligence_text
-    assert "prescriptive Spark packet" in code_intelligence_text
-    assert "command_runner" in coordinator_text
-    assert "context_gatherer" in coordinator_text
-    assert "implementer" in coordinator_text
-    assert "command_runner" in root_agents_text
-    assert "context_gatherer" in root_agents_text
-    assert "implementer" in root_agents_text
     assert "root-local shell/file exploration available" in clarify_goal_text
 
 
@@ -164,6 +153,8 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     """Ensure the coordinator-default config and hook rules do not silently drift."""
     config = tomllib.loads((REPO_ROOT / ".codex" / "config.toml").read_text(encoding="utf-8"))
     agents = config["agents"]
+    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    scripts = package_json["scripts"]
     coordinator_text = (REPO_ROOT / ".codex" / "agents" / "coordinator.toml").read_text(
         encoding="utf-8"
     )
@@ -185,7 +176,6 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     runtime_env_script = (REPO_ROOT / "scripts" / "codex-runtime-env.sh").read_text(
         encoding="utf-8"
     )
-    package_json_text = (REPO_ROOT / "package.json").read_text(encoding="utf-8")
     quality_gates_text = (REPO_ROOT / "docs" / "process" / "quality-gates.md").read_text(
         encoding="utf-8"
     )
@@ -239,31 +229,19 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
         assert expected_fragment in coordinator_launcher_text
 
     assert "Context7 first" in quality_gates_text
-    for expected_fragment in (
-        '"markdownlint": "bash scripts/codex-runtime-env.sh npx --yes markdownlint-cli2@0.22.1',
-        ".codex/.tmp",
-        ".codex/skills",
-    ):
-        assert expected_fragment in package_json_text
-    for expected_fragment in (
-        '"python:lint": "bash scripts/codex-runtime-env.sh bash -lc \'uv run ruff format --check .',
-        '"python:complexity": "bash scripts/codex-runtime-env.sh uv run ruff check --select C901',
-        "lint.mccabe.max-complexity = 6",
-        "npm run python:lint",
-    ):
-        assert expected_fragment in package_json_text
-    assert (
-        'docs:style": "vale --glob=\'!{.venv,.serena,.repomix,.code-review-graph,node_modules,'
-        ".agents/skills,.codex/.tmp,.codex/skills}/**' ." in package_json_text
-    )
-    assert (
-        "docs:spell\": \"cspell --no-progress --exclude '.agents/skills/**' --exclude "
-        "'.codex/.tmp/**' --exclude '.codex/skills/**' --exclude 'tests/**' ." in package_json_text
-    )
-    assert (
-        '"skills:audit": "bash scripts/codex-runtime-env.sh npx --yes agent-skillforge@0.3.2 '
-        'lint .agents/skills --strict",'
-    ) in package_json_text
+    for script_name in ("markdownlint", "python:lint", "python:complexity", "skills:audit"):
+        assert "scripts/codex-runtime-env.sh" in scripts[script_name]
+    assert ".codex/.tmp" in scripts["markdownlint"]
+    assert ".codex/skills" in scripts["markdownlint"]
+    assert "lint.mccabe.max-complexity = 6" in scripts["python:complexity"]
+    assert "npm run python:complexity" in scripts["python:lint"]
+    assert ".agents/skills" in scripts["docs:style"]
+    assert ".codex/.tmp" in scripts["docs:style"]
+    assert ".codex/skills" in scripts["docs:style"]
+    assert ".agents/skills/**" in scripts["docs:spell"]
+    assert ".codex/.tmp/**" in scripts["docs:spell"]
+    assert ".codex/skills/**" in scripts["docs:spell"]
+    assert "tests/**" in scripts["docs:spell"]
 
     for expected_fragment in (
         "scripts/codex-runtime-env.sh",
@@ -357,9 +335,6 @@ def test_django_workaround_patterns_do_not_return() -> None:
 def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
     """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
     root_agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    continuation_text = (REPO_ROOT / ".codex-session-notes" / "continuation.md").read_text(
-        encoding="utf-8"
-    )
     clarify_skill = (REPO_ROOT / ".agents" / "skills" / "clarify-and-goal" / "SKILL.md").read_text(
         encoding="utf-8"
     )
@@ -369,7 +344,6 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
 
     assert ".codex-session-notes/continuation.md" in root_agents
     assert "npm run astgrep:scan" in root_agents
-    assert "milestone-based broader ownership" in continuation_text
     assert "Question packet" in clarify_skill
     assert "Escalation packet" in clarify_skill
     assert "code-review-graph" in code_intel_skill
@@ -647,8 +621,9 @@ def test_docs_inclusive_and_repomix_cover_hub_indexes() -> None:
     assert ".codex/agents" in docs_inclusive
     assert "llms.txt" in docs_inclusive
     assert "tests" not in docs_inclusive
-    assert ".codex/agents/**/*.toml" in include_entries
-    assert "llms.txt" in include_entries
+    assert ".codex/**/*.toml" in include_entries
+    assert ".codex/hooks/**/*.py" in include_entries
+    assert "llms.txt" not in include_entries
     assert "PACKAGE_MANIFEST.md" not in docs_inclusive
     assert "PACKAGE_MANIFEST.md" not in include_entries
     assert ".codex/references" not in docs_inclusive

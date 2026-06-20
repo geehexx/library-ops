@@ -59,6 +59,7 @@ class RoleDefinition:
     object_permissions: tuple[str, ...]
 
 
+# Keep this tuple Final so static analysis treats the role order and bundles as immutable.
 ROLE_DEFINITIONS: Final[tuple[RoleDefinition, ...]] = (
     RoleDefinition(
         name=ROLE_ADMIN,
