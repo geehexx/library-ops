@@ -6,8 +6,8 @@
 # This file defines the repo-owned root session and permission profiles. It is
 # not a user-local `--profile` overlay, and `.codex/agents/*.toml` contains
 # agent configs rather than permission profiles.
-model = "gpt-5.4-mini"
-model_reasoning_effort = "high"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
 model_reasoning_summary = "auto"
 plan_mode_reasoning_effort = "xhigh"
 review_model = "gpt-5.4"
@@ -166,7 +166,7 @@ extends = ":workspace"
 enabled = true
 
 [permissions.coordinator_root]
-description = "Workspace-capable interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
+description = "Interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
 extends = ":workspace"
 
 [permissions.coordinator_root.network]
