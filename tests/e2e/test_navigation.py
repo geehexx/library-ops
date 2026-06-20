@@ -1,5 +1,6 @@
 """Browser smoke tests for the Phase 1 navigation surface."""
 
+import re
 from collections.abc import Callable
 
 import pytest
@@ -68,6 +69,26 @@ class TestNavigationE2E:
         expect(
             page.locator("span.error").filter(has_text="This field is required.").first
         ).to_be_visible()
+
+        title = "The Time Machine"
+        contributor_name = "H. G. Wells"
+        isbn = "9780143111597"
+        barcode = "BC-E2E-001"
+
+        page.get_by_label("Work title").fill(title)
+        page.get_by_label("Contributor name").fill(contributor_name)
+        page.get_by_label("Contributor role").select_option("author")
+        page.get_by_label("ISBN").fill(isbn)
+        page.get_by_label("Barcode").fill(barcode)
+        page.get_by_role("button", name="Create foundation record").click()
+
+        expect(page).to_have_url(re.compile(rf"{re.escape(live_server.url)}/catalog/\d+/$"))
+        expect(page.get_by_role("heading", name=title)).to_be_visible()
+        expect(page.locator("p.eyebrow").filter(has_text="Contributors")).to_be_visible()
+        expect(page.get_by_text(f"ISBN: {isbn}")).to_be_visible()
+        expect(page.locator("li").filter(has_text=barcode)).to_be_visible()
+        expect(page.get_by_role("link", name="Edit work")).to_be_visible()
+        expect(page.get_by_role("link", name="Add edition")).to_be_visible()
 
     def test_librarian_can_open_the_loan_dashboard(
         self,
