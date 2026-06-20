@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from django import forms
 from django.contrib.auth.models import User
@@ -18,9 +18,6 @@ from libraryops.circulation.selectors import (
 )
 from libraryops.inventory.models import BookCopy
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
 
 class _SearchSelectField(forms.ModelChoiceField):  # pyright: ignore[reportMissingTypeArgument]
     """Render a searchable select with stable, human-facing option labels."""
@@ -29,7 +26,7 @@ class _SearchSelectField(forms.ModelChoiceField):  # pyright: ignore[reportMissi
         self,
         *,
         queryset: Any,
-        option_label: Callable[[Any], str],
+        option_label: Any,
         **kwargs: Any,
     ) -> None:
         self._option_label = option_label
