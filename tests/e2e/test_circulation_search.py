@@ -96,8 +96,7 @@ class TestCirculationAndSearchE2E:
         ).to_be_visible()
         return_dialog.get_by_role("combobox", name="Loan:").select_option(
             label=(
-                "BC-BROWSER-001 · Browser Circulation Work · "
-                f"Ada Lovelace (PATRON-{member.pk:04d})"
+                f"BC-BROWSER-001 · Browser Circulation Work · Ada Lovelace (PATRON-{member.pk:04d})"
             )
         )
         page.get_by_role("button", name="Return copy").click()
