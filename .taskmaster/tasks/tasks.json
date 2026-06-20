@@ -1423,11 +1423,12 @@
             "id": 12,
             "title": "Reflow circulation dashboard layout",
             "description": "Rework the circulation dashboard so returned-loan rows, card sections, and tables have enough space and visual hierarchy to remain readable at evaluator scale.",
-            "details": "",
-            "status": "pending",
+            "details": "<info added on 2026-06-20T18:30:18.488Z>\nRefloated circulation dashboard layout to improve readability and responsiveness at evaluator scale. Updated HTML template with two-column desktop grid and full-width recent-returns panel. Enhanced panel headers, table wrappers, and row hierarchy for better visual hierarchy. Added supporting shell CSS in base template. Refreshed E2E test baseline via `test_circulation_search.py`, ensuring checkout/return browser proof adjustments are included for current searchable-select workflow. Updated tests and ran checks: `uv run pytest -q tests/unit/circulation/test_views.py`, `PLAYWRIGHT_VISUAL_BASELINE_REFRESH=1 uv run pytest -q tests/e2e/test_circulation_search.py -k librarian_can_checkout_and_return_a_copy_in_the_browser`, `uv run pytest -q tests/e2e/test_circulation_search.py`, `git diff --check`. Met acceptance criteria for dashboard readability and responsive layout.\n</info added on 2026-06-20T18:30:18.488Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T18:30:18.659Z"
           },
           {
             "id": 13,
@@ -1522,13 +1523,13 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T18:11:07.177Z",
+        "updatedAt": "2026-06-20T18:30:18.659Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
       },
       {
-        "id": 17,
+        "id": "17",
         "title": "Refactor lexical search architecture",
         "description": "Refactor src/libraryops/search/lexical.py toward strategy-based, subclass-friendly boundaries without expanding scope beyond lexical-only search.",
         "details": "Keep this strictly within the current lexical search scope: no vector search, no API surface expansion, and no new search modes. Rework the existing lexical search implementation toward clearer OO or strategy boundaries so exact-match handling, PostgreSQL FTS ranking, faceting, and result explanation assembly are easier to extend without accumulating ad hoc branching. Preserve `search_catalog` as the stable facade and keep the current `search_*` annotation / exact-identifier-first contract stable while allowing internal service/strategy decomposition. Preserve current behavior while improving internal structure and subclassability, then update the narrow lexical tests needed to prove the refactor is behavior-preserving.\n<info added on 2026-06-20T17:05:00Z>\nThe lexical.py refactor remains its own planning/implementation lane and must not be conflated with release-landing or gate-architecture work. Use notes or a successor task rather than hijacking Task 17 for unrelated landing tasks; reopen Task 17 only if fresh repo evidence shows the stable `search_catalog` facade or exact-identifier-first contract was not actually preserved.\n</info added on 2026-06-20T17:05:00Z>",
@@ -1543,14 +1544,12 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T18:11:07.179Z",
+      "lastModified": "2026-06-20T18:30:18.661Z",
       "taskCount": 17,
       "completedCount": 13,
       "tags": [
         "master"
-      ],
-      "created": "2026-06-20T18:15:23.169Z",
-      "description": "Tasks for master context"
+      ]
     }
   },
   "rpg": {
