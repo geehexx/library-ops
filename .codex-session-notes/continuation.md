@@ -17,10 +17,10 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, `mergeStateStatus=UNSTABLE`).
-- Local branch head currently includes commits through `ad3665d`; remote PR head remains monitored by the DevOps owner.
-- Live PR checks: `policy`/`security`/`workflow-security` pass; `quality` is running on run `27883538689` / job `82515054432`.
-- Current PR state has no active failed checks.
+- PR: `#28` (open draft, target `development`, `mergeStateStatus=CLEAN`, `mergeable=MERGEABLE` as of `2026-06-20T20:51:44Z`).
+- Local branch head is `a2e30a6`; remote PR head remains `e9367e1`, so the branch is currently `ahead 1` locally and the draft PR still needs a push before its live checks reflect the latest handoff refresh.
+- Live PR checks on remote head `e9367e1`: `policy`/`security`/`workflow-security`/`quality`/`commitlint` all passed on `2026-06-20` (CI run `27883538689`, commitlint run `27883538700`).
+- Current PR state has no active failed checks, but draft status and local-vs-remote head drift remain open.
 - Major completed slices to carry forward:
   - pre-push authority
   - planning/spec reconciliation
@@ -37,13 +37,13 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
   - Spark-default control-plane packet
 - External blocker: `16.6` remains blocked on provider-console / Render host / Site(SocialApp) configuration.
 - Remaining active queue under PR pressure:
+  - `14.3` release gate ladder rerun proof and PR refresh
   - `14.9`
   - `16.1`
-  - `15.*` reconciliation
-  - `16.20`
   - `16.3`
   - `16.6` external proof blocker
-- Dependabot queue remains separate from this handoff queue.
+- Dependabot queue (`15.*`) remains separate from this handoff queue and should stay out of PR `#28`.
+- Local validation proof on `2026-06-21`: `checks:prepush`, `taskmaster:validate`, `verify:core`, and `verify:all` all passed when rerun with writable UV/XDG temp roots under `/tmp`; use that env override for future `uvx` / Semgrep-based gate reruns in this environment.
 - Keep this file concise, evidence-first, and this branch/PR as the current coordination root.
 
 ## Carry Forward
