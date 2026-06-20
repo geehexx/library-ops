@@ -76,7 +76,7 @@ class EditionForm(forms.ModelForm):
             dict[str, Any],
             self.cleaned_data["external_identifiers"] or {},
         )
-        edition = cast(BookEdition, cast(Any, self.instance))
+        edition = cast(BookEdition, self.instance)
         if edition.pk:
             persisted_edition = BookEdition.objects.get(pk=edition.pk)
             return BookEdition.objects.update_edition(
@@ -108,7 +108,7 @@ class EditionForm(forms.ModelForm):
     def archive(self, *, actor: User) -> BookEdition:
         """Archive the bound edition through the owning manager."""
 
-        edition = cast(BookEdition, cast(Any, self.instance))
+        edition = cast(BookEdition, self.instance)
         if not edition.pk:
             raise ValueError("Cannot archive an unsaved edition.")
         persisted_edition = BookEdition.objects.get(pk=edition.pk)

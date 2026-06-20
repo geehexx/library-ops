@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 from django.core.management import call_command
 from playwright.sync_api import Page, expect
+from tests.e2e.visual_regression import assert_visual_snapshot
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
@@ -22,16 +22,6 @@ if TYPE_CHECKING:
 
     from django.contrib.auth.models import User
     from pytest_django.live_server_helper import LiveServer
-
-ARTIFACT_ROOT = Path("output/playwright/circulation-search")
-
-
-def _artifact_path(filename: str) -> Path:
-    """Return the on-disk path for a browser artifact."""
-
-    path = ARTIFACT_ROOT / filename
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
 
 
 @pytest.mark.e2e
@@ -79,7 +69,7 @@ class TestCirculationAndSearchE2E:
                 "Start typing a barcode, title, borrower name, or patron code."
             )
         ).to_be_visible()
-        page.screenshot(path=str(_artifact_path("checkout-form.png")), full_page=True)
+        assert_visual_snapshot(page, "circulation_search", "checkout-form.png")
 
         checkout_dialog.get_by_label("Copy").fill(copy.barcode)
         checkout_dialog.get_by_label("Borrower").fill("Ada Lovelace")
@@ -109,7 +99,7 @@ class TestCirculationAndSearchE2E:
         ).to_be_visible()
         expect(page.get_by_text("Browser Circulation Work")).to_be_visible()
         expect(page.get_by_role("cell", name=member.email)).to_be_visible()
-        page.screenshot(path=str(_artifact_path("checkout-return-dashboard.png")), full_page=True)
+        assert_visual_snapshot(page, "circulation_search", "checkout-return-dashboard.png")
 
     def test_catalog_search_ranks_exact_isbn_hits_first_in_the_browser(
         self,
@@ -145,12 +135,16 @@ class TestCirculationAndSearchE2E:
         expect(page.get_by_role("heading", name="Catalog Foundation")).to_be_visible()
         expect(page.get_by_text('Showing results for "9780141439518"')).to_be_visible()
         expect(page.get_by_text("Exact identifier hit")).to_be_visible()
+        expect(page.get_by_text("Matched identifier: 9780141439518")).to_be_visible()
+        expect(page.get_by_text("Availability: Available")).to_be_visible()
         expect(page.get_by_text("Match: Exact identifier match")).to_be_visible()
 
         results = page.locator("section.panel").nth(1).locator("li")
         expect(results).to_have_count(2)
         expect(results.nth(0)).to_contain_text("Exact Search Work")
         expect(results.nth(0)).to_contain_text("Exact identifier hit")
+        expect(results.nth(0)).to_contain_text("Matched identifier: 9780141439518")
+        expect(results.nth(0)).to_contain_text("Availability: Available")
         expect(results.nth(0)).to_contain_text("Match: Exact identifier match")
         expect(results.nth(1)).to_contain_text("Reference 9780141439518 BC-1001 OL1W")
-        page.screenshot(path=str(_artifact_path("exact-isbn-ranking.png")), full_page=True)
+        assert_visual_snapshot(page, "circulation_search", "exact-isbn-ranking.png")

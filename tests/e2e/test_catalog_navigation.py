@@ -80,13 +80,72 @@ class TestCatalogNavigationE2E:
         ).to_be_visible()
         expect(page.get_by_role("link", name="Back to catalog")).to_be_visible()
         expect(page.get_by_role("link", name="Edit work")).to_have_count(0)
-        expect(page.get_by_role("button", name="Archive work")).to_have_count(0)
+        expect(page.locator("details.archive-confirm")).to_have_count(0)
 
         librarian = LibrarianUserFactory()
         login_to_live_server(librarian)
 
         page.goto(f"{live_server.url}/catalog/{work.pk}/")
         expect(page.get_by_role("link", name="Edit work")).to_be_visible()
-        expect(page.get_by_role("button", name="Archive work")).to_be_visible()
+        expect(page.locator("details.archive-confirm")).to_have_count(3)
         expect(page.get_by_role("link", name="Edit edition")).to_be_visible()
         expect(page.get_by_role("link", name="Add edition")).to_be_visible()
+
+    def test_catalog_detail_archive_actions_require_confirmation(
+        self,
+        live_server: LiveServer,
+        page: Page,
+        login_to_live_server: Callable[[User], None],
+    ) -> None:
+        """Verify each archive control opens a deliberate confirm/cancel choice."""
+
+        call_command("seed_roles")
+        work_contributor = WorkContributorFactory(
+            work__title="Archive Confirmation Work",
+            contributor__name="Archive Confirmation Author",
+        )
+        work = work_contributor.work
+        edition = BookEditionFactory(
+            work=work,
+            isbn="9780141439518",
+            language="en",
+        )
+        copy = BookCopyFactory(edition=edition, barcode="BC-ARCHIVE-001")
+
+        librarian = LibrarianUserFactory()
+        login_to_live_server(librarian)
+
+        page.goto(f"{live_server.url}/catalog/{work.pk}/")
+        expect(page.locator("details.archive-confirm")).to_have_count(3)
+
+        page.locator("details.archive-confirm").nth(0).locator("summary").click()
+        expect(page.get_by_text(f'Archive "{work.title}"?')).to_be_visible()
+        expect(
+            page.get_by_text("This work will disappear from normal browse and search flows.")
+        ).to_be_visible()
+        expect(page.get_by_role("button", name="Yes, archive work")).to_be_visible()
+        expect(page.get_by_role("link", name="Keep work")).to_be_visible()
+        page.get_by_role("link", name="Keep work").click()
+        expect(page).to_have_url(f"{live_server.url}/catalog/{work.pk}/")
+
+        page.locator("details.archive-confirm").nth(1).locator("summary").click()
+        expect(page.get_by_text(f"Archive edition {edition.isbn}?")).to_be_visible()
+        expect(
+            page.get_by_text("This edition will disappear from normal browse and search flows.")
+        ).to_be_visible()
+        expect(page.get_by_role("button", name="Yes, archive edition")).to_be_visible()
+        expect(page.get_by_role("link", name="Keep edition")).to_be_visible()
+        page.get_by_role("link", name="Keep edition").click()
+        expect(page).to_have_url(f"{live_server.url}/catalog/{work.pk}/")
+
+        page.locator("details.archive-confirm").nth(2).locator("summary").click()
+        expect(page.get_by_text(f"Archive copy {copy.barcode}?")).to_be_visible()
+        expect(
+            page.get_by_text("This copy will disappear from normal browse and search flows.")
+        ).to_be_visible()
+        expect(page.get_by_role("button", name="Yes, archive copy")).to_be_visible()
+        expect(page.get_by_role("link", name="Keep copy")).to_be_visible()
+        page.get_by_role("button", name="Yes, archive copy").click()
+
+        expect(page).to_have_url(f"{live_server.url}/catalog/{work.pk}/")
+        expect(page.get_by_text(copy.barcode)).to_have_count(0)

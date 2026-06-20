@@ -5,12 +5,12 @@ module.exports = {
     'type-enum': [
       2,
       'always',
-      ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'build', 'ci', 'chore', 'deps', 'revert']
+      ['feat', 'fix', 'docs', 'style', 'refactor', 'perf', 'test', 'build', 'ci', 'chore', 'deps', 'format', 'revert']
     ],
     'scope-enum': [
       2,
       'always',
-      ['project', 'prd', 'adr', 'agents', 'deploy', 'codex', 'control-plane', 'speckit', 'taskmaster', 'catalog', 'circulation', 'search', 'seed', 'security', 'ci', 'release', 'render', 'docs', 'tooling', 'auth', 'ux', 'ui', 'visual', 'e2e', 'property', 'a11y']
+      ['project', 'prd', 'adr', 'agents', 'deploy', 'deps', 'codex', 'control-plane', 'speckit', 'taskmaster', 'catalog', 'closeout', 'circulation', 'search', 'seed', 'security', 'ci', 'release', 'render', 'docs', 'tooling', 'planning', 'auth', 'ux', 'ui', 'visual', 'e2e', 'property', 'a11y']
     ],
     'subject-case': [0]
   }

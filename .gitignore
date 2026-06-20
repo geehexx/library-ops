@@ -25,6 +25,7 @@ node_modules/
 npm-debug.log*
 .yarn/
 .pnpm-store/
+.husky/_/
 
 # Codex/local agent state
 .codex-local/

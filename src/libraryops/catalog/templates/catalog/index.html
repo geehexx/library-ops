@@ -119,6 +119,18 @@
                   <strong>{{ work.title }}</strong>
                 </a>
               </div>
+              {% if search_query and work.search_explanation == 'Exact identifier match' %}
+                <div style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.7rem;">
+                  {% if work.search_matched_identifier_value %}
+                    <span class="pill" style="border-color: rgba(155, 67, 46, 0.28); background: rgba(155, 67, 46, 0.08); color: var(--text);">Matched identifier: {{ work.search_matched_identifier_value }}</span>
+                  {% endif %}
+                  {% if work.search_availability_state == 'available' %}
+                    <span class="pill" style="border-color: rgba(64, 124, 91, 0.28); background: rgba(64, 124, 91, 0.1); color: var(--text);">Availability: Available</span>
+                  {% elif work.search_availability_state == 'unavailable' %}
+                    <span class="pill" style="border-color: rgba(160, 81, 45, 0.28); background: rgba(160, 81, 45, 0.1); color: var(--text);">Availability: Unavailable</span>
+                  {% endif %}
+                </div>
+              {% endif %}
               {% if search_query and work.search_explanation %}
                 <div style="margin-top: 0.45rem; {% if search_query and work.search_explanation == 'Exact identifier match' %}font-weight: 700; color: var(--accent-strong);{% else %}color: var(--muted);{% endif %}">
                   Match: {{ work.search_explanation }}
