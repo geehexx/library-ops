@@ -143,9 +143,11 @@ def _collect_subject_values(queryset: QuerySet[BibliographicWork]) -> list[str]:
         raw_subjects: object = identifiers_dict.get("subjects", ())
         if isinstance(raw_subjects, str):
             raw_subjects = (raw_subjects,)
-        if not isinstance(raw_subjects, Iterable):
-            continue
-        for subject in cast("Iterable[object]", raw_subjects):
-            if isinstance(subject, str) and subject.strip():
-                subjects.add(subject.strip())
+        if isinstance(raw_subjects, Iterable):
+            subjects.update(
+                cleaned
+                for subject in cast("Iterable[object]", raw_subjects)
+                if isinstance(subject, str)
+                if (cleaned := subject.strip())
+            )
     return sorted(subjects, key=str.casefold)

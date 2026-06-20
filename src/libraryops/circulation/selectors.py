@@ -153,10 +153,6 @@ def _match_choice(
     if not normalized_value:
         return None
     candidates = list(queryset)
-    if normalized_value.isdigit():
-        for instance in candidates:
-            if instance.pk is not None and str(instance.pk) == normalized_value:
-                return instance
     exact_matches = [
         instance
         for instance in candidates
@@ -171,45 +167,41 @@ def _match_choice(
         for instance in candidates
         if any(normalized_value in _normalized_choice(alias) for alias in aliases(instance))
     ]
-    if len(partial_matches) == 1:
-        return partial_matches[0]
-    return None
+    return partial_matches[0] if len(partial_matches) == 1 else None
 
 
 def resolve_copy(value: str, queryset: Any) -> BookCopy | None:
     """Resolve one selected copy from its display label or barcode."""
 
+    def _copy_aliases(copy: Any) -> tuple[str, str, str, str]:
+        return (
+            copy_label(copy),
+            copy.barcode,
+            copy.edition.work.title,
+            str(copy.pk) if copy.pk is not None else "",
+        )
+
     return cast(
         "BookCopy | None",
-        _match_choice(
-            value,
-            queryset,
-            lambda copy: (
-                copy_label(copy),
-                copy.barcode,
-                copy.edition.work.title,
-                str(copy.pk) if copy.pk is not None else "",
-            ),
-        ),
+        _match_choice(value, queryset, _copy_aliases),
     )
 
 
 def resolve_borrower(value: str, queryset: Any) -> User | None:
     """Resolve one selected borrower from a human name or patron code."""
 
+    def _borrower_aliases(user: Any) -> tuple[str, str, str, str, str]:
+        return (
+            borrower_label(user),
+            borrower_display_name(user),
+            borrower_identifier(user),
+            user.email,
+            user.username,
+        )
+
     return cast(
         "User | None",
-        _match_choice(
-            value,
-            queryset,
-            lambda user: (
-                borrower_label(user),
-                borrower_display_name(user),
-                borrower_identifier(user),
-                user.email,
-                user.username,
-            ),
-        ),
+        _match_choice(value, queryset, _borrower_aliases),
     )
 
 
