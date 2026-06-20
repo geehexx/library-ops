@@ -5,36 +5,110 @@ from __future__ import annotations
 from typing import Any, cast
 
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 
-def checkout_copy_queryset() -> Any:
+def _search_term(query: str | None) -> str | None:
+    """Return one normalized search term or ``None`` when empty."""
+
+    if query is None:
+        return None
+    cleaned = query.strip()
+    return cleaned or None
+
+
+def _borrower_pk(query: str) -> int | None:
+    """Return the patron primary key encoded in one library identifier."""
+
+    for candidate in (query, query.removeprefix("PATRON-"), query.removeprefix("patron-")):
+        normalized = candidate.replace(" ", "")
+        if normalized.isdigit():
+            return int(normalized)
+    return None
+
+
+def _person_search_clause(query: str, *, prefix: str = "") -> Q:
+    """Return the combined text clause used for borrower-style lookup."""
+
+    first_name_field = f"{prefix}first_name" if prefix else "first_name"
+    last_name_field = f"{prefix}last_name" if prefix else "last_name"
+    username_field = f"{prefix}username" if prefix else "username"
+    email_field = f"{prefix}email" if prefix else "email"
+    clause = (
+        Q(**{f"{first_name_field}__icontains": query})
+        | Q(**{f"{last_name_field}__icontains": query})
+        | Q(**{f"{username_field}__icontains": query})
+        | Q(**{f"{email_field}__icontains": query})
+    )
+    terms = [term for term in query.split() if term]
+    if len(terms) >= 2:
+        clause |= Q(
+            **{
+                f"{first_name_field}__icontains": terms[0],
+                f"{last_name_field}__icontains": terms[-1],
+            }
+        )
+    return clause
+
+
+def checkout_copy_queryset(query: str | None = None) -> Any:
     """Return the available copies a checkout workflow may select."""
 
-    return (
+    queryset = (
         BookCopy.objects.select_related("edition", "edition__work")
         .filter(archived_at__isnull=True, status=BookCopyStatus.AVAILABLE)
         .order_by("edition__work__title", "barcode")
     )
+    search = _search_term(query)
+    if search:
+        queryset = queryset.filter(
+            Q(barcode__icontains=search) | Q(edition__work__title__icontains=search)
+        )
+    return queryset
 
 
-def checkout_borrower_queryset() -> Any:
+def checkout_borrower_queryset(query: str | None = None) -> Any:
     """Return the borrowers a checkout workflow may select."""
 
-    return User.objects.filter(groups__name=ROLE_MEMBER).order_by("email").distinct()
+    queryset = User.objects.filter(groups__name=ROLE_MEMBER).order_by(
+        "last_name",
+        "first_name",
+        "email",
+    ).distinct()
+    search = _search_term(query)
+    if not search:
+        return queryset
+    borrower_pk = _borrower_pk(search)
+    query_clause = _person_search_clause(search)
+    if borrower_pk is not None:
+        query_clause |= Q(pk=borrower_pk)
+    return queryset.filter(query_clause)
 
 
-def return_loan_queryset() -> Any:
+def return_loan_queryset(query: str | None = None) -> Any:
     """Return the active loans a return workflow may select."""
 
-    return (
+    queryset = (
         Loan.objects.select_related("copy__edition__work", "borrower")
         .filter(returned_at__isnull=True)
         .order_by("due_at", "-checked_out_at")
     )
+    search = _search_term(query)
+    if not search:
+        return queryset
+    borrower_pk = _borrower_pk(search)
+    query_clause = (
+        Q(copy__barcode__icontains=search)
+        | Q(copy__edition__work__title__icontains=search)
+        | _person_search_clause(search, prefix="borrower__")
+    )
+    if borrower_pk is not None:
+        query_clause |= Q(borrower__pk=borrower_pk) | Q(borrower__id=borrower_pk)
+    return queryset.filter(query_clause)
 
 
 def visible_loans(user: User, *, role: str) -> Any:

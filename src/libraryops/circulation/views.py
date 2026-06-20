@@ -77,6 +77,15 @@ class CirculationWorkflowView(
         context.setdefault("back_url", reverse(self.back_url_name))
         return context
 
+    def get_initial(self) -> dict[str, object]:
+        """Preserve lookup search terms across GET-driven filtering."""
+
+        initial = super().get_initial()
+        initial["copy_query"] = self.request.GET.get("copy_query", "")
+        initial["borrower_query"] = self.request.GET.get("borrower_query", "")
+        initial["loan_query"] = self.request.GET.get("loan_query", "")
+        return initial
+
     def get_success_url(self) -> str:
         """Return to the dashboard after a successful workflow submission."""
 
