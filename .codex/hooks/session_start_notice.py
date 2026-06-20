@@ -221,8 +221,8 @@ def main() -> int:
             f"branch={branch}; dirty_files={dirty_count}; "
             f"task_graph={task_graph_status(root)}; "
             "continuation=.codex-session-notes/continuation.md. "
-            "Re-open the continuation note and the relevant SKILL.md "
-            "entrypoint(s) before editing."
+            "Re-open the continuation note; that note is authoritative. "
+            "Read the relevant SKILL.md entrypoint(s) before editing."
         )
     else:
         print(
@@ -232,6 +232,9 @@ def main() -> int:
             f"features={','.join(enabled_features) or 'none'}; mcps={mcp_summary(config)}; "
             f"{runtime_cache_hint()}; "
             f"instructions={fingerprints}. "
+            "Re-open `.codex-session-notes/continuation.md`; that note is "
+            "authoritative. Treat `.codex-session-notes/scratch.md` as "
+            "disposable scratch only. "
             "Read source-of-truth docs and relevant skills before editing. "
             "Treat broad long-horizon goals as planning envelopes: only concrete, "
             "implementable work should be captured in Task Master tasks/subtasks "

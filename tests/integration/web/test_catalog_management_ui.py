@@ -66,6 +66,17 @@ class CatalogManagementUiTests(TestCase):
         response = self.client.get(reverse("work-create"))
 
         assert response.status_code == 403
+        self.assertContains(response, "Access denied", status_code=403)
+        self.assertContains(response, "You do not have access to this page", status_code=403)
+        self.assertContains(
+            response,
+            (
+                "Use an account with the right role, or contact an administrator "
+                "if you expected access."
+            ),
+            status_code=403,
+        )
+        self.assertContains(response, reverse("home"), status_code=403)
 
     def test_librarian_can_create_edit_and_archive_a_work(self) -> None:
         """Work mutations should flow through the template-backed forms."""
