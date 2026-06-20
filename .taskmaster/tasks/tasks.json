@@ -1448,12 +1448,13 @@
             "title": "Real PostgreSQL search and circulation proof",
             "description": "Execute the lexical search and circulation proof against a real PostgreSQL database instead of SQLite-only or vendor-mocked tests, then record the release evidence and any required CI/local lane updates.",
             "details": "Add an explicit release-proof lane for PostgreSQL behavior. Scope: run exact-identifier and phrase-ordering checks against real SearchVector/SearchQuery/SearchRank SQL; prove facets, archived-record exclusion, availability derivation, duplicate/tie ordering, and active-loan uniqueness on PostgreSQL; cover seeded browser-visible exact-identifier behavior; and add the smallest repeatable local/CI command boundary for this lane. Keep this separate from 16.7 accessibility proof and 16.6 social-auth proof. Do not widen into speculative search architecture changes unless the real PostgreSQL evidence forces them.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               "16.11"
             ],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T18:57:38.644Z"
           },
           {
             "id": 15,
@@ -1524,7 +1525,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T18:49:03.288Z",
+        "updatedAt": "2026-06-20T18:57:38.644Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
@@ -1545,7 +1546,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T18:49:03.288Z",
+      "lastModified": "2026-06-20T18:57:38.648Z",
       "taskCount": 17,
       "completedCount": 13,
       "tags": [
