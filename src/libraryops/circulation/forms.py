@@ -38,7 +38,6 @@ class _AutocompleteTextInput(forms.TextInput):
         """Render the input alongside its option list."""
 
         input_html = super().render(name, value, attrs=attrs, renderer=renderer)
-        assert isinstance(input_html, SafeString)
         options_html = format_html_join(
             "",
             '<option value="{}"></option>',

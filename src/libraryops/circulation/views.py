@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -35,13 +36,12 @@ class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
     def get_visible_loans(self) -> QuerySet[Loan]:
         """Return the loans visible to the current user."""
 
-        loans = Loan.objects.select_related(
+        loans: QuerySet[Loan] = Loan.objects.select_related(
             "copy__edition__work",
             "borrower",
             "copy",
             "copy__edition",
         ).order_by("-checked_out_at")
-        assert isinstance(loans, QuerySet)
         if self.get_user_role() == ROLE_MEMBER:
             return loans.filter(borrower=self.request.user)
         return loans
@@ -102,7 +102,10 @@ class CirculationWorkflowView(
         if getattr(self.request, "htmx", False):
             return [self.fragment_template_name]
         template_name = self.template_name
-        assert template_name is not None
+        if template_name is None:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} requires template_name."
+            )
         return [template_name]
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
