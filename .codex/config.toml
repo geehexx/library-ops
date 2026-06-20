@@ -1,0 +1,237 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+# Project-local Codex configuration. Root-scoped keys MUST stay before any table.
+# Credentials remain in user-local environment variables; the selected local
+# MCP/tool stack is declared here.
+# This file defines the repo-owned root session and permission profiles. It is
+# not a user-local `--profile` overlay, and `.codex/agents/*.toml` contains
+# agent configs rather than permission profiles.
+model = "gpt-5.4-mini"
+model_reasoning_effort = "high"
+model_reasoning_summary = "auto"
+plan_mode_reasoning_effort = "xhigh"
+review_model = "gpt-5.4"
+model_context_window = 500000
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
+default_permissions = "coordinator_root"
+project_root_markers = [".git", ".taskmaster", ".specify"]
+project_doc_fallback_filenames = []
+project_doc_max_bytes = 98304
+web_search = "live"
+
+[features]
+hooks = true
+enable_request_compression = true
+multi_agent = true
+goals = true
+tool_call_mcp_elicitation = true
+
+# Root coordinator plus direct specialists. The default root session stays
+# read-only so planning, synthesis, and user interaction remain separate from
+# write-capable implementation agents. Depth-2 delegation stays available for
+# explicit expert-panel or micro-worker chains, not habitual recursive fan-out.
+# The thread budget is sized for active fan-out plus a few completed-but-not-yet-
+# closed workers; if the pool starts to saturate, close finished agents first
+# and reuse live agents by role before widening the pool further.
+[agents]
+max_threads = 24
+max_depth = 2
+job_max_runtime_seconds = 1800
+
+[agents.coordinator]
+description = "Coordinates source-of-truth alignment, Task Master sequencing, Spec Kit governance, decision gates, and final judgment."
+config_file = "agents/coordinator.toml"
+
+[agents.prd_architect]
+description = "Designs and edits the canonical Task Master PRD and PRD-to-task decomposition."
+config_file = "agents/prd-architect.toml"
+
+[agents.taskmaster_governor]
+description = "Maintains Task Master tasks, dependencies, notes, and task status."
+config_file = "agents/taskmaster-governor.toml"
+
+[agents.speckit_governor]
+description = "Maintains Spec Kit constitution, preset alignment, and spec/plan/task consistency."
+config_file = "agents/speckit-governor.toml"
+
+[agents.researcher]
+description = "Read-only researcher using primary sources, Context7, and Exa for current docs, standards, and examples."
+config_file = "agents/researcher.toml"
+
+[agents.code_intelligence_architect]
+description = "Plans and verifies RTK, code graph, symbol, AST, MCP, and context-window optimization."
+config_file = "agents/code-intelligence-architect.toml"
+
+[agents.implementer]
+description = "Bounded implementation agent for one Task Master task or bounded multi-file slice."
+config_file = "agents/implementer.toml"
+
+[agents.debugger]
+description = "Spark debugger for failure reproduction, triage, and next-command diagnosis."
+config_file = "agents/debugger.toml"
+
+[agents.single_file_implementer]
+description = "Spark write agent for one-file fixes and simple end-to-end patches."
+config_file = "agents/single-file-implementer.toml"
+
+[agents.reviewer]
+description = "Read-only reviewer focused on correctness, security, tests, traceability, and architecture boundaries."
+config_file = "agents/reviewer.toml"
+
+[agents.qa_engineer]
+description = "Designs and verifies unit, integration, property-based, E2E, accessibility, and quality gates."
+config_file = "agents/qa-engineer.toml"
+
+[agents.security_architect]
+description = "Reviews threat model, RBAC, MCP trust, secret handling, dependencies, and security ADRs."
+config_file = "agents/security-architect.toml"
+
+[agents.search_architect]
+description = "Owns exact, FTS, BM25, pgvector, and ranking/fusion design."
+config_file = "agents/search-architect.toml"
+
+[agents.seed_data_engineer]
+description = "Owns public-domain corpus import, seed commands, provenance, and demo data refresh."
+config_file = "agents/seed-data-engineer.toml"
+
+[agents.devops_release_manager]
+description = "Owns CI/CD, branch protections, SemVer, releases, deployment, and runbooks."
+config_file = "agents/devops-release-manager.toml"
+
+[agents.command_runner]
+description = "Runs explicit safe commands and summarizes output, preferring RTK for noisy output."
+config_file = "agents/command-runner.toml"
+
+[agents.planning_orchestrator]
+description = "Read-mostly lead planner that pushes work into bounded direct-specialist packets instead of letting the root absorb broad implementation by default."
+config_file = "agents/planning-orchestrator.toml"
+
+[agents.context_gatherer]
+description = "Read-only repo and source-map collector for source-of-truth, code graph, Serena, ast-grep, and file evidence."
+config_file = "agents/context-gatherer.toml"
+
+[agents.docs_researcher]
+description = "Read-only current-source researcher for official docs, Exa discovery, and skeptical community-signal cleanup."
+config_file = "agents/docs-researcher.toml"
+
+[agents.retrospective_analyst]
+description = "Summarizes sessions and proposes process improvements without editing files directly."
+config_file = "agents/retrospective-analyst.toml"
+
+[agents.skills_maintenance]
+description = "Audits and improves the skills catalog for naming, triggers, rich skill metadata, progressive disclosure, and references."
+config_file = "agents/skills-maintenance.toml"
+
+[agents.ux_design_architect]
+description = "Owns repo-local wireframes, UI flow quality, accessibility notes, and design-to-implementation handoff."
+config_file = "agents/ux-design-architect.toml"
+
+[permissions.workspace]
+description = "Workspace editing with repo secrets denied; external cache/network access uses explicit approval."
+extends = ":workspace"
+
+[permissions.workspace.filesystem]
+":slash_tmp" = "write"
+":tmpdir" = "write"
+
+[permissions.workspace.workspace_roots]
+"~/.cache/ms-playwright" = true
+"~/.cache/pip" = true
+"~/.cache/uv" = true
+"~/.config/gh" = true
+"~/.local/share/uv" = true
+"~/.npm" = true
+"~/.render" = true
+"~/.semgrep" = true
+"~/.codex" = true
+
+[permissions.workspace.filesystem.":workspace_roots"]
+"." = "write"
+".env" = "deny"
+".envrc" = "deny"
+".env.*" = "deny"
+".credentials/**" = "deny"
+".secrets/**" = "deny"
+"credentials/**" = "deny"
+"secrets/**" = "deny"
+"config/credentials/**" = "deny"
+"config/secrets/**" = "deny"
+".git/**" = "write"
+".codex/**" = "write"
+".agents/**" = "write"
+
+[permissions.workspace.network]
+enabled = true
+
+[permissions.coordinator_root]
+description = "Workspace-capable interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
+extends = ":workspace"
+
+[permissions.coordinator_root.network]
+enabled = true
+
+[permissions.command-runner]
+description = "High-trust command micro-worker for explicit execution slices."
+extends = ":workspace"
+
+[permissions.command-runner.network]
+enabled = true
+
+[mcp_servers.context7]
+command = "node"
+args = ["node_modules/@upstash/context7-mcp/dist/index.js", "--transport", "stdio"]
+env_vars = ["CONTEXT7_API_KEY"]
+required = true
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 20
+tool_timeout_sec = 45
+
+[mcp_servers.exa]
+url = "https://mcp.exa.ai/mcp?tools=web_search_exa,web_fetch_exa"
+required = true
+enabled_tools = ["web_search_exa", "web_fetch_exa"]
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 20
+tool_timeout_sec = 45
+
+[mcp_servers.taskmaster-ai]
+command = "npx"
+args = ["--yes", "--package", "task-master-ai@0.43.1", "task-master-ai"]
+required = true
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.taskmaster-ai.env]
+TASK_MASTER_TOOLS = "get_tasks,next_task,get_task,set_task_status,update_subtask,parse_prd"
+
+[mcp_servers.code-review-graph]
+command = "code-review-graph"
+args = ["serve", "--tools", "query_graph_tool,semantic_search_nodes_tool,detect_changes_tool,get_review_context_tool"]
+required = true
+enabled_tools = ["query_graph_tool", "semantic_search_nodes_tool", "detect_changes_tool", "get_review_context_tool"]
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 30
+tool_timeout_sec = 60
+
+[mcp_servers.serena]
+enabled = true
+command = "serena"
+args = ["start-mcp-server", "--project-from-cwd", "--context=codex"]
+required = true
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 30
+tool_timeout_sec = 90
+
+[projects."~/projects/library-ops"]
+trust_level = "trusted"
+
+[mcp_servers.render]
+enabled = true
+url = "https://mcp.render.com/mcp"
+bearer_token_env_var = "RENDER_API_KEY"
+required = true
+default_tools_approval_mode = "approve"
+startup_timeout_sec = 45
+tool_timeout_sec = 120

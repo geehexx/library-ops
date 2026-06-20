@@ -1,0 +1,10 @@
+interface:
+  display_name: "Task Master Execution"
+  short_description: "Work the Task Master graph correctly"
+  default_prompt: "Use $taskmaster to inspect the current Library Ops task, validate dependencies, keep goals broad and measurable, keep concrete implementation detail in Task Master tasks, subtasks, or notes before coding, and promote new slices into Task Master instead of widening the goal."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "taskmaster-ai"
+      description: "Task Master MCP server for task graph inspection and mutation"

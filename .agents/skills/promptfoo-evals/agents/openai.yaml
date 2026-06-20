@@ -1,0 +1,10 @@
+interface:
+  display_name: "Promptfoo Evals"
+  short_description: "Author and run repeatable Promptfoo eval lanes"
+  default_prompt: "Use $promptfoo-evals to expand or debug the right Promptfoo lane for this Library Ops behavior, then validate and record the result cleanly."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "taskmaster-ai"
+      description: "Task Master MCP server for keeping eval work tied to the active execution graph"

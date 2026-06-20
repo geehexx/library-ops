@@ -1,0 +1,4 @@
+interface:
+  display_name: "Define Goal"
+  short_description: "Shape clear measurable goals"
+  default_prompt: "Use $define-goal to turn this intention into a broad, measurable goal before starting work, and move implementation detail into Task Master tasks, subtasks, or notes before coding."

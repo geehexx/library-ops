@@ -1,0 +1,216 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "library-ops"
+version = "0.1.0"
+description = "Spec-driven Django library management demo with Codex agent governance."
+requires-python = ">=3.12"
+dependencies = [
+  "django>=5.2,<6.0",
+  "django-allauth[socialaccount]>=65.0,<66.0",
+  "django-guardian>=3.2,<4.0",
+  "django-unfold>=0.76,<1.0",
+  "django-htmx>=1.20,<2.0",
+  "dj-database-url>=2.2,<3.0",
+  "gunicorn>=23.0,<24.0",
+  "cryptography>=48.0.1,<49.0.0",
+  "psycopg[binary]>=3.3.4,<4.0",
+  "pydantic>=2.10,<3.0",
+  "python-dotenv>=1.0,<2.0",
+  "pillow>=12.2,<13.0",
+  "pgvector>=0.3,<1.0",
+  "whitenoise>=6.8,<7.0",
+]
+
+[dependency-groups]
+dev = [
+  "coverage[toml]>=7.6",
+  "factory-boy>=3.3",
+  "hypothesis>=6.0",
+  "import-linter>=2.0",
+  "pytest>=8.0",
+  "pytest-cov>=6.0",
+  "pytest-django>=4.9",
+  "pytest-playwright>=0.6",
+  "ruff>=0.9",
+  "pyright>=1.1",
+  "pip-audit>=2.7",
+  "python-semantic-release>=10.0",
+  "django-stubs>=5.2,<6.0",
+  "schemathesis>=4.0",
+  "mutmut>=3.2",
+  "interrogate>=1.7",
+  "pydoclint>=0.6",
+  "cyclonedx-bom>=5.0",
+  "bandit>=1.8",
+  "pytest-xdist>=3.6",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "I", "B", "UP", "SIM", "C4", "DTZ", "DJ", "TCH", "RUF", "PT", "ARG", "RET"
+]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"src/libraryops/catalog/forms/*.py" = ["TC002", "TC006", "RUF012"]
+"src/libraryops/catalog/views/*.py" = ["B009", "ARG002", "TC006"]
+"src/libraryops/inventory/models.py" = ["TC006"]
+
+[tool.pyright]
+include = ["src", "tests"]
+exclude = ["**/migrations", ".venv", "build", "dist"]
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+reportMissingTypeStubs = "warning"
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "libraryops.config.settings.test"
+pythonpath = ["src"]
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+addopts = ["--strict-markers", "--strict-config"]
+markers = [
+  "property: property-based tests",
+  "e2e: end-to-end browser tests",
+]
+
+[tool.coverage.run]
+source = ["src/libraryops"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_covered = true
+
+[tool.importlinter]
+root_package = "libraryops"
+
+[[tool.importlinter.contracts]]
+name = "core must not depend on application modules"
+type = "forbidden"
+source_modules = ["libraryops.core"]
+forbidden_modules = [
+  "libraryops.accounts",
+  "libraryops.catalog",
+  "libraryops.inventory",
+  "libraryops.circulation",
+  "libraryops.search",
+  "libraryops.ai_assist",
+  "libraryops.audit",
+  "libraryops.web",
+  "libraryops.shell",
+]
+
+[[tool.importlinter.contracts]]
+name = "catalog must not depend on circulation"
+type = "forbidden"
+source_modules = ["libraryops.catalog"]
+forbidden_modules = ["libraryops.circulation"]
+
+
+[[tool.importlinter.contracts]]
+name = "inventory must not depend on circulation/search/ai/web/shell"
+type = "forbidden"
+source_modules = ["libraryops.inventory"]
+forbidden_modules = [
+  "libraryops.circulation",
+  "libraryops.search",
+  "libraryops.ai_assist",
+  "libraryops.web",
+  "libraryops.shell",
+]
+
+[[tool.importlinter.contracts]]
+name = "circulation must not depend on search/ai/web/shell"
+type = "forbidden"
+source_modules = ["libraryops.circulation"]
+forbidden_modules = [
+  "libraryops.search",
+  "libraryops.ai_assist",
+  "libraryops.web",
+  "libraryops.shell",
+]
+
+[[tool.importlinter.contracts]]
+name = "search must not depend on circulation/web/shell"
+type = "forbidden"
+source_modules = ["libraryops.search"]
+forbidden_modules = [
+  "libraryops.circulation",
+  "libraryops.web",
+  "libraryops.shell",
+]
+
+[[tool.importlinter.contracts]]
+name = "domain modules must not depend on presentation apps"
+type = "forbidden"
+source_modules = [
+  "libraryops.accounts",
+  "libraryops.catalog",
+  "libraryops.inventory",
+  "libraryops.circulation",
+  "libraryops.search",
+  "libraryops.ai_assist",
+  "libraryops.audit",
+]
+forbidden_modules = ["libraryops.web", "libraryops.shell"]
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+branch = "main"
+changelog_file = "CHANGELOG.md"
+build_command = "uv build"
+commit_message = "chore(release): {version} [skip ci]"
+commit_parser = "conventional"
+major_on_zero = false
+
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-magic = true
+ignore-module = true
+ignore-nested-functions = true
+ignore-private = true
+ignore-property-decorators = true
+fail-under = 100
+exclude = [
+  "src/libraryops/accounts/migrations",
+  "src/libraryops/audit/migrations",
+  "src/libraryops/catalog/migrations",
+  "src/libraryops/circulation/migrations",
+  "src/libraryops/inventory/migrations",
+]
+
+[tool.pydoclint]
+style = "google"
+exclude = "(migrations)"
+arg-type-hints-in-docstring = false
+check-return-types = false
+allow-init-docstring = true
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "node_modules"]
+
+[tool.mutmut]
+source_paths = ["src/libraryops"]
+runner = "python -m pytest"
+test_paths = ["tests"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["libraryops*"]

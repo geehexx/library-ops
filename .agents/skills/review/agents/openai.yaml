@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Review"
+  short_description: "Review correctness, tests, and control-plane drift"
+  default_prompt: "Use $review to perform a findings-first review of this Library Ops change, with emphasis on correctness, tests, security, and meta-system drift."

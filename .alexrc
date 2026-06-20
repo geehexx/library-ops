@@ -1,0 +1,24 @@
+{
+  "allow": [
+    "Master",
+    "actors",
+    "clearly",
+    "color",
+    "colors",
+    "disabled",
+    "execution",
+    "failed",
+    "failure",
+    "failures",
+    "hook",
+    "hooks",
+    "host",
+    "hosts",
+    "just",
+    "master",
+    "obvious",
+    "reject",
+    "remains",
+    "steward"
+  ]
+}

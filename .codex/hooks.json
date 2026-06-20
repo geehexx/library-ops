@@ -1,0 +1,41 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_start_notice.py\"",
+            "timeout": 10,
+            "statusMessage": "Loading Library Ops session guardrails"
+          },
+          {
+            "type": "command",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" activate",
+            "timeout": 10,
+            "statusMessage": "Activating Serena project context"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/serena_hook.py\" cleanup",
+            "timeout": 10,
+            "statusMessage": "Cleaning Serena hook state"
+          },
+          {
+            "type": "command",
+            "command": "uv run --no-sync --project \"$(git rev-parse --show-toplevel)\" python \"$(git rev-parse --show-toplevel)/.codex/hooks/session_stop_notice.py\"",
+            "timeout": 10,
+            "statusMessage": "Preparing retrospective reminder"
+          }
+        ]
+      }
+    ]
+  }
+}

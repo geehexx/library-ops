@@ -1,0 +1,4 @@
+interface:
+  display_name: "UX Design"
+  short_description: "Design and verify repo-grounded UX workflows"
+  default_prompt: "Use $ux-design to refine Library Ops wireframes, evaluator flows, accessibility notes, and design handoff work with repo-grounded evidence."

@@ -1,0 +1,13 @@
+interface:
+  display_name: "Search Design"
+  short_description: "Design exact, FTS, BM25, and vector search"
+  default_prompt: "Use $search-design to design or review the Library Ops search stack across exact identifiers, PostgreSQL FTS, BM25 options, and vector ranking."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "context7"
+      description: "Context7 MCP server for current database and library documentation"
+    - type: "mcp"
+      value: "exa"
+      description: "Exa MCP server for current-source search-system research"

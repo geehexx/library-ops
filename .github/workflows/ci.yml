@@ -1,0 +1,227 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [development, main]
+  push:
+    branches: [development, main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: quality
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: libraryops
+          POSTGRES_PASSWORD: libraryops
+          POSTGRES_DB: libraryops_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready -U libraryops -d libraryops_test
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --all-groups
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Node governance dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: uv run playwright install --with-deps chromium
+
+      - name: Set up Go for Vale
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: '1.25'
+
+      - name: Install Vale
+        run: go install github.com/errata-ai/vale/v3/cmd/vale@latest
+
+      - name: Install Lychee
+        run: cargo install lychee --version 0.23.0 --locked
+
+      - name: Lint skills
+        run: npm run skills:lint
+
+      - name: Audit skills
+        run: npm run skills:audit
+
+      - name: Validate Task Master dependencies
+        run: npm run taskmaster:validate
+
+      - name: Validate dependency tree integrity
+        run: npm run deps:tree
+
+      - name: Markdown lint
+        run: npm run markdownlint
+
+      - name: Docs quality
+        run: npm run docs:quality
+
+      - name: Docstring coverage
+        run: npm run docstrings:coverage
+
+      - name: Docstring lint
+        run: npm run docstrings:lint
+
+      - name: Eval smoke and config validation
+        run: npm run eval:ci
+
+      - name: Node dependency audit
+        run: npm audit --audit-level=moderate
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Type check
+        run: uv run pyright
+
+      - name: Python dependency audit
+        run: uv run pip-audit --progress-spinner off
+
+      - name: Import architecture check
+        run: |
+          if [ -f src/libraryops/__init__.py ]; then
+            PYTHONPATH=src uv run lint-imports
+          else
+            echo "src/libraryops package not present yet; import-linter gate activates after bootstrap."
+          fi
+
+      - name: Django checks
+        env:
+          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
+        run: |
+          if [ -f manage.py ] && [ -f src/libraryops/__init__.py ]; then
+            uv run python manage.py check
+          else
+            echo "Django bootstrap not present yet; manage.py check activates after bootstrap."
+          fi
+
+      - name: Migration check
+        env:
+          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
+        run: |
+          if [ -f manage.py ] && [ -f src/libraryops/__init__.py ]; then
+            uv run python manage.py makemigrations --check --dry-run
+          else
+            echo "Django bootstrap not present yet; migration gate activates after bootstrap."
+          fi
+
+      - name: Tests
+        env:
+          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
+          LIBRARYOPS_DEMO_ACCESS_CODE: ci-demo-access-code
+        run: |
+          if find src tests -name "test_*.py" -o -name "*_test.py" | grep -q .; then
+            uv run pytest
+          else
+            echo "Python tests not bootstraped yet; pytest gate activates when tests exist."
+          fi
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: playwright-artifacts
+          path: output/playwright/**
+          if-no-files-found: ignore
+
+  workflow-security:
+    name: workflow-security
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Go for actionlint
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: '1.25'
+
+      - name: Install actionlint
+        run: go install github.com/rhysd/actionlint/cmd/actionlint@latest
+
+      - name: Run actionlint
+        run: actionlint
+
+      - name: Run zizmor
+        run: pipx run zizmor .
+
+  security:
+    name: security
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Semgrep
+        run: pipx run semgrep scan --config .semgrep.yml
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+
+      - name: Run Bandit
+        run: uvx --from bandit bandit -c pyproject.toml -r src
+
+  policy:
+    name: policy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Go for Conftest
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: '1.25'
+
+      - name: Install Conftest
+        run: go install github.com/open-policy-agent/conftest@latest
+
+      - name: Validate Codex policy inputs
+        run: conftest test .codex/config.toml --policy policy --namespace library_ops.codex
+
+      - name: Validate workflow policy inputs
+        run: conftest test .github/workflows/*.yml --policy policy --namespace library_ops.github_actions

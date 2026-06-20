@@ -1,0 +1,143 @@
+<!-- cspell:ignore forloop -->
+{% extends "base.html" %}
+
+{% block title %}Catalog | Library Ops{% endblock %}
+{% block page_title %}Catalog Foundation{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <p>
+      The catalog view is intentionally small in Phase 1: it proves the work,
+      contributor, edition, and copy relationships that later phases build on.
+    </p>
+    <form class="stack" method="get" action="{% url 'catalog-index' %}">
+      <div style="display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr) auto; align-items: end;">
+        <label class="stack" style="gap: 0.35rem;">
+          <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;">Search catalog</span>
+          <input
+            aria-label="Search catalog"
+            name="q"
+            placeholder="ISBN, barcode, title, or author"
+            value="{{ search_query }}"
+          >
+        </label>
+        <div class="nav-actions" style="justify-content: flex-start;">
+          <button class="button" type="submit">Search</button>
+          {% if search_query or selected_availability or selected_contributor or selected_subject or selected_language or selected_source %}
+            <a class="button button--ghost" href="{% url 'catalog-index' %}">Clear</a>
+          {% endif %}
+        </div>
+      </div>
+      <fieldset style="margin: 0; border: 1px solid var(--line); border-radius: 18px; padding: 0.95rem 1rem 1rem; background: rgba(255, 255, 255, 0.55);">
+        <legend class="muted" style="padding: 0 0.35rem; font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;">Filters</legend>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.85rem 0.9rem;">
+          <label class="stack" style="gap: 0.35rem;">
+            <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Availability</span>
+            <select name="availability" aria-label="Availability">
+              <option value="">Any availability</option>
+              {% for availability in facet_options.availability %}
+                <option value="{{ availability }}" {% if selected_availability == availability %}selected{% endif %}>
+                  {{ availability|capfirst }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="stack" style="gap: 0.35rem;">
+            <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Contributor</span>
+            <select name="contributor" aria-label="Contributor">
+              <option value="">Any contributor</option>
+              {% for contributor in facet_options.contributors %}
+                <option value="{{ contributor }}" {% if selected_contributor == contributor %}selected{% endif %}>
+                  {{ contributor }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="stack" style="gap: 0.35rem;">
+            <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Subject</span>
+            <select name="subject" aria-label="Subject">
+              <option value="">Any subject</option>
+              {% for subject in facet_options.subjects %}
+                <option value="{{ subject }}" {% if selected_subject == subject %}selected{% endif %}>
+                  {{ subject }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="stack" style="gap: 0.35rem;">
+            <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Language</span>
+            <select name="language" aria-label="Language">
+              <option value="">Any language</option>
+              {% for language in facet_options.languages %}
+                <option value="{{ language }}" {% if selected_language == language %}selected{% endif %}>
+                  {{ language }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+          <label class="stack" style="gap: 0.35rem;">
+            <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Source</span>
+            <select name="source" aria-label="Source">
+              <option value="">Any source</option>
+              {% for source in facet_options.sources %}
+                <option value="{{ source }}" {% if selected_source == source %}selected{% endif %}>
+                  {{ source }}
+                </option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+      </fieldset>
+    </form>
+    {% if search_query %}
+      <p class="muted">Showing results for "{{ search_query }}"</p>
+    {% endif %}
+    {% if can_manage_catalog %}
+      <div class="nav-actions">
+        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+        <a class="button button--ghost" href="{% url 'work-create' %}">Create work</a>
+      </div>
+    {% else %}
+      <p class="muted">Sign in as an Admin or Librarian to create foundation records.</p>
+      <a class="button button--ghost" href="{% url 'account_login' %}">Sign in</a>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    {% if works %}
+      <ul class="clean">
+        {% for work in works %}
+          <li>
+            <div
+              style="padding: 1rem 1.05rem; border: 1px solid {% if search_query and work.search_explanation == 'Exact identifier match' %}var(--accent-strong){% else %}var(--line){% endif %}; border-radius: 18px; background: {% if search_query and work.search_explanation == 'Exact identifier match' %}linear-gradient(180deg, rgba(155, 67, 46, 0.12), rgba(255, 255, 255, 0.94)){% else %}rgba(255, 255, 255, 0.55){% endif %}; box-shadow: {% if search_query and work.search_explanation == 'Exact identifier match' %}0 12px 30px rgba(155, 67, 46, 0.12){% else %}inset 0 1px 0 rgba(255, 255, 255, 0.7){% endif %};"
+            >
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: baseline;">
+                {% if search_query and work.search_explanation == 'Exact identifier match' %}
+                  <span class="pill" style="border-color: transparent; background: var(--accent-soft); color: var(--accent-strong); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;">Exact identifier hit</span>
+                {% endif %}
+                <a href="{% url 'catalog-detail' work_id=work.pk %}" style="font-family: var(--display-font); font-size: {% if search_query and work.search_explanation == 'Exact identifier match' %}1.55rem{% else %}1.25rem{% endif %}; line-height: 1.1;">
+                  <strong>{{ work.title }}</strong>
+                </a>
+              </div>
+              {% if search_query and work.search_explanation %}
+                <div style="margin-top: 0.45rem; {% if search_query and work.search_explanation == 'Exact identifier match' %}font-weight: 700; color: var(--accent-strong);{% else %}color: var(--muted);{% endif %}">
+                  Match: {{ work.search_explanation }}
+                </div>
+              {% endif %}
+              <div class="muted" style="margin-top: 0.45rem;">
+                {% for relation in work.work_contributors.all %}
+                  {{ relation.contributor.name }} ({{ relation.get_role_display }}){% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  No contributors yet.
+                {% endfor %}
+              </div>
+              <div class="muted" style="margin-top: 0.35rem;">{{ work.editions.count }} edition{{ work.editions.count|pluralize }}</div>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No foundation records exist yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

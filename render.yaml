@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: library-ops
+    runtime: python
+    plan: free
+    buildCommand: python -m pip install uv && uv sync --frozen --no-dev && uv run --no-sync python manage.py migrate --noinput && uv run --no-sync python manage.py collectstatic --noinput
+    startCommand: uv run --no-sync python -m gunicorn libraryops.config.wsgi:application --bind 0.0.0.0:$PORT
+    healthCheckPath: /health/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: libraryops.config.settings.production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_URL
+        sync: false

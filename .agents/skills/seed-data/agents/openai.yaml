@@ -1,0 +1,10 @@
+interface:
+  display_name: "Seed Data"
+  short_description: "Build deterministic demo data and provenance flows"
+  default_prompt: "Use $seed-data to implement or review deterministic Library Ops seed data, provenance tracking, and demo corpus import behavior."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "exa"
+      description: "Exa MCP server for current source and licensing research for demo corpus inputs"
