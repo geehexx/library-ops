@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from datetime import datetime
+from typing import cast
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 
-if TYPE_CHECKING:
-    from datetime import datetime
-
-    from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 
 from libraryops.audit.models import AuditEvent
 from libraryops.circulation import models as circulation_models

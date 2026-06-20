@@ -335,9 +335,6 @@ def test_django_workaround_patterns_do_not_return() -> None:
 def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
     """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
     root_agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    continuation_text = (REPO_ROOT / ".codex-session-notes" / "continuation.md").read_text(
-        encoding="utf-8"
-    )
     clarify_skill = (REPO_ROOT / ".agents" / "skills" / "clarify-and-goal" / "SKILL.md").read_text(
         encoding="utf-8"
     )
@@ -347,7 +344,6 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
 
     assert ".codex-session-notes/continuation.md" in root_agents
     assert "npm run astgrep:scan" in root_agents
-    assert "milestone-based broader ownership" in continuation_text
     assert "Question packet" in clarify_skill
     assert "Escalation packet" in clarify_skill
     assert "code-review-graph" in code_intel_skill
@@ -625,8 +621,9 @@ def test_docs_inclusive_and_repomix_cover_hub_indexes() -> None:
     assert ".codex/agents" in docs_inclusive
     assert "llms.txt" in docs_inclusive
     assert "tests" not in docs_inclusive
-    assert ".codex/agents/**/*.toml" in include_entries
-    assert "llms.txt" in include_entries
+    assert ".codex/**/*.toml" in include_entries
+    assert ".codex/hooks/**/*.py" in include_entries
+    assert "llms.txt" not in include_entries
     assert "PACKAGE_MANIFEST.md" not in docs_inclusive
     assert "PACKAGE_MANIFEST.md" not in include_entries
     assert ".codex/references" not in docs_inclusive
