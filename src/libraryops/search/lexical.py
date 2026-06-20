@@ -35,7 +35,6 @@ from libraryops.catalog.models import (
     clean_isbn,
     normalize_name,
 )
-from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 _EXTERNAL_IDENTIFIER_KEYS: Final[tuple[str, ...]] = (
@@ -216,21 +215,8 @@ def _apply_availability_filter(
         edition__work=OuterRef("pk"),
         archived_at__isnull=True,
     )
-    available_copy_qs = (
-        active_copy_qs.filter(
-            status=BookCopyStatus.AVAILABLE.value,
-        )
-        .annotate(
-            has_active_loan=Exists(
-                Loan.objects.filter(
-                    copy=OuterRef("pk"),
-                    returned_at__isnull=True,
-                )
-            )
-        )
-        .filter(
-            has_active_loan=False,
-        )
+    available_copy_qs = active_copy_qs.filter(
+        status=BookCopyStatus.AVAILABLE.value,
     )
     queryset = queryset.annotate(
         search_has_active_copy=Exists(active_copy_qs),

@@ -35,6 +35,12 @@ class CirculationWorkflowViewTests(TestCase):
         edition = BookEditionFactory(work=work_contributor.work, isbn=build_isbn13(812))
         cls.checkout_copy = BookCopyFactory(edition=edition, barcode="BC-WF-001")
         cls.return_copy = BookCopyFactory(edition=edition, barcode="BC-WF-002")
+        cls.unavailable_checkout_copy = BookCopyFactory(
+            edition=edition,
+            barcode="BC-WF-003",
+        )
+        cls.unavailable_checkout_copy.status = BookCopyStatus.ON_LOAN.value
+        cls.unavailable_checkout_copy.save(update_fields=["status", "updated_at"])
 
     def test_checkout_workflow_renders_for_librarians(self) -> None:
         """Checkout workflow should render with borrower and copy selectors."""
@@ -47,12 +53,19 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Checkout copy")
         self.assertContains(response, "Copy")
         self.assertContains(response, "Borrower")
+        self.assertContains(response, 'role="dialog"')
+        self.assertContains(response, 'aria-modal="true"')
+        self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
+        self.assertContains(response, "id=\"workflow-description\"")
+        self.assertContains(response, "id=\"workflow-guidance\"")
+        self.assertContains(response, 'autofocus="autofocus"')
         self.assertContains(
             response, "Start typing a barcode, title, borrower name, or patron code."
         )
         self.assertContains(response, 'list="checkout-copy-options"')
         self.assertContains(response, 'list="checkout-borrower-options"')
         self.assertContains(response, self.checkout_copy.barcode)
+        self.assertNotContains(response, self.unavailable_checkout_copy.barcode)
         self.assertContains(response, "Ada Lovelace")
         self.assertContains(response, f"PATRON-{self.member.pk:04d}")
 
@@ -66,6 +79,7 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertTemplateUsed(response, "circulation/_workflow_form.html")
         self.assertContains(response, "Checkout copy")
+        self.assertContains(response, 'aria-modal="true"')
 
     def test_checkout_workflow_persists_a_loan(self) -> None:
         """Submitting the checkout form should create a loan and mark the copy on loan."""
@@ -125,6 +139,9 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Return copy")
         self.assertContains(response, "Loan")
+        self.assertContains(response, 'role="dialog"')
+        self.assertContains(response, 'aria-modal="true"')
+        self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
         self.assertContains(response, 'list="return-loan-options"')
         self.assertContains(
             response, "Start typing a barcode, title, borrower name, or patron code."
@@ -145,6 +162,7 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertTemplateUsed(response, "circulation/_workflow_form.html")
         self.assertContains(response, "Return copy")
+        self.assertContains(response, 'aria-modal="true"')
 
     def test_return_workflow_closes_the_active_loan(self) -> None:
         """Submitting the return form should close the loan and restore availability."""

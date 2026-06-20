@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.utils.html import format_html, format_html_join
 
 from libraryops.accounts.roles import ROLE_MEMBER
-from libraryops.catalog import selectors
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
@@ -275,8 +274,8 @@ class CheckoutForm(forms.Form):
 
         super().__init__(*args, **kwargs)
         copy_queryset = (
-            selectors.copy_list()
-            .filter(status=BookCopyStatus.AVAILABLE)
+            BookCopy.objects.select_related("edition", "edition__work")
+            .filter(archived_at__isnull=True, status=BookCopyStatus.AVAILABLE)
             .order_by(
                 "edition__work__title",
                 "barcode",
@@ -287,6 +286,7 @@ class CheckoutForm(forms.Form):
         )
         copy_field = cast("AutocompleteLookupField", self.fields["copy"])
         copy_field.set_queryset(copy_queryset)
+        copy_field.widget.attrs["autofocus"] = "autofocus"
         borrower_field = cast("AutocompleteLookupField", self.fields["borrower"])
         borrower_field.set_queryset(borrower_queryset)
 
@@ -321,6 +321,7 @@ class ReturnForm(forms.Form):
         )
         loan_field = cast("AutocompleteLookupField", self.fields["loan"])
         loan_field.set_queryset(loan_queryset)
+        loan_field.widget.attrs["autofocus"] = "autofocus"
 
     def apply(self, *, actor: User) -> Loan:
         """Persist the return through the loan manager."""

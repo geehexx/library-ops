@@ -11,13 +11,13 @@ from django.test import TestCase
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
-    LoanFactory,
     WorkContributorFactory,
     build_isbn13,
 )
 
 from libraryops.catalog import selectors
 from libraryops.catalog.models import ExternalSourceRecord
+from libraryops.inventory.models import BookCopyStatus
 from libraryops.search.lexical import postgres_keyword_rank_expression
 
 
@@ -94,7 +94,8 @@ class CatalogLexicalSearchTests(TestCase):
             edition=cls.unavailable_edition,
             barcode="BC-2001",
         )
-        LoanFactory(copy=cls.unavailable_copy)
+        cls.unavailable_copy.status = BookCopyStatus.ON_LOAN.value
+        cls.unavailable_copy.save(update_fields=["status", "updated_at"])
         ExternalSourceRecord.objects.create(
             source_name="gutenberg",
             source_identifier="2001",
@@ -196,8 +197,8 @@ class CatalogLexicalSearchTests(TestCase):
 
         assert [work.pk for work in results] == [self.exact_work.pk]
 
-    def test_availability_filter_uses_active_loan_state(self) -> None:
-        """Availability filtering should exclude works with active loans."""
+    def test_availability_filter_uses_copy_status_state(self) -> None:
+        """Availability filtering should exclude works whose active copy is on loan."""
 
         available_results = list(selectors.work_list(availability="available"))
         unavailable_results = list(selectors.work_list(availability="unavailable"))
