@@ -15,9 +15,7 @@ from django.urls import reverse
 if "allauth.socialaccount" in settings.INSTALLED_APPS:
     from allauth.socialaccount.templatetags import socialaccount as socialaccount_tags
 else:
-    raise SkipTest(
-        "Optional socialaccount tests are skipped when OAuth providers are disabled."
-    )
+    raise SkipTest("Optional socialaccount tests are skipped when OAuth providers are disabled.")
 
 
 @dataclass(slots=True)
