@@ -27,6 +27,8 @@ demo to one pass, about 3-6 minutes, and start from the live review target in
 ## Guardrails
 
 - Use the current release status in `README.md` as the live reference.
+- Use [screenshot-matrix.md](./screenshot-matrix.md) as the route-by-route
+  evidence checklist before recording or presenting evaluator screenshots.
 - Keep the narration concrete and avoid feature walk-through detours that go
   beyond the release bundle.
 - If a step fails live, state the failure plainly and move to the next evidence
