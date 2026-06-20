@@ -29,8 +29,8 @@ ones have tracked visual baselines, and which still need follow-up under
 | `/circulation/` dashboard | librarian empty and post-return states | `tests/e2e/test_circulation_search.py` with baseline `circulation_search/checkout-return-dashboard.png` | covered | none |
 | `/circulation/checkout/` dialog | librarian | `tests/e2e/test_circulation_search.py` with baseline `circulation_search/checkout-form.png` | covered | none |
 | `/circulation/return/` dialog | librarian | `tests/e2e/test_circulation_search.py` browser assertions through return workflow | partial | add dedicated screenshot only if the return dialog must appear in evaluator evidence |
-| `/admin/` | admin | route exists in inventory; no dedicated browser evidence artifact | missing | capture explicit admin route evidence or document why Django admin stays out of the evaluator deck |
-| `/health/` | evaluator / release operator | route exists in inventory and README release-status references it | missing | capture explicit release-evidence proof for the health endpoint |
+| `/admin/` | admin | Django admin route is in the inventory; browser evidence should live in `tests/e2e/test_navigation.py` once the dedicated route check lands | partial | keep out of the final evaluator deck unless the dedicated admin route check fails or product scope changes |
+| `/health/` | evaluator / release operator | `tests/smoke/test_django_bootstrap.py` already proves `/health/` returns `ok`; route is also referenced by README and Render blueprint checks | covered | none unless hosted `/health/` proof drifts |
 | social-auth callback completion | Google and GitHub local + Render | blocked by provider-console / Render / SocialApp state | blocked | close under `16.6` with live callback evidence |
 
 ## Notes
