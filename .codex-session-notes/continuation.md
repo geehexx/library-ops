@@ -17,9 +17,10 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open, target `development`).
+- PR: `#28` (open draft, target `development`, `mergeStateStatus=UNSTABLE`).
 - Local branch head currently includes commits through `ad3665d`; remote PR head remains monitored by the DevOps owner.
-- Live PR checks: all lanes green except `quality` (running/pending or unresolved).
+- Live PR checks: `policy`/`security`/`workflow-security` pass; `quality` is running on run `27883538689` / job `82515054432`.
+- Current PR state has no active failed checks.
 - Major completed slices to carry forward:
   - pre-push authority
   - planning/spec reconciliation
