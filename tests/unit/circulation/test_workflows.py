@@ -47,6 +47,12 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Checkout copy")
         self.assertContains(response, "Copy")
         self.assertContains(response, "Borrower")
+        self.assertContains(response, 'role="dialog"')
+        self.assertContains(response, 'aria-modal="true"')
+        self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
+        self.assertContains(response, "id=\"workflow-description\"")
+        self.assertContains(response, "id=\"workflow-guidance\"")
+        self.assertContains(response, 'autofocus="autofocus"')
         self.assertContains(
             response, "Start typing a barcode, title, borrower name, or patron code."
         )
@@ -66,6 +72,7 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertTemplateUsed(response, "circulation/_workflow_form.html")
         self.assertContains(response, "Checkout copy")
+        self.assertContains(response, 'aria-modal="true"')
 
     def test_checkout_workflow_persists_a_loan(self) -> None:
         """Submitting the checkout form should create a loan and mark the copy on loan."""
@@ -125,6 +132,9 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Return copy")
         self.assertContains(response, "Loan")
+        self.assertContains(response, 'role="dialog"')
+        self.assertContains(response, 'aria-modal="true"')
+        self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
         self.assertContains(response, 'list="return-loan-options"')
         self.assertContains(
             response, "Start typing a barcode, title, borrower name, or patron code."
@@ -145,6 +155,7 @@ class CirculationWorkflowViewTests(TestCase):
         assert response.status_code == 200
         self.assertTemplateUsed(response, "circulation/_workflow_form.html")
         self.assertContains(response, "Return copy")
+        self.assertContains(response, 'aria-modal="true"')
 
     def test_return_workflow_closes_the_active_loan(self) -> None:
         """Submitting the return form should close the loan and restore availability."""

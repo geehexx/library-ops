@@ -287,6 +287,7 @@ class CheckoutForm(forms.Form):
         )
         copy_field = cast("AutocompleteLookupField", self.fields["copy"])
         copy_field.set_queryset(copy_queryset)
+        copy_field.widget.attrs["autofocus"] = "autofocus"
         borrower_field = cast("AutocompleteLookupField", self.fields["borrower"])
         borrower_field.set_queryset(borrower_queryset)
 
@@ -321,6 +322,7 @@ class ReturnForm(forms.Form):
         )
         loan_field = cast("AutocompleteLookupField", self.fields["loan"])
         loan_field.set_queryset(loan_queryset)
+        loan_field.widget.attrs["autofocus"] = "autofocus"
 
     def apply(self, *, actor: User) -> Loan:
         """Persist the return through the loan manager."""
