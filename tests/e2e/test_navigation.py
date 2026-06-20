@@ -89,6 +89,7 @@ class TestNavigationE2E:
         expect(page.locator("li").filter(has_text=barcode)).to_be_visible()
         expect(page.get_by_role("link", name="Edit work")).to_be_visible()
         expect(page.get_by_role("link", name="Add edition")).to_be_visible()
+        assert_visual_snapshot(page, "navigation", "catalog-create-success.png")
 
     def test_librarian_can_open_the_loan_dashboard(
         self,

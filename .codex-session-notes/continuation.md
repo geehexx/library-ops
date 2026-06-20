@@ -17,10 +17,9 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `cd4078c`, `mergeStateStatus=UNSTABLE` only because the fresh CI cycle is still running).
-- Local and remote branch head both now point at `cd4078c`; the branch is clean locally and the current remote delta is the Task Master plus canonical-truth closeout packet.
-- Latest fully green PR proof landed on prior head `656d507`: `policy`/`security`/`workflow-security`/`quality`/`commitlint` all passed on `2026-06-20` (CI run `27886176253`, commitlint run `27886176246`). The new follow-up head `cd4078c` has a fresh pending cycle on runs `27886401935` and `27886401940`.
-- Current PR state has no known failed checks, but draft status and the new follow-up CI cycle remain open.
+- PR: `#28` (open draft, target `development`, current head `b2785c0`; local branch is ahead again with the `16.3` visual-baseline closeout packet).
+- Latest fully green PR proof landed on head `b2785c0`: `commitlint`, `policy`, `quality`, `security`, and `workflow-security` all passed on `2026-06-20` / `2026-06-21` (CI run `27886934252`, commitlint run `27886934277`).
+- Current PR state has no known failed checks, but draft status remains open and local head drift is intentional until the `16.3` closeout packet is pushed.
 - Major completed slices to carry forward:
   - pre-push authority
   - planning/spec reconciliation
@@ -37,7 +36,6 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
   - Spark-default control-plane packet
 - External blocker: `16.6` remains blocked on provider-console / Render host / Site(SocialApp) configuration.
 - Remaining active queue under PR pressure:
-  - `16.3`
   - `16.6` external proof blocker
 - Dependabot queue (`15.*`) remains separate from this handoff queue and should stay out of PR `#28`.
 - Local validation proof on `2026-06-21`: `checks:prepush`, `taskmaster:validate`, `verify:core`, and `verify:all` all passed when rerun with writable UV/XDG temp roots under `/tmp`; use that env override for future `uvx` / Semgrep-based gate reruns in this environment.

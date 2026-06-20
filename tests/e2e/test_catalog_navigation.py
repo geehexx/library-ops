@@ -10,6 +10,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from PIL import Image
 from playwright.sync_api import Page, expect
+from tests.e2e.visual_regression import assert_visual_snapshot
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
@@ -90,6 +91,7 @@ class TestCatalogNavigationE2E:
         expect(page.locator("details.archive-confirm")).to_have_count(3)
         expect(page.get_by_role("link", name="Edit edition")).to_be_visible()
         expect(page.get_by_role("link", name="Add edition")).to_be_visible()
+        assert_visual_snapshot(page, "catalog_navigation", "detail/librarian-actions.png")
 
     def test_catalog_detail_archive_actions_require_confirmation(
         self,
@@ -125,6 +127,7 @@ class TestCatalogNavigationE2E:
         ).to_be_visible()
         expect(page.get_by_role("button", name="Yes, archive work")).to_be_visible()
         expect(page.get_by_role("link", name="Keep work")).to_be_visible()
+        assert_visual_snapshot(page, "catalog_navigation", "archive-confirmation.png")
         page.get_by_role("link", name="Keep work").click()
         expect(page).to_have_url(f"{live_server.url}/catalog/{work.pk}/")
 
