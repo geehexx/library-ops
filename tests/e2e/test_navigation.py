@@ -105,6 +105,6 @@ class TestNavigationE2E:
         page.goto(f"{live_server.url}/catalog/create/")
 
         expect(page.get_by_role("heading", name="Access denied")).to_be_visible()
-        expect(page.get_by_text("You do not have permission")).to_be_visible()
-        expect(page.get_by_role("link", name="Browse catalog")).to_be_visible()
+        expect(page.get_by_text("You do not have access to this page.")).to_be_visible()
+        expect(page.get_by_role("link", name="Return home")).to_be_visible()
         assert_visual_snapshot(page, "navigation", "denied/create-flow.png")
