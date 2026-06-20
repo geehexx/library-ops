@@ -109,6 +109,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     commitlint_scopes = ast.literal_eval(commitlint_scope_match.group(1))
     assert "planning" in commitlint_scopes
     assert "render" in commitlint_scopes
+    assert "TM-11" in commitlint_scopes
     assert "command_runner" in coordinator_text
     assert "context_gatherer" in coordinator_text
     assert "implementer" in coordinator_text
