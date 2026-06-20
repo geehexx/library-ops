@@ -177,9 +177,7 @@ class TestCirculationAndSearchE2E:
         page.keyboard.press("Tab")
         expect(page.get_by_role("combobox", name="Source")).to_be_focused()
         page.keyboard.press("Tab")
-        expect(
-            page.get_by_role("main").get_by_role("link", name="Sign in")
-        ).to_be_focused()
+        expect(page.get_by_role("main").get_by_role("link", name="Sign in")).to_be_focused()
         page.keyboard.press("Tab")
         expect(page.get_by_role("link", name="Exact Search Work")).to_be_focused()
         page.keyboard.press("Enter")
