@@ -1303,7 +1303,7 @@
             "id": 1,
             "title": "Reconcile PRD, specs, and constitution",
             "description": "Make the canonical PRD, Spec Kit artifacts, and constitution agree on the current release truth.",
-            "details": "Own the canonical truth sweep across the PRD, supporting Spec Kit artifacts, README/demo-facing guidance, and the current supporting OpenAPI contract so the durable planning surfaces describe one release-convergence story. Align the canonical planning surfaces so they describe the same release boundary, search posture, auth proof requirements, and governance model.\n<info added on 2026-06-19T18:04:01.813Z>\n\"End-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout.\"\n</info added on 2026-06-19T18:04:01.813Z>\n<info added on 2026-06-20T13:39:17.378Z>\n2026-06-20 remediation fold-in: Remove remaining semantic/vector/API/bootstrap-era instructions from the canonical truth surfaces and replace them with the implemented lexical-only Django release story. Scope now includes constitution, PRD, Spec Kit artifacts, README, architecture docs, evaluator/demo docs, OpenAPI/contract surfaces, and search-specific guidance. Ensure Google/GitHub proof is retained as release evidence while preserving password-login fallback and secret-free startup.\n</info added on 2026-06-20T13:39:17.378Z>",
+            "details": "Own the canonical truth sweep across the PRD, supporting Spec Kit artifacts, README/demo-facing guidance, and the current supporting OpenAPI contract so the durable planning surfaces describe one release-convergence story. Align the canonical planning surfaces so they describe the same release boundary, search posture, auth proof requirements, and governance model.\n<info added on 2026-06-19T18:04:01.813Z>\n\"End-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout.\"\n</info added on 2026-06-19T18:04:01.813Z>\n<info added on 2026-06-20T13:39:17.378Z>\n2026-06-20 remediation fold-in: Remove remaining semantic/vector/API/bootstrap-era instructions from the canonical truth surfaces and replace them with the implemented lexical-only Django release story. Scope now includes constitution, PRD, Spec Kit artifacts, README, architecture docs, evaluator/demo docs, OpenAPI/contract surfaces, and search-specific guidance. Ensure Google/GitHub proof is retained as release evidence while preserving password-login fallback and secret-free startup.\n</info added on 2026-06-20T13:39:17.378Z>\n<info added on 2026-06-20T19:25:32.285Z>\nSync `.codex-session-notes/continuation.md`, Task Master notes, and canonical planning surfaces regularly after release boundary changes to prevent drift.\n</info added on 2026-06-20T19:25:32.285Z>",
             "status": "pending",
             "dependencies": [],
             "parentTaskId": 16,
@@ -1471,11 +1471,12 @@
             "id": 16,
             "title": "Track decommissioning of superseded AI-remnant files and directories",
             "description": "Create a bounded follow-on to inventory, decide on, and either remove or rehome superseded AI-remnant surfaces so cleanup is tracked in Task Master rather than happening as local drift. This includes  if that tree is later selected for removal, plus any related stale references that keep the package alive in docs, config, or task notes.",
-            "details": "<info added on 2026-06-20T15:25:24.342Z>\nTrack decommissioning of superseded AI-remnant files and directories, including the src/libraryops/ai_assist/** tree if it is later selected for removal, plus any related stale references that keep the package alive in docs, config, or task notes.\n</info added on 2026-06-20T15:25:24.342Z>",
-            "status": "pending",
+            "details": "<info added on 2026-06-20T15:25:24.342Z>\nTrack decommissioning of superseded AI-remnant files and directories, including the src/libraryops/ai_assist/** tree if it is later selected for removal, plus any related stale references that keep the package alive in docs, config, or task notes.\n</info added on 2026-06-20T15:25:24.342Z>\n<info added on 2026-06-20T19:26:08.239Z>\nCompleted the minimal prune slice: removed src/libraryops/ai_assist/__init__.py and src/libraryops/ai_assist/AGENTS.md, pruned ai_assist from Import Linter contracts in pyproject.toml, and removed the ai_assist CODEOWNERS entry. Validation passed: rg -n \"ai_assist\" pyproject.toml .github/CODEOWNERS src/libraryops/ai_assist returned no matches; git diff --check; npm run importlint; npm run taskmaster:validate. Commit scope stayed limited to package-prune plus live wiring removal only.\n</info added on 2026-06-20T19:26:08.239Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T19:26:12.023Z"
           },
           {
             "id": 17,
@@ -1516,7 +1517,7 @@
             "id": 20,
             "title": "Codify pre-push gatekeeper protocol from chosen gate authority model",
             "description": "Implement the coordinator/Spark pre-push gatekeeper protocol using the authority model from Task 14.9 and the delegation-packet discipline from Task 16.15.",
-            "details": "Consume the gate-authority work from Task 14.9 and the delegation-packet constraints from Task 16.15. Require worker packets to declare fork/reuse status when applicable, list the local gate set they will run, name the expected commit scope before push, and gate push/review against that declared scope plus the adopted local-vs-CI authority model. Keep this scoped to coordinator/Spark packet structure and pre-push enforcement, not product code or a standalone CI-architecture redesign task.",
+            "details": "Consume the gate-authority work from Task 14.9 and the delegation-packet constraints from Task 16.15. Require worker packets to declare fork/reuse status when applicable, list the local gate set they will run, name the expected commit scope before push, and gate push/review against that declared scope plus the adopted local-vs-CI authority model. Keep this scoped to coordinator/Spark packet structure and pre-push enforcement, not product code or a standalone CI-architecture redesign task.\n<info added on 2026-06-20T19:25:27.633Z>\nTrack process truth for branch rewrites, PR supersession, and live-check refresh after force-push or branch replacement. Ensure old PR checks and mergeability evidence are refreshed against the current head to validate their accuracy.\n</info added on 2026-06-20T19:25:27.633Z>",
             "status": "pending",
             "dependencies": [
               "14.9",
@@ -1526,7 +1527,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T19:08:12.216Z",
+        "updatedAt": "2026-06-20T19:26:12.023Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
@@ -1547,7 +1548,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T19:19:43.257Z",
+      "lastModified": "2026-06-20T19:26:12.024Z",
       "taskCount": 17,
       "completedCount": 14,
       "tags": [
