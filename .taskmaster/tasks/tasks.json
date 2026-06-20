@@ -1199,7 +1199,7 @@
             "id": 3,
             "title": "Fix blocked dependency batches",
             "description": "Address shared commitlint and workflow issues in the blocked dependency PR set.",
-            "details": "Fix shared policy or workflow problems once in the repo, then use that to clear the blocked dependency PR batches with minimal repeated work.\n<info added on 2026-06-19T18:18:09.545Z>\nOverride `undici` version in lockfile to resolve dependency issue in PR #21.\n</info added on 2026-06-19T18:18:09.545Z>\n<info added on 2026-06-20T07:08:34.072Z>\nCommit and push the changes, then confirm the affected Dependabot PR quality jobs rerun green.\n</info added on 2026-06-20T07:08:34.072Z>",
+            "details": "Fix shared policy or workflow problems once in the repo, then use that to clear the blocked dependency PR batches with minimal repeated work.\n<info added on 2026-06-19T18:18:09.545Z>\nOverride `undici` version in lockfile to resolve dependency issue in PR #21.\n</info added on 2026-06-19T18:18:09.545Z>\n<info added on 2026-06-20T07:08:34.072Z>\nCommit and push the changes, then confirm the affected Dependabot PR quality jobs rerun green.\n</info added on 2026-06-20T07:08:34.072Z>\n<info added on 2026-06-20T12:38:53.382Z>\nBranch-stabilization slice for PR #25 completed with a message-only history rewrite. - Rewrote head commit 9edb2cf -> 3e97b13 via `git commit --amend` to make the subject conventional: `fix(control-plane): unblock PR #25 lint blockers in test surfaces`. - Pushed with `git push --force-with-lease origin clean-landing-tm11-20260620`. - Local `npm run commitlint` passed on the amended head. - Live PR #25 API now reports head SHA `3e97b13c60753683670431259560e934773fe257`; `commitlint` is `success`, `security` and `workflow-security` are `success`, while `quality` and `policy` are still in progress on the fresh head. - The prior `quality` failure on `9edb2cf` is stale relative to the rewritten head.\n</info added on 2026-06-20T12:38:53.382Z>",
             "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 15,
@@ -1308,11 +1308,12 @@
             "id": 8,
             "title": "Reconcile coordinator_root and workspace-capable permission language",
             "description": "Align .codex config, AGENTS, and docs so the root/coordinator permission model does not leave stale workspace-capable wording or contradictory operator guidance.",
-            "details": "",
-            "status": "pending",
+            "details": "<info added on 2026-06-20T12:47:09.717Z>\nImplemented Tranche 0 meta/config slice across `.codex/config.toml`, `.codex/agents/coordinator.toml`, `.codex/hooks/session_start_notice.py`, `repomix.config.json`, and `src/libraryops/accounts/roles.py`.\n\nChanges:\n- Set the root/coordinator config back to `gpt-5.4` with `medium` reasoning and removed the stale `workspace-capable` wording from the coordinator permission description.\n- Tightened coordinator routing guidance to preserve timed-out worker state, reuse/fork live history when the role/model still matches, and use clean spawns only when role/model changes.\n- Reworded the startup hook so `.codex-session-notes/continuation.md` is authoritative and `.codex-session-notes/scratch.md` is disposable scratch only.\n- Narrowed the default repomix include set to control-plane/repo-governance surfaces instead of broad source/test/static globs.\n- Kept the `Final` explanatory comment in `roles.py`, revised for clearer static-analysis intent.\n\nValidation:\n- `uv run python -c ...` parse/assertion check for TOML, JSON, startup vocabulary, and repomix include narrowing.\n- `uv run python -m py_compile .codex/hooks/session_start_notice.py src/libraryops/accounts/roles.py`\n- `git diff --check`\n\nNotes:\n- No user-facing blocker encountered.\n- The slice stayed narrow and did not expand into unrelated docs or product code.\n</info added on 2026-06-20T12:47:09.717Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T12:47:09.775Z"
           },
           {
             "id": 9,
@@ -1365,12 +1366,12 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T07:38:46.561Z"
+        "updatedAt": "2026-06-20T12:47:09.775Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T07:39:32.655Z",
+      "lastModified": "2026-06-20T12:47:09.776Z",
       "taskCount": 16,
       "completedCount": 12,
       "tags": [
