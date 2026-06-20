@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import Any, cast
 
+from django.contrib.auth.models import User
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 from tests.factories import (
@@ -18,14 +19,18 @@ from tests.factories import (
 )
 
 from libraryops.accounts.roles import ROLE_LIBRARIAN, ROLE_MEMBER
+from libraryops.circulation.models import Loan
 from libraryops.circulation.responses import workflow_response
 from libraryops.circulation.selectors import (
     checkout_borrower_queryset,
     checkout_copy_queryset,
     loan_dashboard_context,
+    resolve_borrower,
+    resolve_copy,
+    resolve_loan,
     return_loan_queryset,
 )
-from libraryops.inventory.models import BookCopyStatus
+from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 
 class CirculationBoundaryHelperTests(TestCase):
@@ -74,6 +79,17 @@ class CirculationBoundaryHelperTests(TestCase):
         assert self.member in borrowers
         assert self.active_loan in return_loans
         assert self.returned_loan not in return_loans
+
+    def test_selector_resolvers_match_exact_copy_borrower_and_loan_labels(self) -> None:
+        """Resolvers should keep resolving the unique copy, borrower, and loan choices."""
+
+        copies = BookCopy.objects.all()
+        users = User.objects.all()
+        loans = Loan.objects.all()
+
+        assert resolve_copy(self.available_copy.barcode, copies) == self.available_copy
+        assert resolve_borrower("Ada Lovelace", users) == self.member
+        assert resolve_loan(str(self.active_loan.pk), loans) == self.active_loan
 
     def test_dashboard_context_preserves_role_visibility(self) -> None:
         """Dashboard slices should keep member visibility narrower than staff."""
