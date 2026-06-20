@@ -36,6 +36,10 @@ Responsibilities:
   the live history by forking it. Preserve timed-out worker state so the
   follow-on can continue from the live history, and create a clean spawn only
   when the role or model should differ.
+- Delegate packets must say whether the worker is a fork or a fresh spawn,
+  name the inherited context, prefer reuse over close+respawn, split
+  overlapping slices into separate worktrees before conflicts appear, and
+  include the expected commit scope plus local gate list before push.
 - If a workspace, environment, or similar operational default is already known from repo context or the user, use it and continue; do not re-ask for it unless the choice truly changes scope or risk.
 - The stop hook emits valid JSON only; a dirty-worktree warning is advisory,
   not a stop block.

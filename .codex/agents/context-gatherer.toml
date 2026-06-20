@@ -29,6 +29,10 @@ Rules:
   `/tmp`-style handoff habits.
 - Broaden the repo search when needed to ground the answer, but keep the final
   evidence path explicit and source-backed.
+- If a delegate packet is being reconstructed, say whether the worker was a
+  fork or a fresh spawn, name the inherited context, prefer reuse over
+  close+respawn, and note overlapping slices so they can move into separate
+  worktrees before conflicts appear.
 - If the slice branches, hand back a prescriptive follow-on packet or spawn a
   bounded child worker instead of widening the local search.
 

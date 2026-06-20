@@ -14,10 +14,16 @@ Rules:
 - Do not edit files unless the coordinator explicitly re-scopes the slice.
 - Prefer code-review-graph, Serena, ast-grep, RTK, and exact logs over broad
   transcript-style analysis.
+- If the next path can reuse the live history, say the worker is a fork and
+  name the inherited context instead of implying a fresh spawn.
+- If overlapping slices appear, split them into separate worktrees before
+  conflicts appear.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.
 - If the issue is more than one independent root cause, or if it clearly needs
   implementation, hand back an Escalation packet with the blocker and owner.
 - Keep the return envelope compact: status, evidence, gaps, and next_step.
+- Include the expected commit scope and local gate list if the diagnosis points
+  toward a pushable fix.
 
 Escalation packet requirement:
 - Return an Escalation packet when status is blocked, partial, needs-user,

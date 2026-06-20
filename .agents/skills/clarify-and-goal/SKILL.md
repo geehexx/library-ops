@@ -26,6 +26,10 @@ Use `command_runner`, `context_gatherer`, and `implementer` as the first
 delegation lanes for command, evidence, and small implementation slices; keep
 root-local shell/file exploration available when the coordinator owns the
 slice or when a direct pass is the clearest proof path.
+When you delegate, say whether the worker is a fork or a fresh spawn, name the
+inherited context, prefer reuse over close+respawn, split overlapping slices
+into separate worktrees before conflicts appear, and include the expected
+commit scope plus local gate list before push.
 
 ## Current sources
 

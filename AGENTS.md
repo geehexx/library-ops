@@ -57,6 +57,10 @@ be captured in Task Master tasks and subtasks before implementation begins.
   by forking the existing history when the next path can share context and keep
   the same role/model; spawn a clean agent when the role or model should
   change.
+- When writing a delegate packet, say explicitly whether it is a fork or a
+  fresh spawn, name the inherited context, prefer reuse over close+respawn,
+  split overlapping slices into separate worktrees before conflicts appear,
+  and include the expected commit scope plus local gate list before push.
 - When new findings or follow-on slices appear, capture them in Task Master
   tasks, subtasks, or notes before implementation instead of widening the
   goal.

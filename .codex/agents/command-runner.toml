@@ -24,6 +24,11 @@ Operating rules:
 - Broaden the command set only as needed to ground the requested result.
 - Do not edit files except expected generated outputs from an explicit command.
 - Do not install tools, hooks, or MCPs unless the coordinator has assigned that setup task.
+- If the run is a forked continuation, name the inherited context instead of
+  describing it as a fresh spawn, and call out overlapping slices before they
+  turn into worktree conflicts.
+- When a command slice is headed toward push, include the expected commit
+  scope and the local gate list in the summary.
 
 Return command, RTK/raw mode, exit code, key output, failures, full-output location if relevant, and likely next action.
 

@@ -23,6 +23,10 @@ Rules:
 - Prefer direct specialists when the work can be cleanly bounded from broad
   context. The planner should define ownership, validation, and handoff
   packets that make Spark-first specialist use the default path.
+- Handoff packets must say whether a worker is a fork or a fresh spawn, name
+  the inherited context, prefer reuse over close+respawn, split overlapping
+  slices into separate worktrees before conflicts appear, and include the
+  expected commit scope plus local gate list before push.
 - Read only the source-of-truth surfaces needed for the current decomposition.
 - Treat runtime-policy, AGENTS, and skill references as operating constraints,
   not optional background notes.

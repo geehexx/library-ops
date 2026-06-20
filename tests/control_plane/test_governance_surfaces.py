@@ -114,11 +114,32 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "implementer" in coordinator_text
     assert "debugger" in coordinator_text
     assert "single_file_implementer" in coordinator_text
+    assert "fork or a" in coordinator_text
+    assert "fresh spawn" in coordinator_text
+    assert "inherited context" in coordinator_text
+    assert "close+respawn" in coordinator_text
+    assert "separate worktrees before conflicts appear" in coordinator_text
+    assert "expected commit scope plus local gate list before push" in coordinator_text
     assert "Pyright" in implementer_text
+    assert "work is a fork" in implementer_text
+    assert "inherited context" in implementer_text
+    assert "separate worktrees before" in implementer_text
+    assert "conflicts appear" in implementer_text
+    assert "expected commit scope and local gate list" in implementer_text
     assert 'model = "gpt-5.3-codex-spark"' in debugger_text
     assert 'sandbox_mode = "danger-full-access"' in debugger_text
+    assert "worker is a fork" in debugger_text
+    assert "fresh spawn" in debugger_text
+    assert "separate worktrees before" in debugger_text
+    assert "conflicts appear" in debugger_text
+    assert "expected commit scope and local gate list" in debugger_text
     assert 'model = "gpt-5.3-codex-spark"' in single_file_text
     assert 'sandbox_mode = "danger-full-access"' in single_file_text
+    assert "work is a fork" in single_file_text
+    assert "fresh spawn" in single_file_text
+    assert "separate worktrees before" in single_file_text
+    assert "conflicts appear" in single_file_text
+    assert "expected commit scope and local gate list" in single_file_text
     assert "Pyright" in django_skill_text
     assert "Pyright" in django_prompt_text
     assert (
@@ -148,6 +169,20 @@ def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
             assert expected_fragment in text
 
     assert "root-local shell/file exploration available" in clarify_goal_text
+    assert "fork or a" in root_agents_text
+    assert "fresh spawn" in root_agents_text
+    assert "separate worktrees before conflicts appear" in root_agents_text
+    assert "expected commit scope plus local gate list before push" in root_agents_text
+    assert "fork or a" in clarify_goal_text
+    assert "fresh spawn" in clarify_goal_text
+    assert "separate worktrees before conflicts appear" in clarify_goal_text
+    assert "include the expected" in clarify_goal_text
+    assert "local gate list before push" in clarify_goal_text
+    assert "fork" in code_intelligence_text
+    assert "split overlapping slices into separate" in code_intelligence_text
+    assert "worktrees before conflicts appear" in code_intelligence_text
+    assert "include the expected" in code_intelligence_text
+    assert "local gate list before push" in code_intelligence_text
 
 
 def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() -> None:
@@ -277,6 +312,14 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     assert "context_gatherer" in coordinator_text
     assert "implementer" in coordinator_text
     assert "Spark-first handling" in code_intelligence_text
+    assert "forked continuation" in command_runner_text
+    assert "fresh spawn" in command_runner_text
+    assert "include the expected commit" in command_runner_text
+    assert "local gate list in the summary" in command_runner_text
+    assert "delegate packet is being reconstructed" in context_gatherer_text
+    assert "fresh spawn" in context_gatherer_text
+    assert "move into separate" in context_gatherer_text
+    assert "worktrees before conflicts appear" in context_gatherer_text
 
     assert "model_reasoning_summary" not in command_runner_text
     assert 'model = "gpt-5.3-codex-spark"' in command_runner_text
