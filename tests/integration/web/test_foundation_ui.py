@@ -89,7 +89,18 @@ class FoundationNavigationTests(TestCase):
 
         assert forbidden_response.status_code == 403
         self.assertContains(forbidden_response, "Access denied", status_code=403)
-        self.assertContains(forbidden_response, "You do not have permission", status_code=403)
+        self.assertContains(
+            forbidden_response, "You do not have access to this page", status_code=403
+        )
+        self.assertContains(
+            forbidden_response,
+            (
+                "Use an account with the right role, or contact an administrator "
+                "if you expected access."
+            ),
+            status_code=403,
+        )
+        self.assertContains(forbidden_response, reverse("home"), status_code=403)
 
 
 class FoundationCreateFlowTests(TestCase):
@@ -266,6 +277,8 @@ class FoundationCatalogSearchTests(TestCase):
         self.assertContains(response, 'value="9780141439518"', status_code=200)
         self.assertContains(response, "Showing results for", status_code=200)
         self.assertContains(response, "Exact identifier hit", status_code=200)
+        self.assertContains(response, "Matched identifier: 9780141439518", status_code=200)
+        self.assertContains(response, "Availability: Available", status_code=200)
         self.assertContains(response, "Match: Exact identifier match", status_code=200)
 
     def test_catalog_index_facets_filter_result_set_and_render_controls(self) -> None:

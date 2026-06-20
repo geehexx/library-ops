@@ -130,28 +130,72 @@ class CatalogLexicalSearchTests(TestCase):
                     results = list(selectors.work_list(query=query))
                     assert results[0].pk == self.exact_work.pk
                     assert cast("Any", results[0]).search_explanation == "Exact identifier match"
+                    assert cast("Any", results[0]).search_matched_identifier_value == query
+                    assert cast("Any", results[0]).search_availability_state == "available"
                     assert results[1].pk == self.broad_identifier_work.pk
                     assert cast("Any", results[1]).search_explanation == "Keyword match"
 
+    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
     def test_exact_title_phrase_ranks_ahead_of_broader_title_text_hits(self) -> None:
-        """An exact normalized title phrase should outrank a looser title match."""
+        """An exact normalized title phrase should keep the exact label while
+        looser hits stay keyword-ranked."""
 
-        results = list(selectors.work_list(query="Pride and Prejudice"))
+        def _keyword_rank_expression(_query: str) -> Case:
+            return Case(
+                When(title__icontains="Pride and Prejudice", then=Value(1.0)),
+                default=Value(0.0),
+                output_field=FloatField(),
+            )
+
+        def _keyword_annotations(query: str) -> dict[str, Any]:
+            return {
+                "search_contributor_text": Value(""),
+                "search_publisher_text": Value(""),
+                "search_keyword_rank": _keyword_rank_expression(query),
+            }
+
+        with patch(
+            "libraryops.search.lexical._postgres_keyword_annotations",
+            side_effect=_keyword_annotations,
+        ):
+            results = list(selectors.work_list(query="Pride and Prejudice"))
 
         assert results[0].pk == self.exact_title_work.pk
         assert cast("Any", results[0]).search_explanation == "Exact phrase match"
         assert self.broad_title_work.pk in [work.pk for work in results]
-        assert cast("Any", results[1]).search_explanation == "Broad lexical match"
+        assert cast("Any", results[1]).search_explanation == "Keyword match"
 
+    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
     def test_exact_author_phrase_ranks_ahead_of_broader_author_text_hits(self) -> None:
-        """An exact normalized contributor phrase should outrank a looser contributor match."""
+        """An exact normalized contributor phrase should keep the exact label
+        while looser hits stay keyword-ranked."""
 
-        results = list(selectors.work_list(query="Jane Austen"))
+        def _keyword_rank_expression(_query: str) -> Case:
+            return Case(
+                When(
+                    work_contributors__contributor__name__icontains="Jane Austen", then=Value(1.0)
+                ),
+                default=Value(0.0),
+                output_field=FloatField(),
+            )
+
+        def _keyword_annotations(query: str) -> dict[str, Any]:
+            return {
+                "search_contributor_text": Value(""),
+                "search_publisher_text": Value(""),
+                "search_keyword_rank": _keyword_rank_expression(query),
+            }
+
+        with patch(
+            "libraryops.search.lexical._postgres_keyword_annotations",
+            side_effect=_keyword_annotations,
+        ):
+            results = list(selectors.work_list(query="Jane Austen"))
 
         assert results[0].pk == self.exact_author_work.pk
         assert cast("Any", results[0]).search_explanation == "Exact phrase match"
         assert self.broad_author_work.pk in [work.pk for work in results]
-        assert cast("Any", results[1]).search_explanation == "Broad lexical match"
+        assert cast("Any", results[1]).search_explanation == "Keyword match"
 
     @patch("libraryops.search.lexical.connection.vendor", "postgresql")
     def test_keyword_match_explanation_is_stable(self) -> None:

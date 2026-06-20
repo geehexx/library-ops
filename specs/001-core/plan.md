@@ -4,6 +4,23 @@
 
 Supporting Spec Kit plan. Task Master generated tasks remain the execution graph.
 
+## Current Release-Convergence Tranche
+
+Current execution is no longer in bootstrap discovery. The active queue is the
+release-convergence lane under Task Master Tasks `14`, `15`, and `16`.
+
+- `14.9` owns the local-vs-CI gate authority model and any required parity or
+  enforcement decisions.
+- `15.4` closes the dependency queue against that chosen gate boundary.
+- `16.1` owns the canonical truth sweep across PRD/spec/README/OpenAPI-facing
+  planning surfaces.
+- `16.20` codifies the coordinator/Spark pre-push gatekeeper protocol from
+  `14.9` plus the packet discipline in `16.15`.
+
+The earlier phase plan remains below for traceability, but new implementation
+or reconciliation work should follow the live Task Master graph rather than
+reopening these historical phases.
+
 ## Phase 0: Meta-system and repository readiness
 
 - Validate Codex config, required MCPs, hooks, skills, ADR consolidation, and

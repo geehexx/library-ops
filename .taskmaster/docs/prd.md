@@ -6,7 +6,7 @@ owner: Engineering
 source_of_truth: true
 taskmaster_profile: rpg
 constitution: .specify/memory/constitution.md
-last_reviewed: 2026-06-17
+last_reviewed: 2026-06-20
 ---
 
 # Library Ops — Canonical RPG PRD
@@ -511,15 +511,18 @@ Support role-based app access with Admin, Librarian, and Member roles.
   - Anonymous direct POST fails.
   - Librarian can mutate catalog/circulation but not manage roles.
 
-#### Feature: C3.F3 OAuth-ready SSO
+#### Feature: C3.F3 Secret-free startup with release-proven social login
 
-- **Description:** Configure django-allauth so deployed demo can support social login when credentials are supplied.
+- **Description:** Configure django-allauth so the app starts cleanly with password login only, while the evaluated release proves Google and GitHub social login when credentials are supplied.
 - **Inputs:** OAuth provider client ID/secret from environment.
 - **Outputs:** OAuth login flow.
-- **Behavior:** Local demo can run with username/password; OAuth is optional and environment-driven.
+- **Behavior:** Local/demo startup works with username/password and no provider secrets; provider links are environment-driven and shown only when configured.
 - **Acceptance criteria:**
   - App runs without OAuth secrets.
-  - README explains optional OAuth setup.
+  - Password-login fallback remains documented and supported.
+  - Google and GitHub provider buttons appear only when configured.
+  - Release evidence proves Google and GitHub callback completion on local and Render.
+  - README explains the provider setup required for release proof.
 
 ### Capability: C4 Catalog Management
 
@@ -546,6 +549,7 @@ Provide evaluator-facing catalog workflows and internal admin support.
 - **Acceptance criteria:**
   - Required fields are enforced.
   - Archive hides records from default catalog results.
+  - Archive actions require explicit confirmation before submission.
   - Audit event records before/after fields where practical.
 
 #### Feature: C4.F3 Cover image support
@@ -601,10 +605,11 @@ Implement checkout/borrow and checkin/return lifecycle.
 - **Description:** Provide checkout/return workflows for librarians/admins.
 - **Inputs:** Book detail actions, copy barcode, patron search, due date.
 - **Outputs:** App-owned circulation URL, views, and HTML/HTMX modal or page response.
-- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer.
+- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer. Lookup interactions must scale beyond raw browser datalist behavior by surfacing a repeatable search-select path for borrower/copy selection.
 - **Acceptance criteria:**
   - Checkout can be completed from book detail or circulation page.
   - Return can be completed from active loans dashboard.
+  - Borrower/copy selection remains understandable at evaluator scale through a search-select style interaction.
 
 #### Feature: C5.F4 Loan dashboard
 
@@ -615,6 +620,7 @@ Implement checkout/borrow and checkin/return lifecycle.
 - **Acceptance criteria:**
   - Overdue status is derived from `due_at` and `returned_at`.
   - Member cannot see other members’ loans.
+  - Active, overdue, and returned loan rows remain readable without cramped layout.
 
 ### Capability: C6 Search and Discovery
 
@@ -631,6 +637,7 @@ Provide exact-identifier-first lexical catalog search with PostgreSQL full-text 
 - **Acceptance criteria:**
   - Exact ISBN ranks first.
   - Exact barcode routes directly to copy/edition context.
+  - Exact-identifier results surface the matched identifier value and current availability clearly in the rendered UI.
 
 #### Feature: C6.F2 PostgreSQL full-text search
 
@@ -662,6 +669,7 @@ Provide exact-identifier-first lexical catalog search with PostgreSQL full-text 
   - Ranking is deterministic for the same dataset/query.
   - Exact identifier match always outranks keyword-only results.
   - Explanations describe why a result matched.
+  - Exact-identifier explanations stay aligned with the rendered card so evaluator-visible result state shows identifier, availability, and match reason consistently.
 
 ### Capability: C7 Superseded Product AI
 
@@ -1000,6 +1008,29 @@ lose the path to a deployed demo.
 - CI skeleton is ready.
 
 **Delivers:** An implementable plan and governed agent workspace.
+
+### Current Active Tranche: Release Convergence
+
+**Goal:** Close the evaluator-facing release truth gap without reopening product scope.
+
+**Entry criteria:** Core catalog, circulation, search, seed, and deployment paths already exist in source and Task Master; the open queue is Tasks 14 through 16.
+
+**Tasks:**
+
+- align PRD, Spec Kit, README/demo guidance, and the supporting OpenAPI surface to the implemented lexical-only Django release;
+- define local-vs-CI gate authority, then codify the coordinator/Spark pre-push gatekeeper protocol from that model;
+- validate dependency closure against the chosen gate authority boundary;
+- prove PostgreSQL search/circulation behavior, provider-enabled social-auth flows, and final evaluator-visible rendered states;
+- refresh deployment, screenshot, and release evidence against the actual candidate commit.
+
+**Exit criteria:**
+
+- PRD/spec/task graph/continuation surfaces describe one release-convergence story;
+- local-vs-CI gate authority and pre-push protocol are explicit in Task Master and durable docs;
+- release evidence is current, truthful, and tied to the release candidate;
+- no superseded bootstrap, semantic-search, or dedicated-API instructions remain active in planning surfaces.
+
+**Delivers:** A coherent release-convergence queue grounded in current product truth and reproducible proof paths.
 
 ### Phase 1: Django Bootstrap, Domain, and RBAC
 
@@ -1604,7 +1635,7 @@ Every PR must include:
 - Production settings enforce secure secret handling.
 - Debug mode disabled in production.
 - Demo credentials are disposable and resettable.
-- AI outputs are reviewed before persistence.
+- Social-auth providers request only the minimum scopes needed for login and remain hidden unless configured.
 
 ### 17.3 Privacy Scope
 
@@ -1714,11 +1745,11 @@ Scenario: Librarian returns an active loan
 ### 19.5 Search
 
 ```gherkin
-Scenario: Exact ISBN outranks semantic match
+Scenario: Exact ISBN outranks broader lexical matches
   Given the catalog contains a book with ISBN "9780141439518"
   When I search for "9780141439518"
   Then that exact edition is the first result
-  And the result explanation includes "ISBN exact match"
+  And the result explanation includes "Exact identifier match"
 ```
 
 ### 19.6 Seed Refresh
@@ -1837,10 +1868,10 @@ Exa, or web research before making version-sensitive implementation changes.
 
 ### 24.1 Current Artifact Review Status
 
-The current archive has been reviewed as a **governed control-plane package bootstrap**. It contains PRD, constitution,
-agent configuration, ADRs, CI bootstraping, evaluator demo surfaces, and wireframes. It does not yet contain the completed
-Django application. The PRD and agent instructions MUST therefore describe the app as planned, not as
-already implemented.
+The current repository should be treated as a **release-convergence codebase**, not a bootstrap archive. It already contains
+implemented Django product surfaces, seeded-demo workflows, lexical search, circulation behavior, deployment wiring, and a governed
+control plane. The planning surfaces MUST therefore describe the product as implemented-but-still-needing-current-proof, not as a
+future bootstrap plan.
 
 A personal-context lookup during the 2026-06-12 review returned no additional relevant memory. The review
 therefore used the current conversation, original control-plane package archive, updated control-plane package archive, and current

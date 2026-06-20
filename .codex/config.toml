@@ -6,8 +6,8 @@
 # This file defines the repo-owned root session and permission profiles. It is
 # not a user-local `--profile` overlay, and `.codex/agents/*.toml` contains
 # agent configs rather than permission profiles.
-model = "gpt-5.4-mini"
-model_reasoning_effort = "high"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
 model_reasoning_summary = "auto"
 plan_mode_reasoning_effort = "xhigh"
 review_model = "gpt-5.4"
@@ -29,8 +29,9 @@ tool_call_mcp_elicitation = true
 
 # Root coordinator plus direct specialists. The default root session stays
 # read-only so planning, synthesis, and user interaction remain separate from
-# write-capable implementation agents. Depth-2 delegation stays available for
-# explicit expert-panel or micro-worker chains, not habitual recursive fan-out.
+# command, implementation, and monitoring work that should go to specialists.
+# Depth-2 delegation stays available for explicit expert-panel or
+# micro-worker chains, not habitual recursive fan-out.
 # The thread budget is sized for active fan-out plus a few completed-but-not-yet-
 # closed workers; if the pool starts to saturate, close finished agents first
 # and reuse live agents by role before widening the pool further.
@@ -40,7 +41,7 @@ max_depth = 2
 job_max_runtime_seconds = 1800
 
 [agents.coordinator]
-description = "Coordinates source-of-truth alignment, Task Master sequencing, Spec Kit governance, decision gates, and final judgment."
+description = "Read-mostly coordinator for source-of-truth alignment, Task Master sequencing, Spec Kit governance, decision gates, and final judgment."
 config_file = "agents/coordinator.toml"
 
 [agents.prd_architect]
@@ -165,7 +166,7 @@ extends = ":workspace"
 enabled = true
 
 [permissions.coordinator_root]
-description = "Workspace-capable interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
+description = "Interactive root with live web access for coordination, research, repo-owned fixes, and user interaction."
 extends = ":workspace"
 
 [permissions.coordinator_root.network]

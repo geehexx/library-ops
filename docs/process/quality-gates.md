@@ -24,6 +24,17 @@ evidence that can be copied into Task Master notes or a PR.
 npm run checks:precommit
 ```
 
+### Pre-push authority
+
+```bash
+npm run checks:prepush
+```
+
+`checks:prepush` is the authoritative local gate list before a push. It runs
+`commitlint:range` before `checks:precommit` so commit-scope violations fail
+before the broader hygiene checks. GitHub Actions mirrors the same script
+after fetching the `development` history needed for range validation.
+
 ### Control-plane loop
 
 ```bash
