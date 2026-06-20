@@ -44,9 +44,13 @@ class _FakeAdapter:
         self._providers = {provider.id: provider for provider in providers}
 
     def list_providers(self, _request: Any) -> list[_FakeProvider]:
+        """Return the configured provider set for the template tag under test."""
+
         return list(self._providers.values())
 
     def get_provider(self, _request: Any, provider: str) -> _FakeProvider:
+        """Return one configured provider by identifier."""
+
         return self._providers[provider]
 
 
