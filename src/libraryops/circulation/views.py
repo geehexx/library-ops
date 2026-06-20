@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import QuerySet
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import FormView, TemplateView
@@ -41,6 +41,7 @@ class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
             "copy",
             "copy__edition",
         ).order_by("-checked_out_at")
+        assert isinstance(loans, QuerySet)
         if self.get_user_role() == ROLE_MEMBER:
             return loans.filter(borrower=self.request.user)
         return loans
@@ -100,7 +101,9 @@ class CirculationWorkflowView(
 
         if getattr(self.request, "htmx", False):
             return [self.fragment_template_name]
-        return [cast("str", self.template_name)]
+        template_name = self.template_name
+        assert template_name is not None
+        return [template_name]
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         """Attach the shared workflow labels and back link."""
