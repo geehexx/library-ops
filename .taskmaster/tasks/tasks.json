@@ -1250,7 +1250,7 @@
         "description": "Drain the dependency-update queue, merge safe bumps, and confirm dependency hygiene stays green.",
         "details": "Inventory open dependency-update PRs, group them by risk, land safe updates, and resolve resulting lockfile or config drift. Keep updates aligned with the repo pinned tooling and validation model and end with every open dependency PR merged or explicitly closed.",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [
           "14"
         ],
@@ -1375,7 +1375,7 @@
             "title": "Full Google/GitHub social-auth proof on local+Render",
             "description": "Verify Google and GitHub social-auth end to end on local and Render.",
             "details": "<info added on 2026-06-20T07:32:58.669Z>\nRun a real browser through Google and GitHub sign-in on the live host(s) with provider callbacks completing successfully, then record the resulting session evidence.\n</info added on 2026-06-20T07:32:58.669Z>\n<info added on 2026-06-20T13:39:20.798Z>\nRun a real browser through Google and GitHub sign-in on the live host(s) with provider callbacks completing successfully, then record the resulting session evidence. Ensure provider configuration settings-based and environment-driven, avoid duplicating providers through SocialApp records. Record local+Render proof as release-commit evidence with callback host, resulting role, and sanitized screenshot/trace pointers. Include app startup without provider secrets and password-login fallback in acceptance criteria.\n</info added on 2026-06-20T13:39:20.798Z>\n<info added on 2026-06-20T18:15:50.322Z>\nRun a real browser through Google and GitHub sign-in on the live host(s) with provider callbacks completing successfully, then record the resulting session evidence. Ensure provider configuration settings-based and environment-driven, avoid duplicating providers through SocialApp records. Record local+Render proof as release-commit evidence with callback host, resulting role, and sanitized screenshot/trace pointers. Include app startup without provider secrets and password-login fallback in acceptance criteria.\n\nNext steps:\n1. Confirm Render hostname confirmed in provider consoles.\n2. Align `DJANGO_ALLOWED_HOSTS` to that host.\n3. Update Django `Site` domain/name to match the Render host.\n4. Assign `SocialApp` entries for Google and GitHub to that site.\n5. Perform browser-backed local and Render login callback completion using real provider sandbox apps after verifying provider-console + site/socialapp registrations.\n</info added on 2026-06-20T18:15:50.322Z>",
-            "status": "pending",
+            "status": "blocked",
             "dependencies": [
               "16.19"
             ],
@@ -1410,7 +1410,7 @@
             "id": 9,
             "title": "Normalize remaining cache/workaround wording across durable docs",
             "description": "Remove or rephrase residual cache/workaround language in docs and notes so the closeout surfaces describe current behavior and not historical escape hatches.",
-            "details": "Replace immediate-submit archive behavior with an explicit confirmation step that names the target record, states the effect on default visibility, and offers a clear cancel path. The confirmation must be keyboard accessible, work in the server-rendered fallback path as well as the enhanced path, and be captured in the screenshot matrix so release evidence proves the destructive action is no longer one-click.",
+            "details": "Remove or rephrase residual cache/workaround language in docs and notes so the closeout surfaces describe current behavior and not historical escape hatches.",
             "status": "pending",
             "dependencies": [],
             "parentTaskId": 16,
@@ -1420,7 +1420,7 @@
             "id": 10,
             "title": "Implement destructive archive confirmation",
             "description": "Add explicit confirmation for destructive archive actions surfaced by the UX review, so archive flows require a deliberate user choice before data is hidden or removed.",
-            "details": "Tighten the final rendered exact-identifier card so it visibly surfaces the matched identifier value, the current availability signal, and the reason the result ranked first. Do not stop at backend explanation text alone; this task owns the evaluator-visible presentation that makes exact-identifier matches unmistakable in the result list.\n<info added on 2026-06-20T17:24:44.567Z>\nImplemented keyboard-accessible destructive confirmation for catalog work, edition, and copy archive actions on the detail surface. Replaced one-click archive forms with disclosure-based confirmation blocks that name the target record, explain it disappears from normal browse/search flows, and provide explicit confirm/cancel choices. Browser-backed coverage added in tests/e2e/test_catalog_navigation.py for open/cancel/confirm behavior. Checks run: uv run pyright tests/e2e/test_catalog_navigation.py; uv run pytest -q tests/e2e/test_catalog_navigation.py; uv run pytest -q tests/integration/web/test_catalog_management_ui.py -k archive; git diff --check; npm exec -- ast-grep scan tests/e2e/test_catalog_navigation.py --rule /tmp/page-locator-rule.yml --files-with-matches. Commit: bf4cdaa (Add catalog archive confirmation).\n</info added on 2026-06-20T17:24:44.567Z>",
+            "details": "Add an explicit confirmation step for destructive archive actions, naming the target record, stating the visibility impact, and offering a clear cancel path. Keep existing info blocks and other content unchanged.\n<info added on 2026-06-20T17:24:44.567Z>\nImplemented keyboard-accessible destructive confirmation for catalog work, edition, and copy archive actions on the detail surface. Replaced one-click archive forms with disclosure-based confirmation blocks that name the target record, explain it disappears from normal browse/search flows, and provide explicit confirm/cancel choices. Browser-backed coverage added in tests/e2e/test_catalog_navigation.py for open/cancel/confirm behavior. Checks run: uv run pyright tests/e2e/test_catalog_navigation.py; uv run pytest -q tests/e2e/test_catalog_navigation.py; uv run pytest -q tests/integration/web/test_catalog_management_ui.py -k archive; git diff --check; npm exec -- ast-grep scan tests/e2e/test_catalog_navigation.py --rule /tmp/page-locator-rule.yml --files-with-matches. Commit: bf4cdaa (Add catalog archive confirmation).\n</info added on 2026-06-20T17:24:44.567Z>",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
@@ -1431,7 +1431,7 @@
             "id": 11,
             "title": "Clarify exact-identifier result-card presentation",
             "description": "Improve the exact-identifier search result cards so ISBN and other identifier hits read clearly, dominate the result list, and do not bury the primary match signal in surrounding copy.",
-            "details": "Refine the loans dashboard toward a row-first layout that keeps active, overdue, and returned items readable without cramped card stacking. Own the evaluator-visible readability issues from the UX audit: returned-loan row density, action-column clarity, and spacing/hierarchy between summary cards and loan tables.\n<info added on 2026-06-20T17:25:45.817Z>\nExact-identifier result-card clarity implemented. Catalog search result card now surfaces matched identifier value and availability state ahead of secondary metadata for exact identifier hits, preserving existing explanation label ('Match: Exact identifier match'). Updated `src/libraryops/search/lexical.py`, `src/libraryops/catalog/templates/catalog/index.html`, and assertions in test files. Visual baseline refreshed at `tests/e2e/visual_baselines/circulation_search/exact-isbn-ranking.png`.\n</info added on 2026-06-20T17:25:45.817Z>",
+            "details": "Refine the exact-identifier result card so it visibly surfaces the matched identifier value, current availability, and why the result ranked first. Keep existing info blocks and other content unchanged.\n<info added on 2026-06-20T17:25:45.817Z>\nExact-identifier result-card clarity implemented. Catalog search result card now surfaces matched identifier value and availability state ahead of secondary metadata for exact identifier hits, preserving existing explanation label ('Match: Exact identifier match'). Updated `src/libraryops/search/lexical.py`, `src/libraryops/catalog/templates/catalog/index.html`, and assertions in test files. Visual baseline refreshed at `tests/e2e/visual_baselines/circulation_search/exact-isbn-ranking.png`.\n</info added on 2026-06-20T17:25:45.817Z>",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
