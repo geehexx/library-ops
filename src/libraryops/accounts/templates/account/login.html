@@ -69,9 +69,33 @@
     </p>
   </section>
 
-  {% if SOCIALACCOUNT_ENABLED %}
-    <section class="panel provider-panel" aria-labelledby="social-sign-in-heading">
-      {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    </section>
-  {% endif %}
+  <section class="panel provider-panel" aria-labelledby="social-sign-in-heading">
+    <p class="eyebrow">Optional OAuth</p>
+    <h3 id="social-sign-in-heading" style="margin-top: 0;">Or use a third-party</h3>
+    <p class="muted" style="margin-bottom: 0;">
+      Google and GitHub sign-in use optional OAuth credentials. When this
+      environment does not expose them, these actions stay unavailable and the
+      seeded demo-password path remains the reliable fallback.
+    </p>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
+      {% if SOCIALACCOUNT_ENABLED %}
+        <a
+          href="/accounts/google/login/"
+          class="button button--ghost"
+        >
+          Continue with Google
+        </a>
+        <a
+          href="/accounts/github/login/"
+          class="button button--ghost"
+        >
+          Continue with GitHub
+        </a>
+      {% else %}
+        <span class="button button--ghost" aria-disabled="true">Continue with Google</span>
+        <span class="button button--ghost" aria-disabled="true">Continue with GitHub</span>
+      {% endif %}
+    </div>
+  </section>
 {% endblock %}

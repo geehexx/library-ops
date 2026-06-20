@@ -64,6 +64,10 @@ class TestAuthSurfaceE2E:
         expect(page.locator('input[type="email"]')).to_be_visible()
         expect(page.locator('input[type="password"]')).to_be_visible()
         expect(page.get_by_role("button", name="Sign In")).to_be_visible()
+        expect(page.get_by_role("heading", name="Or use a third-party")).to_be_visible()
+        expect(
+            page.get_by_text("Google and GitHub sign-in use optional OAuth credentials.")
+        ).to_be_visible()
         assert_visual_snapshot(page, "auth_surface", "default/login.png")
 
         page.locator('input[type="email"]').fill("librarian@libraryops.demo")
@@ -91,6 +95,9 @@ class TestAuthSurfaceE2E:
 
         expect(page.get_by_role("heading", name="Sign In")).to_be_visible()
         expect(page.get_by_text("Or use a third-party")).to_be_visible()
+        expect(
+            page.get_by_text("Google and GitHub sign-in use optional OAuth credentials.")
+        ).to_be_visible()
         expect(page.get_by_role("link", name=re.compile("Google", re.IGNORECASE))).to_be_visible()
         expect(page.get_by_role("link", name=re.compile("GitHub", re.IGNORECASE))).to_be_visible()
         expect(page.locator('input[type="email"]')).to_be_visible()
