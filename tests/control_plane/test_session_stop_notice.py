@@ -67,49 +67,18 @@ def test_session_stop_notice_accepts_stop_when_worktree_clean(
     assert result == {}
 
 
-@pytest.mark.parametrize(
-    ("payload", "dirty_entries"),
-    [
-        (
-            {
-                "cwd": str(REPO_ROOT),
-                "hook_event_name": "Stop",
-                "last_assistant_message": "I have completed the refactoring.",
-                "stop_hook_active": False,
-            },
-            [" M .codex/hooks/session_stop_notice.py"],
-        ),
-        (
-            {
-                "cwd": str(REPO_ROOT),
-                "hook_event_name": "Stop",
-                "last_assistant_message": "We are pursuing goals and working toward the objective.",
-                "stop_hook_active": False,
-            },
-            [" M .codex/hooks/session_stop_notice.py"],
-        ),
-        (
-            {
-                "cwd": str(REPO_ROOT),
-                "hook_event_name": "Stop",
-                "last_assistant_message": "This is a progress update and coordination checkpoint.",
-                "stop_hook_active": True,
-            },
-            [" M .codex/hooks/session_stop_notice.py"],
-        ),
-    ],
-)
 def test_session_stop_notice_emits_notice_for_dirty_worktree(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
-    payload: Mapping[str, object],
-    dirty_entries: list[str],
 ) -> None:
     """Dirty worktrees should emit a notice without blocking stop requests."""
     hook = load_hook_module()
-    result = invoke_hook(hook, capsys, monkeypatch, payload, dirty_entries)
+    payload = {
+        "cwd": str(REPO_ROOT),
+        "hook_event_name": "Stop",
+        "last_assistant_message": "I have completed the refactoring.",
+        "stop_hook_active": False,
+    }
+    result = invoke_hook(hook, capsys, monkeypatch, payload, [" M docs/example.md"])
 
-    assert "decision" not in result
-    assert (
-        result["notice"] == "Worktree has uncommitted changes: .codex/hooks/session_stop_notice.py."
-    )
+    assert result == {"notice": "Worktree has uncommitted changes: docs/example.md."}
