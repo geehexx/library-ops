@@ -11,9 +11,19 @@ from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.utils.html import format_html, format_html_join
 
-from libraryops.accounts.roles import ROLE_MEMBER
 from libraryops.circulation.models import Loan
-from libraryops.inventory.models import BookCopy, BookCopyStatus
+from libraryops.circulation.selectors import (
+    borrower_label,
+    checkout_borrower_queryset,
+    checkout_copy_queryset,
+    copy_label,
+    loan_label,
+    resolve_borrower,
+    resolve_copy,
+    resolve_loan,
+    return_loan_queryset,
+)
+from libraryops.inventory.models import BookCopy
 
 
 class _AutocompleteTextInput(forms.TextInput):
@@ -103,169 +113,21 @@ class AutocompleteLookupField(forms.Field):
         return resolved
 
 
-def _normalized_choice(value: str) -> str:
-    """Normalize one typed choice for comparison."""
-
-    return " ".join(value.strip().split()).casefold()
-
-
-def _borrower_display_name(user: Any) -> str:
-    """Return a human-facing borrower name from durable user data."""
-
-    full_name = user.get_full_name().strip()
-    if full_name:
-        return full_name
-    username = user.get_username().strip()
-    local_part = username.split("@", 1)[0]
-    local_part = local_part.replace(".", " ").replace("_", " ").replace("-", " ")
-    fallback = " ".join(local_part.split()).title()
-    return fallback or f"Borrower {user.pk or ''}".strip()
-
-
-def _borrower_identifier(user: Any) -> str:
-    """Return the library-style borrower identifier."""
-
-    if user.pk is None:
-        return "PATRON-UNSAVED"
-    return f"PATRON-{user.pk:04d}"
-
-
-def _borrower_label(user: Any) -> str:
-    """Return the autocomplete label for one borrower."""
-
-    return f"{_borrower_display_name(user)} ({_borrower_identifier(user)})"
-
-
-def _copy_label(copy: BookCopy) -> str:
-    """Return the autocomplete label for one copy."""
-
-    edition = cast("Any", copy.edition)
-    return f"{copy.barcode} · {edition.work.title}"
-
-
-def _loan_label(loan: Loan) -> str:
-    """Return the autocomplete label for one loan."""
-
-    copy: BookCopy = cast("BookCopy", loan.copy)
-    borrower: User = cast("User", loan.borrower)
-    return f"{_copy_label(copy)} · {_borrower_label(borrower)}"
-
-
-def _loan_aliases(loan: Loan) -> tuple[str, ...]:
-    """Return the searchable labels for one loan."""
-
-    copy: BookCopy = cast("BookCopy", loan.copy)
-    borrower: User = cast("User", loan.borrower)
-    return (
-        _loan_label(loan),
-        _copy_label(copy),
-        copy.barcode,
-        _borrower_label(borrower),
-        _borrower_display_name(borrower),
-        _borrower_identifier(borrower),
-        str(loan.pk) if loan.pk is not None else "",
-    )
-
-
-def _match_choice(
-    value: str,
-    queryset: QuerySet[Any],
-    aliases: Callable[[Any], tuple[str, ...]],
-) -> Any | None:
-    """Return the unique queryset instance matching one typed value."""
-
-    normalized_value = _normalized_choice(value)
-    if not normalized_value:
-        return None
-    candidates = list(queryset)
-    if normalized_value.isdigit():
-        for instance in candidates:
-            if instance.pk is not None and str(instance.pk) == normalized_value:
-                return instance
-    exact_matches = [
-        instance
-        for instance in candidates
-        if normalized_value in {_normalized_choice(alias) for alias in aliases(instance)}
-    ]
-    if len(exact_matches) == 1:
-        return exact_matches[0]
-    if exact_matches:
-        return None
-    partial_matches = [
-        instance
-        for instance in candidates
-        if any(normalized_value in _normalized_choice(alias) for alias in aliases(instance))
-    ]
-    if len(partial_matches) == 1:
-        return partial_matches[0]
-    return None
-
-
-def _resolve_copy(value: str, queryset: QuerySet[BookCopy]) -> BookCopy | None:
-    """Resolve one selected copy from its display label or barcode."""
-
-    return cast(
-        "BookCopy | None",
-        _match_choice(
-            value,
-            queryset,
-            lambda copy: (
-                _copy_label(copy),
-                copy.barcode,
-                copy.edition.work.title,
-                str(copy.pk) if copy.pk is not None else "",
-            ),
-        ),
-    )
-
-
-def _resolve_borrower(value: str, queryset: QuerySet[User]) -> User | None:
-    """Resolve one selected borrower from a human name or patron code."""
-
-    return cast(
-        "User | None",
-        _match_choice(
-            value,
-            queryset,
-            lambda user: (
-                _borrower_label(user),
-                _borrower_display_name(user),
-                _borrower_identifier(user),
-                user.email,
-                user.username,
-            ),
-        ),
-    )
-
-
-def _resolve_loan(value: str, queryset: QuerySet[Loan]) -> Loan | None:
-    """Resolve one selected loan from its copy or borrower label."""
-
-    return cast(
-        "Loan | None",
-        _match_choice(
-            value,
-            queryset,
-            _loan_aliases,
-        ),
-    )
-
-
 class CheckoutForm(forms.Form):
     """Collect the data needed to checkout one available copy."""
 
     copy = AutocompleteLookupField(
         queryset=BookCopy.objects.none(),
-        option_label=_copy_label,
-        resolver=_resolve_copy,
+        option_label=copy_label,
+        resolver=resolve_copy,
         datalist_id="checkout-copy-options",
         label="Copy",
         help_text="Start typing a barcode or title, then choose an available copy.",
     )
     borrower = AutocompleteLookupField(
         queryset=User.objects.none(),
-        option_label=_borrower_label,
-        resolver=_resolve_borrower,
+        option_label=borrower_label,
+        resolver=resolve_borrower,
         datalist_id="checkout-borrower-options",
         label="Borrower",
         help_text="Start typing a member name or patron code, then choose a borrower.",
@@ -275,22 +137,11 @@ class CheckoutForm(forms.Form):
         """Refresh the dynamic querysets used by the workflow."""
 
         super().__init__(*args, **kwargs)
-        copy_queryset = (
-            BookCopy.objects.select_related("edition", "edition__work")
-            .filter(archived_at__isnull=True, status=BookCopyStatus.AVAILABLE)
-            .order_by(
-                "edition__work__title",
-                "barcode",
-            )
-        )
-        borrower_queryset = (
-            User.objects.filter(groups__name=ROLE_MEMBER).order_by("email").distinct()
-        )
         copy_field = cast("AutocompleteLookupField", self.fields["copy"])
-        copy_field.set_queryset(copy_queryset)
+        copy_field.set_queryset(checkout_copy_queryset())
         copy_field.widget.attrs["autofocus"] = "autofocus"
         borrower_field = cast("AutocompleteLookupField", self.fields["borrower"])
-        borrower_field.set_queryset(borrower_queryset)
+        borrower_field.set_queryset(checkout_borrower_queryset())
 
     def apply(self, *, actor: User) -> Loan:
         """Persist the checkout through the loan manager."""
@@ -305,8 +156,8 @@ class ReturnForm(forms.Form):
 
     loan = AutocompleteLookupField(
         queryset=Loan.objects.none(),
-        option_label=_loan_label,
-        resolver=_resolve_loan,
+        option_label=loan_label,
+        resolver=resolve_loan,
         datalist_id="return-loan-options",
         label="Loan",
         help_text="Start typing a copy barcode or borrower name, then choose an active loan.",
@@ -316,13 +167,8 @@ class ReturnForm(forms.Form):
         """Refresh the dynamic loan queryset used by the workflow."""
 
         super().__init__(*args, **kwargs)
-        loan_queryset = (
-            Loan.objects.select_related("copy__edition__work", "borrower")
-            .filter(returned_at__isnull=True)
-            .order_by("due_at", "-checked_out_at")
-        )
         loan_field = cast("AutocompleteLookupField", self.fields["loan"])
-        loan_field.set_queryset(loan_queryset)
+        loan_field.set_queryset(return_loan_queryset())
         loan_field.widget.attrs["autofocus"] = "autofocus"
 
     def apply(self, *, actor: User) -> Loan:
