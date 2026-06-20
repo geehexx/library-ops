@@ -103,9 +103,7 @@ class CirculationWorkflowView(
             return [self.fragment_template_name]
         template_name = self.template_name
         if template_name is None:
-            raise ImproperlyConfigured(
-                f"{self.__class__.__name__} requires template_name."
-            )
+            raise ImproperlyConfigured(f"{self.__class__.__name__} requires template_name.")
         return [template_name]
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
