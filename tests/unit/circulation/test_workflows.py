@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from django.core.management import call_command
+import pytest
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management import call_command
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from tests.factories import (
@@ -81,12 +82,9 @@ class CirculationWorkflowViewTests(TestCase):
 
         rendered = widget.render("copy", "BC-WF-001")
 
-        self.assertIn('list="checkout-copy-options"', rendered)
-        self.assertIn('<datalist id="checkout-copy-options">', rendered)
-        self.assertIn(
-            '<option value="BC-WF-001 · The Dispossessed"></option>',
-            rendered,
-        )
+        assert 'list="checkout-copy-options"' in rendered
+        assert '<datalist id="checkout-copy-options">' in rendered
+        assert '<option value="BC-WF-001 · The Dispossessed"></option>' in rendered
 
     def test_checkout_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Checkout workflow should swap in the fragment when loaded through HTMX."""
@@ -111,7 +109,7 @@ class CirculationWorkflowViewTests(TestCase):
         )()
         view.request = request
 
-        with self.assertRaises(ImproperlyConfigured):
+        with pytest.raises(ImproperlyConfigured):
             view.get_template_names()
 
     def test_checkout_workflow_persists_a_loan(self) -> None:
