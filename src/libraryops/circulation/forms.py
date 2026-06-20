@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from django.utils.html import format_html, format_html_join
-from django.utils.safestring import SafeString
 
 from libraryops.accounts.roles import ROLE_MEMBER
 from libraryops.circulation.models import Loan
@@ -34,7 +33,7 @@ class _AutocompleteTextInput(forms.TextInput):
         value: Any,
         attrs: dict[str, Any] | None = None,
         renderer: Any | None = None,
-    ) -> SafeString:
+    ) -> Any:
         """Render the input alongside its option list."""
 
         input_html = super().render(name, value, attrs=attrs, renderer=renderer)
