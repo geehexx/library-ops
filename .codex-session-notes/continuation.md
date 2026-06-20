@@ -1,6 +1,6 @@
 # Library Ops Continuation
 
-Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provisional next session.
+Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provisional until re-verified next session.
 
 ## Source Order
 
@@ -16,21 +16,34 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 
 ## Current Handoff Snapshot
 
-- PR `#26` is merged into `development`.
-- Branch `recovery/clean-landing-tm11-20260620` currently contains unpushed local continuation work; re-check `git status --short --branch` before assuming the exact ahead count or local head list.
-- The current local continuation tranche includes the pre-push authority commit, the release-convergence planning reconciliation commit, and this handoff refresh series.
-- Active release-convergence queue:
-  - `14.9` local-vs-CI gate authority model
-  - `15.4` dependency closure against that model
-  - `16.1` canonical truth sweep
-  - `16.15` delegation packet tightening
-  - `16.20` pre-push gatekeeper protocol consuming `14.9` and `16.15`
-- UX/search sequencing currently linked to:
-  - `16.11 -> 16.7/16.14`
-  - `16.18 -> 16.13/16.17`
-  - `16.19 -> 16.6`
-- Dependabot PR queue remains live and is tracked separately.
-- `continuation.md` is still the start-stop handoff authority; keep it brief and evidence-first.
+- Branch: `release-convergence-20260621` (active local branch for continuation).
+- PR: `#28` (open, target `development`).
+- Local branch head currently includes commits through `ad3665d`; remote PR head remains monitored by the DevOps owner.
+- Live PR checks: all lanes green except `quality` (running/pending or unresolved).
+- Major completed slices to carry forward:
+  - pre-push authority
+  - planning/spec reconciliation
+  - auth provider parity
+  - exact-identifier UI
+  - archive confirmation
+  - circulation boundary split
+  - circulation lookup
+  - circulation dashboard reflow
+  - cast cleanup
+  - PostgreSQL proof
+  - search accessibility proof
+  - AI-remnant prune
+  - Spark-default control-plane packet
+- External blocker: `16.6` remains blocked on provider-console / Render host / Site(SocialApp) configuration.
+- Remaining active queue under PR pressure:
+  - `14.9`
+  - `16.1`
+  - `15.*` reconciliation
+  - `16.20`
+  - `16.3`
+  - `16.6` external proof blocker
+- Dependabot queue remains separate from this handoff queue.
+- Keep this file concise, evidence-first, and this branch/PR as the current coordination root.
 
 ## Carry Forward
 
