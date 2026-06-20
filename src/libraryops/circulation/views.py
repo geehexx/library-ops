@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -15,9 +15,6 @@ from libraryops.accounts.permissions import RoleContextMixin
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 from libraryops.circulation.forms import CheckoutForm, ReturnForm
 from libraryops.circulation.models import Loan
-
-if TYPE_CHECKING:
-    from django.db.models import QuerySet
 
 
 def _workflow_response(request: Any, redirect_url: str) -> HttpResponse:
@@ -35,10 +32,10 @@ class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
 
     template_name = "circulation/loan_dashboard.html"
 
-    def get_visible_loans(self) -> QuerySet[Loan]:
+    def get_visible_loans(self):
         """Return the loans visible to the current user."""
 
-        loans: QuerySet[Loan] = Loan.objects.select_related(
+        loans = Loan.objects.select_related(
             "copy__edition__work",
             "borrower",
             "copy",
