@@ -31,8 +31,13 @@ This file is managed by Python Semantic Release.
   explicit Python build backend, sanitizing Task Master subtask parent IDs,
   making Semgrep path filters future-proof, and running Codex hook scripts with
   `uv run --no-sync`.
+- Reconciled release-convergence planning truth so the PRD, continuation
+  surfaces, and Task Master status no longer describe the implemented Django
+  product surfaces as merely planned or bootstrap-only.
 
-### Not Yet Implemented
+### Remaining Release-Convergence Work
 
-- Product-domain Django apps, models, APIs, and UI flows beyond the current
-  bootstrap and smoke-test surface remain pending.
+- External Google/GitHub social-auth proof on local plus Render remains blocked
+  on provider-console and hosted-environment state outside the repo.
+- Final evaluator-visible evidence and UX closeout still needs to close the
+  remaining `16.3` release-convergence slice.

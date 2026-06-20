@@ -17,10 +17,10 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, `mergeStateStatus=CLEAN`, `mergeable=MERGEABLE` as of `2026-06-20T20:51:44Z`).
-- Local branch head is `a2e30a6`; remote PR head remains `e9367e1`, so the branch is currently `ahead 1` locally and the draft PR still needs a push before its live checks reflect the latest handoff refresh.
-- Live PR checks on remote head `e9367e1`: `policy`/`security`/`workflow-security`/`quality`/`commitlint` all passed on `2026-06-20` (CI run `27883538689`, commitlint run `27883538700`).
-- Current PR state has no active failed checks, but draft status and local-vs-remote head drift remain open.
+- PR: `#28` (open draft, target `development`, current head `cd4078c`, `mergeStateStatus=UNSTABLE` only because the fresh CI cycle is still running).
+- Local and remote branch head both now point at `cd4078c`; the branch is clean locally and the current remote delta is the Task Master plus canonical-truth closeout packet.
+- Latest fully green PR proof landed on prior head `656d507`: `policy`/`security`/`workflow-security`/`quality`/`commitlint` all passed on `2026-06-20` (CI run `27886176253`, commitlint run `27886176246`). The new follow-up head `cd4078c` has a fresh pending cycle on runs `27886401935` and `27886401940`.
+- Current PR state has no known failed checks, but draft status and the new follow-up CI cycle remain open.
 - Major completed slices to carry forward:
   - pre-push authority
   - planning/spec reconciliation
@@ -37,9 +37,6 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
   - Spark-default control-plane packet
 - External blocker: `16.6` remains blocked on provider-console / Render host / Site(SocialApp) configuration.
 - Remaining active queue under PR pressure:
-  - `14.3` release gate ladder rerun proof and PR refresh
-  - `14.9`
-  - `16.1`
   - `16.3`
   - `16.6` external proof blocker
 - Dependabot queue (`15.*`) remains separate from this handoff queue and should stay out of PR `#28`.

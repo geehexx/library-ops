@@ -1966,5 +1966,5 @@ As of this PRD revision:
 
 - **Verified:** standards/tooling/deployment claims recorded in the source register and research register.
 - **Mechanically verified:** control-plane package archive hygiene and Markdown/Python static checks.
-- **Planned but not implemented:** app-based Django UI slices, database models, search services, kind-first test end state, seed importers, API, and deployment.
-- **Implementation-time checks required:** selected PostgreSQL host extension support, ParadeDB availability, final Codex model availability/cost policy, strict required-tooling check, and actual Task Master-generated task graph quality.
+- **Implemented and release-converging:** Django product surfaces, database models, lexical search, seeded demo workflows, circulation behavior, deployment wiring, and the governed control plane are present and must be described as implemented-but-still-needing-current-proof rather than future scope.
+- **Implementation-time checks still required:** current PR/CI proof, final release evidence and changelog alignment, current Task Master/task-note consistency, and external provider/Render social-auth proof that remains blocked outside the repo.

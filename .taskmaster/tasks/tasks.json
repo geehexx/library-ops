@@ -1325,11 +1325,12 @@
             "id": 1,
             "title": "Reconcile PRD, specs, and constitution",
             "description": "Make the canonical PRD, Spec Kit artifacts, and constitution agree on the current release truth.",
-            "details": "Own the canonical truth sweep across the PRD, supporting Spec Kit artifacts, README/demo-facing guidance, and the current supporting OpenAPI contract so the durable planning surfaces describe one release-convergence story. Align the canonical planning surfaces so they describe the same release boundary, search posture, auth proof requirements, and governance model.\n<info added on 2026-06-19T18:04:01.813Z>\n\"End-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout.\"\n</info added on 2026-06-19T18:04:01.813Z>\n<info added on 2026-06-20T13:39:17.378Z>\n2026-06-20 remediation fold-in: Remove remaining semantic/vector/API/bootstrap-era instructions from the canonical truth surfaces and replace them with the implemented lexical-only Django release story. Scope now includes constitution, PRD, Spec Kit artifacts, README, architecture docs, evaluator/demo docs, OpenAPI/contract surfaces, and search-specific guidance. Ensure Google/GitHub proof is retained as release evidence while preserving password-login fallback and secret-free startup.\n</info added on 2026-06-20T13:39:17.378Z>\n<info added on 2026-06-20T19:25:32.285Z>\nSync `.codex-session-notes/continuation.md`, Task Master notes, and canonical planning surfaces regularly after release boundary changes to prevent drift.\n</info added on 2026-06-20T19:25:32.285Z>\n<info added on 2026-06-20T22:42:00.121Z>\nEnd-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout. Ensure any durable release-note, evidence, or branch-finalization wording is aligned with the final release story and included in the official changelog/release-evidence documentation as part of this truth sweep.\n</info added on 2026-06-20T22:42:00.121Z>",
-            "status": "pending",
+            "details": "Own the canonical truth sweep across the PRD, supporting Spec Kit artifacts, README/demo-facing guidance, and the current supporting OpenAPI contract so the durable planning surfaces describe one release-convergence story. Align the canonical planning surfaces so they describe the same release boundary, search posture, auth proof requirements, and governance model.\n<info added on 2026-06-19T18:04:01.813Z>\n\"End-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout.\"\n</info added on 2026-06-19T18:04:01.813Z>\n<info added on 2026-06-20T13:39:17.378Z>\n2026-06-20 remediation fold-in: Remove remaining semantic/vector/API/bootstrap-era instructions from the canonical truth surfaces and replace them with the implemented lexical-only Django release story. Scope now includes constitution, PRD, Spec Kit artifacts, README, architecture docs, evaluator/demo docs, OpenAPI/contract surfaces, and search-specific guidance. Ensure Google/GitHub proof is retained as release evidence while preserving password-login fallback and secret-free startup.\n</info added on 2026-06-20T13:39:17.378Z>\n<info added on 2026-06-20T19:25:32.285Z>\nSync `.codex-session-notes/continuation.md`, Task Master notes, and canonical planning surfaces regularly after release boundary changes to prevent drift.\n</info added on 2026-06-20T19:25:32.285Z>\n<info added on 2026-06-20T22:42:00.121Z>\nEnd-to-end manual UX audit with review of every screenshot-worthy state and all user-visible surfaces, then iterative planning/research/implementation of improvements. Any durable findings from that audit that change product scope description, UI behavior claims, demo evidence, or release boundaries must be reconciled back into the canonical PRD, supporting Spec Kit artifacts, and durable docs before closeout. Ensure any durable release-note, evidence, or branch-finalization wording is aligned with the final release story and included in the official changelog/release-evidence documentation as part of this truth sweep.\n</info added on 2026-06-20T22:42:00.121Z>\n<info added on 2026-06-20T22:59:39.269Z>\n2026-06-21: Canonical-truth pass complete. PRD claim-status wording, changelog release-convergence wording, and continuation queue truth were reconciled to the current release state. README, Spec Kit artifacts, OpenAPI, and constitution were verified as already aligned in this pass; no further canonical edits were needed for those surfaces.\n</info added on 2026-06-20T22:59:39.269Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T22:59:48.824Z"
           },
           {
             "id": 2,
@@ -1414,11 +1415,12 @@
             "id": 9,
             "title": "Normalize remaining cache/workaround wording across durable docs",
             "description": "Remove or rephrase residual cache/workaround language in docs and notes so the closeout surfaces describe current behavior and not historical escape hatches.",
-            "details": "Remove or rephrase residual cache/workaround language in docs and notes so the closeout surfaces describe current behavior and not historical escape hatches.",
-            "status": "pending",
+            "details": "Remove or rephrase residual cache/workaround language in docs and notes so the closeout surfaces describe current behavior and not historical escape hatches.\n<info added on 2026-06-20T22:59:47.020Z>\n2026-06-21: Targeted canonical-truth search found no remaining stale workaround/cache wording in PRD, changelog, continuation, README, specs, docs, or constitution that required further canonical edits. All instances of residual cache/workaround language have been removed or rephrased across durable documentation surfaces, ensuring they accurately reflect current behavior without historical escape hatches.\n</info added on 2026-06-20T22:59:47.020Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T22:59:50.740Z"
           },
           {
             "id": 10,
@@ -1551,7 +1553,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T22:51:08.536Z",
+        "updatedAt": "2026-06-20T22:59:50.740Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
@@ -1572,7 +1574,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T22:53:18.225Z",
+      "lastModified": "2026-06-20T22:59:50.740Z",
       "taskCount": 17,
       "completedCount": 13,
       "tags": [
