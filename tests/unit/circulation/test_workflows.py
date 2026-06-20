@@ -35,6 +35,12 @@ class CirculationWorkflowViewTests(TestCase):
         edition = BookEditionFactory(work=work_contributor.work, isbn=build_isbn13(812))
         cls.checkout_copy = BookCopyFactory(edition=edition, barcode="BC-WF-001")
         cls.return_copy = BookCopyFactory(edition=edition, barcode="BC-WF-002")
+        cls.unavailable_checkout_copy = BookCopyFactory(
+            edition=edition,
+            barcode="BC-WF-003",
+        )
+        cls.unavailable_checkout_copy.status = BookCopyStatus.ON_LOAN.value
+        cls.unavailable_checkout_copy.save(update_fields=["status", "updated_at"])
 
     def test_checkout_workflow_renders_for_librarians(self) -> None:
         """Checkout workflow should render with borrower and copy selectors."""
@@ -59,6 +65,7 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, 'list="checkout-copy-options"')
         self.assertContains(response, 'list="checkout-borrower-options"')
         self.assertContains(response, self.checkout_copy.barcode)
+        self.assertNotContains(response, self.unavailable_checkout_copy.barcode)
         self.assertContains(response, "Ada Lovelace")
         self.assertContains(response, f"PATRON-{self.member.pk:04d}")
 

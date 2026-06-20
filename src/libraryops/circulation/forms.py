@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 from django.utils.html import format_html, format_html_join
 
 from libraryops.accounts.roles import ROLE_MEMBER
-from libraryops.catalog import selectors
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
@@ -275,8 +274,8 @@ class CheckoutForm(forms.Form):
 
         super().__init__(*args, **kwargs)
         copy_queryset = (
-            selectors.copy_list()
-            .filter(status=BookCopyStatus.AVAILABLE)
+            BookCopy.objects.select_related("edition", "edition__work")
+            .filter(archived_at__isnull=True, status=BookCopyStatus.AVAILABLE)
             .order_by(
                 "edition__work__title",
                 "barcode",
