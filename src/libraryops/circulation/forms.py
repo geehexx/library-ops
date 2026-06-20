@@ -38,6 +38,7 @@ class _AutocompleteTextInput(forms.TextInput):
         """Render the input alongside its option list."""
 
         input_html = super().render(name, value, attrs=attrs, renderer=renderer)
+        assert isinstance(input_html, SafeString)
         options_html = format_html_join(
             "",
             '<option value="{}"></option>',
@@ -61,15 +62,21 @@ class AutocompleteLookupField(forms.Field):
     def __init__(
         self,
         *,
-        queryset: QuerySet[Any],
-        option_label: Callable[[Any], str],
-        resolver: Callable[[str, QuerySet[Any]], Any | None],
+        queryset: Any,
+        option_label: Any,
+        resolver: Any,
         datalist_id: str,
         **kwargs: Any,
     ) -> None:
-        self.queryset = queryset
-        self._option_label = option_label
-        self._resolver = resolver
+        if not isinstance(queryset, QuerySet):
+            raise TypeError("queryset must be a QuerySet.")
+        if not isinstance(option_label, Callable):
+            raise TypeError("option_label must be callable.")
+        if not isinstance(resolver, Callable):
+            raise TypeError("resolver must be callable.")
+        self.queryset: QuerySet[Any] = queryset
+        self._option_label: Callable[[Any], str] = option_label
+        self._resolver: Callable[[str, QuerySet[Any]], Any | None] = resolver
         self.widget = _AutocompleteTextInput(datalist_id=datalist_id)
         super().__init__(**kwargs)
         self.refresh_options()
@@ -104,7 +111,7 @@ def _normalized_choice(value: str) -> str:
     return " ".join(value.strip().split()).casefold()
 
 
-def _borrower_display_name(user: User) -> str:
+def _borrower_display_name(user: Any) -> str:
     """Return a human-facing borrower name from durable user data."""
 
     full_name = user.get_full_name().strip()
@@ -117,7 +124,7 @@ def _borrower_display_name(user: User) -> str:
     return fallback or f"Borrower {user.pk or ''}".strip()
 
 
-def _borrower_identifier(user: User) -> str:
+def _borrower_identifier(user: Any) -> str:
     """Return the library-style borrower identifier."""
 
     if user.pk is None:
@@ -125,7 +132,7 @@ def _borrower_identifier(user: User) -> str:
     return f"PATRON-{user.pk:04d}"
 
 
-def _borrower_label(user: User) -> str:
+def _borrower_label(user: Any) -> str:
     """Return the autocomplete label for one borrower."""
 
     return f"{_borrower_display_name(user)} ({_borrower_identifier(user)})"

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import cast
+from typing import Any, cast
 
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -15,9 +15,11 @@ from libraryops.circulation import models as circulation_models
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 
-def _require_loan_manager(actor: User) -> None:
+def _require_loan_manager(actor: Any) -> None:
     """Reject users that cannot manage circulation loans."""
 
+    if not isinstance(actor, User):
+        raise TypeError("actor must be a User instance.")
     if not actor.is_authenticated or not actor.has_perm("circulation.change_loan"):
         raise PermissionDenied("Loan mutations require librarian or admin access.")
 
@@ -57,10 +59,10 @@ class LoanManager(models.Manager["circulation_models.Loan"]):
     def checkout_copy(
         self,
         *,
-        actor: User,
+        actor: Any,
         copy: BookCopy,
-        borrower: User,
-        due_at: datetime | None = None,
+        borrower: Any,
+        due_at: Any | None = None,
     ) -> circulation_models.Loan:
         """Create one active loan and mark the copy on loan."""
 
@@ -69,6 +71,8 @@ class LoanManager(models.Manager["circulation_models.Loan"]):
             raise ValueError("Cannot mutate an unsaved copy.")
         if borrower.pk is None:
             raise ValueError("Cannot checkout to an unsaved borrower.")
+        if due_at is not None and not isinstance(due_at, datetime):
+            raise TypeError("due_at must be a datetime or None.")
 
         copy = BookCopy.objects.select_for_update().get(pk=copy.pk)
         if copy.archived_at is not None or copy.status != BookCopyStatus.AVAILABLE.value:
@@ -100,7 +104,7 @@ class LoanManager(models.Manager["circulation_models.Loan"]):
     def return_copy(
         self,
         *,
-        actor: User,
+        actor: Any,
         loan: circulation_models.Loan,
     ) -> circulation_models.Loan:
         """Close one active loan and restore the copy to available."""
