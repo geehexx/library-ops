@@ -1480,12 +1480,13 @@
             "title": "Cast/workaround detection and cleanup follow-on",
             "description": "Add a bounded cleanup pass to detect remaining cast and workaround patterns in Django product files, then either remove them or track any unavoidable exceptions explicitly.",
             "details": "Keep the scan narrow to product Django modules and their immediate tests. Look for patterns such as nested cast(Any, self.instance), type-suppression shims, and similar workaround code that should be removed or turned into an explicit, tracked exception. Use the existing governance and quality-gate surfaces to keep the preferred pattern from drifting back.\n<info added on 2026-06-20T15:36:04.809Z>\n2026-06-20 note: this is the cast/workaround detection-and-removal follow-on from the completed circulation architecture review. Keep it separate from the UX tasks in 16.12/16.13 and keep the scan narrow to product Django modules and their immediate tests. Gate expectation: use the existing governance/quality-gate surfaces as the regression net, and when implementation starts, pair the change with the smallest relevant test/lint surface plus a clean Task Master dependency validation run.\n</info added on 2026-06-20T15:36:04.809Z>\n<info added on 2026-06-20T15:53:45.018Z>\nUpdated src/libraryops/circulation/forms.py, src/libraryops/circulation/managers.py, src/libraryops/circulation/views.py, and src/libraryops/circulation/management/commands/seed_circulation_examples.py to keep the imports runtime-justified and Pyright-clean while satisfying Ruff TC00x rules and the governance shim check. Validation: uv run ruff check src/libraryops/circulation/forms.py src/libraryops/circulation/managers.py src/libraryops/circulation/views.py src/libraryops/circulation/management/commands/seed_circulation_examples.py; uv run pyright src/libraryops/circulation/forms.py src/libraryops/circulation/managers.py src/libraryops/circulation/views.py src/libraryops/circulation/management/commands/seed_circulation_examples.py; uv run pytest -q tests/control_plane/test_governance_surfaces.py -k 'product_python_modules_do_not_depend_on_type_checking_shims'; git diff --check; npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'.\n</info added on 2026-06-20T15:53:45.018Z>",
-            "status": "pending",
+            "status": "done",
             "dependencies": [
               "16.18"
             ],
             "parentTaskId": 16,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-06-20T18:49:03.288Z"
           },
           {
             "id": 18,
@@ -1523,7 +1524,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-20T18:30:18.659Z",
+        "updatedAt": "2026-06-20T18:49:03.288Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
@@ -1544,7 +1545,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-20T18:30:18.661Z",
+      "lastModified": "2026-06-20T18:49:03.288Z",
       "taskCount": 17,
       "completedCount": 13,
       "tags": [

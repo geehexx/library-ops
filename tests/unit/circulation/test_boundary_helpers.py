@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import Any, cast
+from typing import Any
 
 from django.contrib.auth.models import User
 from django.test import RequestFactory, TestCase
@@ -117,13 +117,13 @@ class CirculationBoundaryHelperTests(TestCase):
     def test_workflow_response_supports_standard_and_htmx_redirects(self) -> None:
         """Workflow response selection should preserve browser behavior."""
 
-        request = self.factory.post("/")
+        request: Any = self.factory.post("/")
 
         standard_response = workflow_response(request, "/circulation/")
         assert standard_response.status_code == 302
         assert standard_response.headers["Location"] == "/circulation/"
 
-        cast("Any", request).htmx = True
+        request.htmx = True
         htmx_response = workflow_response(request, "/circulation/")
         assert htmx_response.status_code == 204
         assert htmx_response.headers["HX-Redirect"] == "/circulation/"

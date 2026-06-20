@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
@@ -14,9 +14,6 @@ from libraryops.accounts.permissions import RoleContextMixin
 from libraryops.circulation.forms import CheckoutForm, ReturnForm
 from libraryops.circulation.responses import workflow_response
 from libraryops.circulation.selectors import loan_dashboard_context
-
-if TYPE_CHECKING:
-    from django.http import HttpResponse
 
 
 class LoanDashboardView(LoginRequiredMixin, RoleContextMixin, TemplateView):
@@ -91,7 +88,7 @@ class CirculationWorkflowView(
 
         return reverse("loan-dashboard")
 
-    def form_valid(self, form: Any) -> HttpResponse:
+    def form_valid(self, form: Any) -> Any:
         """Redirect to the dashboard after a workflow succeeds."""
 
         _ = form
@@ -105,11 +102,11 @@ class LoanCheckoutView(CirculationWorkflowView):
     page_title = "Checkout copy"
     submit_label = "Checkout copy"
 
-    def form_valid(self, form: CheckoutForm) -> HttpResponse:
+    def form_valid(self, form: CheckoutForm) -> Any:
         """Persist the checkout and return to the dashboard."""
 
         form.apply(actor=self.request.user)
-        return super().form_valid(form)
+        return workflow_response(self.request, self.get_success_url())
 
 
 class LoanReturnView(CirculationWorkflowView):
@@ -119,8 +116,8 @@ class LoanReturnView(CirculationWorkflowView):
     page_title = "Return copy"
     submit_label = "Return copy"
 
-    def form_valid(self, form: ReturnForm) -> HttpResponse:
+    def form_valid(self, form: ReturnForm) -> Any:
         """Persist the return and return to the dashboard."""
 
         form.apply(actor=self.request.user)
-        return super().form_valid(form)
+        return workflow_response(self.request, self.get_success_url())

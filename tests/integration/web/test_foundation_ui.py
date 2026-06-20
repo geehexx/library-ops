@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Protocol, cast
+from typing import Any
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -19,27 +19,6 @@ from tests.factories import (
 
 from libraryops.audit.models import AuditEvent
 from libraryops.catalog.models import BibliographicWork, ContributorRole, ExternalSourceRecord
-
-
-class _BookCopyLike(Protocol):
-    """Protocol for the minimal book-copy shape used in assertions."""
-
-    barcode: str
-
-
-class _BookEditionLike(Protocol):
-    """Protocol for the minimal book-edition shape used in assertions."""
-
-    isbn: str | None
-    copies: Any
-
-
-class _BibliographicWorkLike(Protocol):
-    """Protocol for the minimal work shape used in assertions."""
-
-    pk: int | None
-    editions: Any
-    work_contributors: Any
 
 
 class FoundationNavigationTests(TestCase):
@@ -79,7 +58,7 @@ class FoundationNavigationTests(TestCase):
         login_url = reverse("account_login")
         create_url = reverse("catalog-create")
 
-        anonymous_response = cast("Any", self.client.get(create_url))
+        anonymous_response: Any = self.client.get(create_url)
         assert anonymous_response.status_code == 302
         assert anonymous_response.url == f"{login_url}?next={create_url}"
 
@@ -159,12 +138,9 @@ class FoundationCreateFlowTests(TestCase):
             },
         )
 
-        work = cast(
-            "_BibliographicWorkLike",
-            BibliographicWork.objects.get(title="The Left Hand of Darkness"),
-        )
-        edition = cast("_BookEditionLike", work.editions.get())
-        copy = cast("_BookCopyLike", edition.copies.get())
+        work: Any = BibliographicWork.objects.get(title="The Left Hand of Darkness")
+        edition = work.editions.get()
+        copy = edition.copies.get()
 
         assert response.status_code == 302
         self.assertRedirects(response, reverse("catalog-detail", kwargs={"work_id": work.pk}))

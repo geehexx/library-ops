@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.contrib.auth.models import User
@@ -21,8 +21,6 @@ from libraryops.inventory.models import BookCopy
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from django.db.models import QuerySet
-
 
 class _SearchSelectField(forms.ModelChoiceField):  # pyright: ignore[reportMissingTypeArgument]
     """Render a searchable select with stable, human-facing option labels."""
@@ -30,7 +28,7 @@ class _SearchSelectField(forms.ModelChoiceField):  # pyright: ignore[reportMissi
     def __init__(
         self,
         *,
-        queryset: QuerySet[Any],
+        queryset: Any,
         option_label: Callable[[Any], str],
         **kwargs: Any,
     ) -> None:
@@ -42,7 +40,7 @@ class _SearchSelectField(forms.ModelChoiceField):  # pyright: ignore[reportMissi
 
         return str(self._option_label(obj))
 
-    def set_queryset(self, queryset: QuerySet[Any]) -> None:
+    def set_queryset(self, queryset: Any) -> None:
         """Replace the backing queryset used to build the select options."""
 
         self.queryset = queryset
@@ -73,11 +71,15 @@ class CheckoutForm(forms.Form):
         self.copy_query = self._lookup_query("copy_query")
         self.borrower_query = self._lookup_query("borrower_query")
 
-        copy_field = cast("_SearchSelectField", self.fields["copy"])
+        copy_field = self.fields["copy"]
+        if not isinstance(copy_field, _SearchSelectField):
+            raise TypeError("Expected copy to use the searchable select field.")
         copy_field.set_queryset(checkout_copy_queryset(query=self.copy_query))
         copy_field.widget.attrs["autofocus"] = "autofocus"
 
-        borrower_field = cast("_SearchSelectField", self.fields["borrower"])
+        borrower_field = self.fields["borrower"]
+        if not isinstance(borrower_field, _SearchSelectField):
+            raise TypeError("Expected borrower to use the searchable select field.")
         borrower_field.set_queryset(checkout_borrower_queryset(query=self.borrower_query))
 
     def _lookup_query(self, key: str) -> str:
@@ -89,8 +91,12 @@ class CheckoutForm(forms.Form):
     def apply(self, *, actor: User) -> Loan:
         """Persist the checkout through the loan manager."""
 
-        copy = cast("BookCopy", self.cleaned_data["copy"])
-        borrower = cast("User", self.cleaned_data["borrower"])
+        copy = self.cleaned_data["copy"]
+        if not isinstance(copy, BookCopy):
+            raise TypeError("Expected cleaned copy to be a BookCopy.")
+        borrower = self.cleaned_data["borrower"]
+        if not isinstance(borrower, User):
+            raise TypeError("Expected cleaned borrower to be a User.")
         return Loan.objects.checkout_copy(actor=actor, copy=copy, borrower=borrower)
 
 
@@ -111,7 +117,9 @@ class ReturnForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.loan_query = self._lookup_query("loan_query")
 
-        loan_field = cast("_SearchSelectField", self.fields["loan"])
+        loan_field = self.fields["loan"]
+        if not isinstance(loan_field, _SearchSelectField):
+            raise TypeError("Expected loan to use the searchable select field.")
         loan_field.set_queryset(return_loan_queryset(query=self.loan_query))
         loan_field.widget.attrs["autofocus"] = "autofocus"
 
@@ -124,5 +132,7 @@ class ReturnForm(forms.Form):
     def apply(self, *, actor: User) -> Loan:
         """Persist the return through the loan manager."""
 
-        loan = cast("Loan", self.cleaned_data["loan"])
+        loan = self.cleaned_data["loan"]
+        if not isinstance(loan, Loan):
+            raise TypeError("Expected cleaned loan to be a Loan.")
         return Loan.objects.return_copy(actor=actor, loan=loan)

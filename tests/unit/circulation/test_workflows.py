@@ -96,8 +96,8 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertNotContains(response, self.return_copy.barcode)
         self.assertNotContains(response, "<datalist")
 
-    def test_autocomplete_widget_renders_datalist_markup(self) -> None:
-        """Autocomplete widgets should keep the datalist markup intact."""
+    def test_autocomplete_widget_renders_select_markup(self) -> None:
+        """Autocomplete widgets should keep the searchable select markup intact."""
 
         form = CheckoutForm()
         widget = form.fields["copy"].widget
@@ -105,9 +105,9 @@ class CirculationWorkflowViewTests(TestCase):
 
         rendered = widget.render("copy", "BC-WF-001")
 
-        assert 'list="checkout-copy-options"' in rendered
-        assert '<datalist id="checkout-copy-options">' in rendered
-        assert '<option value="BC-WF-001 · The Dispossessed"></option>' in rendered
+        assert '<select name="copy"' in rendered
+        assert '<option value="">Choose a copy</option>' in rendered
+        assert "BC-WF-001 · The Dispossessed" in rendered
 
     def test_checkout_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Checkout workflow should swap in the fragment when loaded through HTMX."""

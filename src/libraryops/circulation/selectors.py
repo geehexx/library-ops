@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any
 
 from django.contrib.auth.models import User
 from django.db.models import Q
 
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
+from libraryops.catalog.models import BookEdition
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
@@ -192,23 +193,33 @@ def borrower_label(user: Any) -> str:
 def copy_label(copy: BookCopy) -> str:
     """Return the autocomplete label for one copy."""
 
-    edition = cast("Any", copy.edition)
+    edition = copy.edition
+    if not isinstance(edition, BookEdition):
+        raise TypeError("Expected copy.edition to be a BookEdition.")
     return f"{copy.barcode} · {edition.work.title}"
 
 
 def loan_label(loan: Loan) -> str:
     """Return the autocomplete label for one loan."""
 
-    copy: BookCopy = cast("BookCopy", loan.copy)
-    borrower: User = cast("User", loan.borrower)
+    copy = loan.copy
+    if not isinstance(copy, BookCopy):
+        raise TypeError("Expected loan.copy to be a BookCopy.")
+    borrower = loan.borrower
+    if not isinstance(borrower, User):
+        raise TypeError("Expected loan.borrower to be a User.")
     return f"{copy_label(copy)} · {borrower_label(borrower)}"
 
 
 def loan_aliases(loan: Loan) -> tuple[str, ...]:
     """Return the searchable labels for one loan."""
 
-    copy: BookCopy = cast("BookCopy", loan.copy)
-    borrower: User = cast("User", loan.borrower)
+    copy = loan.copy
+    if not isinstance(copy, BookCopy):
+        raise TypeError("Expected loan.copy to be a BookCopy.")
+    borrower = loan.borrower
+    if not isinstance(borrower, User):
+        raise TypeError("Expected loan.borrower to be a User.")
     return (
         loan_label(loan),
         copy_label(copy),
@@ -259,10 +270,8 @@ def resolve_copy(value: str, queryset: Any) -> BookCopy | None:
             str(copy.pk) if copy.pk is not None else "",
         )
 
-    return cast(
-        "BookCopy | None",
-        _match_choice(value, queryset, _copy_aliases),
-    )
+    resolved = _match_choice(value, queryset, _copy_aliases)
+    return resolved if isinstance(resolved, BookCopy) else None
 
 
 def resolve_borrower(value: str, queryset: Any) -> User | None:
@@ -277,13 +286,12 @@ def resolve_borrower(value: str, queryset: Any) -> User | None:
             user.username,
         )
 
-    return cast(
-        "User | None",
-        _match_choice(value, queryset, _borrower_aliases),
-    )
+    resolved = _match_choice(value, queryset, _borrower_aliases)
+    return resolved if isinstance(resolved, User) else None
 
 
 def resolve_loan(value: str, queryset: Any) -> Loan | None:
     """Resolve one selected loan from its copy or borrower label."""
 
-    return cast("Loan | None", _match_choice(value, queryset, loan_aliases))
+    resolved = _match_choice(value, queryset, loan_aliases)
+    return resolved if isinstance(resolved, Loan) else None
