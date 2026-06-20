@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from django.contrib.auth.models import User
     from pytest_django.live_server_helper import LiveServer
 
+
 @pytest.mark.e2e
 @pytest.mark.django_db(transaction=True)
 class TestCirculationAndSearchE2E:
@@ -98,9 +99,7 @@ class TestCirculationAndSearchE2E:
         ).to_be_visible()
         expect(page.get_by_text("Browser Circulation Work")).to_be_visible()
         expect(page.get_by_role("cell", name=member.email)).to_be_visible()
-        assert_visual_snapshot(
-            page, "circulation_search", "checkout-return-dashboard.png"
-        )
+        assert_visual_snapshot(page, "circulation_search", "checkout-return-dashboard.png")
 
     def test_catalog_search_ranks_exact_isbn_hits_first_in_the_browser(
         self,

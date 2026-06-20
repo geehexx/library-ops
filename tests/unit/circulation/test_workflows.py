@@ -56,8 +56,8 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, 'role="dialog"')
         self.assertContains(response, 'aria-modal="true"')
         self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
-        self.assertContains(response, "id=\"workflow-description\"")
-        self.assertContains(response, "id=\"workflow-guidance\"")
+        self.assertContains(response, 'id="workflow-description"')
+        self.assertContains(response, 'id="workflow-guidance"')
         self.assertContains(response, 'autofocus="autofocus"')
         self.assertContains(
             response, "Start typing a barcode, title, borrower name, or patron code."
