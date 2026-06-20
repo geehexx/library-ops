@@ -48,7 +48,7 @@ class CopyForm(forms.ModelForm):
         status = self.cleaned_data["status"]
         shelf_location = str(self.cleaned_data["shelf_location"])
         condition_note = str(self.cleaned_data["condition_note"])
-        copy = cast(BookCopy, cast(Any, self.instance))
+        copy = cast(BookCopy, self.instance)
         if copy.pk:
             return BookCopy.objects.update_copy(
                 actor=actor,
@@ -71,7 +71,7 @@ class CopyForm(forms.ModelForm):
     def archive(self, *, actor: User) -> BookCopy:
         """Archive the bound copy through the owning manager."""
 
-        copy = cast(BookCopy, cast(Any, self.instance))
+        copy = cast(BookCopy, self.instance)
         if not copy.pk:
             raise ValueError("Cannot archive an unsaved copy.")
         return BookCopy.objects.archive_copy(actor=actor, copy=copy)
