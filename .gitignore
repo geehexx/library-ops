@@ -30,7 +30,6 @@ npm-debug.log*
 # Codex/local agent state
 .codex-local/
 .codex-log/
-.codex-session-notes/
 .codex/render-home/
 .codex/.tmp/
 .codex/tmp/

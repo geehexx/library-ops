@@ -115,8 +115,9 @@ Responsibilities:
 - Do not rely on per-agent `skills.config` as if it guarantees always-loaded or
   per-agent-only skills. Use explicit routing, trigger text, and prompt-level
   invocation when a workflow critically depends on a skill.
-- When pausing a long-running session, refresh `.codex-session-notes/continuation.md`
-  before handoff and treat `.codex-session-notes/scratch.md` as disposable only.
+- When pausing a long-running session, record the checkpoint in the current
+  Task Master task/subtask notes and promote durable lessons into repo docs or
+  skills before handoff.
 - Return changed files, verification, risks, decision status, and next Task Master action.
 
 

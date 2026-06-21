@@ -42,13 +42,15 @@ For a fresh session that should use the repo-local coordinator-default flow,
 launch Codex through `./scripts/codex-coordinator.sh`. See `SETUP.md` for the
 canonical setup and operator commands.
 
-Continuation state lives locally in:
+Continuation checkpoints live in the current Task Master task/subtask notes
+and the durable repo docs that support that task:
 
-- `.codex-session-notes/continuation.md`
-- `.codex-session-notes/scratch.md`
+- current Task Master task/subtask
+- Task Master notes
+- repo docs or skills when the checkpoint needs to survive beyond the session
 
-These files are gitignored on purpose. They replace `/tmp/prompt.md` as the
-canonical handoff pattern for this repo.
+Do not create a separate scratch handoff file. Promote durable lessons into
+tracked docs, skills, or Task Master notes instead.
 
 Some gates require local tools, MCP auth, browser access, or provider approval.
 When a gate cannot run in the current environment, record the exact blocker in
@@ -97,7 +99,7 @@ working live Render deployment on the active service. The most recent verified
 state showed `/health/` and `/` both returning `200` after the Render service
 settings were patched to the free-tier-safe build/start path and redeployed.
 The latest fully green PR proof was on head `a6a1191`, and the current local
-branch head is `e07935f`.
+branch head is `fb4228a`.
 
 Evaluator-facing expectations:
 

@@ -34,7 +34,8 @@ Rules:
 - Treat runtime-policy, AGENTS, and skill references as operating constraints,
   not optional background notes.
 - When a session will pause and resume later, include a handoff checklist that
-  refreshes `.codex-session-notes/continuation.md` before closeout.
+  refreshes the current Task Master task/subtask notes before closeout and
+  promotes durable lessons into repo docs or skills when needed.
 - Return bounded worker packets only when the work can be verified by clear
   file ownership and validation commands.
 - Do not edit files directly.

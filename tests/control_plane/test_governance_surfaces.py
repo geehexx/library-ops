@@ -5,7 +5,6 @@ from __future__ import annotations
 import ast
 import json
 import re
-import subprocess
 import tomllib
 from pathlib import Path
 
@@ -487,8 +486,8 @@ def test_django_workaround_patterns_do_not_return() -> None:
     )
 
 
-def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
-    """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
+def test_root_agents_and_references_encode_repo_local_checkpoint_and_astgrep_path() -> None:
+    """Ensure canonical checkpoint and repo-local ast-grep paths stay explicit."""
     root_agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
     clarify_skill = (REPO_ROOT / ".agents" / "skills" / "clarify-and-goal" / "SKILL.md").read_text(
         encoding="utf-8"
@@ -497,7 +496,9 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
         REPO_ROOT / ".agents" / "skills" / "code-intelligence" / "SKILL.md"
     ).read_text(encoding="utf-8")
 
-    assert ".codex-session-notes/continuation.md" in root_agents
+    assert ".codex-session-notes" not in root_agents
+    assert "Task Master task/subtask" in root_agents
+    assert "Task Master notes" in root_agents
     assert "npm run astgrep:scan" in root_agents
     assert "Question packet" in clarify_skill
     assert "Escalation packet" in clarify_skill
@@ -505,28 +506,22 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
     assert "ast-grep" in code_intel_skill
 
 
-def test_readme_and_continuation_track_the_current_branch_head() -> None:
-    """Ensure the release-truth surfaces reflect the last refresh commit's branch tip."""
-    refreshed_head = subprocess.run(
-        ["git", "rev-parse", "--short", "HEAD^"],
-        cwd=REPO_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
+def test_readme_setup_and_retrospective_track_the_taskmaster_checkpoint_path() -> None:
+    """Ensure the durable handoff path points at Task Master, not note files."""
     readme_text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-    continuation_text = (REPO_ROOT / ".codex-session-notes" / "continuation.md").read_text(
+    setup_text = (REPO_ROOT / "SETUP.md").read_text(encoding="utf-8")
+    retrospective_text = (REPO_ROOT / "docs" / "process" / "retrospective.md").read_text(
         encoding="utf-8"
     )
 
-    assert re.search(
-        rf"current local\s+branch head is\s+`{re.escape(refreshed_head)}`", readme_text
-    )
-    assert re.search(rf"current head\s+`{re.escape(refreshed_head)}`", continuation_text)
-    assert re.search(
-        rf"Follow-on local head\s+`{re.escape(refreshed_head)}` is not yet revalidated",
-        continuation_text,
-    )
+    for text in (readme_text, setup_text, retrospective_text):
+        assert ".codex-session-notes" not in text
+        assert "Task Master" in text
+        assert "notes" in text
+
+    assert "current Task Master task/subtask" in readme_text
+    assert "current Task Master task/subtask" in setup_text
+    assert "Task Master notes" in retrospective_text
 
 
 def test_skill_discovery_stays_on_direct_skill_files_and_not_serena_memory_reads() -> None:

@@ -108,9 +108,11 @@ Feature work should branch from `development`.
 
 ## 7. Handoff artifacts
 
-- `.codex-session-notes/continuation.md` is authoritative.
-- `.codex-session-notes/scratch.md` is disposable scratch space.
+- The current Task Master task/subtask and its notes are the checkpoint
+  surface.
 - Record command, blocker, and validation evidence in Task Master notes.
+- Promote durable lessons into repo docs or skills instead of adding a new
+  scratch handoff file.
 
 ## 8. Canonical references
 

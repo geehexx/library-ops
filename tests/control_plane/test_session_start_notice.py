@@ -77,10 +77,10 @@ def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
     assert "parse-prd --force" not in output
 
 
-def test_resume_notice_is_more_compact_and_continuation_focused(
+def test_resume_notice_is_more_compact_and_taskmaster_focused(
     monkeypatch: Any, capsys: Any
 ) -> None:
-    """Ensure the resume notice is shorter and centered on continuation context."""
+    """Ensure the resume notice is shorter and centered on Task Master context."""
     hook: Any = load_hook_module()
     payload = {
         "cwd": str(REPO_ROOT),
@@ -92,7 +92,8 @@ def test_resume_notice_is_more_compact_and_continuation_focused(
     output = capsys.readouterr().out
 
     assert "resume context" in output
-    assert "continuation=.codex-session-notes/continuation.md" in output
+    assert ".codex-session-notes" not in output
+    assert "Task Master task/subtask notes" in output
     assert "instructions=" not in output
     assert "cache_hint=" not in output
     assert "mcps=" not in output

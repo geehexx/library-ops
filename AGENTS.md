@@ -94,8 +94,10 @@ be captured in Task Master tasks and subtasks before implementation begins.
 3. Confirm whether the work is meta/control-plane, product-code, or both; split
    commits accordingly.
 4. Confirm the canonical continuation artifacts:
-   - `.codex-session-notes/continuation.md` is authoritative
-   - `.codex-session-notes/scratch.md` is optional scratch only
+   - the current Task Master task/subtask and its notes are the checkpoint
+     surface
+   - repo docs and skills are the durable promotion surface when a lesson
+     needs to survive beyond the session
 5. Perform skill discovery before broad work. Start with the repo-local catalog
    under `.agents/skills/`, read the relevant `SKILL.md` entrypoint directly
    before any symbol/context tooling, then choose the skill whose capability
@@ -179,10 +181,10 @@ workflow logic in untracked global wrappers.
 
 ## Continuation and retrospective
 
-- Keep `.codex-session-notes/continuation.md` updated at major checkpoints.
-- Treat `.codex-session-notes/scratch.md` as disposable working notes only.
-- When a pattern proves durable, promote it into the relevant skill or repo
-  docs; do not leave it trapped as memory-only guidance.
+- Keep the current Task Master task/subtask notes updated at major
+  checkpoints.
+- Promote durable lessons into the relevant skill or repo docs; do not leave
+  them trapped as memory-only guidance.
 - Promote repeated lessons into tracked surfaces through
   `docs/process/retrospective.md` instead of letting memory-only instructions
   compound indefinitely.

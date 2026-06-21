@@ -16,8 +16,8 @@
 5. Can the issue be prevented by an automated check?
 6. Should the update go to AGENTS.md, nested override, skill, PRD/ADR, Task Master, CI/tooling, or nowhere?
 7. Should the lesson also be written into memory so future runs do not have to rediscover it?
-8. Should the lesson update `.codex-session-notes/continuation.md` or the
-   startup/handoff workflow?
+8. Should the lesson update Task Master notes or the startup/handoff
+   workflow?
 9. Was the main friction root-level JIT planning, and if so should the fix be
    a coordinator/implementer routing rule instead of another general AGENTS.md
    change?
@@ -55,9 +55,9 @@ first (`AGENTS.md`, coordinator TOML, and the matching skill), then pin the
 new wording in the control-plane tests before widening to mirrored surfaces
 like the startup banner.
 
-When the live Task Master pointer changes, refresh
-`.codex-session-notes/continuation.md` in the same checkpoint so the next
-session does not inherit stale task IDs or stale next-task guidance.
+When the live Task Master pointer changes, refresh the current
+Task Master task/subtask notes in the same checkpoint so the next session does
+not inherit stale task IDs or stale next-task guidance.
 
 If the repository already provides a dedicated Task Master governor agent
 (`.codex/agents/taskmaster-governor.toml`), treat that as the first routing
