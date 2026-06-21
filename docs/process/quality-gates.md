@@ -45,8 +45,9 @@ npm run checks:quality
 `checks:quality` is the required GitHub Actions quality job. It keeps the
 runtime-critical type, migration, import, and test lane authoritative while the
 docs/bootstrap work moves to the sibling `docs-bootstrap` job via
-`npm run checks:ci:docs`. Use `npm run checks:ci` when you want the full local
-CI bundle in one command.
+`npm run docs:bootstrap`. Use `npm run checks:ci` when you want the full local
+CI bundle in one command, or `npm run checks:ci:docs` when you want the
+composite local docs bundle as well.
 
 Current proof payload for release-convergence doc/meta work should stay short:
 
