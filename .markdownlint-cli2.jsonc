@@ -18,6 +18,7 @@
     "!.serena",
     "!.repomix",
     "!.code-review-graph",
+    "!output/development-sync/**",
     "!corpora",
     "!model-cache"
   ]

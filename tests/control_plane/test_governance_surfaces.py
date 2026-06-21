@@ -381,6 +381,7 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     assert ".agents/skills" in scripts["docs:style"]
     assert ".codex/.tmp" in scripts["docs:style"]
     assert ".codex/skills" in scripts["docs:style"]
+    assert "output/development-sync" in scripts["docs:style"]
     assert ".agents/skills/**" in scripts["docs:spell"]
     assert ".codex/.tmp/**" in scripts["docs:spell"]
     assert ".codex/skills/**" in scripts["docs:spell"]
@@ -884,6 +885,21 @@ def test_docs_inclusive_and_repomix_cover_hub_indexes() -> None:
     for retired_surface in RETIRED_DOC_SURFACES:
         assert retired_surface not in docs_inclusive
         assert retired_surface not in include_entries
+
+
+def test_generated_development_sync_mirror_is_excluded_from_docs_tooling() -> None:
+    """Ensure cloned generated docs do not pollute markdown/docs quality sweeps."""
+    markdownlint_config = json.loads(
+        (REPO_ROOT / ".markdownlint-cli2.jsonc").read_text(encoding="utf-8")
+    )
+    cspell_config = json.loads((REPO_ROOT / "cspell.json").read_text(encoding="utf-8"))
+    valeignore_text = (REPO_ROOT / ".valeignore").read_text(encoding="utf-8")
+    lychee_config = (REPO_ROOT / "lychee.toml").read_text(encoding="utf-8")
+
+    assert "!output/development-sync/**" in markdownlint_config["globs"]
+    assert "output/development-sync/**" in cspell_config["ignorePaths"]
+    assert "output/development-sync/" in valeignore_text
+    assert "output/development-sync" in lychee_config
 
 
 def test_catalog_forms_and_views_are_package_reexports() -> None:

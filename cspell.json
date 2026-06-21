@@ -17,6 +17,7 @@
         "dist/**",
         "htmlcov/**",
         "node_modules/**",
+        "output/development-sync/**",
         "package-lock.json",
         "reports/**",
         "src/library_ops.egg-info/**",

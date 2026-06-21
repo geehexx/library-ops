@@ -39,7 +39,7 @@
     "importlint": "PYTHONPATH=src uv run lint-imports",
     "test": "uv run pytest",
     "django:check": "uv run python manage.py check",
-    "docs:style": "vale --glob='!{.venv,.serena,.repomix,.code-review-graph,node_modules,.agents/skills,.codex/.tmp,.codex/skills}/**' .",
+    "docs:style": "vale --glob='!{.venv,.serena,.repomix,.code-review-graph,node_modules,.agents/skills,.codex/.tmp,.codex/skills,output/development-sync}/**' .",
     "docs:spell": "cspell --no-progress --exclude '.agents/skills/**' --exclude '.codex/.tmp/**' --exclude '.codex/skills/**' --exclude 'tests/**' .",
     "docs:links": "lychee --config lychee.toml .",
     "docs:inclusive": "alex AGENTS.md README.md llms.txt .codex/agents docs specs src evals",

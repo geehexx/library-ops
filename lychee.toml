@@ -1,4 +1,4 @@
-exclude_path = ["node_modules", ".venv", ".git", "uv.lock", "package-lock.json", "dist", "build", "reports", "(^|/)templates/.*\\.html$"]
+exclude_path = ["node_modules", ".venv", ".git", "uv.lock", "package-lock.json", "dist", "build", "reports", "output/development-sync", "(^|/)templates/.*\\.html$"]
 accept = [200, 204, 206, 429]
 max_retries = 2
 retry_wait_time = 2
