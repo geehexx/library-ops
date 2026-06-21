@@ -38,6 +38,34 @@ remaining external social-auth blocker `16.6`.
 Use this as the shortest repo-side path for the external social-auth blocker. Do not
 rewrite product code for this slice unless the live proof reveals a real defect.
 
+### Current live snapshot
+
+- Live host: `https://library-ops.onrender.com`
+- Render service id: `srv-d8pgtl6gvqtc7396ra10`
+- Live deploy: `dep-d8ribcfaqgkc73bjjab0`
+- Probes: `/` and `/health/` both returned `200`
+- Django site row: still `example.com`
+- OAuth app tables: no `socialaccount_*` tables yet
+
+Copyable checks for the current state:
+
+```bash
+curl -I https://library-ops.onrender.com/
+curl -I https://library-ops.onrender.com/health/
+```
+
+```sql
+SELECT id, domain, name
+FROM django_site
+ORDER BY id;
+
+SELECT tablename
+FROM pg_catalog.pg_tables
+WHERE schemaname = 'public'
+  AND tablename LIKE 'socialaccount_%'
+ORDER BY tablename;
+```
+
 1. Confirm the provider-console setup for both Google and GitHub.
    - Verify the OAuth client IDs and secrets exist in the provider consoles.
    - Verify the authorized redirect/callback URIs match the local and Render
@@ -50,6 +78,9 @@ rewrite product code for this slice unless the live proof reveals a real defect.
    - Verify the deployment environment exposes the OAuth client variables and
      `DJANGO_ALLOWED_HOSTS` for that hostname.
    - Verify the deployed revision is the one you are about to prove.
+   - On the current live service, the host and health checks are already green,
+     but the Django site record and social-auth tables still need admin/DB
+     wiring before provider callbacks can complete.
 3. Confirm the Django auth records are wired to the same hostname.
    - In Django admin, update the `Site` domain/name to the Render hostname.
    - Attach the Google and GitHub `SocialApp` records to that `Site`.
@@ -66,7 +97,9 @@ rewrite product code for this slice unless the live proof reveals a real defect.
 - Render confirmation that the live hostname and OAuth environment match the
   provider-console setup.
 - Django admin evidence showing the `Site` record and the attached Google/GitHub
-  `SocialApp` rows.
+  `SocialApp` rows. Current live snapshot: the `Site` row is still
+  `example.com`, and there are no `socialaccount_*` tables yet in the Render
+  Postgres database, so this proof is still externally blocked.
 - Browser proof from both local and Render runs, with sanitized screenshots or
   traces that show a successful callback completion.
 - A Task Master note that records the provider hostname, the resulting role, and
