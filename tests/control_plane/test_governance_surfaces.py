@@ -506,9 +506,9 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
 
 
 def test_readme_and_continuation_track_the_current_branch_head() -> None:
-    """Ensure the release-truth surfaces do not drift from the live branch tip."""
-    current_head = subprocess.run(
-        ["git", "rev-parse", "--short", "HEAD"],
+    """Ensure the release-truth surfaces reflect the last refresh commit's branch tip."""
+    refreshed_head = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD^"],
         cwd=REPO_ROOT,
         check=True,
         capture_output=True,
@@ -519,10 +519,12 @@ def test_readme_and_continuation_track_the_current_branch_head() -> None:
         encoding="utf-8"
     )
 
-    assert re.search(rf"current local\s+branch head is\s+`{re.escape(current_head)}`", readme_text)
-    assert re.search(rf"current head\s+`{re.escape(current_head)}`", continuation_text)
     assert re.search(
-        rf"Follow-on local head\s+`{re.escape(current_head)}` is not yet revalidated",
+        rf"current local\s+branch head is\s+`{re.escape(refreshed_head)}`", readme_text
+    )
+    assert re.search(rf"current head\s+`{re.escape(refreshed_head)}`", continuation_text)
+    assert re.search(
+        rf"Follow-on local head\s+`{re.escape(refreshed_head)}` is not yet revalidated",
         continuation_text,
     )
 
