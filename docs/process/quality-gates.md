@@ -39,19 +39,21 @@ range validation separately.
 ### CI quality loop
 
 ```bash
-npm run checks:ci
+npm run checks:quality
 ```
 
-`checks:ci` consolidates the GitHub Actions quality job so the workflow can run
-the precommit gate once and then continue with CI-only docs, dependency,
-coverage, import, type, migration, and test checks without repeating commit
-lint or duplicated inline workflow steps.
+`checks:quality` is the required GitHub Actions quality job. It keeps the
+runtime-critical type, migration, import, and test lane authoritative while the
+docs/bootstrap work moves to the sibling `docs-bootstrap` job via
+`npm run checks:ci:docs`. Use `npm run checks:ci` when you want the full local
+CI bundle in one command.
 
 Current proof payload for release-convergence doc/meta work should stay short:
 
 - the current local head and, if different, the last fully green PR/CI head;
 - `checks:prepush` result as local gate authority;
-- `checks:ci` result as the mirrored CI-quality path;
+- `checks:quality` result as the mirrored required-quality path;
+- `docs-bootstrap` result for the sibling docs/bootstrap lane when relevant;
 - any deeper `verify:core` / `verify:all` runtime proof relevant to the slice;
 - any remaining external blocker that cannot be proved from repo state alone.
 

@@ -54,6 +54,44 @@ jobs:
       - name: Install Playwright browser
         run: uv run playwright install --with-deps chromium
 
+      - name: Run runtime quality checks
+        run: npm run checks:quality
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: playwright-artifacts
+          path: output/playwright/**
+          if-no-files-found: ignore
+
+  docs-bootstrap:
+    name: docs-bootstrap
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --all-groups
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Node governance dependencies
+        run: npm ci
+
       - name: Set up Go for Vale
         uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
@@ -65,16 +103,8 @@ jobs:
       - name: Install Lychee
         run: cargo install lychee --version 0.23.0 --locked
 
-      - name: Run CI quality checks
-        run: npm run checks:ci
-
-      - name: Upload Playwright artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
-        with:
-          name: playwright-artifacts
-          path: output/playwright/**
-          if-no-files-found: ignore
+      - name: Run docs/bootstrap checks
+        run: npm run checks:ci:docs
 
   workflow-security:
     name: workflow-security

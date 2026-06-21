@@ -773,19 +773,28 @@ def test_pre_push_authority_is_installed_and_mirrored_in_ci() -> None:
     quality_gates_text = (REPO_ROOT / "docs" / "process" / "quality-gates.md").read_text(
         encoding="utf-8"
     )
+    runtime_job_text = ci_text.split("  docs-bootstrap:")[0]
 
     assert package_json["scripts"]["prepare"] == "husky"
     assert "checks:ci" in package_json["scripts"]
+    assert "checks:quality" in package_json["scripts"]
+    assert "checks:ci:docs" in package_json["scripts"]
+    assert "npm run checks:quality" in package_json["scripts"]["checks:ci"]
+    assert "npm run checks:ci:docs" in package_json["scripts"]["checks:ci"]
     assert "npm run commitlint:range" in package_json["scripts"]["checks:prepush"]
     assert "npm run checks:precommit" in package_json["scripts"]["checks:prepush"]
     assert "npm run checks:prepush" in pre_push_text
     assert ".husky/_/" in gitignore_text
-    assert "npm run checks:ci" in ci_text
-    assert "npm run checks:prepush" not in ci_text
-    assert "fetch-depth: 1" in ci_text
-    assert "git fetch origin development:refs/remotes/origin/development" not in ci_text
+    assert "name: docs-bootstrap" in ci_text
+    assert "npm run checks:quality" in runtime_job_text
+    assert "npm run checks:ci:docs" in ci_text
+    assert "npm run checks:ci" not in runtime_job_text
+    assert "npm run checks:prepush" not in runtime_job_text
+    assert "fetch-depth: 1" in runtime_job_text
+    assert "git fetch origin development:refs/remotes/origin/development" not in runtime_job_text
     assert "cache: npm" in commitlint_text
-    assert "npm run checks:ci" in quality_gates_text
+    assert "npm run checks:quality" in quality_gates_text
+    assert "npm run checks:ci:docs" in quality_gates_text
     assert "npm run checks:prepush" in quality_gates_text
     assert "commitlint:range" in quality_gates_text
     for duplicated_step in (
@@ -807,7 +816,7 @@ def test_pre_push_authority_is_installed_and_mirrored_in_ci() -> None:
         "pyright",
         "pip-audit --progress-spinner off",
     ):
-        assert duplicated_step not in ci_text
+        assert duplicated_step not in runtime_job_text
 
 
 def test_pull_request_template_tracks_pre_push_authority() -> None:
