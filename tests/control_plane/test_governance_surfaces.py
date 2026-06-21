@@ -763,9 +763,12 @@ def test_hooks_json_does_not_register_pre_tool_use_reminder() -> None:
 
 
 def test_pre_push_authority_is_installed_and_mirrored_in_ci() -> None:
-    """Ensure the pre-push gate is installed, documented, and mirrored in CI."""
+    """Ensure the pre-push gate is installed, documented, and split from CI."""
     package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
     ci_text = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    commitlint_text = (REPO_ROOT / ".github" / "workflows" / "commitlint.yml").read_text(
+        encoding="utf-8"
+    )
     pre_push_text = (REPO_ROOT / ".husky" / "pre-push").read_text(encoding="utf-8")
     gitignore_text = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
     quality_gates_text = (REPO_ROOT / "docs" / "process" / "quality-gates.md").read_text(
@@ -773,15 +776,31 @@ def test_pre_push_authority_is_installed_and_mirrored_in_ci() -> None:
     )
 
     assert package_json["scripts"]["prepare"] == "husky"
+    assert "checks:ci" in package_json["scripts"]
     assert "npm run commitlint:range" in package_json["scripts"]["checks:prepush"]
     assert "npm run checks:precommit" in package_json["scripts"]["checks:prepush"]
     assert "npm run checks:prepush" in pre_push_text
     assert ".husky/_/" in gitignore_text
-    assert "npm run checks:prepush" in ci_text
-    assert "fetch-depth: 0" in ci_text
-    assert "git fetch origin development:refs/remotes/origin/development" in ci_text
+    assert "npm run checks:ci" in ci_text
+    assert "npm run checks:prepush" not in ci_text
+    assert "fetch-depth: 1" in ci_text
+    assert "git fetch origin development:refs/remotes/origin/development" not in ci_text
+    assert "cache: npm" in commitlint_text
+    assert "npm run checks:ci" in quality_gates_text
     assert "npm run checks:prepush" in quality_gates_text
     assert "commitlint:range" in quality_gates_text
+
+
+def test_pull_request_template_tracks_pre_push_authority() -> None:
+    """Ensure the PR checklist points at the authoritative pre-push gate."""
+    pull_request_template_text = (REPO_ROOT / ".github" / "pull_request_template.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "- [ ] `npm run checks:prepush` (authoritative local pre-push gate)" in (
+        pull_request_template_text
+    )
+    assert "- [ ] `npm run commitlint`" not in pull_request_template_text
 
 
 def test_stop_hook_stays_notice_only() -> None:

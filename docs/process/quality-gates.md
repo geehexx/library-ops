@@ -32,8 +32,20 @@ npm run checks:prepush
 
 `checks:prepush` is the authoritative local gate list before a push. It runs
 `commitlint:range` before `checks:precommit` so commit-scope violations fail
-before the broader hygiene checks. GitHub Actions mirrors the same script
-after fetching the `development` history needed for range validation.
+before the broader hygiene checks. GitHub Actions runs `checks:ci` after a
+shallow checkout, and the dedicated `commitlint.yml` workflow handles commit
+range validation separately.
+
+### CI quality loop
+
+```bash
+npm run checks:ci
+```
+
+`checks:ci` consolidates the GitHub Actions quality job so the workflow can run
+the precommit gate once and then continue with CI-only docs, dependency,
+coverage, import, type, migration, and test checks without repeating commit
+lint or duplicated lint surfaces.
 
 ### Control-plane loop
 

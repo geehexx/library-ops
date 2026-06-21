@@ -27,6 +27,7 @@
     "django:migrations:check": "uv run python manage.py makemigrations --check --dry-run",
     "checks:precommit": "bash scripts/codex-runtime-env.sh bash -lc 'npm run python:lint && npm run markdownlint && npm run skills:lint && npm run skills:audit && npm run taskmaster:validate'",
     "checks:prepush": "bash scripts/codex-runtime-env.sh bash -lc 'npm run commitlint:range && npm run checks:precommit'",
+    "checks:ci": "bash scripts/codex-runtime-env.sh bash -lc 'npm run checks:precommit && npm run docs:style && npm run docs:spell && npm run docs:inclusive && npm run docs:links && npm run docstrings:coverage && npm run eval:ci && npm run deps:tree && uv run pyright && uv run python manage.py check && uv run python manage.py makemigrations --check --dry-run && PYTHONPATH=src uv run lint-imports && uv run pytest'",
     "checks:governance": "bash scripts/codex-runtime-env.sh bash -lc 'npm run skills:lint && npm run skills:audit && npm run docs:quality && npm run docstrings:coverage && npm run docstrings:lint && npm run eval:ci && npm run deps:tree && npm run workflow:lint && npm run policy:check && npm run release:check && npm run taskmaster:validate'",
     "checks:python": "bash scripts/codex-runtime-env.sh bash -lc 'npm run python:lint && uv run python manage.py check && npm run django:migrations:check && PYTHONPATH=src uv run lint-imports && uv run pyright && uv run pytest -q'",
     "verify:core": "npm run checks:governance && npm run checks:python",
