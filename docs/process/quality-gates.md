@@ -45,7 +45,7 @@ npm run checks:ci
 `checks:ci` consolidates the GitHub Actions quality job so the workflow can run
 the precommit gate once and then continue with CI-only docs, dependency,
 coverage, import, type, migration, and test checks without repeating commit
-lint or duplicated lint surfaces.
+lint or duplicated inline workflow steps.
 
 ### Control-plane loop
 

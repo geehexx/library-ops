@@ -51,9 +51,6 @@ jobs:
       - name: Install Node governance dependencies
         run: npm ci
 
-      - name: Run CI quality checks
-        run: npm run checks:ci
-
       - name: Install Playwright browser
         run: uv run playwright install --with-deps chromium
 
@@ -68,71 +65,8 @@ jobs:
       - name: Install Lychee
         run: cargo install lychee --version 0.23.0 --locked
 
-      - name: Lint skills
-        run: npm run skills:lint
-
-      - name: Audit skills
-        run: npm run skills:audit
-
-      - name: Validate Task Master dependencies
-        run: npm run taskmaster:validate
-
-      - name: Validate dependency tree integrity
-        run: npm run deps:tree
-
-      - name: Markdown lint
-        run: npm run markdownlint
-
-      - name: Docs quality
-        run: npm run docs:quality
-
-      - name: Docstring coverage
-        run: npm run docstrings:coverage
-
-      - name: Docstring lint
-        run: npm run docstrings:lint
-
-      - name: Eval smoke and config validation
-        run: npm run eval:ci
-
-      - name: Import architecture check
-        run: |
-          if [ -f src/libraryops/__init__.py ]; then
-            PYTHONPATH=src uv run lint-imports
-          else
-            echo "src/libraryops package not present yet; import-linter gate activates after bootstrap."
-          fi
-
-      - name: Django checks
-        env:
-          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-        run: |
-          if [ -f manage.py ] && [ -f src/libraryops/__init__.py ]; then
-            uv run python manage.py check
-          else
-            echo "Django bootstrap not present yet; manage.py check activates after bootstrap."
-          fi
-
-      - name: Migration check
-        env:
-          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-        run: |
-          if [ -f manage.py ] && [ -f src/libraryops/__init__.py ]; then
-            uv run python manage.py makemigrations --check --dry-run
-          else
-            echo "Django bootstrap not present yet; migration gate activates after bootstrap."
-          fi
-
-      - name: Tests
-        env:
-          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-          LIBRARYOPS_DEMO_ACCESS_CODE: ci-demo-access-code
-        run: |
-          if find src tests -name "test_*.py" -o -name "*_test.py" | grep -q .; then
-            uv run pytest
-          else
-            echo "Python tests not bootstraped yet; pytest gate activates when tests exist."
-          fi
+      - name: Run CI quality checks
+        run: npm run checks:ci
 
       - name: Upload Playwright artifacts on failure
         if: failure()

@@ -789,6 +789,26 @@ def test_pre_push_authority_is_installed_and_mirrored_in_ci() -> None:
     assert "npm run checks:ci" in quality_gates_text
     assert "npm run checks:prepush" in quality_gates_text
     assert "commitlint:range" in quality_gates_text
+    for duplicated_step in (
+        "skills:lint",
+        "skills:audit",
+        "taskmaster:validate",
+        "deps:tree",
+        "docs:quality",
+        "docstrings:coverage",
+        "docstrings:lint",
+        "eval:ci",
+        "lint-imports",
+        "manage.py check",
+        "makemigrations --check --dry-run",
+        "pytest",
+        "npm audit --audit-level=moderate",
+        "ruff format --check",
+        "ruff check .",
+        "pyright",
+        "pip-audit --progress-spinner off",
+    ):
+        assert duplicated_step not in ci_text
 
 
 def test_pull_request_template_tracks_pre_push_authority() -> None:
