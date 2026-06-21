@@ -8,7 +8,13 @@
 - Runtime/provider/dependency policy lives in
   `.taskmaster/docs/runtime-policy.md`.
 - Task mutations should use Task Master tools or CLI commands, not manual edits
-  to runtime files.
+  to runtime files or the committed graph. If the canonical writer path is
+  stale or unavailable, capture the blocker in Task Master instead of
+  hand-editing `.taskmaster/tasks/tasks.json` or forcing a regeneration from
+  stale state.
+- Treat the `master` surface in `.taskmaster/tasks/tasks.json` as the canonical
+  committed view for this repo session. Tag-scoped alternates are staged
+  snapshots and need an explicit Task Master note before they diverge.
 - When new findings or follow-on slices appear, add or update the relevant
   task, subtask, or note before implementation instead of widening the goal.
 - Task Master work in this repo assumes Context7, Exa, Serena, and

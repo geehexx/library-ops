@@ -59,7 +59,7 @@ Evaluator / Admin / Librarian / Member
 Library Ops web application
         |
         +-- PostgreSQL
-        +-- optional external metadata APIs for public-domain import
+        +-- optional external metadata sources for public-domain import
         +-- GitHub Actions / Render for delivery
 ```
 
@@ -153,7 +153,7 @@ project policy.
 Stop and correct the design if any of these appear:
 
 - views mutate loan/catalog state directly instead of calling services;
-- selectors import views/forms/API modules;
+- selectors import views/forms/response modules;
 - search writes authoritative catalog state;
 - AI suggestion output is applied without provenance and human review;
 - seed commands require private credentials for the demo path;

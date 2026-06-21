@@ -58,13 +58,15 @@ class EditionForm(forms.ModelForm):
         """Refresh relation querysets when rendering or binding the form."""
 
         super().__init__(*args, **kwargs)
-        work_field = cast(Any, self.fields["work"])
+        work_field = self.fields["work"]
+        if not isinstance(work_field, forms.ModelChoiceField):
+            raise TypeError("Expected work to be a model choice field.")
         work_field.queryset = selectors.work_list()
 
     def apply(self, *, actor: User) -> BookEdition:
         """Persist the edition through the owning manager."""
 
-        work = cast(BibliographicWork, self.cleaned_data["work"])
+        work: BibliographicWork = self.cleaned_data["work"]
         publisher = str(self.cleaned_data["publisher"])
         publication_year = self.cleaned_data["publication_year"]
         language = str(self.cleaned_data["language"])
@@ -76,7 +78,7 @@ class EditionForm(forms.ModelForm):
             dict[str, Any],
             self.cleaned_data["external_identifiers"] or {},
         )
-        edition = cast(BookEdition, cast(Any, self.instance))
+        edition = _bound_edition(self)
         if edition.pk:
             persisted_edition = BookEdition.objects.get(pk=edition.pk)
             return BookEdition.objects.update_edition(
@@ -108,8 +110,14 @@ class EditionForm(forms.ModelForm):
     def archive(self, *, actor: User) -> BookEdition:
         """Archive the bound edition through the owning manager."""
 
-        edition = cast(BookEdition, cast(Any, self.instance))
+        edition = _bound_edition(self)
         if not edition.pk:
             raise ValueError("Cannot archive an unsaved edition.")
         persisted_edition = BookEdition.objects.get(pk=edition.pk)
         return BookEdition.objects.archive_edition(actor=actor, edition=persisted_edition)
+
+
+def _bound_edition(form: EditionForm) -> BookEdition:
+    """Return the form's bound edition instance through a narrow boundary cast."""
+
+    return cast(BookEdition, form.instance)

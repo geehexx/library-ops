@@ -102,14 +102,16 @@ Accessibility notes:
 | Pass  [______________]   | Librarian: librarian@...           |
 | [Sign in]                | Member: member@...                 |
 |                          | Password: <local-demo-password-from-seed-command>      |
-| [Continue with provider] |                                    |
+| [Continue with Google]  [Continue with GitHub]               |
 +--------------------------+------------------------------------+
 ```
 
 Implementation notes:
 
 - Demo credentials are disposable and recreated by seed command.
-- OAuth may be configured but password login should keep the demo reliable.
+- Password login should keep the demo reliable even when no provider is configured.
+- Provider buttons appear only for configured providers and must preserve any
+  `next` redirect target through the social-login flow.
 
 Accessibility notes:
 
@@ -161,8 +163,9 @@ Accessibility notes:
 |             | +---------------------------------------------+ |
 |             | | Pride and Prejudice                         | |
 |             | | Jane Austen · 1813 · English                | |
-|             | | Available: 3 of 4 copies                    | |
-|             | | Match: exact title + contributor            | |
+|             | | Matched identifier: ISBN 9780141439518      | |
+|             | | Availability: 3 of 4 copies available       | |
+|             | | Match: exact identifier match               | |
 |             | | [Details] [Checkout copy]                   | |
 |             | +---------------------------------------------+ |
 +-------------+-------------------------------------------------+
@@ -173,7 +176,8 @@ Implementation notes:
 - Exact ISBN/barcode results should short-circuit or rank first, ahead of other
   lexical matches.
 - Result rows include match explanation from the search service, with exact
-  identifier matches clearly distinguished from lexical matches.
+  identifier matches shown as a distinct result state from lexical matches and
+  the matched identifier value surfaced directly on the card.
 - Role-aware actions: anonymous/member see details; librarian/admin see checkout.
 - HTMX can update result list and filters without full reload.
 
@@ -212,7 +216,8 @@ Try a title, author, ISBN, or broader subject term.
 Implementation notes:
 
 - Metadata and live availability are separate sections.
-- Archive action requires confirmation.
+- Archive action requires confirmation that names the record and states the
+  visibility impact before submission.
 - Upload cover is Admin/Librarian only.
 
 Accessibility notes:
@@ -238,15 +243,12 @@ Accessibility notes:
 | Initial copies [ 1 ]                                          |
 |                                                               |
 | [Save book] [Save and add another] [Cancel]                   |
-|                                                               |
-| AI assist: [Suggest tags and description]                     |
 +---------------------------------------------------------------+
 ```
 
 Implementation notes:
 
 - Validation lives in forms and services.
-- AI suggestions open in a review panel and are not auto-saved.
 - Initial copies generate deterministic barcodes or require explicit barcode.
 
 Accessibility notes:
@@ -261,7 +263,7 @@ Accessibility notes:
 | Checkout copy B-000001                                       |
 | Book: Pride and Prejudice                                    |
 | Status: Available                                            |
-| Patron * [Search/select member___________________________]    |
+| Patron * [Search/select member by name or library ID____]    |
 | Due date [2026-07-03]                                        |
 |                                                               |
 | [Checkout] [Cancel]                                          |
@@ -273,6 +275,8 @@ Implementation notes:
 - Service must run transactionally.
 - Duplicate active-loan constraint is authoritative.
 - On success, HTMX refreshes copy table and dashboard metric.
+- Search/select must scale beyond raw browser datalist behavior while keeping a
+  progressive-enhancement fallback path.
 
 Accessibility notes:
 
@@ -304,9 +308,10 @@ Implementation notes:
 | Nav         | Loans                                           |
 |             | [Active] [Overdue] [Returned] [Mine]            |
 |             |                                                 |
-|             | Book                Patron       Due      Action |
-|             | Pride and...        Member Demo  Jul 03   Return |
-|             | Frankenstein        Member Demo  Jun 10   Return |
+|             | Status  Book                Patron   Due   Action|
+|             | Active  Pride and...        Member   Jul03 Return|
+|             | Overdue Frankenstein        Member   Jun10 Return|
+|             | Returned Jane Eyre          Member   Jun01 View  |
 +-------------+-------------------------------------------------+
 ```
 
@@ -314,6 +319,8 @@ Implementation notes:
 
 - Member sees only own loans.
 - Librarian/Admin see all loans.
+- Keep the table row-first and readable at evaluator scale instead of packing
+  returned items into cramped card fragments.
 
 ## 10. Evidence and release checks
 

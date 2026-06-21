@@ -9,7 +9,6 @@ from django import forms
 from django.contrib.auth.models import User
 
 from libraryops.catalog import selectors
-from libraryops.catalog.models import BookEdition
 from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 
@@ -37,18 +36,20 @@ class CopyForm(forms.ModelForm):
         """Refresh relation querysets when rendering or binding the form."""
 
         super().__init__(*args, **kwargs)
-        edition_field = cast(Any, self.fields["edition"])
+        edition_field = self.fields["edition"]
+        if not isinstance(edition_field, forms.ModelChoiceField):
+            raise TypeError("Expected edition to be a model choice field.")
         edition_field.queryset = selectors.edition_list()
 
     def apply(self, *, actor: User) -> BookCopy:
         """Persist the copy through the owning manager."""
 
-        edition = cast(BookEdition, self.cleaned_data["edition"])
+        edition = self.cleaned_data["edition"]
         barcode = str(self.cleaned_data["barcode"])
         status = self.cleaned_data["status"]
         shelf_location = str(self.cleaned_data["shelf_location"])
         condition_note = str(self.cleaned_data["condition_note"])
-        copy = cast(BookCopy, cast(Any, self.instance))
+        copy = _bound_copy(self)
         if copy.pk:
             return BookCopy.objects.update_copy(
                 actor=actor,
@@ -71,7 +72,13 @@ class CopyForm(forms.ModelForm):
     def archive(self, *, actor: User) -> BookCopy:
         """Archive the bound copy through the owning manager."""
 
-        copy = cast(BookCopy, cast(Any, self.instance))
+        copy = _bound_copy(self)
         if not copy.pk:
             raise ValueError("Cannot archive an unsaved copy.")
         return BookCopy.objects.archive_copy(actor=actor, copy=copy)
+
+
+def _bound_copy(form: CopyForm) -> BookCopy:
+    """Return the form's bound copy instance through a narrow boundary cast."""
+
+    return cast(BookCopy, form.instance)

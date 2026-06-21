@@ -106,7 +106,6 @@ forbidden_modules = [
   "libraryops.inventory",
   "libraryops.circulation",
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.audit",
   "libraryops.web",
   "libraryops.shell",
@@ -126,7 +125,6 @@ source_modules = ["libraryops.inventory"]
 forbidden_modules = [
   "libraryops.circulation",
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.web",
   "libraryops.shell",
 ]
@@ -137,7 +135,6 @@ type = "forbidden"
 source_modules = ["libraryops.circulation"]
 forbidden_modules = [
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.web",
   "libraryops.shell",
 ]
@@ -161,7 +158,6 @@ source_modules = [
   "libraryops.inventory",
   "libraryops.circulation",
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.audit",
 ]
 forbidden_modules = ["libraryops.web", "libraryops.shell"]

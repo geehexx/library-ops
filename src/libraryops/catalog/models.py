@@ -45,25 +45,22 @@ def validate_cover_image_format(value: Any) -> None:
 
     image_format = ""
     try:
-        try:
+        file_obj: Any = getattr(value, "file", None)
+        with suppress(AttributeError):
             value.seek(0)
-        except AttributeError:
-            file_obj = getattr(value, "file", None)
-            if file_obj is not None:
-                file_obj.seek(0)
+        with suppress(AttributeError):
+            file_obj.seek(0)
         with Image.open(value) as image:
             image.verify()
             image_format = (image.format or "").upper()
     except (OSError, UnidentifiedImageError) as exc:
         raise ValidationError("Upload a JPEG, PNG, or WebP cover image.") from exc
     finally:
-        try:
+        file_obj = getattr(value, "file", None)
+        with suppress(AttributeError):
             value.seek(0)
-        except AttributeError:
-            file_obj = getattr(value, "file", None)
-            if file_obj is not None:
-                with suppress(AttributeError):
-                    file_obj.seek(0)
+        with suppress(AttributeError):
+            file_obj.seek(0)
 
     if image_format not in EDITION_COVER_ALLOWED_FORMATS:
         raise ValidationError("Upload a JPEG, PNG, or WebP cover image.")

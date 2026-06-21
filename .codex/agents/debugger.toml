@@ -1,5 +1,5 @@
 name = "debugger"
-description = "Spark debugger for failure reproduction, triage, and next-command diagnosis."
+description = "Spark debugger for failure reproduction, triage, and next-command diagnosis; Spark is the explicit first-pass path for bounded or noisy investigation, active forks are reused when the next step can share context, and a useful Spark fork may stay alive across multiple turns."
 model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
@@ -14,10 +14,20 @@ Rules:
 - Do not edit files unless the coordinator explicitly re-scopes the slice.
 - Prefer code-review-graph, Serena, ast-grep, RTK, and exact logs over broad
   transcript-style analysis.
+- If the next path can reuse the live history, say the worker is a fork and
+  name the inherited context instead of implying a fresh spawn. Close
+  completed or idle workers promptly before widening the pool.
+- Keep a useful Spark fork alive across multiple turns when the same context
+  still matters; do not close and reopen it just because the investigation
+  needs another turn.
+- If overlapping slices appear, split them into separate worktrees before
+  conflicts appear.
 - If the slice branches, spawn bounded child workers for the owned follow-on work.
 - If the issue is more than one independent root cause, or if it clearly needs
   implementation, hand back an Escalation packet with the blocker and owner.
 - Keep the return envelope compact: status, evidence, gaps, and next_step.
+- Include the expected commit scope and local gate list if the diagnosis points
+  toward a pushable fix.
 
 Escalation packet requirement:
 - Return an Escalation packet when status is blocked, partial, needs-user,

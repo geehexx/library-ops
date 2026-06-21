@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Protocol, cast
+from typing import Any
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -19,27 +19,6 @@ from tests.factories import (
 
 from libraryops.audit.models import AuditEvent
 from libraryops.catalog.models import BibliographicWork, ContributorRole, ExternalSourceRecord
-
-
-class _BookCopyLike(Protocol):
-    """Protocol for the minimal book-copy shape used in assertions."""
-
-    barcode: str
-
-
-class _BookEditionLike(Protocol):
-    """Protocol for the minimal book-edition shape used in assertions."""
-
-    isbn: str | None
-    copies: Any
-
-
-class _BibliographicWorkLike(Protocol):
-    """Protocol for the minimal work shape used in assertions."""
-
-    pk: int | None
-    editions: Any
-    work_contributors: Any
 
 
 class FoundationNavigationTests(TestCase):
@@ -79,7 +58,7 @@ class FoundationNavigationTests(TestCase):
         login_url = reverse("account_login")
         create_url = reverse("catalog-create")
 
-        anonymous_response = cast("Any", self.client.get(create_url))
+        anonymous_response: Any = self.client.get(create_url)
         assert anonymous_response.status_code == 302
         assert anonymous_response.url == f"{login_url}?next={create_url}"
 
@@ -89,7 +68,18 @@ class FoundationNavigationTests(TestCase):
 
         assert forbidden_response.status_code == 403
         self.assertContains(forbidden_response, "Access denied", status_code=403)
-        self.assertContains(forbidden_response, "You do not have permission", status_code=403)
+        self.assertContains(
+            forbidden_response, "You do not have access to this page", status_code=403
+        )
+        self.assertContains(
+            forbidden_response,
+            (
+                "Use an account with the right role, or contact an administrator "
+                "if you expected access."
+            ),
+            status_code=403,
+        )
+        self.assertContains(forbidden_response, reverse("home"), status_code=403)
 
 
 class FoundationCreateFlowTests(TestCase):
@@ -148,12 +138,9 @@ class FoundationCreateFlowTests(TestCase):
             },
         )
 
-        work = cast(
-            "_BibliographicWorkLike",
-            BibliographicWork.objects.get(title="The Left Hand of Darkness"),
-        )
-        edition = cast("_BookEditionLike", work.editions.get())
-        copy = cast("_BookCopyLike", edition.copies.get())
+        work: Any = BibliographicWork.objects.get(title="The Left Hand of Darkness")
+        edition = work.editions.get()
+        copy = edition.copies.get()
 
         assert response.status_code == 302
         self.assertRedirects(response, reverse("catalog-detail", kwargs={"work_id": work.pk}))
@@ -264,8 +251,19 @@ class FoundationCatalogSearchTests(TestCase):
         assert self.title_work.pk in [work.pk for work in works]
         self.assertContains(response, 'name="q"', status_code=200)
         self.assertContains(response, 'value="9780141439518"', status_code=200)
-        self.assertContains(response, "Showing results for", status_code=200)
+        self.assertContains(
+            response,
+            'role="status" aria-live="polite"',
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            'Showing 2 results for "9780141439518"',
+            status_code=200,
+        )
         self.assertContains(response, "Exact identifier hit", status_code=200)
+        self.assertContains(response, "Matched identifier: 9780141439518", status_code=200)
+        self.assertContains(response, "Availability: Available", status_code=200)
         self.assertContains(response, "Match: Exact identifier match", status_code=200)
 
     def test_catalog_index_facets_filter_result_set_and_render_controls(self) -> None:
@@ -285,6 +283,12 @@ class FoundationCatalogSearchTests(TestCase):
         assert response.status_code == 200
         works = list(response.context["works"])
         assert [work.pk for work in works] == [self.exact_work.pk]
+        self.assertContains(
+            response,
+            'role="status" aria-live="polite"',
+            status_code=200,
+        )
+        self.assertContains(response, "Showing 1 result", status_code=200)
         self.assertContains(response, 'name="availability"', status_code=200)
         self.assertContains(response, 'name="contributor"', status_code=200)
         self.assertContains(response, 'name="subject"', status_code=200)

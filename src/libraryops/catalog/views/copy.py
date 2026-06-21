@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -12,9 +12,18 @@ from django.views.generic import FormView, UpdateView
 
 from libraryops.catalog import selectors
 from libraryops.catalog.forms import CopyForm
-from libraryops.catalog.models import BookEdition
 from libraryops.catalog.views.base import CatalogMutationView
 from libraryops.inventory.models import BookCopy
+
+
+def _work_id_for_copy(copy: Any) -> int:
+    """Return the owning work primary key for one copy."""
+
+    edition = copy.edition
+    work_pk = edition.work.pk
+    if work_pk is None:
+        raise ValueError("Edition is missing an owning work.")
+    return work_pk
 
 
 class CopyCreateView(CatalogMutationView, FormView):
@@ -40,8 +49,8 @@ class CopyCreateView(CatalogMutationView, FormView):
         """Persist one copy and redirect to the parent work detail page."""
 
         copy = form.apply(actor=self.request.user)
-        edition = cast(BookEdition, cast(Any, copy.edition))
-        return HttpResponseRedirect(reverse("catalog-detail", kwargs={"work_id": edition.work.pk}))
+        work_id = _work_id_for_copy(copy)
+        return HttpResponseRedirect(reverse("catalog-detail", kwargs={"work_id": work_id}))
 
 
 class CopyUpdateView(CatalogMutationView, UpdateView):
@@ -62,16 +71,15 @@ class CopyUpdateView(CatalogMutationView, UpdateView):
     def get_back_url_kwargs(self) -> dict[str, Any]:
         """Return the back link for the bound copy's work."""
 
-        copy = getattr(self, "object")
-        edition = getattr(copy, "edition")
-        return {"work_id": edition.work.pk}
+        copy = selectors.copy_detail(int(self.kwargs["copy_id"]))
+        return {"work_id": _work_id_for_copy(copy)}
 
     def form_valid(self, form: CopyForm) -> Any:
         """Persist the copy update and redirect to the parent work detail page."""
 
         copy = form.apply(actor=self.request.user)
-        edition = getattr(copy, "edition")
-        return HttpResponseRedirect(reverse("catalog-detail", kwargs={"work_id": edition.work.pk}))
+        work_id = _work_id_for_copy(copy)
+        return HttpResponseRedirect(reverse("catalog-detail", kwargs={"work_id": work_id}))
 
 
 class CopyArchiveView(CatalogMutationView, View):
@@ -81,7 +89,6 @@ class CopyArchiveView(CatalogMutationView, View):
         """Archive the copy and return to the parent work detail page."""
 
         copy = selectors.copy_detail(copy_id)
-        edition = cast(BookEdition, cast(Any, copy.edition))
-        work = edition.work
+        work_id = _work_id_for_copy(copy)
         BookCopy.objects.archive_copy(actor=request.user, copy=copy)
-        return HttpResponseRedirect(reverse("catalog-detail", kwargs={"work_id": work.pk}))
+        return HttpResponseRedirect(reverse("catalog-detail", kwargs={"work_id": work_id}))

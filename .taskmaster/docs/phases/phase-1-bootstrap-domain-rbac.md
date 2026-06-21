@@ -78,8 +78,9 @@ uv run pyright
 uv run pytest tests/smoke tests/web tests/e2e
 ```
 
-## Suggested local regeneration command
+## Suggested local regeneration workflow
 
-```bash
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/phases/phase-1-bootstrap-domain-rbac.md --force'
-```
+Review the committed graph first. If phase-1 regeneration is genuinely needed,
+run it as a bounded draft/review lane and compare the result against
+`.taskmaster/tasks/tasks.json` before accepting any mutations. Do not use
+`task-master parse-prd --force` here as a routine refresh.

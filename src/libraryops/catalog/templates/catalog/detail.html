@@ -5,6 +5,15 @@
 {% block page_title %}{{ work.title }}{% endblock %}
 
 {% block content %}
+  <style>
+    .archive-confirm > summary {
+      list-style: none;
+    }
+
+    .archive-confirm > summary::-webkit-details-marker {
+      display: none;
+    }
+  </style>
   <section class="panel">
     <p class="eyebrow">Contributors</p>
     <p>
@@ -18,12 +27,23 @@
       <div class="nav-actions">
         <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
         <a class="button button--ghost" href="{% url 'work-edit' work_id=work.pk %}">Edit work</a>
-        <form method="post" action="{% url 'work-archive' work_id=work.pk %}">
-          {% csrf_token %}
-          <button class="button button--ghost" type="submit">Archive work</button>
-        </form>
         <a class="button button--ghost" href="{% url 'edition-create' work_id=work.pk %}">Add edition</a>
       </div>
+      <details class="archive-confirm" style="margin-top: 1rem;">
+        <summary class="button button--ghost">Archive work</summary>
+        <div class="panel" style="margin: 0.75rem 0 0;">
+          <p class="eyebrow">Destructive action</p>
+          <h3 style="margin-top: 0;">Archive "{{ work.title }}"?</h3>
+          <p>This work will disappear from normal browse and search flows.</p>
+          <div class="nav-actions" style="justify-content: flex-start;">
+            <form method="post" action="{% url 'work-archive' work_id=work.pk %}">
+              {% csrf_token %}
+              <button class="button" type="submit">Yes, archive work</button>
+            </form>
+            <a class="button button--ghost" href="{% url 'catalog-detail' work_id=work.pk %}">Keep work</a>
+          </div>
+        </div>
+      </details>
     {% else %}
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Back to catalog</a>
     {% endif %}
@@ -36,14 +56,27 @@
         {% if can_manage_catalog %}
           <div class="nav-actions">
             <a class="button button--ghost" href="{% url 'edition-edit' edition_id=edition.pk %}">Edit edition</a>
-            <form method="post" action="{% url 'edition-archive' edition_id=edition.pk %}">
-              {% csrf_token %}
-              <button class="button button--ghost" type="submit">Archive edition</button>
-            </form>
             <a class="button button--ghost" href="{% url 'copy-create' edition_id=edition.pk %}">Add copy</a>
           </div>
         {% endif %}
       </div>
+      {% if can_manage_catalog %}
+        <details class="archive-confirm" style="margin-top: 1rem;">
+          <summary class="button button--ghost">Archive edition</summary>
+          <div class="panel" style="margin: 0.75rem 0 0;">
+            <p class="eyebrow">Destructive action</p>
+            <h3 style="margin-top: 0;">Archive edition {{ edition.isbn|default:"without ISBN" }}?</h3>
+            <p>This edition will disappear from normal browse and search flows.</p>
+            <div class="nav-actions" style="justify-content: flex-start;">
+              <form method="post" action="{% url 'edition-archive' edition_id=edition.pk %}">
+                {% csrf_token %}
+                <button class="button" type="submit">Yes, archive edition</button>
+              </form>
+              <a class="button button--ghost" href="{% url 'catalog-detail' work_id=work.pk %}">Keep edition</a>
+            </div>
+          </div>
+        </details>
+      {% endif %}
       <p><strong>ISBN:</strong> {{ edition.isbn|default:"Not set" }}</p>
       <p><strong>Publisher:</strong> {{ edition.publisher|default:"Not set" }}</p>
       <p><strong>Language:</strong> {{ edition.language }}</p>
@@ -62,13 +95,24 @@
           <li>
             {{ copy.barcode }} — {{ copy.get_status_display }}{% if copy.shelf_location %} — shelf {{ copy.shelf_location }}{% endif %}
             {% if can_manage_catalog %}
-              <span class="muted">
-                <a href="{% url 'copy-edit' copy_id=copy.pk %}">Edit</a>
-                <form method="post" action="{% url 'copy-archive' copy_id=copy.pk %}" style="display: inline;">
-                  {% csrf_token %}
-                  <button class="button button--ghost" type="submit" style="padding: 0.25rem 0.5rem; margin-left: 0.25rem;">Archive</button>
-                </form>
-              </span>
+              <div class="nav-actions" style="justify-content: flex-start; margin-top: 0.5rem;">
+                <a class="button button--ghost" href="{% url 'copy-edit' copy_id=copy.pk %}">Edit</a>
+                <details class="archive-confirm">
+                  <summary class="button button--ghost">Archive copy</summary>
+                  <div class="panel" style="margin: 0.75rem 0 0;">
+                    <p class="eyebrow">Destructive action</p>
+                    <h3 style="margin-top: 0;">Archive copy {{ copy.barcode }}?</h3>
+                    <p>This copy will disappear from normal browse and search flows.</p>
+                    <div class="nav-actions" style="justify-content: flex-start;">
+                      <form method="post" action="{% url 'copy-archive' copy_id=copy.pk %}">
+                        {% csrf_token %}
+                        <button class="button" type="submit">Yes, archive copy</button>
+                      </form>
+                      <a class="button button--ghost" href="{% url 'catalog-detail' work_id=work.pk %}">Keep copy</a>
+                    </div>
+                  </div>
+                </details>
+              </div>
             {% endif %}
           </li>
         {% empty %}

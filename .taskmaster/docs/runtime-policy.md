@@ -38,7 +38,11 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
 ## Source-of-truth rule
 
 1. `.taskmaster/docs/prd.md` is the canonical Task Master input.
-2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact.
+2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact and
+   must not be hand-edited to compensate for stale Task Master reads. Treat the
+   `master` surface as the canonical committed view for this repo session;
+   tag-scoped alternate surfaces are staged snapshots and only become mutation
+   targets when a Task Master note explicitly documents the divergence.
 3. Generated tasks must still be reconciled against `specs/001-core/tasks.md`
    and the active ADR set before implementation, and new findings or
    follow-on slices should be captured in Task Master tasks, subtasks, or
@@ -75,6 +79,10 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
   not fall back to `~/.promptfoo`.
 - Do not read `.taskmaster/state.json` directly; use the Task Master MCP or CLI
   and keep local runtime state out of the committed graph.
+- If the canonical writer path is stale or unavailable, stop instead of
+  hand-editing `.taskmaster/tasks/tasks.json` or forcing a graph replacement
+  from stale state. Capture the blocker in Task Master and resume once the
+  source of truth is fresh.
 - Keep on CLI:
   - `analyze_project_complexity`
   - `complexity_report`
@@ -368,3 +376,6 @@ Preserve raw output for:
 - Keep telemetry and user-identity settings local and non-committed.
 - Treat the PRD and committed task graph as repo artifacts; treat model/provider
   setup as operator-local runtime state.
+- If the writer path is stale or unavailable, update the Task Master note and
+  wait for a fresh MCP/CLI mutation path instead of hand-editing the committed
+  graph or forcing regeneration from stale reads.

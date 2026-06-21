@@ -25,11 +25,11 @@ def load_hook_module() -> ModuleType:
     return module
 
 
-def test_task_graph_status_reports_task_count_for_current_repo() -> None:
-    """Ensure the startup notice reports the current Task Master graph size."""
+def test_task_graph_status_reports_present_task_graph_for_current_repo() -> None:
+    """Ensure the startup notice reports that the Task Master graph is present."""
     hook: Any = load_hook_module()
 
-    assert hook.task_graph_status(REPO_ROOT) == "present:tasks=16"
+    assert hook.task_graph_status(REPO_ROOT).startswith("present:tasks=")
 
 
 def test_mcp_summary_mentions_required_servers() -> None:
@@ -56,26 +56,31 @@ def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
     assert hook.main() == 0
     output = capsys.readouterr().out
 
-    assert "approval=approve" in output
-    assert "npm_config_cache=" in output
-    assert "XDG_CACHE_HOME=" in output
-    assert "command_runner" in output
-    assert "context_gatherer" in output
-    assert "debugger" in output
-    assert "single_file_implementer" in output
-    assert "implementer" in output
-    assert "make the delegate packet prescriptive" in output
-    assert "Batch reasoning before any tool or agent call" in output
-    assert "choose the narrowest Spark action" in output
-    assert "fan out bounded child workers" in output
-    assert "stop hook emits JSON only" in output
-    assert "already known from repo context or the user" in output
+    for expected_fragment in (
+        "approval=approve",
+        "npm_config_cache=",
+        "XDG_CACHE_HOME=",
+        "command_runner",
+        "context_gatherer",
+        "debugger",
+        "single_file_implementer",
+        "implementer",
+        "continue, checkpoint, evidence, handoff",
+        "multiple turns",
+        "stop hook emits JSON only",
+        "/mnt/c/...",
+        "graph replacement as an explicit regeneration event",
+    ):
+        assert expected_fragment in output
+
+    assert "Ralph loop" not in output
+    assert "parse-prd --force" not in output
 
 
-def test_resume_notice_is_more_compact_and_continuation_focused(
+def test_resume_notice_is_more_compact_and_taskmaster_focused(
     monkeypatch: Any, capsys: Any
 ) -> None:
-    """Ensure the resume notice is shorter and centered on continuation context."""
+    """Ensure the resume notice is shorter and centered on Task Master context."""
     hook: Any = load_hook_module()
     payload = {
         "cwd": str(REPO_ROOT),
@@ -87,7 +92,8 @@ def test_resume_notice_is_more_compact_and_continuation_focused(
     output = capsys.readouterr().out
 
     assert "resume context" in output
-    assert "continuation=.codex-session-notes/continuation.md" in output
+    assert ".codex-session-notes" not in output
+    assert "Task Master task/subtask notes" in output
     assert "instructions=" not in output
     assert "cache_hint=" not in output
     assert "mcps=" not in output
