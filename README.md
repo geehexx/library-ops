@@ -94,11 +94,11 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-The current branch is in release convergence. Live demo data has been refreshed
-on Render to the medium seeded corpus. The pushed code commit `0e169d1` is
-still waiting on CI before Render auto-deploys it. Provider links are live on
-the hosted login surface, and the remaining hosted gap is deploy propagation
-plus real provider callback proof.
+The current branch is in release convergence. The hosted Render environment is
+seeded with the medium demo corpus, the seeded hosted verifier now passes
+end-to-end, and the provider-enabled login surface is live. The remaining
+external proof gap is real Google/GitHub callback completion, plus final
+release/main closeout work.
 
 Evaluator-facing expectations:
 
@@ -106,8 +106,8 @@ Evaluator-facing expectations:
 - sign in with the documented demo accounts after seeding or on the refreshed
   live environment;
 - expect password-based demo auth to work first; configured social login
-  remains part of the release-evidence lane while provider-callback proof and
-  deploy propagation finish;
+  remains part of the release-evidence lane while provider-callback proof is
+  captured;
 - expect release evidence to come from the server-rendered app, README, the
   demo script, and smoke tests rather than a dedicated API surface.
 
@@ -116,11 +116,13 @@ Known limitations:
 - release tagging and the final release PR are still pending;
 - the evaluator-facing demo script now lives at
   [docs/evaluation/demo-script.md](docs/evaluation/demo-script.md);
-- the smoke surface now passes locally, and the live service has refreshed demo
-  data but still needs the current pushed commit to finish CI and auto-deploy
-  propagation before that code refresh is fully reflected;
+- the smoke surface passes locally, and the live hosted seeded proof now passes
+  against the Render review target;
 - real Google/GitHub callback completion still needs browser-backed proof on
   the live provider-enabled path;
+- GitHub-hosted CI and PR gate workflows are temporarily stubbed to keep
+  iteration fast; restore the full remote workflows before the final
+  release/main pass;
 - the deployment contract now targets the Render free-tier path, which means
   migrations must be handled without `preDeployCommand`, and demo seed refresh
   must be run manually via the operator sequence in [SETUP.md](SETUP.md);

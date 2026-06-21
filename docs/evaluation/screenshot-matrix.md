@@ -82,17 +82,18 @@ login page is expected to expose the live OAuth links.
 - Live URL: `https://library-ops.onrender.com`
 - Render service id: `srv-d8pgtl6gvqtc7396ra10`
 - Current Render state: live demo data has been refreshed to the medium seeded
-  corpus, the pushed code commit `0e169d1` is waiting on CI before Render
-  auto-deploys it, and the hosted login surface exposes live provider links.
-- Remaining hosted gap: deploy propagation plus real Google/GitHub callback
-  proof on the provider-enabled path.
+  corpus, the provider-enabled login surface is live, and the seeded hosted
+  verifier now passes end to end.
+- Remaining hosted gap: real Google/GitHub callback proof on the provider-
+  enabled path, plus restoring the full GitHub-hosted CI workflows before the
+  final release/main pass.
 - Django site row: `library-ops.onrender.com`
 - OAuth app tables now exist after the full rebuild/deploy:
   `socialaccount_socialaccount`, `socialaccount_socialapp`,
   `socialaccount_socialapp_sites`, and `socialaccount_socialtoken`
-- Login page currently exposes live Google/GitHub provider links; the current
-  code refresh still needs CI plus Render auto-deploy propagation before the
-  hosted proof is fully current.
+- Login page currently exposes live Google/GitHub provider links, and the
+  hosted seeded verifier passes with seeded login, exact-ID catalog proof, and
+  librarian/member/admin workflow checks.
 
 Copyable checks for the current state:
 

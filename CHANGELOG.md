@@ -6,6 +6,19 @@ This file is managed by Python Semantic Release.
 
 ### Changed
 
+- Refined the live demo and release-review surfaces around the real hosted
+  state: search-first catalog UI, truthful auth/demo copy, direct social-login
+  provider flow, and a seeded Render verifier that checks home, login, search,
+  and librarian/member/admin paths end to end.
+- Expanded the demo data model from the tiny bootstrap snapshot to a medium
+  seeded corpus with deterministic extra borrowers, richer public-domain import
+  slices, and multi-year circulation history while keeping the visible dashboard
+  flow readable.
+- Added a repeatable hosted verification helper plus docs/runbook updates for
+  the manual Render free-tier refresh path.
+- Temporarily stubbed GitHub-hosted `ci` and `commitlint` workflows so local
+  hooks remain the active guardrail during rapid iteration; this must be
+  reverted before the final release/main pass.
 - Reconciled the live Django bootstrap with the planning surfaces so Task Master,
   the PRD, and README no longer describe a second nested `django-admin
   startproject` pass.
@@ -39,6 +52,8 @@ This file is managed by Python Semantic Release.
 
 - External Google/GitHub social-auth proof on local plus Render remains blocked
   on provider-console and hosted-environment state outside the repo.
+- Restore the full GitHub-hosted CI and PR gate workflows, then rerun and fix
+  them against the final branch state before the release/main closeout.
 - Remaining in-repo merge/governance work is limited to explicit post-merge
   cleanup and milestone-board follow-through; the screenshot matrix route
   inventory is already closed, and the only remaining evaluator-visible blocker
