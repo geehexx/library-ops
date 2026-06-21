@@ -79,7 +79,7 @@ class TestAuthSurfaceE2E:
             expect(
                 page.get_by_text(
                     "This deployment exposes password sign-in only. "
-                    "Use the demo-password path above to continue."
+                    "Use the seeded demo-password path above to continue."
                 )
             ).to_be_visible()
             expect(
