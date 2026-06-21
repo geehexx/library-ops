@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -17,8 +18,11 @@ from tests.factories import (
     build_isbn13,
 )
 
+from libraryops.accounts.management.commands.seed_demo_users import DEMO_ACCESS_CODE_ENV_VAR
 from libraryops.audit.models import AuditEvent
 from libraryops.catalog.models import BibliographicWork, ContributorRole, ExternalSourceRecord
+
+DEMO_ACCESS_CODE = "library-ops-demo-access-code"
 
 
 class FoundationNavigationTests(TestCase):
@@ -39,6 +43,16 @@ class FoundationNavigationTests(TestCase):
         self.assertContains(response, reverse("catalog-index"))
         self.assertContains(response, reverse("account_login"))
         self.assertNotContains(response, reverse("catalog-create"))
+        self.assertContains(
+            response,
+            "operator refresh before the full catalog and circulation workflow",
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            "environment is currently unseeded.",
+            status_code=200,
+        )
 
     def test_home_nav_exposes_create_flow_for_librarian(self) -> None:
         """Catalog managers should see the protected create action."""
@@ -191,6 +205,27 @@ class FoundationCatalogPagesTests(TestCase):
         assert detail_response.status_code == 200
         self.assertContains(detail_response, "BC-0001", status_code=200)
         self.assertContains(detail_response, "9780141439518", status_code=200)
+
+    def test_home_page_switches_to_seeded_copy_when_demo_data_exists(self) -> None:
+        """The home page should advertise seeded proof only when data is present."""
+
+        call_command("seed_roles")
+        with patch.dict("os.environ", {DEMO_ACCESS_CODE_ENV_VAR: DEMO_ACCESS_CODE}, clear=False):
+            call_command("seed_demo_users", reset_passwords=True)
+
+        response = self.client.get(reverse("home"))
+
+        assert response.status_code == 200
+        self.assertContains(
+            response,
+            "Explore a server-rendered library workflow with seeded catalog",
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            "Imported works currently visible in the seeded browse flow.",
+            status_code=200,
+        )
 
 
 class FoundationCatalogSearchTests(TestCase):
