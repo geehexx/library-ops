@@ -33,6 +33,45 @@ remaining external social-auth blocker `16.6`.
 | `/health/` | evaluator / release operator | `tests/smoke/test_django_bootstrap.py` already proves `/health/` returns `ok`; route is also referenced by README and Render blueprint checks | covered | none unless hosted `/health/` proof drifts |
 | social-auth callback completion | Google and GitHub local + Render | blocked by provider-console / Render / SocialApp state | blocked | close under `16.6` with live callback evidence |
 
+## Runbook: Clear `16.6`
+
+Use this as the shortest repo-side path for the external social-auth blocker. Do not
+rewrite product code for this slice unless the live proof reveals a real defect.
+
+1. Confirm the provider-console setup for both Google and GitHub.
+   - Verify the OAuth client IDs and secrets exist in the provider consoles.
+   - Verify the authorized redirect/callback URIs match the local and Render
+     callback URLs used by this app.
+   - Keep the evidence outside the repo; record only the provider names, host,
+     and callback URLs in the Task Master note.
+2. Confirm the Render environment is aligned.
+   - Verify the Render service hostname is the one used in provider console
+     callback settings.
+   - Verify the deployment environment exposes the OAuth client variables and
+     `DJANGO_ALLOWED_HOSTS` for that hostname.
+   - Verify the deployed revision is the one you are about to prove.
+3. Confirm the Django auth records are wired to the same host.
+   - In Django admin, update the `Site` domain/name to the Render host.
+   - Attach the Google and GitHub `SocialApp` records to that `Site`.
+   - Do not duplicate provider rows to work around missing host/site wiring.
+4. Capture browser-backed proof on local and Render.
+   - Start from the login page, click each provider, and complete the callback.
+   - Prove the post-callback landing state, signed-in role, and callback host.
+   - Capture sanitized screenshots or traces for each successful callback.
+
+### Required evidence
+
+- Provider-console confirmation for Google and GitHub, including the callback
+  URLs that were used.
+- Render confirmation that the live hostname and OAuth environment match the
+  provider-console setup.
+- Django admin evidence showing the `Site` record and the attached Google/GitHub
+  `SocialApp` rows.
+- Browser proof from both local and Render runs, with sanitized screenshots or
+  traces that show a successful callback completion.
+- A Task Master note that records the provider host, the resulting role, and
+  where the sanitized proof was stored.
+
 ## Notes
 
 - This matrix is intentionally route-inventory driven. It should not claim
