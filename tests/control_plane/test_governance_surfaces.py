@@ -948,9 +948,9 @@ def test_product_python_modules_do_not_depend_on_type_checking_shims() -> None:
 
 def test_search_design_agent_metadata_stays_lexical_only() -> None:
     """Ensure search-design agent metadata does not drift into vector/semantic scope."""
-    policy_text = (
-        REPO_ROOT / ".agents" / "skills" / "search-design" / "SKILL.md"
-    ).read_text(encoding="utf-8")
+    policy_text = (REPO_ROOT / ".agents" / "skills" / "search-design" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
     search_design_prompt = (
         REPO_ROOT / ".agents" / "skills" / "search-design" / "agents" / "openai.yaml"
     ).read_text(encoding="utf-8")
