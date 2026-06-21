@@ -77,6 +77,19 @@ def search_catalog(
     exact_isbn = _exact_isbn(normalized_query)
 
     queryset = queryset.annotate(
+        search_has_active_copy=Exists(
+            BookCopy.objects.filter(
+                edition__work=OuterRef("pk"),
+                archived_at__isnull=True,
+            )
+        ),
+        search_has_available_copy=Exists(
+            BookCopy.objects.filter(
+                edition__work=OuterRef("pk"),
+                archived_at__isnull=True,
+                status=BookCopyStatus.AVAILABLE.value,
+            )
+        ),
         search_isbn_hit=_isbn_hit(exact_isbn),
         search_barcode_hit=_barcode_hit(normalized_query),
         search_external_source_identifier_hit=_external_source_identifier_hit(normalized_query),
@@ -100,6 +113,17 @@ def search_catalog(
             When(search_edition_external_identifier_hit=True, then=Value(True)),
             default=Value(False),
             output_field=BooleanField(),
+        ),
+        search_matched_identifier_value=Case(
+            When(search_identifier_hit=True, then=Value(normalized_query)),
+            default=Value(""),
+            output_field=CharField(),
+        ),
+        search_availability_state=Case(
+            When(search_has_available_copy=True, then=Value("available")),
+            When(search_has_active_copy=True, then=Value("unavailable")),
+            default=Value("unknown"),
+            output_field=CharField(),
         ),
         search_phrase_hit=Case(
             When(search_title_phrase_hit=True, then=Value(True)),
@@ -211,17 +235,7 @@ def _apply_availability_filter(
 ) -> QuerySet[BibliographicWork]:
     """Restrict works by live inventory and circulation state."""
 
-    active_copy_qs = BookCopy.objects.filter(
-        edition__work=OuterRef("pk"),
-        archived_at__isnull=True,
-    )
-    available_copy_qs = active_copy_qs.filter(
-        status=BookCopyStatus.AVAILABLE.value,
-    )
-    queryset = queryset.annotate(
-        search_has_active_copy=Exists(active_copy_qs),
-        search_has_available_copy=Exists(available_copy_qs),
-    )
+    queryset = _availability_annotations(queryset)
     if availability == "available":
         return queryset.filter(search_has_available_copy=True)
     if availability == "unavailable":
@@ -249,6 +263,24 @@ def _postgres_keyword_annotations(query: str) -> dict[str, object]:
             output_field=FloatField(),
         ),
     }
+
+
+def _availability_annotations(
+    queryset: QuerySet[BibliographicWork],
+) -> QuerySet[BibliographicWork]:
+    """Annotate live inventory availability for template rendering and filtering."""
+
+    active_copy_qs = BookCopy.objects.filter(
+        edition__work=OuterRef("pk"),
+        archived_at__isnull=True,
+    )
+    available_copy_qs = active_copy_qs.filter(
+        status=BookCopyStatus.AVAILABLE.value,
+    )
+    return queryset.annotate(
+        search_has_active_copy=Exists(active_copy_qs),
+        search_has_available_copy=Exists(available_copy_qs),
+    )
 
 
 def postgres_keyword_rank_expression(query: str):

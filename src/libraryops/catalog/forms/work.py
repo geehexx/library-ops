@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import cast
 
 from django import forms
 from django.contrib.auth.models import User
@@ -27,7 +27,7 @@ class WorkForm(forms.ModelForm):
 
         title = str(self.cleaned_data["title"])
         description = str(self.cleaned_data["description"])
-        work = cast(BibliographicWork, cast(Any, self.instance))
+        work = _bound_work(self)
         if work.pk:
             persisted_work = BibliographicWork.objects.get(pk=work.pk)
             return BibliographicWork.objects.update_work(
@@ -45,8 +45,14 @@ class WorkForm(forms.ModelForm):
     def archive(self, *, actor: User) -> BibliographicWork:
         """Archive the bound work through the owning manager."""
 
-        work = cast(BibliographicWork, cast(Any, self.instance))
+        work = _bound_work(self)
         if not work.pk:
             raise ValueError("Cannot archive an unsaved work.")
         persisted_work = BibliographicWork.objects.get(pk=work.pk)
         return BibliographicWork.objects.archive_work(actor=actor, work=persisted_work)
+
+
+def _bound_work(form: WorkForm) -> BibliographicWork:
+    """Return the form's bound work instance through a narrow boundary cast."""
+
+    return cast(BibliographicWork, form.instance)

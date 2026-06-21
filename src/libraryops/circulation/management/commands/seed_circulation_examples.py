@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
@@ -14,9 +14,6 @@ from django.utils import timezone
 from libraryops.catalog.models import BookEdition
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
-
-if TYPE_CHECKING:
-    from django.contrib.auth.models import User
 
 EXAMPLE_MEMBER_EMAIL = "member@libraryops.demo"
 EXAMPLE_ACTOR_EMAILS = ("librarian@libraryops.demo", "admin@libraryops.demo")
@@ -62,7 +59,7 @@ EXAMPLE_LOAN_PLANS: tuple[ExampleLoanPlan, ...] = (
 )
 
 
-def _load_user(user_model: type[User], email: str) -> User:
+def _load_user(user_model: Any, email: str) -> Any:
     """Return one seeded user or fail fast with a clear message."""
 
     user = user_model.objects.filter(email=email).first()
@@ -74,7 +71,7 @@ def _load_user(user_model: type[User], email: str) -> User:
     return user
 
 
-def _load_actor(user_model: type[User]) -> User:
+def _load_actor(user_model: Any) -> Any:
     """Return a privileged seeded actor for inventory and circulation mutations."""
 
     for email in EXAMPLE_ACTOR_EMAILS:
@@ -111,13 +108,14 @@ def _clear_example_snapshot() -> None:
     example_copies.delete()
 
 
-def _ensure_copy(*, actor: User, edition: BookEdition, barcode: str) -> BookCopy:
+def _ensure_copy(*, actor: Any, edition: BookEdition, barcode: str) -> BookCopy:
     """Return the dedicated example copy, recreating it if it drifted."""
 
     copy = BookCopy.objects.select_related("edition").filter(barcode=barcode).first()
     if copy is None:
         return BookCopy.objects.create_copy(actor=actor, edition=edition, barcode=barcode)
-    if cast("Any", copy).edition_id != edition.pk or copy.archived_at is not None:
+    copy_edition_id = getattr(copy, "edition_id", None)
+    if copy_edition_id != edition.pk or copy.archived_at is not None:
         Loan.objects.filter(copy=copy).delete()
         copy.delete()
         return BookCopy.objects.create_copy(actor=actor, edition=edition, barcode=barcode)
@@ -160,8 +158,8 @@ def _prune_duplicate_loans(copy: BookCopy, keep: Loan | None) -> None:
 
 def _sync_active_loan(
     *,
-    actor: User,
-    borrower: User,
+    actor: Any,
+    borrower: Any,
     copy: BookCopy,
     plan: ExampleLoanPlan,
     anchor: datetime,
@@ -195,8 +193,8 @@ def _sync_active_loan(
 
 def _sync_returned_loan(
     *,
-    actor: User,
-    borrower: User,
+    actor: Any,
+    borrower: Any,
     copy: BookCopy,
     plan: ExampleLoanPlan,
     anchor: datetime,
@@ -252,7 +250,7 @@ class Command(BaseCommand):
     def handle(self, *_args: str, **options: object) -> None:
         """Create or refresh the circulation seed snapshot."""
 
-        user_model = cast("type[User]", get_user_model())
+        user_model = get_user_model()
         member = _load_user(user_model, EXAMPLE_MEMBER_EMAIL)
         actor = _load_actor(user_model)
 

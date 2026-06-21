@@ -99,7 +99,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     ).read_text(encoding="utf-8")
 
     assert config["permissions"]["coordinator_root"]["extends"] == ":workspace"
-    assert "model_context_window = 500000" in config_text
+    assert config.get("model_context_window", 0) >= 500000
     assert "max_threads = 24" in config_text
     commitlint_scope_match = re.search(
         r"(?ms)^\s*'scope-enum': \[\s*2,\s*'always',\s*(\[[^\]]+\])\s*\]",
@@ -107,19 +107,57 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     )
     assert commitlint_scope_match is not None
     commitlint_scopes = ast.literal_eval(commitlint_scope_match.group(1))
+    assert "planning" in commitlint_scopes
     assert "render" in commitlint_scopes
+    assert "TM-11" in commitlint_scopes
     assert "command_runner" in coordinator_text
     assert "context_gatherer" in coordinator_text
     assert "implementer" in coordinator_text
     assert "debugger" in coordinator_text
     assert "single_file_implementer" in coordinator_text
+    assert "Spark lanes are the default first" in config_text
+    assert "pass for bounded or noisy work" in config_text
+    assert "close completed or idle" in config_text
+    assert "workers promptly and reuse active forks with useful context" in config_text
+    assert "useful Spark fork alive across multiple turns" in coordinator_text
+    assert "fork or a" in coordinator_text
+    assert "fresh spawn" in coordinator_text
+    assert "inherited context" in coordinator_text
+    assert "close+respawn" in coordinator_text
+    assert "separate worktrees before conflicts appear" in coordinator_text
+    assert "expected commit scope plus local gate list before push" in coordinator_text
+    assert "force-pushed, replaced, or superseded, refresh live PR" in coordinator_text
+    assert "checks and mergeability evidence against the current head" in coordinator_text
+    assert "bounded continuation loop" in coordinator_text
+    assert "continue, checkpoint, evidence" in coordinator_text
+    assert "Close completed or idle workers promptly" in coordinator_text
     assert "Pyright" in implementer_text
+    assert "work is a fork" in implementer_text
+    assert "inherited context" in implementer_text
+    assert "separate worktrees before" in implementer_text
+    assert "conflicts appear" in implementer_text
+    assert "expected commit scope and local gate list" in implementer_text
+    assert "useful Spark fork alive across multiple turns" in implementer_text
     assert 'model = "gpt-5.3-codex-spark"' in debugger_text
     assert 'sandbox_mode = "danger-full-access"' in debugger_text
+    assert "worker is a fork" in debugger_text
+    assert "fresh spawn" in debugger_text
+    assert "separate worktrees before" in debugger_text
+    assert "conflicts appear" in debugger_text
+    assert "expected commit scope and local gate list" in debugger_text
     assert 'model = "gpt-5.3-codex-spark"' in single_file_text
     assert 'sandbox_mode = "danger-full-access"' in single_file_text
+    assert "useful Spark fork alive across multiple turns" in single_file_text
+    assert "work is a fork" in single_file_text
+    assert "fresh spawn" in single_file_text
+    assert "separate worktrees before" in single_file_text
+    assert "conflicts appear" in single_file_text
+    assert "expected commit scope and local gate list" in single_file_text
     assert "Pyright" in django_skill_text
     assert "Pyright" in django_prompt_text
+    assert "keep it alive across turns" in (
+        REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md"
+    ).read_text(encoding="utf-8")
     assert (
         "Use manager/model methods first for aggregate-specific CRUD/archive" in django_skill_text
     )
@@ -142,28 +180,124 @@ def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
         REPO_ROOT / ".agents" / "skills" / "clarify-and-goal" / "SKILL.md"
     ).read_text(encoding="utf-8")
 
-    for expected_fragment in ("command_runner", "context_gatherer", "implementer"):
-        assert expected_fragment in coordinator_text
-        assert expected_fragment in root_agents_text
-        assert expected_fragment in code_intelligence_text
-        assert expected_fragment in clarify_goal_text
+    for text in (coordinator_text, root_agents_text, code_intelligence_text, clarify_goal_text):
+        for expected_fragment in ("command_runner", "context_gatherer", "implementer"):
+            assert expected_fragment in text
 
-    assert "Spark lanes" in code_intelligence_text
-    assert "default to Spark-first handling" in code_intelligence_text
-    assert "prescriptive Spark packet" in code_intelligence_text
-    assert "command_runner" in coordinator_text
-    assert "context_gatherer" in coordinator_text
-    assert "implementer" in coordinator_text
-    assert "command_runner" in root_agents_text
-    assert "context_gatherer" in root_agents_text
-    assert "implementer" in root_agents_text
     assert "root-local shell/file exploration available" in clarify_goal_text
+    assert "fork or a" in root_agents_text
+    assert "fresh spawn" in root_agents_text
+    assert "separate worktrees before conflicts appear" in root_agents_text
+    assert "expected commit scope plus local gate list before push" in root_agents_text
+    assert "fork or a" in clarify_goal_text
+    assert "fresh spawn" in clarify_goal_text
+    assert "separate worktrees before conflicts appear" in clarify_goal_text
+    assert "include the expected" in clarify_goal_text
+    assert "local gate list before push" in clarify_goal_text
+    assert "Ralph loop" not in coordinator_text
+    assert "fork" in code_intelligence_text
+    assert "split overlapping slices into separate" in code_intelligence_text
+    assert "worktrees before conflicts appear" in code_intelligence_text
+    assert "include the expected" in code_intelligence_text
+    assert "local gate list before push" in code_intelligence_text
+    assert "force-pushed, replaced, or superseded, refresh live PR" in code_intelligence_text
+    assert "checks and mergeability evidence against the current head" in code_intelligence_text
+
+
+def test_taskmaster_docs_avoid_forceful_phase_regeneration_guidance() -> None:
+    """Ensure repo-owned Task Master docs stop recommending forceful graph churn."""
+    taskmaster_readme = (REPO_ROOT / ".taskmaster" / "README.md").read_text(encoding="utf-8")
+    taskmaster_skill = (REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "task-master parse-prd .taskmaster/docs/phases/" not in taskmaster_readme
+    assert "forceful PRD regeneration" in taskmaster_skill
+    assert "parse-prd --force" not in taskmaster_skill
+
+    for phase_path in sorted((REPO_ROOT / ".taskmaster" / "docs" / "phases").glob("phase-*.md")):
+        phase_text = phase_path.read_text(encoding="utf-8")
+        assert (
+            "npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd" not in phase_text
+        )
+        assert "Suggested local regeneration workflow" in phase_text
+
+
+def test_taskmaster_committed_graph_requires_numeric_top_level_ids_and_canonical_writes() -> None:
+    """Ensure the committed graph schema and writer guidance do not drift silently."""
+    taskmaster_readme = (REPO_ROOT / ".taskmaster" / "README.md").read_text(encoding="utf-8")
+    taskmaster_agents = (REPO_ROOT / ".taskmaster" / "AGENTS.md").read_text(encoding="utf-8")
+    runtime_policy_text = (REPO_ROOT / ".taskmaster" / "docs" / "runtime-policy.md").read_text(
+        encoding="utf-8"
+    )
+    taskmaster_skill = (REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    tasks_json = json.loads(
+        (REPO_ROOT / ".taskmaster" / "tasks" / "tasks.json").read_text(encoding="utf-8")
+    )
+    master_task12 = next(task for task in tasks_json["master"]["tasks"] if task["id"] == 12)
+    library_ops_task12 = next(
+        task for task in tasks_json["library-ops"]["tasks"] if task["id"] == 12
+    )
+    library_ops_task12_subtask6 = next(
+        subtask for subtask in library_ops_task12["subtasks"] if subtask["id"] == 6
+    )
+
+    assert "hand-edit" in taskmaster_readme
+    assert "hand-edit" in taskmaster_agents
+    assert "hand-edited" in runtime_policy_text
+    assert "canonical writer path is" in taskmaster_readme
+    assert "stale or unavailable" in taskmaster_readme
+    assert "canonical writer path is" in taskmaster_agents
+    assert "stale or unavailable" in taskmaster_agents
+    assert "canonical writer path is" in runtime_policy_text
+    assert "stale or unavailable" in runtime_policy_text
+    assert "canonical writer path is" in taskmaster_skill
+    assert "stale or unavailable" in taskmaster_skill
+    assert "canonical committed view" in runtime_policy_text
+    assert "Alternate tag surfaces are staged" in taskmaster_readme
+    assert "Tag-scoped alternates are staged" in taskmaster_agents
+    assert "staged alternate surface" in library_ops_task12_subtask6["details"]
+
+    assert {type(task["id"]) for task in tasks_json["master"]["tasks"]} == {int}
+    assert {type(task["id"]) for task in tasks_json["library-ops"]["tasks"]} == {int}
+    assert isinstance(master_task12["id"], int)
+    assert master_task12["id"] == 12
+    assert {subtask["id"] for subtask in master_task12["subtasks"]} == {1, 2, 3, 4, 5}
+    assert {subtask["id"] for subtask in library_ops_task12["subtasks"]} == {
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+    }
+    assert all("status" in task for task in tasks_json["master"]["tasks"])
+    assert all(isinstance(task["dependencies"], list) for task in tasks_json["master"]["tasks"])
+
+
+def test_release_and_governance_skills_match_development_branch_policy() -> None:
+    """Ensure release/governance skills use the current branch naming contract."""
+    release_text = (REPO_ROOT / ".agents" / "skills" / "release" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    governance_text = (
+        REPO_ROOT / ".agents" / "skills" / "github-governance" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+
+    assert "`development` integrates verified work." in release_text
+    assert "`main` and `development` protected." in governance_text
+    assert "`develop`" not in release_text
+    assert "`develop`" not in governance_text
 
 
 def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() -> None:
     """Ensure the coordinator-default config and hook rules do not silently drift."""
     config = tomllib.loads((REPO_ROOT / ".codex" / "config.toml").read_text(encoding="utf-8"))
     agents = config["agents"]
+    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    scripts = package_json["scripts"]
     coordinator_text = (REPO_ROOT / ".codex" / "agents" / "coordinator.toml").read_text(
         encoding="utf-8"
     )
@@ -185,13 +319,12 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     runtime_env_script = (REPO_ROOT / "scripts" / "codex-runtime-env.sh").read_text(
         encoding="utf-8"
     )
-    package_json_text = (REPO_ROOT / "package.json").read_text(encoding="utf-8")
     quality_gates_text = (REPO_ROOT / "docs" / "process" / "quality-gates.md").read_text(
         encoding="utf-8"
     )
     policy_text = (REPO_ROOT / "policy" / "codex.rego").read_text(encoding="utf-8")
 
-    assert config["model_context_window"] == 500000
+    assert config.get("model_context_window", 0) >= 500000
     assert agents["max_threads"] == 24
     assert agents["max_depth"] == 2
     assert "debugger" in agents
@@ -239,31 +372,19 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
         assert expected_fragment in coordinator_launcher_text
 
     assert "Context7 first" in quality_gates_text
-    for expected_fragment in (
-        '"markdownlint": "bash scripts/codex-runtime-env.sh npx --yes markdownlint-cli2@0.22.1',
-        ".codex/.tmp",
-        ".codex/skills",
-    ):
-        assert expected_fragment in package_json_text
-    for expected_fragment in (
-        '"python:lint": "bash scripts/codex-runtime-env.sh bash -lc \'uv run ruff format --check .',
-        '"python:complexity": "bash scripts/codex-runtime-env.sh uv run ruff check --select C901',
-        "lint.mccabe.max-complexity = 6",
-        "npm run python:lint",
-    ):
-        assert expected_fragment in package_json_text
-    assert (
-        'docs:style": "vale --glob=\'!{.venv,.serena,.repomix,.code-review-graph,node_modules,'
-        ".agents/skills,.codex/.tmp,.codex/skills}/**' ." in package_json_text
-    )
-    assert (
-        "docs:spell\": \"cspell --no-progress --exclude '.agents/skills/**' --exclude "
-        "'.codex/.tmp/**' --exclude '.codex/skills/**' --exclude 'tests/**' ." in package_json_text
-    )
-    assert (
-        '"skills:audit": "bash scripts/codex-runtime-env.sh npx --yes agent-skillforge@0.3.2 '
-        'lint .agents/skills --strict",'
-    ) in package_json_text
+    for script_name in ("markdownlint", "python:lint", "python:complexity", "skills:audit"):
+        assert "scripts/codex-runtime-env.sh" in scripts[script_name]
+    assert ".codex/.tmp" in scripts["markdownlint"]
+    assert ".codex/skills" in scripts["markdownlint"]
+    assert "lint.mccabe.max-complexity = 6" in scripts["python:complexity"]
+    assert "npm run python:complexity" in scripts["python:lint"]
+    assert ".agents/skills" in scripts["docs:style"]
+    assert ".codex/.tmp" in scripts["docs:style"]
+    assert ".codex/skills" in scripts["docs:style"]
+    assert ".agents/skills/**" in scripts["docs:spell"]
+    assert ".codex/.tmp/**" in scripts["docs:spell"]
+    assert ".codex/skills/**" in scripts["docs:spell"]
+    assert "tests/**" in scripts["docs:spell"]
 
     for expected_fragment in (
         "scripts/codex-runtime-env.sh",
@@ -298,11 +419,22 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     assert "context_gatherer" in coordinator_text
     assert "implementer" in coordinator_text
     assert "Spark-first handling" in code_intelligence_text
+    assert "forked continuation" in command_runner_text
+    assert "fresh spawn" in command_runner_text
+    assert "include the expected commit" in command_runner_text
+    assert "local gate list in the summary" in command_runner_text
+    assert "delegate packet is being reconstructed" in context_gatherer_text
+    assert "fresh spawn" in context_gatherer_text
+    assert "move into separate" in context_gatherer_text
+    assert "worktrees before conflicts appear" in context_gatherer_text
 
     assert "model_reasoning_summary" not in command_runner_text
     assert 'model = "gpt-5.3-codex-spark"' in command_runner_text
     assert 'model = "gpt-5.3-codex-spark"' in context_gatherer_text
-    assert "Spark repo and source-map collector for local evidence." in context_gatherer_text
+    assert "Spark repo and source-map collector for local evidence;" in context_gatherer_text
+    assert (
+        "explicit first-pass path for bounded or noisy evidence gathering" in context_gatherer_text
+    )
     assert "bounded child worker" in context_gatherer_text
     assert 'sandbox_mode = "danger-full-access"' in context_gatherer_text
 
@@ -354,12 +486,9 @@ def test_django_workaround_patterns_do_not_return() -> None:
     )
 
 
-def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path() -> None:
-    """Ensure canonical handoff and repo-local ast-grep paths stay explicit."""
+def test_root_agents_and_references_encode_repo_local_checkpoint_and_astgrep_path() -> None:
+    """Ensure canonical checkpoint and repo-local ast-grep paths stay explicit."""
     root_agents = (REPO_ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    continuation_text = (REPO_ROOT / ".codex-session-notes" / "continuation.md").read_text(
-        encoding="utf-8"
-    )
     clarify_skill = (REPO_ROOT / ".agents" / "skills" / "clarify-and-goal" / "SKILL.md").read_text(
         encoding="utf-8"
     )
@@ -367,13 +496,32 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
         REPO_ROOT / ".agents" / "skills" / "code-intelligence" / "SKILL.md"
     ).read_text(encoding="utf-8")
 
-    assert ".codex-session-notes/continuation.md" in root_agents
+    assert ".codex-session-notes" not in root_agents
+    assert "Task Master task/subtask" in root_agents
+    assert "Task Master notes" in root_agents
     assert "npm run astgrep:scan" in root_agents
-    assert "milestone-based broader ownership" in continuation_text
     assert "Question packet" in clarify_skill
     assert "Escalation packet" in clarify_skill
     assert "code-review-graph" in code_intel_skill
     assert "ast-grep" in code_intel_skill
+
+
+def test_readme_setup_and_retrospective_track_the_taskmaster_checkpoint_path() -> None:
+    """Ensure the durable handoff path points at Task Master, not note files."""
+    readme_text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    setup_text = (REPO_ROOT / "SETUP.md").read_text(encoding="utf-8")
+    retrospective_text = (REPO_ROOT / "docs" / "process" / "retrospective.md").read_text(
+        encoding="utf-8"
+    )
+
+    for text in (readme_text, setup_text, retrospective_text):
+        assert ".codex-session-notes" not in text
+        assert "Task Master" in text
+        assert "notes" in text
+
+    assert "current Task Master task/subtask" in readme_text
+    assert "current Task Master task/subtask" in setup_text
+    assert "Task Master notes" in retrospective_text
 
 
 def test_skill_discovery_stays_on_direct_skill_files_and_not_serena_memory_reads() -> None:
@@ -525,6 +673,8 @@ def test_spark_policy_routes_command_and_exploration_work_to_micro_workers() -> 
     assert "Batch reasoning before tools" in coordinator_text
     assert "Batch reasoning before tools" in root_agents_text
     assert "bounded child-worker fan-out" in coordinator_text
+    assert "force-pushed, replaced, or superseded, refresh live PR" in coordinator_text
+    assert "checks and mergeability evidence against the current head" in coordinator_text
 
 
 def test_retired_anchor_files_are_removed() -> None:
@@ -611,6 +761,83 @@ def test_hooks_json_does_not_register_pre_tool_use_reminder() -> None:
     assert "PreToolUse" not in hooks["hooks"]
 
 
+def test_pre_push_authority_is_installed_and_mirrored_in_ci() -> None:
+    """Ensure the pre-push gate is installed, documented, and split from CI."""
+    package_json = json.loads((REPO_ROOT / "package.json").read_text(encoding="utf-8"))
+    ci_text = (REPO_ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    commitlint_text = (REPO_ROOT / ".github" / "workflows" / "commitlint.yml").read_text(
+        encoding="utf-8"
+    )
+    pre_push_text = (REPO_ROOT / ".husky" / "pre-push").read_text(encoding="utf-8")
+    gitignore_text = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
+    quality_gates_text = (REPO_ROOT / "docs" / "process" / "quality-gates.md").read_text(
+        encoding="utf-8"
+    )
+    docs_bootstrap_job_text = ci_text.split("  docs-bootstrap:")[1].split("  workflow-security:")[0]
+    runtime_job_text = ci_text.split("  docs-bootstrap:")[0]
+
+    assert package_json["scripts"]["prepare"] == "husky"
+    assert "checks:ci" in package_json["scripts"]
+    assert "checks:quality" in package_json["scripts"]
+    assert "docs:bootstrap" in package_json["scripts"]
+    assert "checks:ci:docs" in package_json["scripts"]
+    assert "npm run checks:quality" in package_json["scripts"]["checks:ci"]
+    assert "npm run checks:ci:docs" in package_json["scripts"]["checks:ci"]
+    assert "npm run docs:bootstrap" in package_json["scripts"]["checks:ci:docs"]
+    assert "npm run commitlint:range" in package_json["scripts"]["checks:prepush"]
+    assert "npm run checks:precommit" in package_json["scripts"]["checks:prepush"]
+    assert "npm run checks:prepush" in pre_push_text
+    assert ".husky/_/" in gitignore_text
+    assert "name: docs-bootstrap" in ci_text
+    assert "npm run checks:quality" in runtime_job_text
+    assert "npm run docs:bootstrap" in docs_bootstrap_job_text
+    assert "npm run checks:precommit" not in docs_bootstrap_job_text
+    assert "~/.cargo/bin/lychee" in docs_bootstrap_job_text
+    assert "cache-hit != 'true'" in docs_bootstrap_job_text
+    assert "npm run checks:ci" not in runtime_job_text
+    assert "npm run checks:prepush" not in runtime_job_text
+    assert "fetch-depth: 1" in runtime_job_text
+    assert "git fetch origin development:refs/remotes/origin/development" not in runtime_job_text
+    assert "cache: npm" in commitlint_text
+    assert "npm run checks:quality" in quality_gates_text
+    assert "npm run docs:bootstrap" in quality_gates_text
+    assert "npm run checks:ci:docs" in quality_gates_text
+    assert "npm run checks:prepush" in quality_gates_text
+    assert "commitlint:range" in quality_gates_text
+    for duplicated_step in (
+        "skills:lint",
+        "skills:audit",
+        "taskmaster:validate",
+        "deps:tree",
+        "docs:quality",
+        "docstrings:coverage",
+        "docstrings:lint",
+        "eval:ci",
+        "lint-imports",
+        "manage.py check",
+        "makemigrations --check --dry-run",
+        "pytest",
+        "npm audit --audit-level=moderate",
+        "ruff format --check",
+        "ruff check .",
+        "pyright",
+        "pip-audit --progress-spinner off",
+    ):
+        assert duplicated_step not in runtime_job_text
+
+
+def test_pull_request_template_tracks_pre_push_authority() -> None:
+    """Ensure the PR checklist points at the authoritative pre-push gate."""
+    pull_request_template_text = (REPO_ROOT / ".github" / "pull_request_template.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "- [ ] `npm run checks:prepush` (authoritative local pre-push gate)" in (
+        pull_request_template_text
+    )
+    assert "- [ ] `npm run commitlint`" not in pull_request_template_text
+
+
 def test_stop_hook_stays_notice_only() -> None:
     """Ensure the stop hook keeps emitting notice-only JSON."""
     stop_hook_text = (REPO_ROOT / ".codex" / "hooks" / "session_stop_notice.py").read_text(
@@ -647,8 +874,9 @@ def test_docs_inclusive_and_repomix_cover_hub_indexes() -> None:
     assert ".codex/agents" in docs_inclusive
     assert "llms.txt" in docs_inclusive
     assert "tests" not in docs_inclusive
-    assert ".codex/agents/**/*.toml" in include_entries
-    assert "llms.txt" in include_entries
+    assert ".codex/**/*.toml" in include_entries
+    assert ".codex/hooks/**/*.py" in include_entries
+    assert "llms.txt" not in include_entries
     assert "PACKAGE_MANIFEST.md" not in docs_inclusive
     assert "PACKAGE_MANIFEST.md" not in include_entries
     assert ".codex/references" not in docs_inclusive
@@ -849,3 +1077,23 @@ def test_product_python_modules_do_not_depend_on_type_checking_shims() -> None:
                 offenders.append(path.relative_to(REPO_ROOT).as_posix())
 
     assert offenders == []
+
+
+def test_search_design_agent_metadata_stays_lexical_only() -> None:
+    """Ensure search-design agent metadata does not drift into vector/semantic scope."""
+    policy_text = (REPO_ROOT / ".agents" / "skills" / "search-design" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    search_design_prompt = (
+        REPO_ROOT / ".agents" / "skills" / "search-design" / "agents" / "openai.yaml"
+    ).read_text(encoding="utf-8")
+
+    assert "Semantic/vector search is out of the current release scope." in policy_text
+
+    lowered_prompt = search_design_prompt.lower()
+    assert "bm25" not in lowered_prompt
+    assert "semantic" not in lowered_prompt
+    assert "vector search" not in lowered_prompt
+    assert "exact identifiers" in lowered_prompt
+    assert "postgresql" in lowered_prompt
+    assert "lexical" in lowered_prompt

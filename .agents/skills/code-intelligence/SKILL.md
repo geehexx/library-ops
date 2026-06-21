@@ -18,8 +18,15 @@ For delegated slices, default to Spark-first handling of trivial, noisy, or
 obviously bounded work. Reuse live agent history when the next path can share
 context and stay on the same role/model; spawn a clean agent when the role or
 model should change.
+When a packet is a fork, say so explicitly, name the inherited context,
+prefer reuse over close+respawn, split overlapping slices into separate
+worktrees before conflicts appear, and include the expected commit scope plus
+local gate list before push.
 When a slice branches, the owning coordinator or specialist should hand off a
 bounded child worker rather than flattening the work into a wider local pass.
+If a branch has been force-pushed, replaced, or superseded, refresh live PR
+checks and mergeability evidence against the current head before trusting
+earlier results.
 If context is still incomplete, stop and form a prescriptive Spark packet
 before another shell, graph, or symbol call; let the delegated lane fan out
 bounded child workers if the slice branches again.

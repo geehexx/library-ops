@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -47,6 +47,17 @@ class CatalogIndexView(RoleContextMixin, ListView):
         context["selected_subject"] = request.GET.get("subject") or ""
         context["selected_language"] = request.GET.get("language") or ""
         context["selected_source"] = request.GET.get("source") or ""
+        context["result_count"] = len(cast("Any", context["works"]))
+        context["search_active"] = any(
+            (
+                context["search_query"],
+                context["selected_availability"],
+                context["selected_contributor"],
+                context["selected_subject"],
+                context["selected_language"],
+                context["selected_source"],
+            )
+        )
         context["facet_options"] = selectors.work_facet_options(query=context["search_query"])
         return context
 

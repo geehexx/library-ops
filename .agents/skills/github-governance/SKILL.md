@@ -7,7 +7,7 @@ description: Use when configuring GitHub repo, branch protections, PR template, 
 
 ## Required controls
 
-- `main` and `develop` protected.
+- `main` and `development` protected.
 - PR required.
 - Required status checks.
 - Conversation resolution.

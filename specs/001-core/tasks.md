@@ -4,10 +4,17 @@
 
 This is a Spec Kit seed task list for reconciliation. Task Master generated tasks are the execution graph after `task-master parse-prd`. Do not implement from this file alone.
 
+## Current release-convergence note
+
+The seed checklist below is historical foundation-planning context. The active
+execution queue is the current Task Master graph, especially Tasks `14`, `15`,
+and `16` for release convergence. Do not reopen Phase 1/setup work from this
+file unless the canonical PRD and live graph are deliberately reset.
+
 ## Seed tasks
 
 - [ ] T001 Validate meta-system readiness: required toolchain, Codex config, MCPs, hooks, skills, ADRs, PRD, explicit coordinator-first bounded delegation, permission-profile/agent-config/profile-overlay separation, bad-anchor avoidance, and no-junk checks.
-- [ ] T002 Prove the committed Django bootstrap: settings, URLs, ASGI/WSGI, test settings, and health check.
+- [ ] T002 Prove the committed Django foundation: settings, URLs, ASGI/WSGI, test settings, and health check.
 - [ ] T003 Implement the Phase 1 domain modules and migrations for accounts, catalog, inventory, circulation, audit, and app-owned presentation surfaces.
 - [ ] T004 Add only the services/forms/authorization helpers needed for the protected foundation slice and keep Import Linter boundaries valid.
 - [ ] T005 Implement seeded roles and disposable demo users.

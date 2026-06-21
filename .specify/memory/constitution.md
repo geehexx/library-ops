@@ -58,18 +58,17 @@ Borrowing operates on a copy. Historical loans MUST survive book archival.
 
 ## IV. Search Relevance Discipline
 
-Search MUST prioritize exact identifiers before fuzzy, BM25, or semantic search.
+Search MUST prioritize exact identifiers before broader lexical ranking.
 The default ranking order is:
 
 1. exact ISBN, barcode, Open Library ID, Gutenberg ID, or other external ID,
 2. exact normalized title/contributor phrase,
 3. PostgreSQL `tsvector` full-text search,
-4. optional ParadeDB/BM25 adapter,
-5. pgvector semantic similarity,
-6. explicit business boosts and reciprocal-rank fusion.
+4. deterministic business boosts and tie ordering.
 
 Availability MUST be computed from database state, never from AI-generated text.
-Semantic search MUST be additive, not authoritative.
+Semantic/vector search is out of scope for the current release and MUST NOT be
+treated as an active product requirement.
 
 ## V. Security and Authorization
 
@@ -96,13 +95,13 @@ Every pull request to `development` or `main` MUST pass the applicable subset of
 - migration checks,
 - unit and integration tests,
 - property-based tests for core invariants,
-- E2E tests for user-critical flows once bootstraped.
+- E2E tests for user-critical flows once the target stack exists.
 
 Validation planning SHOULD stay kind-first: lower-level invariants and
 constraints first, request and integration coverage next, and browser/E2E
 coverage only where the user flow requires it.
 
-Checks MAY be conditionally skipped only while their target bootstrap does not yet
+Checks MAY be conditionally skipped only while their target stack does not yet
 exist, and the skip MUST be explicit in CI output.
 
 ## VII. Agent Compatibility

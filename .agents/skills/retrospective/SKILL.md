@@ -31,6 +31,9 @@ local pass.
   otherwise keep it here or in `docs/process/retrospective.md`.
 - If the same lesson is likely to recur, prefer a tracked skill, agent TOML,
   or docs update before writing anything to memory.
+- If a branch is rewritten, force-pushed, or replaced, refresh live PR checks
+  and mergeability evidence against the current head before treating older
+  results as truth.
 
 ## Output
 
