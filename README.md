@@ -119,7 +119,8 @@ Known limitations:
   [docs/evaluation/demo-script.md](docs/evaluation/demo-script.md);
 - the smoke surface now passes locally and on the live service;
 - the deployment contract now targets the Render free-tier path, which means
-  migrations must be handled without `preDeployCommand`;
+  migrations must be handled without `preDeployCommand`, and demo seed refresh
+  must be run manually via the operator sequence in [SETUP.md](SETUP.md);
 
 The product work should continue from the canonical graph, while the control-
 plane state remains governed by the PRD, Task Master graph, agent config,

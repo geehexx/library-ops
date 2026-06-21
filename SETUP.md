@@ -81,6 +81,24 @@ ollama ps
 curl -sS http://127.0.0.1:11434/api/generate -d '{"model":"qwen3.5:0.8b","prompt":"Return JSON only: {\"ok\":true}","stream":false}'
 ```
 
+### Render demo refresh
+
+Render free-tier deploys do not run a seed hook during build, so the live demo
+state must be refreshed manually after a deploy or database reset. Set
+`LIBRARYOPS_DEMO_ACCESS_CODE` in the Render service environment or the shell
+session first, then run:
+
+```bash
+uv run python manage.py seed_roles
+uv run python manage.py seed_demo_users --reset-passwords
+uv run python manage.py import_public_domain_catalog --source openlibrary --limit 1 --refresh
+uv run python manage.py import_public_domain_catalog --source gutenberg --limit 1 --refresh
+uv run python manage.py seed_circulation_examples --refresh
+```
+
+This sequence is idempotent and can be rerun safely to restore the seeded demo
+accounts, catalog rows, and circulation examples without hardcoding secrets.
+
 ### Review-graph lane
 
 ```bash
