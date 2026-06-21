@@ -962,7 +962,7 @@
             "id": 4,
             "title": "Harden release and branch governance to the implemented packaging flow",
             "description": "Keep release-readiness, Dependabot, CODEOWNERS, PR template, and branch guidance aligned with the actual packaging and validation model.",
-            "details": "Review release/governance docs and GitHub config for stale references to old blockers or superseded flows. The durable repo state includes pinned GitHub Actions, Dependabot targeting `development`, CODEOWNERS coverage for `.taskmaster/`, PR template alignment, and a read-only `release-readiness` workflow consistent with the externalized Task Master packaging model and the documented `development` -> `main` path.",
+            "details": "Review release/governance docs and GitHub config for stale references to old blockers or superseded flows. The durable repo state includes pinned GitHub Actions, Dependabot targeting `development`, CODEOWNERS coverage for `.taskmaster/`, PR template alignment, and a read-only `release-readiness` workflow consistent with the externalized Task Master packaging model and the documented `development` -> `main` path.\n<info added on 2026-06-21T10:41:03.970Z>\nControl-plane config hygiene pass completed for this tranche. Removed the stale root `model_context_window = 500000` override from `.codex/config.toml`. Updated governance tests to assert the root config no longer pins that override. Validation to follow in the same slice: focused governance and hook tests plus `taskmaster validate-dependencies`.\n</info added on 2026-06-21T10:41:03.970Z>",
             "status": "done",
             "dependencies": [],
             "parentTaskId": 12,
@@ -1034,7 +1034,7 @@
             "title": "Update .codex/hooks/*.py",
             "description": "Ensure Spark-first coordinator handoff, batch reasoning before tools, and bounded recursive child-worker fan-out are documented in .codex/hooks/*.py.",
             "dependencies": [],
-            "details": "Review and update the hook scripts in .codex/hooks/ to include the new policy requirements.\n<info added on 2026-06-19T12:56:20.351Z>\nUpdated .codex/hooks/session_start_notice.py so the startup reminder fingerprints the new lane configs and repeats the batch-reasoning-before-tools / bounded-child-worker guidance. Verified the file with a no-write AST parse because py_compile would have tried to write __pycache__ in the read-only sandbox.\n</info added on 2026-06-19T12:56:20.351Z>",
+            "details": "Review and update the hook scripts in .codex/hooks/ to include the new policy requirements.\n<info added on 2026-06-19T12:56:20.351Z>\nUpdated .codex/hooks/session_start_notice.py so the startup reminder fingerprints the new lane configs and repeats the batch-reasoning-before-tools / bounded-child-worker guidance. Verified the file with a no-write AST parse because py_compile would have tried to write __pycache__ in the read-only sandbox.\n</info added on 2026-06-19T12:56:20.351Z>\n<info added on 2026-06-21T10:41:10.653Z>\nUpdated .codex/hooks/session_start_notice.py to use the bounded continuation loop wording, remove the old \"Ralph loop\" shorthand, drop the retired \"parse-prd --force\" callout, and align the startup reminder with current Spark/cache/session guidance. Added a new test case to verify the updated wording and ensure that the retired shorthand/command do not reappear. Validation steps include focused hook tests, governance tests, and `taskmaster validate-dependencies`.\n</info added on 2026-06-21T10:41:10.653Z>",
             "status": "done",
             "testStrategy": "Run unit tests for hook scripts to ensure they adhere to the new policy.",
             "parentId": "undefined",
@@ -3500,9 +3500,20 @@
             "dependencies": [],
             "parentTaskId": 12,
             "parentId": "12"
+          },
+          {
+            "id": 6,
+            "title": "Capture explicit permissions, sandbox, escalation, and MCP startup guidance",
+            "description": "Record the audit-mandated control-plane guidance for direct permissions, sandbox and escalation behavior, plus MCP startup, usage, and local-auth expectations.",
+            "details": "Keep the permissions, sandbox, and escalation rules explicit in the control-plane runtime policy, and keep MCP startup/use/local-auth guidance visible in the startup and runtime surfaces. This is a bookkeeping subtask for the audit recommendation and intentionally does not duplicate Task 13.4's startup-reminder fingerprinting or any product work.\n<info added on 2026-06-21T10:58:15Z>\nRoot-cause note for the current Task Master drift fix: stale Task Master reads plus non-canonical mutation/refresh paths can leave the committed graph and the active MCP view out of sync. Treat the `master` surface as the canonical committed view for this repo session, and treat the `library-ops` tag view as a staged alternate surface that must be documented before it diverges. Do not hand-edit or force-regenerate the committed graph when the canonical writer path is stale or unavailable; capture the blocker in Task Master and resume through the fresh MCP/CLI mutation path.\n</info added on 2026-06-21T10:58:15Z>",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 12,
+            "parentId": "12",
+            "updatedAt": "2026-06-21T10:30:08Z"
           }
         ],
-        "updatedAt": "2026-06-16T09:24:09.797Z"
+        "updatedAt": "2026-06-21T10:30:08Z"
       },
       {
         "id": 13,

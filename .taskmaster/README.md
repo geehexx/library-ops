@@ -81,7 +81,13 @@ smaller, better-bounded generation target. Do not treat the phase PRDs as a
 reason to overwrite the committed graph in place. Review graph changes in a
 bounded lane first, and avoid `task-master parse-prd --force` on repo-owned
 surfaces unless the owning Task Master task explicitly calls for graph
-replacement.
+replacement. If the canonical writer path is stale or unavailable, stop and
+capture the blocker in Task Master instead of hand-editing
+`.taskmaster/tasks/tasks.json` or forcing a refresh from stale state.
+Within the committed graph, treat the `master` surface as the canonical
+committed view for this repo session. Alternate tag surfaces are staged
+snapshots and should only diverge when a Task Master note makes that intent
+explicit.
 
 Current proven low-memory local lane:
 

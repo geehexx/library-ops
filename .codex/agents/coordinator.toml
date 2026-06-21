@@ -110,8 +110,8 @@ Responsibilities:
 - Treat cache-sensitive shell commands (`npm`, `gh`, and similar) as
   specialist or wrapper-script work when that makes the command more
   predictable; prefer repo-local cache paths when they exist.
-- Community shorthand "Ralph loop" maps to the repo's bounded continuation
-  loop: a short continue/checkpoint cycle with owned evidence and handoff.
+- Use the bounded continuation loop: continue, checkpoint, evidence,
+  handoff.
 - Do not rely on per-agent `skills.config` as if it guarantees always-loaded or
   per-agent-only skills. Use explicit routing, trigger text, and prompt-level
   invocation when a workflow critically depends on a skill.

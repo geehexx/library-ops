@@ -65,12 +65,16 @@ def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
         "debugger",
         "single_file_implementer",
         "implementer",
+        "continue, checkpoint, evidence, handoff",
         "multiple turns",
         "stop hook emits JSON only",
         "/mnt/c/...",
-        "parse-prd --force",
+        "graph replacement as an explicit regeneration event",
     ):
         assert expected_fragment in output
+
+    assert "Ralph loop" not in output
+    assert "parse-prd --force" not in output
 
 
 def test_resume_notice_is_more_compact_and_continuation_focused(

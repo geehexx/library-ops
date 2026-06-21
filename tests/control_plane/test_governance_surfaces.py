@@ -99,7 +99,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     ).read_text(encoding="utf-8")
 
     assert config["permissions"]["coordinator_root"]["extends"] == ":workspace"
-    assert "model_context_window = 500000" in config_text
+    assert "model_context_window" not in config
     assert "max_threads = 24" in config_text
     commitlint_scope_match = re.search(
         r"(?ms)^\s*'scope-enum': \[\s*2,\s*'always',\s*(\[[^\]]+\])\s*\]",
@@ -128,6 +128,8 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     assert "expected commit scope plus local gate list before push" in coordinator_text
     assert "force-pushed, replaced, or superseded, refresh live PR" in coordinator_text
     assert "checks and mergeability evidence against the current head" in coordinator_text
+    assert "bounded continuation loop" in coordinator_text
+    assert "continue, checkpoint, evidence" in coordinator_text
     assert "Close completed or idle workers promptly" in coordinator_text
     assert "Pyright" in implementer_text
     assert "work is a fork" in implementer_text
@@ -192,6 +194,7 @@ def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
     assert "separate worktrees before conflicts appear" in clarify_goal_text
     assert "include the expected" in clarify_goal_text
     assert "local gate list before push" in clarify_goal_text
+    assert "Ralph loop" not in coordinator_text
     assert "fork" in code_intelligence_text
     assert "split overlapping slices into separate" in code_intelligence_text
     assert "worktrees before conflicts appear" in code_intelligence_text
@@ -209,7 +212,8 @@ def test_taskmaster_docs_avoid_forceful_phase_regeneration_guidance() -> None:
     )
 
     assert "task-master parse-prd .taskmaster/docs/phases/" not in taskmaster_readme
-    assert "parse-prd --force" in taskmaster_skill
+    assert "forceful PRD regeneration" in taskmaster_skill
+    assert "parse-prd --force" not in taskmaster_skill
 
     for phase_path in sorted((REPO_ROOT / ".taskmaster" / "docs" / "phases").glob("phase-*.md")):
         phase_text = phase_path.read_text(encoding="utf-8")
@@ -217,6 +221,58 @@ def test_taskmaster_docs_avoid_forceful_phase_regeneration_guidance() -> None:
             "npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd" not in phase_text
         )
         assert "Suggested local regeneration workflow" in phase_text
+
+
+def test_taskmaster_committed_graph_requires_string_ids_and_canonical_writes() -> None:
+    """Ensure the committed graph schema and writer guidance do not drift silently."""
+    taskmaster_readme = (REPO_ROOT / ".taskmaster" / "README.md").read_text(encoding="utf-8")
+    taskmaster_agents = (REPO_ROOT / ".taskmaster" / "AGENTS.md").read_text(encoding="utf-8")
+    runtime_policy_text = (REPO_ROOT / ".taskmaster" / "docs" / "runtime-policy.md").read_text(
+        encoding="utf-8"
+    )
+    taskmaster_skill = (REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    tasks_json = json.loads(
+        (REPO_ROOT / ".taskmaster" / "tasks" / "tasks.json").read_text(encoding="utf-8")
+    )
+    master_task12 = next(task for task in tasks_json["master"]["tasks"] if task["id"] == "12")
+    library_ops_task12 = next(
+        task for task in tasks_json["library-ops"]["tasks"] if task["id"] == 12
+    )
+    library_ops_task12_subtask6 = next(
+        subtask for subtask in library_ops_task12["subtasks"] if subtask["id"] == 6
+    )
+
+    assert "hand-edit" in taskmaster_readme
+    assert "hand-edit" in taskmaster_agents
+    assert "hand-edited" in runtime_policy_text
+    assert "canonical writer path is" in taskmaster_readme
+    assert "stale or unavailable" in taskmaster_readme
+    assert "canonical writer path is" in taskmaster_agents
+    assert "stale or unavailable" in taskmaster_agents
+    assert "canonical writer path is" in runtime_policy_text
+    assert "stale or unavailable" in runtime_policy_text
+    assert "canonical writer path is" in taskmaster_skill
+    assert "stale or unavailable" in taskmaster_skill
+    assert "canonical committed view" in runtime_policy_text
+    assert "Alternate tag surfaces are staged" in taskmaster_readme
+    assert "Tag-scoped alternates are staged" in taskmaster_agents
+    assert "staged alternate surface" in library_ops_task12_subtask6["details"]
+
+    assert isinstance(master_task12["id"], str)
+    assert master_task12["id"] == "12"
+    assert {subtask["id"] for subtask in master_task12["subtasks"]} == {1, 2, 3, 4, 5}
+    assert {subtask["id"] for subtask in library_ops_task12["subtasks"]} == {
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+    }
+    assert all("status" in task for task in tasks_json["master"]["tasks"])
+    assert all(isinstance(task["dependencies"], list) for task in tasks_json["master"]["tasks"])
 
 
 def test_release_and_governance_skills_match_development_branch_policy() -> None:
@@ -266,7 +322,7 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     )
     policy_text = (REPO_ROOT / "policy" / "codex.rego").read_text(encoding="utf-8")
 
-    assert config["model_context_window"] == 500000
+    assert "model_context_window" not in config
     assert agents["max_threads"] == 24
     assert agents["max_depth"] == 2
     assert "debugger" in agents
