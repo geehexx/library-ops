@@ -17,9 +17,13 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `6dad4bb`).
-- Latest fully green PR proof is on prior head `a6a1191`: `commitlint`, `policy`, `quality`, `security`, and `workflow-security` all passed on `2026-06-20` / `2026-06-21` (CI run `27887454334`, commitlint run `27887454337`). The current local head is a follow-on housekeeping commit and has not been revalidated yet.
-- Current PR state is merge-clean (`mergeStateStatus=CLEAN`), draft is still open, and there are no live review requests or PR comments to address from the GitHub surface checked in this session.
+- PR: `#28` (open draft, target `development`, current head `8c65587`).
+- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `8c65587` is not yet revalidated in this handoff cycle.
+- Current PR state in this file is constrained to local git evidence only: branch/head are read from `git status`, `git rev-parse`, and `git log`.
+- Control-plane truth updates (local evidence):
+  - `2126fcc` (`docs(release): realign release-truth surfaces`): updated continuation, README, PRD, specs, and docs quality-gate wording to current release-convergence intent.
+  - `8c65587` (`docs(control-plane): harden taskmaster mutation policy`): hardened mutation posture in `.taskmaster/AGENTS.md`, `.taskmaster/docs/runtime-policy.md`, `.taskmaster/README.md`, `.agents/skills/taskmaster/SKILL.md`, `.codex/agents/coordinator.toml`, `.codex/config.toml`, and governance tests.
+  - `.taskmaster/tasks/tasks.json` line 3508 now records drift root cause as stale Task Master reads + non-canonical mutation/refresh paths and the required wait/capture path (Task Master note, then MCP/CLI mutation path when fresh).
 - Major completed slices to carry forward:
   - pre-push authority
   - planning/spec reconciliation
