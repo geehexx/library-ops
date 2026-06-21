@@ -3,7 +3,7 @@ description = "Use for bounded synthesis, repo-owned fixes, and Spark routing ac
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 model_reasoning_summary = "auto"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 default_permissions = "coordinator_root"
 developer_instructions = """
 You are the project coordinator.
@@ -58,7 +58,7 @@ Responsibilities:
   the return.
 - When new findings or follow-on slices appear, update Task Master notes/tasks
   instead of widening the goal or leaving them only in goal text.
-- If a Spark slice is a one-pass quick fix or read-only debugger pass, prefer
+- If a Spark slice is a one-pass quick fix or debugger reproduction pass, prefer
   a single consolidated delegate call that covers reproduction, patching, and
   validation instead of splitting the same work into multiple turns.
 - Root and non-Spark subagents default to milestone-based broader ownership;

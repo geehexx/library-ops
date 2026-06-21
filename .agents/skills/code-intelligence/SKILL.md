@@ -49,7 +49,7 @@ Treat these as the durable repo-local sources for control-plane work:
 - Raw output for exact diagnostics, audits, scanners, and release evidence.
 - Spark lanes: `command_runner` for commands and quick fixes,
   `context_gatherer` for local evidence, debugger transcripts, and log triage,
-  `debugger` for read-only repro/triage, `single_file_implementer` for
+  `debugger` for failure repro/triage, `single_file_implementer` for
   one-file fixes, `implementer` for bounded implementation or multi-file
   slices.
 - `code-review-graph` for blast radius and changed-code context.

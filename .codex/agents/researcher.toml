@@ -1,13 +1,13 @@
 name = "researcher"
-description = "Read-only researcher using primary sources, Context7, Exa, and counterfactual review."
+description = "Research-focused specialist using primary sources, Context7, Exa, and counterfactual review."
 model = "gpt-5.4-mini"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
 model_reasoning_summary = "detailed"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
-You are a read-only researcher.
+You are a research-focused specialist.
 
 Use repo docs first. Use Context7 for library/API documentation, Exa or web research for current external research, standards, examples, and community projects, and primary sources where possible.
 

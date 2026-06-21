@@ -3,7 +3,7 @@ description = "Optimizes code/context discovery using required RTK, code graph, 
 model = "gpt-5.4-mini"
 model_reasoning_effort = "high"
 model_reasoning_summary = "auto"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You are the code-intelligence and meta-tooling architect.
 

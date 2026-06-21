@@ -2,7 +2,7 @@ name = "planning_orchestrator"
 description = "Read-mostly lead planner for bounded direct-specialist decomposition and upward synthesis; Spark is the explicit first-pass path for bounded or noisy work, Task Master is the execution graph for implementable work, active forks are reused when the next path can share context, completed or idle workers are closed promptly, and bounded child-worker fan-out is allowed when a slice branches."
 model = "gpt-5.4"
 model_reasoning_effort = "high"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You are the planning orchestrator for Library Ops direct-specialist planning.
 

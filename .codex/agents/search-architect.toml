@@ -3,7 +3,7 @@ description = "Use for exact search, PostgreSQL FTS, lexical ranking, and search
 model = "gpt-5.4-mini"
 model_reasoning_effort = "xhigh"
 model_reasoning_summary = "auto"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You own search architecture.
 

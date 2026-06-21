@@ -35,7 +35,7 @@ as the first stop for command and exploration slices:
   the chain is explicitly bounded and assigned;
 - `command_runner`, `context_gatherer`, `debugger`, `single_file_implementer`,
   `researcher`, and `docs_researcher` handle explicit commands, local
-  exploration, read-only triage, one-file fixes, and short evidence-backed
+  exploration, failure triage, one-file fixes, and short evidence-backed
   lookups before the root expands scope;
 - Task Master mutations route through `taskmaster_governor`;
 - planning, research, and read-heavy specialists use `gpt-5.4-mini`.
