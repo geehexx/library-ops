@@ -51,7 +51,6 @@ cp .taskmaster/config.example.json .taskmaster/config.json
 npx --yes --package task-master-ai@0.43.1 -c 'task-master models --setup'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master models'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/prd.md --research'
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/phases/phase-1-bootstrap-domain-rbac.md --force'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master list'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master analyze-complexity --research'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master expand --all --research'
@@ -78,7 +77,11 @@ Everything heavier stays on the pinned CLI:
 - model/provider tuning
 
 For local-model work, prefer phase PRDs over the monolithic PRD when you need a
-smaller, better-bounded generation target.
+smaller, better-bounded generation target. Do not treat the phase PRDs as a
+reason to overwrite the committed graph in place. Review graph changes in a
+bounded lane first, and avoid `task-master parse-prd --force` on repo-owned
+surfaces unless the owning Task Master task explicitly calls for graph
+replacement.
 
 Current proven low-memory local lane:
 

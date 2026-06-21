@@ -201,6 +201,39 @@ def test_routing_skills_name_the_spark_lanes_and_direct_entrypoints() -> None:
     assert "checks and mergeability evidence against the current head" in code_intelligence_text
 
 
+def test_taskmaster_docs_avoid_forceful_phase_regeneration_guidance() -> None:
+    """Ensure repo-owned Task Master docs stop recommending forceful graph churn."""
+    taskmaster_readme = (REPO_ROOT / ".taskmaster" / "README.md").read_text(encoding="utf-8")
+    taskmaster_skill = (REPO_ROOT / ".agents" / "skills" / "taskmaster" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "task-master parse-prd .taskmaster/docs/phases/" not in taskmaster_readme
+    assert "parse-prd --force" in taskmaster_skill
+
+    for phase_path in sorted((REPO_ROOT / ".taskmaster" / "docs" / "phases").glob("phase-*.md")):
+        phase_text = phase_path.read_text(encoding="utf-8")
+        assert (
+            "npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd" not in phase_text
+        )
+        assert "Suggested local regeneration workflow" in phase_text
+
+
+def test_release_and_governance_skills_match_development_branch_policy() -> None:
+    """Ensure release/governance skills use the current branch naming contract."""
+    release_text = (REPO_ROOT / ".agents" / "skills" / "release" / "SKILL.md").read_text(
+        encoding="utf-8"
+    )
+    governance_text = (
+        REPO_ROOT / ".agents" / "skills" / "github-governance" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+
+    assert "`development` integrates verified work." in release_text
+    assert "`main` and `development` protected." in governance_text
+    assert "`develop`" not in release_text
+    assert "`develop`" not in governance_text
+
+
 def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() -> None:
     """Ensure the coordinator-default config and hook rules do not silently drift."""
     config = tomllib.loads((REPO_ROOT / ".codex" / "config.toml").read_text(encoding="utf-8"))

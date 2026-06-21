@@ -115,6 +115,7 @@ be captured in Task Master tasks and subtasks before implementation begins.
 Startup handoff contract:
 - Repository startup and stop paths are controlled by `.codex/hooks/session_start_notice.py`, `.codex/hooks/session_stop_notice.py`, and `.codex/hooks.json`.
 - Stop-hook behavior is notice-only and must output valid JSON to continue the stop flow.
+- Repo-owned write access is bounded to the workspace and the explicitly approved cache/config roots in `.codex/config.toml`. External mounts and host paths such as `/mnt/c/...` are not repo-owned defaults; treat them as session-scoped reads/writes that may require escalation or a different session profile instead of inventing local workarounds.
 - Do not re-ask for known defaults (workspace/default/operator context) when those defaults are already captured in repo surfaces or explicitly confirmed by the user.
 
 ## Routing rules

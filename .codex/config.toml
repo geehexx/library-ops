@@ -138,6 +138,9 @@ extends = ":workspace"
 ":slash_tmp" = "write"
 ":tmpdir" = "write"
 
+# Repo-owned writable roots stop here. External mounts such as `/mnt/c/...`
+# are not implied workspace roots and may still require escalation or a
+# differently-scoped session even when the host path exists.
 [permissions.workspace.workspace_roots]
 "~/.cache/ms-playwright" = true
 "~/.cache/pip" = true

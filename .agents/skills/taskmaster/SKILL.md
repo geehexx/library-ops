@@ -66,6 +66,11 @@ This repo does not use Task Master in isolation. Pair it with:
   rescue provider only when the local lane cannot satisfy the required task.
 - If a Task Master operation depends on current framework or provider behavior,
   fetch the current docs first instead of letting the model improvise.
+- In this repo, do not run `task-master parse-prd --force` against the
+  committed graph as a routine refresh. Review the current graph first, prefer
+  notes/status updates for narrow continuation work, and treat graph
+  replacement as an explicit regeneration event that must be justified in Task
+  Master instead of a convenience command.
 
 ## Prohibited
 

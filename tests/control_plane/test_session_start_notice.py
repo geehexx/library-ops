@@ -67,6 +67,8 @@ def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
         "implementer",
         "multiple turns",
         "stop hook emits JSON only",
+        "/mnt/c/...",
+        "parse-prd --force",
     ):
         assert expected_fragment in output
 
