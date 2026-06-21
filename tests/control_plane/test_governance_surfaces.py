@@ -224,7 +224,7 @@ def test_taskmaster_docs_avoid_forceful_phase_regeneration_guidance() -> None:
         assert "Suggested local regeneration workflow" in phase_text
 
 
-def test_taskmaster_committed_graph_requires_string_ids_and_canonical_writes() -> None:
+def test_taskmaster_committed_graph_requires_numeric_top_level_ids_and_canonical_writes() -> None:
     """Ensure the committed graph schema and writer guidance do not drift silently."""
     taskmaster_readme = (REPO_ROOT / ".taskmaster" / "README.md").read_text(encoding="utf-8")
     taskmaster_agents = (REPO_ROOT / ".taskmaster" / "AGENTS.md").read_text(encoding="utf-8")
@@ -237,7 +237,7 @@ def test_taskmaster_committed_graph_requires_string_ids_and_canonical_writes() -
     tasks_json = json.loads(
         (REPO_ROOT / ".taskmaster" / "tasks" / "tasks.json").read_text(encoding="utf-8")
     )
-    master_task12 = next(task for task in tasks_json["master"]["tasks"] if task["id"] == "12")
+    master_task12 = next(task for task in tasks_json["master"]["tasks"] if task["id"] == 12)
     library_ops_task12 = next(
         task for task in tasks_json["library-ops"]["tasks"] if task["id"] == 12
     )
@@ -261,8 +261,10 @@ def test_taskmaster_committed_graph_requires_string_ids_and_canonical_writes() -
     assert "Tag-scoped alternates are staged" in taskmaster_agents
     assert "staged alternate surface" in library_ops_task12_subtask6["details"]
 
-    assert isinstance(master_task12["id"], str)
-    assert master_task12["id"] == "12"
+    assert {type(task["id"]) for task in tasks_json["master"]["tasks"]} == {int}
+    assert {type(task["id"]) for task in tasks_json["library-ops"]["tasks"]} == {int}
+    assert isinstance(master_task12["id"], int)
+    assert master_task12["id"] == 12
     assert {subtask["id"] for subtask in master_task12["subtasks"]} == {1, 2, 3, 4, 5}
     assert {subtask["id"] for subtask in library_ops_task12["subtasks"]} == {
         1,
