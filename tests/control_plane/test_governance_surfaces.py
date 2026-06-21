@@ -100,7 +100,7 @@ def test_coordinator_and_django_skill_encode_direct_specialists_and_pyright_firs
     ).read_text(encoding="utf-8")
 
     assert config["permissions"]["coordinator_root"]["extends"] == ":workspace"
-    assert "model_context_window" not in config
+    assert config.get("model_context_window", 0) >= 500000
     assert "max_threads = 24" in config_text
     commitlint_scope_match = re.search(
         r"(?ms)^\s*'scope-enum': \[\s*2,\s*'always',\s*(\[[^\]]+\])\s*\]",
@@ -325,7 +325,7 @@ def test_codex_config_and_rules_preserve_default_approved_mcp_and_hook_policy() 
     )
     policy_text = (REPO_ROOT / "policy" / "codex.rego").read_text(encoding="utf-8")
 
-    assert "model_context_window" not in config
+    assert config.get("model_context_window", 0) >= 500000
     assert agents["max_threads"] == 24
     assert agents["max_depth"] == 2
     assert "debugger" in agents
