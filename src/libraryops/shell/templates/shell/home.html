@@ -7,22 +7,41 @@
   <section class="panel split-hero">
     <div class="stack">
       <div>
-        <p class="eyebrow">Evaluator-ready demo</p>
+        <p class="eyebrow">
+          {% if demo_data_ready and demo_auth_ready %}
+            Evaluator-ready demo
+          {% else %}
+            Deployment status
+          {% endif %}
+        </p>
         <p class="lede">
-          Explore a server-rendered library workflow with seeded catalog records,
-          circulation states, role-aware access, and exact-match search proof.
+          {% if demo_data_ready and demo_auth_ready %}
+            Explore a server-rendered library workflow with seeded catalog
+            records, circulation states, role-aware access, and exact-match
+            search proof.
+          {% else %}
+            This deployment is live, but evaluator demo data and accounts need
+            an operator refresh before the full catalog and circulation workflow
+            can be reviewed end to end.
+          {% endif %}
         </p>
       </div>
       {% if user.is_authenticated %}
         <p><strong>Signed in as:</strong> {{ user.email }}{% if role %} ({{ role }}){% endif %}</p>
       {% else %}
         <div class="pill-row">
-          <span class="pill">Seeded users</span>
+          {% if demo_auth_ready %}
+            <span class="pill">Seeded users</span>
+          {% else %}
+            <span class="pill">Operator refresh required</span>
+          {% endif %}
           <span class="pill">Catalog search</span>
           <span class="pill">Circulation dashboard</span>
         </div>
         <div class="nav-actions" style="justify-content: flex-start;">
-          <a class="button" href="{% url 'account_login' %}">Sign in to the demo</a>
+          <a class="button" href="{% url 'account_login' %}">
+            {% if demo_auth_ready %}Sign in to the demo{% else %}Sign in{% endif %}
+          </a>
           <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog first</a>
         </div>
       {% endif %}
@@ -30,9 +49,15 @@
     <aside class="hero-note">
       <p class="eyebrow">What this page proves</p>
       <p class="muted" style="margin: 0;">
-        The current branch is no longer just a bootstrap foundation. It already
-        exposes real catalog counts, seeded circulation examples, and role-aware
-        entry points that the release audit can verify end to end.
+        {% if demo_data_ready %}
+          The current branch is no longer just a bootstrap foundation. It
+          exposes real catalog counts, seeded circulation examples, and
+          role-aware entry points that the release audit can verify end to end.
+        {% else %}
+          The service is reachable and the role-aware routes are wired, but this
+          environment is currently unseeded. Run the demo refresh sequence in
+          `SETUP.md` before using it as evaluator proof.
+        {% endif %}
       </p>
     </aside>
   </section>
@@ -41,20 +66,37 @@
     <article class="panel metric-card">
       <p class="eyebrow">Catalog works</p>
       <p class="metric-value">{{ work_count }}</p>
-      <p class="muted" style="margin: 0;">Imported works currently visible in the seeded browse flow.</p>
+      <p class="muted" style="margin: 0;">
+        {% if work_count %}
+          Imported works currently visible in the seeded browse flow.
+        {% else %}
+          No seeded catalog data is loaded yet for evaluator review.
+        {% endif %}
+      </p>
     </article>
     <article class="panel metric-card">
       <p class="eyebrow">Inventory copies</p>
       <p class="metric-value">{{ copy_count }}</p>
-      <p class="muted" style="margin: 0;">Physical copies available to drive checkout, return, and search states.</p>
+      <p class="muted" style="margin: 0;">
+        {% if copy_count %}
+          Physical copies available to drive checkout, return, and search states.
+        {% else %}
+          Run the demo refresh sequence to populate circulation-ready copies.
+        {% endif %}
+      </p>
     </article>
   </section>
 
   <section class="panel">
     <h2 style="margin-top: 0;">Circulation</h2>
     <p>
-      Review active, overdue, and recently returned loans on the circulation
-      dashboard.
+      {% if demo_data_ready %}
+        Review active, overdue, and recently returned loans on the circulation
+        dashboard.
+      {% else %}
+        The live service is up, but seeded loan examples are not loaded yet.
+        Refresh the demo data before using circulation as release evidence.
+      {% endif %}
     </p>
     {% if user.is_authenticated %}
       <a class="button button--ghost" href="{% url 'loan-dashboard' %}">Open loan dashboard</a>
@@ -70,8 +112,13 @@
       <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
     {% else %}
       <p>
-        Browse the live catalog, review seeded availability, and sign in when
-        you want to test the role-aware staff flows.
+        {% if demo_data_ready %}
+          Browse the live catalog, review seeded availability, and sign in when
+          you want to test the role-aware staff flows.
+        {% else %}
+          Browse the live catalog shell now, then run the demo refresh before
+          testing evaluator search and staff flows.
+        {% endif %}
       </p>
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog</a>
     {% endif %}

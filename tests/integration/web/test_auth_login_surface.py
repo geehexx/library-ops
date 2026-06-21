@@ -9,6 +9,7 @@ from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
@@ -16,6 +17,10 @@ if "allauth.socialaccount" in settings.INSTALLED_APPS:
     from allauth.socialaccount.templatetags import socialaccount as socialaccount_tags
 else:
     raise SkipTest("Optional socialaccount tests are skipped when OAuth providers are disabled.")
+
+from libraryops.accounts.management.commands.seed_demo_users import DEMO_ACCESS_CODE_ENV_VAR
+
+DEMO_ACCESS_CODE = "library-ops-demo-access-code"
 
 
 @dataclass(slots=True)
@@ -89,8 +94,34 @@ class LoginSurfaceTests(TestCase):
         )
         self.assertContains(response, 'name="next"', status_code=200)
         self.assertContains(response, 'value="/catalog/"', status_code=200)
+        self.assertContains(
+            response,
+            "seeded evaluator accounts are not available",
+            status_code=200,
+        )
         self.assertNotContains(response, "Continue with Google")
         self.assertNotContains(response, "Continue with GitHub")
+
+    def test_login_page_mentions_seeded_demo_path_when_demo_users_exist(self) -> None:
+        """The seeded-demo guidance should only appear when demo users are present."""
+
+        call_command("seed_roles")
+        with patch.dict("os.environ", {DEMO_ACCESS_CODE_ENV_VAR: DEMO_ACCESS_CODE}, clear=False):
+            call_command("seed_demo_users", reset_passwords=True)
+
+        response, _providers = self._render_login_page([], next_path="/catalog/")
+
+        assert response.status_code == 200
+        self.assertContains(
+            response,
+            "Use a seeded demo account for evaluator verification",
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            "Use the seeded demo-password path above to continue.",
+            status_code=200,
+        )
 
     def test_login_page_shows_only_one_provider_and_preserves_next(self) -> None:
         """A one-provider deployment should expose only the configured provider link."""
