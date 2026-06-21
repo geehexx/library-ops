@@ -17,8 +17,8 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `8c0a142`).
-- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `8c0a142` is not yet revalidated in this handoff cycle.
+- PR: `#28` (open draft, target `development`, current head `e07935f`).
+- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `e07935f` is not yet revalidated in this handoff cycle.
 - Current PR state in this file is constrained to local git evidence only: branch/head are read from `git status`, `git rev-parse`, and `git log`.
 - Control-plane truth updates (local evidence):
   - `2126fcc` (`docs(release): realign release-truth surfaces`): updated continuation, README, PRD, specs, and docs quality-gate wording to current release-convergence intent.
@@ -61,7 +61,7 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 | CI quality path | `checks:ci` now runs as the non-duplicated GitHub Actions quality lane and passed locally on `8c0a142`. | proved |
 | Control-plane/task graph | `task-master validate-dependencies` passes on the committed graph; governance tests pass on the current doc/meta truth surfaces. | proved |
 | Product/runtime proof | `verify:core` and `verify:all` passed locally with writable temp/cache roots under `/tmp`. | proved |
-| Release-evidence delta | Current branch head `8c0a142` is ahead of the last fully green PR proof head `a6a1191`; live PR/CI truth still needs refresh against the current tip before merge claims. | needs live refresh |
+| Release-evidence delta | Current branch head `e07935f` is ahead of the last fully green PR proof head `a6a1191`; live PR/CI truth still needs refresh against the current tip before merge claims. | needs live refresh |
 | External hosted auth proof | Google/GitHub callback proof on local plus Render remains blocked by provider-console / Site(SocialApp) state under `16.6`. | blocked external |
 
 ## Carry Forward
