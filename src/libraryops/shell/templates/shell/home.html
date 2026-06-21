@@ -9,7 +9,7 @@
       <div>
         <p class="eyebrow">
           {% if demo_data_ready and demo_auth_ready %}
-            Evaluator-ready demo
+            Demo-ready library
           {% else %}
             Deployment status
           {% endif %}
@@ -18,9 +18,9 @@
           {% if demo_data_ready and demo_auth_ready %}
             Explore a server-rendered library workflow with seeded catalog
             records, circulation states, role-aware access, and exact-match
-            search proof.
+            search states.
           {% else %}
-            This deployment is live, but evaluator demo data and accounts need
+            This deployment is live, but demo data and accounts need
             an operator refresh before the full catalog and circulation workflow
             can be reviewed end to end.
           {% endif %}
@@ -47,16 +47,15 @@
       {% endif %}
     </div>
     <aside class="hero-note">
-      <p class="eyebrow">What this page proves</p>
+      <p class="eyebrow">Current live state</p>
       <p class="muted" style="margin: 0;">
         {% if demo_data_ready %}
-          The current branch is no longer just a bootstrap foundation. It
-          exposes real catalog counts, seeded circulation examples, and
-          role-aware entry points that the release audit can verify end to end.
+          This host now exposes seeded catalog counts, circulation examples,
+          and role-aware entry points for the full product walkthrough.
         {% else %}
-          The service is reachable and the role-aware routes are wired, but this
+          The host is reachable and the role-aware routes are wired, but this
           environment is currently unseeded. Run the demo refresh sequence in
-          `SETUP.md` before using it as evaluator proof.
+          `SETUP.md` before using it for the full walkthrough.
         {% endif %}
       </p>
     </aside>
@@ -70,7 +69,7 @@
         {% if work_count %}
           Imported works currently visible in the seeded browse flow.
         {% else %}
-          No seeded catalog data is loaded yet for evaluator review.
+          No seeded catalog data is loaded yet for the live demo.
         {% endif %}
       </p>
     </article>
@@ -117,7 +116,7 @@
           you want to test the role-aware staff flows.
         {% else %}
           Browse the live catalog shell now, then run the demo refresh before
-          testing evaluator search and staff flows.
+          testing search and staff workflows.
         {% endif %}
       </p>
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog</a>

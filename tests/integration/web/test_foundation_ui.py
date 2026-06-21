@@ -45,7 +45,7 @@ class FoundationNavigationTests(TestCase):
         self.assertNotContains(response, reverse("catalog-create"))
         self.assertContains(
             response,
-            "operator refresh before the full catalog and circulation workflow",
+            "an operator refresh before the full catalog and circulation workflow",
             status_code=200,
         )
         self.assertContains(
@@ -302,7 +302,7 @@ class FoundationCatalogSearchTests(TestCase):
         self.assertContains(response, "Match: Exact identifier match", status_code=200)
 
     def test_catalog_index_facets_filter_result_set_and_render_controls(self) -> None:
-        """The index should filter by the selected facets and preserve the form state."""
+        """The index should filter by the selected facets and preserve active filters."""
 
         response = self.client.get(
             reverse("catalog-index"),
@@ -329,8 +329,13 @@ class FoundationCatalogSearchTests(TestCase):
         self.assertContains(response, 'name="subject"', status_code=200)
         self.assertContains(response, 'name="language"', status_code=200)
         self.assertContains(response, 'name="source"', status_code=200)
-        self.assertContains(response, 'value="available" selected', status_code=200)
-        self.assertContains(response, 'value="Exact Search Author" selected', status_code=200)
-        self.assertContains(response, 'value="Classics" selected', status_code=200)
-        self.assertContains(response, 'value="en" selected', status_code=200)
-        self.assertContains(response, 'value="openlibrary" selected', status_code=200)
+        self.assertContains(response, 'type="hidden" name="availability" value="available"',  html=False, status_code=200)
+        self.assertContains(response, 'type="hidden" name="contributor" value="Exact Search Author"', html=False, status_code=200)
+        self.assertContains(response, 'type="hidden" name="subject" value="Classics"', html=False, status_code=200)
+        self.assertContains(response, 'type="hidden" name="language" value="en"', html=False, status_code=200)
+        self.assertContains(response, 'type="hidden" name="source" value="openlibrary"', html=False, status_code=200)
+        self.assertContains(response, "Availability: Available", status_code=200)
+        self.assertContains(response, "Contributor: Exact Search Author", status_code=200)
+        self.assertContains(response, "Subject: Classics", status_code=200)
+        self.assertContains(response, "Language: en", status_code=200)
+        self.assertContains(response, "Source: openlibrary", status_code=200)

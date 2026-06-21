@@ -54,6 +54,14 @@ class LoanDashboardViewTests(TestCase):
             due_at=timezone.now() - timedelta(days=2),
             returned_at=timezone.now() - timedelta(hours=2),
         )
+        cls.archived_history_copy = BookCopyFactory(edition=edition, barcode="BC-9004")
+        cls.archived_history_loan = LoanFactory(
+            copy=cls.archived_history_copy,
+            borrower=cls.other_member,
+            checked_out_at=timezone.now() - timedelta(days=120),
+            due_at=timezone.now() - timedelta(days=106),
+            returned_at=timezone.now() - timedelta(days=90),
+        )
 
     def test_librarian_sees_all_visible_loan_slices(self) -> None:
         """Librarians should see the full dashboard across all borrowers."""
@@ -70,6 +78,7 @@ class LoanDashboardViewTests(TestCase):
         self.assertContains(response, self.overdue_copy.barcode)
         self.assertContains(response, self.returned_copy.barcode)
         self.assertContains(response, self.other_member.email)
+        self.assertNotContains(response, self.archived_history_copy.barcode)
 
     def test_member_only_sees_own_loans(self) -> None:
         """Members should only see their own loans on the dashboard."""
@@ -86,3 +95,4 @@ class LoanDashboardViewTests(TestCase):
         self.assertNotContains(response, self.overdue_copy.barcode)
         self.assertNotContains(response, self.returned_copy.barcode)
         self.assertNotContains(response, self.other_member.email)
+        self.assertNotContains(response, self.archived_history_copy.barcode)

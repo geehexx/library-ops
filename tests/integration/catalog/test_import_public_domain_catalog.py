@@ -14,6 +14,8 @@ from libraryops.catalog.management.commands.import_public_domain_catalog import 
     SOURCE_GUTENBERG,
     SOURCE_OPENLIBRARY,
     ImportedPublicDomainRecord,
+    load_gutenberg_records,
+    load_openlibrary_records,
 )
 from libraryops.catalog.models import BibliographicWork, BookEdition, ExternalSourceRecord
 
@@ -67,6 +69,17 @@ def _patched_loader(records: list[ImportedPublicDomainRecord]):
 
 class ImportPublicDomainCatalogCommandTests(TestCase):
     """Cover the minimal public-domain import command contract."""
+
+    def test_curated_source_loaders_return_multiple_records_and_honor_limit(self) -> None:
+        """The built-in source fixtures should provide a medium slice per source."""
+
+        openlibrary_records = load_openlibrary_records(3)
+        gutenberg_records = load_gutenberg_records(5)
+
+        assert len(openlibrary_records) == 3
+        assert len(gutenberg_records) == 5
+        assert openlibrary_records[0].title == "Pride and Prejudice"
+        assert gutenberg_records[-1].title == "The Picture of Dorian Gray"
 
     def test_dry_run_does_not_write_records(self) -> None:
         """Dry runs should leave the catalog completely untouched."""

@@ -11,16 +11,16 @@
   {% demo_auth_ready as demo_accounts_ready %}
 
   <section class="panel" aria-labelledby="sign-in-heading">
-    <p class="eyebrow">Evaluator Access</p>
-    <h2 id="sign-in-heading" style="margin-top: 0;">Continue to the live demo workflow</h2>
+    <p class="eyebrow">Account Access</p>
+    <h2 id="sign-in-heading" style="margin-top: 0;">Sign in to Library Ops</h2>
     <p class="muted lede" style="margin-bottom: 0;">
       {% if demo_accounts_ready %}
-        Use a seeded demo account for evaluator verification, or continue with a
-        configured social provider when the deployment exposes OAuth.
+        Use a seeded demo account for the guided product tour, or continue with
+        a configured social provider when the deployment exposes OAuth.
       {% else %}
-        This deployment is live, but seeded evaluator accounts are not available
-        yet. Use an existing account, or run the operator demo refresh before
-        treating this environment as evaluator-ready.
+        This live deployment does not have seeded demo accounts yet. Use an
+        existing account, or refresh the demo data before treating this host as
+        fully ready.
       {% endif %}
     </p>
 
@@ -79,7 +79,13 @@
 
   <section class="panel provider-panel" aria-labelledby="social-sign-in-heading">
     <p class="eyebrow">Optional OAuth</p>
-    <h3 id="social-sign-in-heading" style="margin-top: 0;">Or use a third-party</h3>
+    <h3 id="social-sign-in-heading" style="margin-top: 0;">
+      {% if socialaccount_providers %}
+        Continue with Google or GitHub
+      {% else %}
+        Optional OAuth providers
+      {% endif %}
+    </h3>
     <p class="muted" style="margin-bottom: 0;">
       Google and GitHub sign-in use optional OAuth credentials. When this
       environment does not expose them, password sign-in remains the reliable
@@ -100,10 +106,9 @@
         <p class="muted" style="margin-bottom: 0;">
           This deployment exposes password sign-in only.
           {% if demo_accounts_ready %}
-            Use the seeded demo-password path above to continue.
+            Use the seeded demo password path above to continue.
           {% else %}
-            Run the operator demo refresh before expecting seeded evaluator
-            access.
+            Run the operator demo refresh before expecting seeded demo access.
           {% endif %}
         </p>
       {% endif %}

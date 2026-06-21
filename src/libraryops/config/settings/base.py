@@ -182,3 +182,6 @@ ANONYMOUS_USER_NAME = None
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+# This demo does not expose a social-account connect flow, so skipping the
+# allauth confirmation interstitial keeps hosted login UX intentional.
+SOCIALACCOUNT_LOGIN_ON_GET = True

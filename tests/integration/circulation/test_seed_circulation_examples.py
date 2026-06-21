@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from django.contrib.auth import get_user_model
@@ -18,6 +18,7 @@ from libraryops.catalog.management.commands.import_public_domain_catalog import 
 )
 from libraryops.circulation.management.commands.seed_circulation_examples import (
     EXAMPLE_ACTOR_EMAILS,
+    HISTORY_COPY_PREFIX,
     EXAMPLE_LOAN_PLANS,
     EXAMPLE_MEMBER_EMAIL,
 )
@@ -29,6 +30,8 @@ TEST_DEMO_ACCESS_CODE = "library-ops-demo-access-code"
 
 class SeedCirculationExamplesCommandTests(TestCase):
     """Cover the reproducible circulation snapshot command."""
+
+    ANCHOR = "2026-01-15T12:00:00+00:00"
 
     @classmethod
     def setUpTestData(cls) -> None:
@@ -55,9 +58,9 @@ class SeedCirculationExamplesCommandTests(TestCase):
         assert BookCopy.objects.filter(
             barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]
         ).count() == len(EXAMPLE_LOAN_PLANS)
-        assert Loan.objects.count() == len(EXAMPLE_LOAN_PLANS)
+        assert Loan.objects.filter(copy__barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]).count() == len(EXAMPLE_LOAN_PLANS)
 
-        now = timezone.now()
+        now = datetime.fromisoformat(self.ANCHOR)
         for plan in EXAMPLE_LOAN_PLANS:
             copy = BookCopy.objects.select_related("edition").get(barcode=plan.barcode)
             loan = Loan.objects.select_related("copy", "borrower").get(copy=copy)
@@ -79,17 +82,23 @@ class SeedCirculationExamplesCommandTests(TestCase):
         assert get_user_model().objects.filter(email__in=EXAMPLE_ACTOR_EMAILS).count() == len(
             EXAMPLE_ACTOR_EMAILS
         )
+        assert Loan.objects.filter(copy__barcode__startswith=HISTORY_COPY_PREFIX).exists()
+        assert Loan.objects.filter(
+            copy__barcode__startswith=HISTORY_COPY_PREFIX,
+            returned_at__lt=now - timedelta(days=30),
+        ).exists()
 
     def test_seed_command_is_idempotent_and_creates_realistic_states(self) -> None:
         """The command should create one active, one overdue, and one returned loan."""
 
-        call_command("seed_circulation_examples")
+        call_command("seed_circulation_examples", as_of=self.ANCHOR)
         first_snapshot = {
             plan.barcode: Loan.objects.get(copy__barcode=plan.barcode).pk
             for plan in EXAMPLE_LOAN_PLANS
         }
+        first_history_count = Loan.objects.filter(copy__barcode__startswith=HISTORY_COPY_PREFIX).count()
 
-        call_command("seed_circulation_examples")
+        call_command("seed_circulation_examples", as_of=self.ANCHOR)
 
         self._assert_example_snapshot()
         second_snapshot = {
@@ -97,15 +106,16 @@ class SeedCirculationExamplesCommandTests(TestCase):
             for plan in EXAMPLE_LOAN_PLANS
         }
         assert first_snapshot == second_snapshot
+        assert Loan.objects.filter(copy__barcode__startswith=HISTORY_COPY_PREFIX).count() == first_history_count
 
     def test_refresh_rebuilds_the_demo_snapshot_without_duplicates(self) -> None:
         """Refresh should restore the fixed example state even after drift."""
 
-        call_command("seed_circulation_examples")
+        call_command("seed_circulation_examples", as_of=self.ANCHOR)
 
         tampered_copy = BookCopy.objects.get(barcode=EXAMPLE_LOAN_PLANS[0].barcode)
         Loan.objects.filter(copy=tampered_copy).update(due_at=timezone.now() - timedelta(days=30))
 
-        call_command("seed_circulation_examples", refresh=True)
+        call_command("seed_circulation_examples", refresh=True, as_of=self.ANCHOR)
 
         self._assert_example_snapshot()

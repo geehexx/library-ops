@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from django.contrib.auth.models import User
@@ -11,6 +12,8 @@ from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 from libraryops.catalog.models import BookEdition
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
+
+RECENT_RETURN_WINDOW_DAYS = 30
 
 
 def _search_term(query: str | None) -> str | None:
@@ -133,20 +136,25 @@ def visible_loans(user: User, *, role: str) -> Any:
 def loan_dashboard_context(user: User, *, role: str, now: Any) -> dict[str, Any]:
     """Return the dashboard slices and counts for one user role."""
 
-    visible_loans_queryset = visible_loans(user, role=role)
-    active_loans = visible_loans_queryset.filter(returned_at__isnull=True).order_by(
+    dashboard_queryset = visible_loans(user, role=role)
+    active_loans = dashboard_queryset.filter(returned_at__isnull=True).order_by(
         "due_at",
         "-checked_out_at",
     )
     overdue_loans = active_loans.filter(due_at__lt=now)
+    recent_return_window_start = now - timedelta(days=RECENT_RETURN_WINDOW_DAYS)
     recent_returns = list(
-        visible_loans_queryset.filter(returned_at__isnull=False).order_by(
+        dashboard_queryset.filter(
+            returned_at__isnull=False,
+            returned_at__gte=recent_return_window_start,
+        ).order_by(
             "-returned_at",
             "-checked_out_at",
         )[:5]
     )
+    visible_loan_count = active_loans.count() + len(recent_returns)
     return {
-        "visible_loan_count": visible_loans_queryset.count(),
+        "visible_loan_count": visible_loan_count,
         "active_loans": active_loans,
         "active_loan_count": active_loans.count(),
         "overdue_loans": overdue_loans,

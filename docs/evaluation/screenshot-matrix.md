@@ -38,15 +38,57 @@ remaining external social-auth blocker `16.6`.
 Use this as the shortest repo-side path for the external social-auth blocker. Do not
 rewrite product code for this slice unless the live proof reveals a real defect.
 
+Before treating the host as seeded or provider-ready, run the hosted verification
+helper so the anonymous and role-aware surfaces fail in one place:
+
+```bash
+uv run python scripts/check_hosted_demo.py --base-url https://library-ops.onrender.com --mode unseeded
+```
+
+When provider env vars are active but the host is still unseeded, use:
+
+```bash
+uv run python scripts/check_hosted_demo.py \
+  --base-url https://library-ops.onrender.com \
+  --mode unseeded \
+  --auth-mode provider-enabled \
+  --expect-provider google \
+  --expect-provider github
+```
+
+After the demo refresh and once the shared demo password is available:
+
+```bash
+LIBRARYOPS_DEMO_ACCESS_CODE='<demo access code>' \
+  uv run python scripts/check_hosted_demo.py \
+  --base-url https://library-ops.onrender.com \
+  --mode seeded \
+  --auth-mode provider-enabled \
+  --expect-provider google \
+  --expect-provider github \
+  --report-file reports/validation/hosted-demo-seeded.json
+```
+
+This helper does not prove provider callback completion. Keep browser-backed
+local + Render callback traces/screenshots as the acceptance evidence for the
+actual `16.6` closeout.
+
+Add `--expect-provider google --expect-provider github` only after the hosted
+login page is expected to expose the live OAuth links.
+
 ### Current live snapshot
 
 <!-- cspell:ignore pgtl gvqtc ribcfaqgkc bjjab tablename schemaname -->
 - Live URL: `https://library-ops.onrender.com`
 - Render service id: `srv-d8pgtl6gvqtc7396ra10`
-- Live deploy: `dep-d8ribcfaqgkc73bjjab0`
+- Live deploy: `dep-d8s3b2v7f7vs73bkechg`
 - Probes: `/` and `/health/` both returned `200`
-- Django site row: still `example.com`
-- OAuth app tables: no `socialaccount_*` tables yet
+- Django site row: `library-ops.onrender.com`
+- OAuth app tables now exist after the full rebuild/deploy:
+  `socialaccount_socialaccount`, `socialaccount_socialapp`,
+  `socialaccount_socialapp_sites`, and `socialaccount_socialtoken`
+- Login page now returns `200`, exposes live Google/GitHub provider links, and
+  the hosted seeded proof passed after the manual refresh sequence.
 
 Copyable checks for the current state:
 
@@ -78,14 +120,16 @@ ORDER BY tablename;
      callback settings.
    - Verify the deployment environment exposes the OAuth client variables and
      `DJANGO_ALLOWED_HOSTS` for that hostname.
+   - Redeploy after setting the provider env vars so `allauth.socialaccount`
+     and the provider apps are installed, then confirm the login page exposes
+     the provider links and the `socialaccount_*` tables exist.
    - Verify the deployed revision is the one you are about to prove.
-   - On the current live service, the URL and health checks are already green,
-     but the Django site record and social-auth tables still need admin/DB
-     wiring before provider callbacks can complete.
-3. Confirm the Django auth records are wired to the same hostname.
-   - In Django admin, update the `Site` domain/name to the Render hostname.
-   - Attach the Google and GitHub `SocialApp` records to that `Site`.
-   - Do not duplicate provider rows to work around missing hostname/site wiring.
+3. Confirm the Django site record matches the same hostname.
+   - Keep the `Site` domain/name aligned to the Render hostname.
+   - Do not configure `SocialApp` rows for Google or GitHub when those same
+     providers are already configured through `SOCIALACCOUNT_PROVIDERS` in
+     settings; allauth treats that as ambiguous and can raise
+     `MultipleObjectsReturned`.
 4. Capture browser-backed proof on local and Render.
    - Start from the login page, click each provider, and complete the callback.
    - Prove the post-callback landing state, signed-in role, and callback hostname.
@@ -97,10 +141,8 @@ ORDER BY tablename;
   URLs that were used.
 - Render confirmation that the live hostname and OAuth environment match the
   provider-console setup.
-- Django admin evidence showing the `Site` record and the attached Google/GitHub
-  `SocialApp` rows. Current live snapshot: the `Site` row is still
-  `example.com`, and there are no `socialaccount_*` tables yet in the Render
-  Postgres database, so this proof is still externally blocked.
+- Django evidence showing the `Site` record matches the Render hostname, and
+  that the `socialaccount_*` tables exist.
 - Browser proof from both local and Render runs, with sanitized screenshots or
   traces that show a successful callback completion.
 - A Task Master note that records the provider hostname, the resulting role, and

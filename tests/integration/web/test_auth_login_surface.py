@@ -96,11 +96,12 @@ class LoginSurfaceTests(TestCase):
         self.assertContains(response, 'value="/catalog/"', status_code=200)
         self.assertContains(
             response,
-            "seeded evaluator accounts are not available",
+            "This live deployment does not have seeded demo accounts yet",
             status_code=200,
         )
-        self.assertNotContains(response, "Continue with Google")
-        self.assertNotContains(response, "Continue with GitHub")
+        self.assertContains(response, "Optional OAuth providers", status_code=200)
+        self.assertNotContains(response, 'href="/accounts/google/login/"')
+        self.assertNotContains(response, 'href="/accounts/github/login/"')
 
     def test_login_page_mentions_seeded_demo_path_when_demo_users_exist(self) -> None:
         """The seeded-demo guidance should only appear when demo users are present."""
@@ -114,12 +115,12 @@ class LoginSurfaceTests(TestCase):
         assert response.status_code == 200
         self.assertContains(
             response,
-            "Use a seeded demo account for evaluator verification",
+            "Use a seeded demo account for the guided product tour",
             status_code=200,
         )
         self.assertContains(
             response,
-            "Use the seeded demo-password path above to continue.",
+            "Use the seeded demo password path above to continue.",
             status_code=200,
         )
 
@@ -131,6 +132,7 @@ class LoginSurfaceTests(TestCase):
         response, providers = self._render_login_page([google], next_path="/catalog/")
 
         assert response.status_code == 200
+        self.assertContains(response, "Continue with Google or GitHub", status_code=200)
         self.assertContains(response, "Continue with Google", status_code=200)
         self.assertNotContains(response, "Continue with GitHub")
         self.assertContains(
@@ -152,6 +154,7 @@ class LoginSurfaceTests(TestCase):
         response, providers = self._render_login_page([google, github])
 
         assert response.status_code == 200
+        self.assertContains(response, "Continue with Google or GitHub", status_code=200)
         self.assertContains(response, "Continue with GitHub", status_code=200)
         self.assertContains(response, "Continue with Google", status_code=200)
         self.assertContains(response, 'href="/accounts/github/login/"', status_code=200)
