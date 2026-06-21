@@ -33,14 +33,14 @@ npm-debug.log*
 .codex/render-home/
 .codex/.tmp/
 .codex/tmp/
-.codex/*.sqlite
-.codex/*.sqlite-shm
-.codex/*.sqlite-wal
-.codex/installation_id
 .codex/skills/
 .mcp.json
 .codex.local.toml
 .codex/.runtime/
+.codex/skills/.system/
+.codex/*.sqlite
+.codex/*.sqlite-*
+.codex/installation_id
 
 
 # Local code-intelligence / context-tool state
@@ -80,6 +80,7 @@ dist/
 coverage.xml
 output/playwright/
 reports/
+output/
 *.egg-info/
 
 # OS/editor
