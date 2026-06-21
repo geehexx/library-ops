@@ -47,6 +47,14 @@ the precommit gate once and then continue with CI-only docs, dependency,
 coverage, import, type, migration, and test checks without repeating commit
 lint or duplicated inline workflow steps.
 
+Current proof payload for release-convergence doc/meta work should stay short:
+
+- the current local head and, if different, the last fully green PR/CI head;
+- `checks:prepush` result as local gate authority;
+- `checks:ci` result as the mirrored CI-quality path;
+- any deeper `verify:core` / `verify:all` runtime proof relevant to the slice;
+- any remaining external blocker that cannot be proved from repo state alone.
+
 ### Control-plane loop
 
 ```bash

@@ -97,7 +97,7 @@ working live Render deployment on the active service. The most recent verified
 state showed `/health/` and `/` both returning `200` after the Render service
 settings were patched to the free-tier-safe build/start path and redeployed.
 The latest fully green PR proof was on head `a6a1191`, and the current local
-branch head is `d653a4b`.
+branch head is `8c0a142`.
 
 Evaluator-facing expectations:
 

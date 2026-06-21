@@ -19,7 +19,7 @@ js_repl = true
 
 - You can also start a new session with `--enable js_repl` (equivalent to `-c features.js_repl=true`).
 - After enabling `js_repl`, start a new Codex session so the tool list refreshes.
-- For now, run this workflow with sandboxing disabled: start Codex with `--sandbox danger-full-access` (or the equivalent config for `sandbox_mode=danger-full-access`). This is a temporary requirement while `js_repl` + Playwright support inside the sandbox is still being completed.
+- For now, run this workflow in a session that allows the required browser/process access. In this repo that normally means `danger-full-access` rather than the default workspace-write sandbox. Treat that as an operational requirement to verify at session start, not as a reason to improvise partial browser proof inside a constrained sandbox.
 - Run setup from the same project directory you need to debug.
 - Treat `js_repl_reset` as a recovery tool, not routine cleanup. Resetting the kernel destroys your Playwright handles.
 
@@ -690,4 +690,4 @@ If you plan to exit Codex immediately after debugging, run the cleanup cell firs
 - `Identifier has already been declared`: reuse the existing top-level bindings, choose a new name, or wrap the code in `{ ... }`. Use `js_repl_reset` only when the kernel is genuinely stuck.
 - `browserContext.newPage: Protocol error (Target.createTarget): Not supported` while working with Electron: do not use `appWindow.context().newPage()` or `electronApp.context().newPage()` as a scratch page; use the Electron-specific screenshot normalization flow in the model-bound screenshots section.
 - `js_repl` timed out or reset: rerun the bootstrap cell and recreate the session with shorter, more focused cells.
-- Browser launch or network operations fail immediately: confirm the session was started with `--sandbox danger-full-access` and restart that way if needed.
+- Browser launch or network operations fail immediately: confirm the session has the required browser/process access for Playwright, and in this repo restart with `--sandbox danger-full-access` if the current workspace-write sandbox is blocking that access.

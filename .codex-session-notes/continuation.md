@@ -17,8 +17,8 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `d653a4b`).
-- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `d653a4b` is not yet revalidated in this handoff cycle.
+- PR: `#28` (open draft, target `development`, current head `8c0a142`).
+- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `8c0a142` is not yet revalidated in this handoff cycle.
 - Current PR state in this file is constrained to local git evidence only: branch/head are read from `git status`, `git rev-parse`, and `git log`.
 - Control-plane truth updates (local evidence):
   - `2126fcc` (`docs(release): realign release-truth surfaces`): updated continuation, README, PRD, specs, and docs quality-gate wording to current release-convergence intent.
@@ -42,12 +42,27 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 - Remaining local governance queue to keep explicit but out of the merge blocker list:
   - `14.6` milestone-board checkpointing and evidence capture
   - `14.7` post-merge local branch/worktree/stash cleanup
-  - `14.11` keep tiny hygiene slices off the coordinator root
 - Remaining active queue under PR pressure:
   - `16.6` external proof blocker only
 - Dependabot queue (`15.*`) remains separate from this handoff queue and should stay out of PR `#28`.
-- Local validation proof on `2026-06-21`: `checks:prepush`, `taskmaster:validate`, `verify:core`, and `verify:all` all passed when rerun with writable UV/XDG temp roots under `/tmp`; use that env override for future `uvx` / Semgrep-based gate reruns in this environment.
+- Local validation proof on `2026-06-21`: `checks:ci`, `checks:prepush`, `taskmaster:validate`, `verify:core`, and `verify:all` all passed when rerun with writable UV/XDG temp roots under `/tmp`; use that env override for future `uvx` / Semgrep-based gate reruns in this environment.
+- Post-restart blocker reconciliation:
+  - The local `policy` config fix is already present on head `8c0a142`: `.codex/config.toml` now includes `model_context_window = 500000`. Treat policy as locally remediated and awaiting a remote PR rerun to refresh live proof on the current tip.
+  - Track RC-07 (`gate split`) and RC-11 (`MCP/schema/runtime claim hardening`) in the active milestone board so the follow-up work stays explicit.
+  - The CI container-init fix for Dependabot PRs `#17` and `#18` is also present locally; treat that queue as waiting on remote reruns / branch refresh against `development`, not as missing local remediation.
+  - `16.6` remains the only true release blocker, and `15.*` stays a separate queue from PR `#28`.
 - Keep this file concise, evidence-first, and this branch/PR as the current coordination root.
+
+## PR #28 Proof Matrix
+
+| Proof lane | Current evidence | Status |
+|---|---|---|
+| Local gate authority | `checks:prepush` is the authoritative local pre-push gate and is mirrored in the PR template and governance tests. | proved |
+| CI quality path | `checks:ci` now runs as the non-duplicated GitHub Actions quality lane and passed locally on `8c0a142`. | proved |
+| Control-plane/task graph | `task-master validate-dependencies` passes on the committed graph; governance tests pass on the current doc/meta truth surfaces. | proved |
+| Product/runtime proof | `verify:core` and `verify:all` passed locally with writable temp/cache roots under `/tmp`. | proved |
+| Release-evidence delta | Current branch head `8c0a142` is ahead of the last fully green PR proof head `a6a1191`; live PR/CI truth still needs refresh against the current tip before merge claims. | needs live refresh |
+| External hosted auth proof | Google/GitHub callback proof on local plus Render remains blocked by provider-console / Site(SocialApp) state under `16.6`. | blocked external |
 
 ## Carry Forward
 

@@ -787,6 +787,9 @@ Ship a live, reviewable product and documentation evidence.
   quality gates, release tag, and known limitations.
 - **Acceptance:** An evaluator can verify the deployed app and understand how it was built without reading the
   entire PRD.
+- **Proof payload:** The release-evidence payload SHOULD stay compact and reviewer-facing: current branch/PR head,
+  current local gate results, current CI-quality lane result, live-host status when available, and any remaining
+  blocked external proof such as provider-console social-auth completion.
 
 #### Feature: C11.F4 Reusable SDLC pattern
 
@@ -820,6 +823,9 @@ Ship a live, reviewable product and documentation evidence.
   or the planning model shifts.
 - **Acceptance:** Repeated planning lessons are promoted into tracked repo docs or skills rather than staying
   memory-only.
+- **Lane split:** Durable docs SHOULD distinguish the authoritative local pre-push lane (`checks:prepush`), the
+  broader CI-quality lane (`checks:ci`), and the deeper product/runtime proof lanes (`verify:core`, `verify:all`)
+  so reviewers can tell which proof applies locally, in CI, and at release closeout.
 
 ## 6. Structural Decomposition
 
