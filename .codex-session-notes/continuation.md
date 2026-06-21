@@ -17,8 +17,8 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `8c65587`).
-- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `8c65587` is not yet revalidated in this handoff cycle.
+- PR: `#28` (open draft, target `development`, current head `3c57bd1`).
+- Local branch proof state: latest revalidated PR checks are on prior head `a6a1191` (`commitlint`, `policy`, `quality`, `security`, `workflow-security`; CI run `27887454334`, commitlint run `27887454337`). Follow-on local head `3c57bd1` is not yet revalidated in this handoff cycle.
 - Current PR state in this file is constrained to local git evidence only: branch/head are read from `git status`, `git rev-parse`, and `git log`.
 - Control-plane truth updates (local evidence):
   - `2126fcc` (`docs(release): realign release-truth surfaces`): updated continuation, README, PRD, specs, and docs quality-gate wording to current release-convergence intent.

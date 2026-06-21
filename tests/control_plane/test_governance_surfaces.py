@@ -5,6 +5,7 @@ from __future__ import annotations
 import ast
 import json
 import re
+import subprocess
 import tomllib
 from pathlib import Path
 
@@ -500,6 +501,28 @@ def test_root_agents_and_references_encode_repo_local_handoff_and_astgrep_path()
     assert "Escalation packet" in clarify_skill
     assert "code-review-graph" in code_intel_skill
     assert "ast-grep" in code_intel_skill
+
+
+def test_readme_and_continuation_track_the_current_branch_head() -> None:
+    """Ensure the release-truth surfaces do not drift from the live branch tip."""
+    current_head = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    readme_text = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    continuation_text = (REPO_ROOT / ".codex-session-notes" / "continuation.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert re.search(rf"current local\s+branch head is\s+`{re.escape(current_head)}`", readme_text)
+    assert re.search(rf"current head\s+`{re.escape(current_head)}`", continuation_text)
+    assert re.search(
+        rf"Follow-on local head\s+`{re.escape(current_head)}` is not yet revalidated",
+        continuation_text,
+    )
 
 
 def test_skill_discovery_stays_on_direct_skill_files_and_not_serena_memory_reads() -> None:
