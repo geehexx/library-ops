@@ -43,8 +43,9 @@ file as a cancellation record only.
 
 - none; Phase 3 is cancelled and should not be regenerated into the active plan
 
-## Suggested local regeneration command
+## Suggested local regeneration workflow
 
-```bash
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/phases/phase-3-bonus-quality-features.md --force'
-```
+Do not regenerate this cancelled phase into the active graph as a routine
+operation. If historical comparison is ever needed, keep it in a bounded draft
+lane and do not use `task-master parse-prd --force` against the committed
+graph.

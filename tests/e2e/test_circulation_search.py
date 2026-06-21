@@ -62,17 +62,21 @@ class TestCirculationAndSearchE2E:
         page.get_by_role("link", name="Checkout copy").click()
         checkout_dialog = page.get_by_role("dialog", name="Checkout copy")
         expect(checkout_dialog).to_be_visible()
-        expect(checkout_dialog.get_by_label("Copy")).to_be_visible()
-        expect(checkout_dialog.get_by_label("Borrower")).to_be_visible()
+        expect(checkout_dialog.get_by_role("combobox", name="Copy:")).to_be_visible()
+        expect(checkout_dialog.get_by_role("combobox", name="Borrower:")).to_be_visible()
         expect(
             checkout_dialog.get_by_text(
-                "Start typing a barcode, title, borrower name, or patron code."
+                "Search first, then choose from the filtered select lists below."
             )
         ).to_be_visible()
         assert_visual_snapshot(page, "circulation_search", "checkout-form.png")
 
-        checkout_dialog.get_by_label("Copy").fill(copy.barcode)
-        checkout_dialog.get_by_label("Borrower").fill("Ada Lovelace")
+        checkout_dialog.get_by_role("combobox", name="Copy:").select_option(
+            label=f"{copy.barcode} · Browser Circulation Work"
+        )
+        checkout_dialog.get_by_role("combobox", name="Borrower:").select_option(
+            label=f"Ada Lovelace (PATRON-{member.pk:04d})"
+        )
         page.get_by_role("button", name="Checkout copy").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
@@ -84,13 +88,17 @@ class TestCirculationAndSearchE2E:
         page.get_by_role("link", name="Return copy").click()
         return_dialog = page.get_by_role("dialog", name="Return copy")
         expect(return_dialog).to_be_visible()
-        expect(return_dialog.get_by_label("Loan")).to_be_visible()
+        expect(return_dialog.get_by_role("combobox", name="Loan:")).to_be_visible()
         expect(
             return_dialog.get_by_text(
-                "Start typing a barcode, title, borrower name, or patron code."
+                "Search first, then choose from the filtered select lists below."
             )
         ).to_be_visible()
-        return_dialog.get_by_label("Loan").fill(copy.barcode)
+        return_dialog.get_by_role("combobox", name="Loan:").select_option(
+            label=(
+                f"BC-BROWSER-001 · Browser Circulation Work · Ada Lovelace (PATRON-{member.pk:04d})"
+            )
+        )
         page.get_by_role("button", name="Return copy").click()
 
         expect(page).to_have_url(f"{live_server.url}/circulation/")
@@ -133,14 +141,46 @@ class TestCirculationAndSearchE2E:
         page.goto(f"{live_server.url}/catalog/?q=9780141439518")
 
         expect(page.get_by_role("heading", name="Catalog Foundation")).to_be_visible()
-        expect(page.get_by_text('Showing results for "9780141439518"')).to_be_visible()
+        status = page.get_by_role("status")
+        expect(status).to_have_attribute("aria-live", "polite")
+        expect(status).to_have_text('Showing 2 results for "9780141439518"')
         expect(page.get_by_text("Exact identifier hit")).to_be_visible()
+        expect(page.get_by_text("Matched identifier: 9780141439518")).to_be_visible()
+        expect(page.get_by_text("Availability: Available")).to_be_visible()
         expect(page.get_by_text("Match: Exact identifier match")).to_be_visible()
 
         results = page.locator("section.panel").nth(1).locator("li")
         expect(results).to_have_count(2)
         expect(results.nth(0)).to_contain_text("Exact Search Work")
         expect(results.nth(0)).to_contain_text("Exact identifier hit")
+        expect(results.nth(0)).to_contain_text("Matched identifier: 9780141439518")
+        expect(results.nth(0)).to_contain_text("Availability: Available")
         expect(results.nth(0)).to_contain_text("Match: Exact identifier match")
         expect(results.nth(1)).to_contain_text("Reference 9780141439518 BC-1001 OL1W")
         assert_visual_snapshot(page, "circulation_search", "exact-isbn-ranking.png")
+
+        search_field = page.get_by_label("Search catalog")
+        search_field.click()
+        expect(search_field).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("button", name="Search")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("link", name="Clear")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("combobox", name="Availability")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("combobox", name="Contributor")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("combobox", name="Subject")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("combobox", name="Language")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("combobox", name="Source")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("main").get_by_role("link", name="Sign in")).to_be_focused()
+        page.keyboard.press("Tab")
+        expect(page.get_by_role("link", name="Exact Search Work")).to_be_focused()
+        page.keyboard.press("Enter")
+
+        expect(page).to_have_url(f"{live_server.url}/catalog/{exact_work.pk}/")
+        expect(page.get_by_role("heading", name="Exact Search Work")).to_be_visible()

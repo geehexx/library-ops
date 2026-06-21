@@ -40,15 +40,17 @@ npm run checks:precommit
 
 For a fresh session that should use the repo-local coordinator-default flow,
 launch Codex through `./scripts/codex-coordinator.sh`. See `SETUP.md` for the
-canonical bootstrap and operator commands.
+canonical setup and operator commands.
 
-Continuation state lives locally in:
+Continuation checkpoints live in the current Task Master task/subtask notes
+and the durable repo docs that support that task:
 
-- `.codex-session-notes/continuation.md`
-- `.codex-session-notes/scratch.md`
+- current Task Master task/subtask
+- Task Master notes
+- repo docs or skills when the checkpoint needs to survive beyond the session
 
-These files are gitignored on purpose. They replace `/tmp/prompt.md` as the
-canonical handoff pattern for this repo.
+Do not create a separate scratch handoff file. Promote durable lessons into
+tracked docs, skills, or Task Master notes instead.
 
 Some gates require local tools, MCP auth, browser access, or provider approval.
 When a gate cannot run in the current environment, record the exact blocker in
@@ -62,7 +64,7 @@ rather than claiming the check passed.
 | Product contract | `.taskmaster/docs/prd.md`, `specs/001-core/` | Library domain, user journeys, acceptance criteria, task-generation source. |
 | Agent control plane | `AGENTS.md`, `.codex/`, `.agents/skills/` | Coordinator rules, subagents, skills, hooks, MCP policy, escalation behavior. |
 | Architecture and decisions | `docs/ARCHITECTURE.md`, `docs/adr/`, `docs/reference/` | arc42/C4/DDD-lite direction, decision records, and durable reference material. |
-| Human documentation | `SETUP.md`, `docs/AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/README.md`, `docs/design/wireframes.md`, `docs/evaluation/eval-strategy.md`, `docs/reference/context-lineage.md`, `docs/reference/question-packet-schema.md`, `docs/process/quality-gates.md`, `docs/process/retrospective.md`, `docs/process/sdlc.md` | Canonical bootstrap, docs-local decisioning, architecture rationale, evaluator-facing design/evaluation guidance, stable reference material, session lessons, and validation/release flow. |
+| Human documentation | `SETUP.md`, `docs/AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/README.md`, `docs/design/wireframes.md`, `docs/evaluation/demo-script.md`, `docs/evaluation/eval-strategy.md`, `docs/reference/context-lineage.md`, `docs/reference/question-packet-schema.md`, `docs/process/quality-gates.md`, `docs/process/retrospective.md`, `docs/process/sdlc.md` | Canonical setup, docs-local decisioning, architecture rationale, evaluator-facing design and release-demo guidance, stable reference material, session lessons, and validation/release flow. |
 | Documentation policy | `docs/AGENTS.md` | Docs-local placement rules and maintenance boundaries. |
 | Quality gates | `policy/`, `.github/`, `promptfooconfig.yaml`, `evals/`, direct npm/uv/npx commands | Workflow security, docs quality, Promptfoo evals, and direct-tool validation. |
 | Transient local outputs | `reports/**` | Ignored local validation summaries, Promptfoo output, SBOMs, and other derived run artifacts. |
@@ -92,20 +94,23 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-The release-evidence slice now has a working live Render deployment on the
-active service. The most recent verified state showed `/health/` and `/`
-both returning `200` after the Render service settings were patched to the
-free-tier-safe build/start path and redeployed.
+The current branch is in release convergence. The release-evidence slice has a
+working live Render deployment on the active service. The most recent verified
+state showed `/health/` and `/` both returning `200` after the Render service
+settings were patched to the free-tier-safe build/start path and redeployed.
+The latest fully green PR proof was on head `a6a1191`, and the current local
+branch head is `fb4228a`.
 
 Evaluator-facing expectations:
 
 - use the Render deployment path as the current review target;
 - sign in with the documented demo accounts after seeding or on the seeded live
   environment;
-- expect password-based demo auth to work first; OAuth/social auth remains
-  optional and environment-driven;
-- expect release evidence to come from the server-rendered app, README, and
-  smoke tests rather than a dedicated API/docs surface.
+- expect password-based demo auth to work first; configured social login
+  remains part of the release-evidence lane when provider and deployment-domain
+  configuration are available;
+- expect release evidence to come from the server-rendered app, README, the
+  demo script, and smoke tests rather than a dedicated API surface.
 
 Known limitations:
 
@@ -123,7 +128,7 @@ skills, and thin durable docs.
 ## Documentation map
 
 Use `docs/README.md` as the navigation hub. The intended shape is a small
-canonical set: `SETUP.md` for bootstrap, `docs/ARCHITECTURE.md` for rationale,
+canonical set: `SETUP.md` for setup, `docs/ARCHITECTURE.md` for rationale,
 `docs/design/wireframes.md` for evaluator-facing UX, `docs/evaluation/eval-strategy.md`
 for eval guidance, `docs/reference/` for stable schemas/context, and
 `docs/process/` for validation, delivery flow, and retrospectives.
@@ -131,7 +136,7 @@ for eval guidance, `docs/reference/` for stable schemas/context, and
 Important entry points:
 
 - `CHANGELOG.md` — release history and semantic-release target file.
-- `SETUP.md` — canonical local bootstrap and operator commands.
+- `SETUP.md` — canonical local setup and operator commands.
 - `docs/AGENTS.md` — docs-local decisioning and placement rules.
 - `docs/ARCHITECTURE.md` — architecture approach, alternatives, and validation.
 - `docs/README.md` — documentation navigation.

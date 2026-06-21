@@ -23,13 +23,14 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U libraryops -d libraryops_test"
+          --health-cmd "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
+          fetch-depth: 1
           persist-credentials: false
 
       - name: Install uv
@@ -53,97 +54,8 @@ jobs:
       - name: Install Playwright browser
         run: uv run playwright install --with-deps chromium
 
-      - name: Set up Go for Vale
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
-        with:
-          go-version: '1.25'
-
-      - name: Install Vale
-        run: go install github.com/errata-ai/vale/v3/cmd/vale@latest
-
-      - name: Install Lychee
-        run: cargo install lychee --version 0.23.0 --locked
-
-      - name: Lint skills
-        run: npm run skills:lint
-
-      - name: Audit skills
-        run: npm run skills:audit
-
-      - name: Validate Task Master dependencies
-        run: npm run taskmaster:validate
-
-      - name: Validate dependency tree integrity
-        run: npm run deps:tree
-
-      - name: Markdown lint
-        run: npm run markdownlint
-
-      - name: Docs quality
-        run: npm run docs:quality
-
-      - name: Docstring coverage
-        run: npm run docstrings:coverage
-
-      - name: Docstring lint
-        run: npm run docstrings:lint
-
-      - name: Eval smoke and config validation
-        run: npm run eval:ci
-
-      - name: Node dependency audit
-        run: npm audit --audit-level=moderate
-
-      - name: Format check
-        run: uv run ruff format --check .
-
-      - name: Lint
-        run: uv run ruff check .
-
-      - name: Type check
-        run: uv run pyright
-
-      - name: Python dependency audit
-        run: uv run pip-audit --progress-spinner off
-
-      - name: Import architecture check
-        run: |
-          if [ -f src/libraryops/__init__.py ]; then
-            PYTHONPATH=src uv run lint-imports
-          else
-            echo "src/libraryops package not present yet; import-linter gate activates after bootstrap."
-          fi
-
-      - name: Django checks
-        env:
-          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-        run: |
-          if [ -f manage.py ] && [ -f src/libraryops/__init__.py ]; then
-            uv run python manage.py check
-          else
-            echo "Django bootstrap not present yet; manage.py check activates after bootstrap."
-          fi
-
-      - name: Migration check
-        env:
-          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-        run: |
-          if [ -f manage.py ] && [ -f src/libraryops/__init__.py ]; then
-            uv run python manage.py makemigrations --check --dry-run
-          else
-            echo "Django bootstrap not present yet; migration gate activates after bootstrap."
-          fi
-
-      - name: Tests
-        env:
-          DATABASE_URL: postgres://libraryops:libraryops@localhost:5432/libraryops_test
-          LIBRARYOPS_DEMO_ACCESS_CODE: ci-demo-access-code
-        run: |
-          if find src tests -name "test_*.py" -o -name "*_test.py" | grep -q .; then
-            uv run pytest
-          else
-            echo "Python tests not bootstraped yet; pytest gate activates when tests exist."
-          fi
+      - name: Run runtime quality checks
+        run: npm run checks:quality
 
       - name: Upload Playwright artifacts on failure
         if: failure()
@@ -152,6 +64,55 @@ jobs:
           name: playwright-artifacts
           path: output/playwright/**
           if-no-files-found: ignore
+
+  docs-bootstrap:
+    name: docs-bootstrap
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install Python dependencies
+        run: uv sync --all-groups
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install Node governance dependencies
+        run: npm ci
+
+      - name: Set up Go for Vale
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version: '1.25'
+
+      - name: Install Vale
+        run: go install github.com/errata-ai/vale/v3/cmd/vale@latest
+
+      - name: Cache Lychee binary
+        id: lychee-cache
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: ~/.cargo/bin/lychee
+          key: ${{ runner.os }}-lychee-0.23.0
+
+      - name: Install Lychee
+        if: steps.lychee-cache.outputs.cache-hit != 'true'
+        run: cargo install lychee --version 0.23.0 --locked
+
+      - name: Run docs/bootstrap checks
+        run: npm run docs:bootstrap
 
   workflow-security:
     name: workflow-security
@@ -189,9 +150,11 @@ jobs:
           persist-credentials: false
 
       - name: Run Gitleaks
-        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tmpdir="$(mktemp -d)"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz" -o "$tmpdir/gitleaks.tar.gz"
+          tar -xzf "$tmpdir/gitleaks.tar.gz" -C "$tmpdir"
+          "$tmpdir/gitleaks" detect --source . --redact
 
       - name: Run Semgrep
         run: pipx run semgrep scan --config .semgrep.yml

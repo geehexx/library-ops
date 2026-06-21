@@ -57,6 +57,10 @@ be captured in Task Master tasks and subtasks before implementation begins.
   by forking the existing history when the next path can share context and keep
   the same role/model; spawn a clean agent when the role or model should
   change.
+- When writing a delegate packet, say explicitly whether it is a fork or a
+  fresh spawn, name the inherited context, prefer reuse over close+restart,
+  split overlapping slices into separate worktrees before conflicts appear,
+  and include the expected commit scope plus local gate list before push.
 - When new findings or follow-on slices appear, capture them in Task Master
   tasks, subtasks, or notes before implementation instead of widening the
   goal.
@@ -90,8 +94,10 @@ be captured in Task Master tasks and subtasks before implementation begins.
 3. Confirm whether the work is meta/control-plane, product-code, or both; split
    commits accordingly.
 4. Confirm the canonical continuation artifacts:
-   - `.codex-session-notes/continuation.md` is authoritative
-   - `.codex-session-notes/scratch.md` is optional scratch only
+   - the current Task Master task/subtask and its notes are the checkpoint
+     surface
+   - repo docs and skills are the durable promotion surface when a lesson
+     needs to survive beyond the session
 5. Perform skill discovery before broad work. Start with the repo-local catalog
    under `.agents/skills/`, read the relevant `SKILL.md` entrypoint directly
    before any symbol/context tooling, then choose the skill whose capability
@@ -111,6 +117,7 @@ be captured in Task Master tasks and subtasks before implementation begins.
 Startup handoff contract:
 - Repository startup and stop paths are controlled by `.codex/hooks/session_start_notice.py`, `.codex/hooks/session_stop_notice.py`, and `.codex/hooks.json`.
 - Stop-hook behavior is notice-only and must output valid JSON to continue the stop flow.
+- Repo-owned write access is bounded to the workspace and the explicitly approved cache/config roots in `.codex/config.toml`. External mounts and filesystem paths such as `/mnt/c/...` are not repo-owned defaults; treat them as session-scoped reads/writes that may require escalation or a different session profile instead of inventing local workarounds.
 - Do not re-ask for known defaults (workspace/default/operator context) when those defaults are already captured in repo surfaces or explicitly confirmed by the user.
 
 ## Routing rules
@@ -174,10 +181,10 @@ workflow logic in untracked global wrappers.
 
 ## Continuation and retrospective
 
-- Keep `.codex-session-notes/continuation.md` updated at major checkpoints.
-- Treat `.codex-session-notes/scratch.md` as disposable working notes only.
-- When a pattern proves durable, promote it into the relevant skill or repo
-  docs; do not leave it trapped as memory-only guidance.
+- Keep the current Task Master task/subtask notes updated at major
+  checkpoints.
+- Promote durable lessons into the relevant skill or repo docs; do not leave
+  them trapped as memory-only guidance.
 - Promote repeated lessons into tracked surfaces through
   `docs/process/retrospective.md` instead of letting memory-only instructions
   compound indefinitely.

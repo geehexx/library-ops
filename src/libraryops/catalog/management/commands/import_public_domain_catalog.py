@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -268,39 +269,32 @@ class Command(BaseCommand):
         if limit <= 0:
             raise CommandError("--limit must be a positive integer.")
 
-        loader = (
-            load_openlibrary_records if source == SOURCE_OPENLIBRARY else load_gutenberg_records
-        )
+        loader = {
+            SOURCE_OPENLIBRARY: load_openlibrary_records,
+            SOURCE_GUTENBERG: load_gutenberg_records,
+        }[source]
         records = loader(limit)
-
-        created = 0
-        refreshed = 0
-        skipped = 0
-        for record in records:
-            if bool(options["dry_run"]):
-                skipped += 1
-                continue
-            outcome, _ = _upsert_record(
-                source_name=source,
-                record=record,
-                refresh=bool(options["refresh"]),
-            )
-            if outcome == "created":
-                created += 1
-            elif outcome == "refreshed":
-                refreshed += 1
-            else:
-                skipped += 1
 
         if bool(options["dry_run"]):
             self.stdout.write(
-                self.style.SUCCESS(f"Dry run: would import {skipped} record(s) from {source}.")
+                self.style.SUCCESS(f"Dry run: would import {len(records)} record(s) from {source}.")
             )
             return
 
+        outcomes = Counter[str]()
+        outcome_aliases = {"created": "created", "refreshed": "refreshed"}
+        refresh = bool(options["refresh"])
+        for record in records:
+            outcome, _ = _upsert_record(
+                source_name=source,
+                record=record,
+                refresh=refresh,
+            )
+            outcomes[outcome_aliases.get(outcome, "skipped")] += 1
+
         self.stdout.write(
             self.style.SUCCESS(
-                f"Imported {created} record(s) from {source}"
-                + (f", refreshed {refreshed}." if refreshed else ".")
+                f"Imported {outcomes['created']} record(s) from {source}"
+                + (f", refreshed {outcomes['refreshed']}." if outcomes["refreshed"] else ".")
             )
         )

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from datetime import timedelta
-from typing import Any, cast
+from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -61,7 +61,7 @@ class SeedCirculationExamplesCommandTests(TestCase):
         for plan in EXAMPLE_LOAN_PLANS:
             copy = BookCopy.objects.select_related("edition").get(barcode=plan.barcode)
             loan = Loan.objects.select_related("copy", "borrower").get(copy=copy)
-            borrower = cast("Any", loan.borrower)
+            borrower: Any = loan.borrower
             assert borrower.email == EXAMPLE_MEMBER_EMAIL
             if plan.returned_days_ago is None:
                 assert loan.returned_at is None

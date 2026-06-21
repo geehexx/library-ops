@@ -130,6 +130,8 @@ class CatalogLexicalSearchTests(TestCase):
                     results = list(selectors.work_list(query=query))
                     assert results[0].pk == self.exact_work.pk
                     assert cast("Any", results[0]).search_explanation == "Exact identifier match"
+                    assert cast("Any", results[0]).search_matched_identifier_value == query
+                    assert cast("Any", results[0]).search_availability_state == "available"
                     assert results[1].pk == self.broad_identifier_work.pk
                     assert cast("Any", results[1]).search_explanation == "Keyword match"
 

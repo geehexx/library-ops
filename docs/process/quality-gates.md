@@ -24,6 +24,40 @@ evidence that can be copied into Task Master notes or a PR.
 npm run checks:precommit
 ```
 
+### Pre-push authority
+
+```bash
+npm run checks:prepush
+```
+
+`checks:prepush` is the authoritative local gate list before a push. It runs
+`commitlint:range` before `checks:precommit` so commit-scope violations fail
+before the broader hygiene checks. GitHub Actions runs `checks:ci` after a
+shallow checkout, and the dedicated `commitlint.yml` workflow handles commit
+range validation separately.
+
+### CI quality loop
+
+```bash
+npm run checks:quality
+```
+
+`checks:quality` is the required GitHub Actions quality job. It keeps the
+runtime-critical type, migration, import, and test lane authoritative while the
+docs/bootstrap work moves to the sibling `docs-bootstrap` job via
+`npm run docs:bootstrap`. Use `npm run checks:ci` when you want the full local
+CI bundle in one command, or `npm run checks:ci:docs` when you want the
+composite local docs bundle as well.
+
+Current proof payload for release-convergence doc/meta work should stay short:
+
+- the current local head and, if different, the last fully green PR/CI head;
+- `checks:prepush` result as local gate authority;
+- `checks:quality` result as the mirrored required-quality path;
+- `docs-bootstrap` result for the sibling docs/bootstrap lane when relevant;
+- any deeper `verify:core` / `verify:all` runtime proof relevant to the slice;
+- any remaining external blocker that cannot be proved from repo state alone.
+
 ### Control-plane loop
 
 ```bash
@@ -32,7 +66,7 @@ npm run taskmaster:validate
 npm run verify:core
 ```
 
-### Control-plane bootstrap loop
+### Control-plane setup loop
 
 Run this before broad implementation when agent/config/hook surfaces changed:
 

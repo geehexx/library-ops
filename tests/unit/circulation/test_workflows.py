@@ -47,7 +47,7 @@ class CirculationWorkflowViewTests(TestCase):
         cls.unavailable_checkout_copy.save(update_fields=["status", "updated_at"])
 
     def test_checkout_workflow_renders_for_librarians(self) -> None:
-        """Checkout workflow should render with borrower and copy selectors."""
+        """Checkout workflow should render search controls and select lists."""
 
         self.client.force_login(self.librarian)
 
@@ -57,24 +57,47 @@ class CirculationWorkflowViewTests(TestCase):
         self.assertContains(response, "Checkout copy")
         self.assertContains(response, "Copy")
         self.assertContains(response, "Borrower")
+        self.assertContains(response, "Search copies")
+        self.assertContains(response, "Search borrowers")
+        self.assertContains(response, 'name="copy_query"')
+        self.assertContains(response, 'name="borrower_query"')
+        self.assertContains(response, 'name="copy"')
+        self.assertContains(response, 'name="borrower"')
         self.assertContains(response, 'role="dialog"')
         self.assertContains(response, 'aria-modal="true"')
         self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
         self.assertContains(response, 'id="workflow-description"')
         self.assertContains(response, 'id="workflow-guidance"')
         self.assertContains(response, 'autofocus="autofocus"')
-        self.assertContains(
-            response, "Start typing a barcode, title, borrower name, or patron code."
-        )
-        self.assertContains(response, 'list="checkout-copy-options"')
-        self.assertContains(response, 'list="checkout-borrower-options"')
+        self.assertContains(response, "Search first, then choose from the filtered select lists")
         self.assertContains(response, self.checkout_copy.barcode)
-        self.assertNotContains(response, self.unavailable_checkout_copy.barcode)
         self.assertContains(response, "Ada Lovelace")
         self.assertContains(response, f"PATRON-{self.member.pk:04d}")
+        self.assertNotContains(response, "<datalist")
 
-    def test_autocomplete_widget_renders_datalist_markup(self) -> None:
-        """Autocomplete widgets should keep the datalist markup intact."""
+    def test_checkout_workflow_filters_select_options_from_search_queries(self) -> None:
+        """Search terms should narrow the copy and borrower select options."""
+
+        self.client.force_login(self.librarian)
+
+        response = self.client.get(
+            reverse("loan-checkout"),
+            data={
+                "copy_query": "BC-WF-001",
+                "borrower_query": f"PATRON-{self.member.pk:04d}",
+            },
+        )
+
+        assert response.status_code == 200
+        self.assertContains(response, 'value="BC-WF-001"')
+        self.assertContains(response, 'value="PATRON-')
+        self.assertContains(response, self.checkout_copy.barcode)
+        self.assertContains(response, "The Dispossessed")
+        self.assertNotContains(response, self.return_copy.barcode)
+        self.assertNotContains(response, "<datalist")
+
+    def test_autocomplete_widget_renders_select_markup(self) -> None:
+        """Autocomplete widgets should keep the searchable select markup intact."""
 
         form = CheckoutForm()
         widget = form.fields["copy"].widget
@@ -82,9 +105,9 @@ class CirculationWorkflowViewTests(TestCase):
 
         rendered = widget.render("copy", "BC-WF-001")
 
-        assert 'list="checkout-copy-options"' in rendered
-        assert '<datalist id="checkout-copy-options">' in rendered
-        assert '<option value="BC-WF-001 · The Dispossessed"></option>' in rendered
+        assert '<select name="copy"' in rendered
+        assert '<option value="">Choose a copy</option>' in rendered
+        assert "BC-WF-001 · The Dispossessed" in rendered
 
     def test_checkout_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Checkout workflow should swap in the fragment when loaded through HTMX."""
@@ -120,8 +143,8 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-checkout"),
             data={
-                "copy": self.checkout_copy.barcode,
-                "borrower": "Ada Lovelace",
+                "copy": self.checkout_copy.pk,
+                "borrower": self.member.pk,
             },
         )
 
@@ -142,8 +165,8 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-checkout"),
             data={
-                "copy": self.checkout_copy.barcode,
-                "borrower": "Ada Lovelace",
+                "copy": self.checkout_copy.pk,
+                "borrower": self.member.pk,
             },
             HTTP_HX_REQUEST="true",
         )
@@ -158,27 +181,31 @@ class CirculationWorkflowViewTests(TestCase):
         assert self.checkout_copy.status == BookCopyStatus.ON_LOAN
 
     def test_return_workflow_renders_for_librarians(self) -> None:
-        """Return workflow should render with the active loan selector."""
+        """Return workflow should render a searchable active-loan select."""
 
         self.client.force_login(self.librarian)
         Loan.objects.checkout_copy(
             actor=self.librarian, copy=self.return_copy, borrower=self.member
         )
 
-        response = self.client.get(reverse("loan-return"))
+        response = self.client.get(
+            reverse("loan-return"),
+            data={"loan_query": f"PATRON-{self.member.pk:04d}"},
+        )
 
         assert response.status_code == 200
         self.assertContains(response, "Return copy")
         self.assertContains(response, "Loan")
+        self.assertContains(response, "Search loans")
+        self.assertContains(response, 'name="loan_query"')
+        self.assertContains(response, 'name="loan"')
         self.assertContains(response, 'role="dialog"')
         self.assertContains(response, 'aria-modal="true"')
         self.assertContains(response, 'aria-describedby="workflow-description workflow-guidance"')
-        self.assertContains(response, 'list="return-loan-options"')
-        self.assertContains(
-            response, "Start typing a barcode, title, borrower name, or patron code."
-        )
+        self.assertContains(response, "Search first, then choose from the filtered select lists")
         self.assertContains(response, self.return_copy.barcode)
-        self.assertContains(response, "Ada Lovelace")
+        self.assertContains(response, "Ada Lovelace (")
+        self.assertNotContains(response, "<datalist")
 
     def test_return_workflow_renders_as_an_htmx_fragment(self) -> None:
         """Return workflow should swap in the fragment when loaded through HTMX."""
@@ -206,7 +233,7 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-return"),
             data={
-                "loan": self.return_copy.barcode,
+                "loan": loan.pk,
             },
         )
 
@@ -229,7 +256,7 @@ class CirculationWorkflowViewTests(TestCase):
         response = self.client.post(
             reverse("loan-return"),
             data={
-                "loan": self.return_copy.barcode,
+                "loan": loan.pk,
             },
             HTTP_HX_REQUEST="true",
         )

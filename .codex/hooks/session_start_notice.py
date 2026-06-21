@@ -21,14 +21,18 @@ PUBLIC_INSTRUCTION_PATHS = [
     ".codex/agents/debugger.toml",
     ".codex/agents/implementer.toml",
     ".codex/agents/single-file-implementer.toml",
+    ".codex/agents/command-runner.toml",
+    ".codex/agents/context-gatherer.toml",
+    ".codex/agents/planning-orchestrator.toml",
     ".taskmaster/docs/prd.md",
     ".specify/memory/constitution.md",
     ".codex/agents/coordinator.toml",
     ".codex/agents/devops-release-manager.toml",
-    ".codex/agents/planning-orchestrator.toml",
     ".codex/agents/taskmaster-governor.toml",
     ".agents/skills/clarify-and-goal/SKILL.md",
     ".agents/skills/code-intelligence/SKILL.md",
+    ".agents/skills/taskmaster/SKILL.md",
+    ".agents/skills/retrospective/SKILL.md",
     "docs/process/retrospective.md",
     "docs/process/quality-gates.md",
 ]
@@ -220,8 +224,7 @@ def main() -> int:
             "Library Ops resume context (redacted): "
             f"branch={branch}; dirty_files={dirty_count}; "
             f"task_graph={task_graph_status(root)}; "
-            "continuation=.codex-session-notes/continuation.md. "
-            "Re-open the continuation note; that note is authoritative. "
+            "Use the current Task Master task/subtask notes for checkpoints. "
             "Read the relevant SKILL.md entrypoint(s) before editing."
         )
     else:
@@ -232,9 +235,9 @@ def main() -> int:
             f"features={','.join(enabled_features) or 'none'}; mcps={mcp_summary(config)}; "
             f"{runtime_cache_hint()}; "
             f"instructions={fingerprints}. "
-            "Re-open `.codex-session-notes/continuation.md`; that note is "
-            "authoritative. Treat `.codex-session-notes/scratch.md` as "
-            "disposable scratch only. "
+            "Use the current Task Master task/subtask notes for checkpoints, "
+            "and promote durable lessons into repo docs or skills instead of "
+            "creating a separate scratch handoff file. "
             "Read source-of-truth docs and relevant skills before editing. "
             "Treat broad long-horizon goals as planning envelopes: only concrete, "
             "implementable work should be captured in Task Master tasks/subtasks "
@@ -247,6 +250,12 @@ def main() -> int:
             "modules, and the evidence you need back. "
             "If a slice branches, fan out bounded child workers from the owning "
             "coordinator or specialist slice instead of widening the root search. "
+            "Keep a useful Spark fork alive across multiple turns when the same "
+            "context still matters; do not close and reopen it just because the "
+            "slice outlives one turn. "
+            "If a branch has been force-pushed, replaced, or superseded, refresh "
+            "live PR checks and mergeability evidence against the current head "
+            "before trusting earlier results. "
             "The stop hook emits JSON only; a dirty-worktree warning is "
             "advisory, not a stop block. "
             "Use the Spark lanes `command_runner`, `context_gatherer`, "
@@ -254,12 +263,22 @@ def main() -> int:
             "for noisy or bounded work. Use root-local shell or file "
             "exploration directly when it is the clearest proof or patch "
             "path, and keep bounded child-worker fan-out allowed when a slice "
-            "branches. "
-            "Community shorthand 'Ralph loop' means the repo's bounded "
-            "continuation loop: continue, checkpoint, evidence, handoff. "
+            "branches. Close completed or idle workers promptly, and reuse "
+            "active forks only while their context is still useful. Use the "
+            "bounded continuation loop: continue, checkpoint, evidence, "
+            "handoff. "
             "If a workspace default or other operational default is already "
             "known from repo context or the user, use it directly instead of "
             "re-asking. "
+            "Repo-owned writable paths stop at the workspace plus the explicit "
+            "cache/config roots in `.codex/config.toml`; external mounts such "
+            "as `/mnt/c/...` are not default workspace roots and may require "
+            "escalation or a differently scoped session instead of being "
+            "treated as repo-owned defaults. "
+            "Avoid blind Task Master regeneration from phase PRDs: review the "
+            "committed graph first and treat graph replacement as an explicit "
+            "regeneration event that must be justified in Task Master unless "
+            "the owning task explicitly calls for it. "
             "OAuth/provider setup is operator-local; if a required login is missing, "
             "ask the user to run the official login/setup command."
         )

@@ -1,7 +1,7 @@
 interface:
   display_name: "Search Design"
-  short_description: "Design exact, FTS, BM25, and vector search"
-  default_prompt: "Use $search-design to design or review the Library Ops search stack across exact identifiers, PostgreSQL FTS, BM25 options, and vector ranking."
+  short_description: "Design exact, PostgreSQL FTS, and lexical search"
+  default_prompt: "Use $search-design to design or review the Library Ops search stack across exact identifiers, PostgreSQL FTS, and lexical ranking."
 
 dependencies:
   tools:

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n socialaccount %}
 
 {% block title %}Sign In | Library Ops{% endblock %}
 {% block page_title %}Sign In{% endblock %}
@@ -7,6 +7,7 @@
 {% block content %}
   {% url "account_login" as login_url %}
   {% url "account_signup" as signup_url %}
+  {% get_providers as socialaccount_providers %}
 
   <section class="panel" aria-labelledby="sign-in-heading">
     <p class="eyebrow">Evaluator Access</p>
@@ -74,27 +75,25 @@
     <h3 id="social-sign-in-heading" style="margin-top: 0;">Or use a third-party</h3>
     <p class="muted" style="margin-bottom: 0;">
       Google and GitHub sign-in use optional OAuth credentials. When this
-      environment does not expose them, these actions stay unavailable and the
-      seeded demo-password path remains the reliable fallback.
+      environment does not expose them, the seeded demo-password path remains
+      the reliable fallback.
     </p>
 
     <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
-      {% if SOCIALACCOUNT_ENABLED %}
-        <a
-          href="/accounts/google/login/"
-          class="button button--ghost"
-        >
-          Continue with Google
-        </a>
-        <a
-          href="/accounts/github/login/"
-          class="button button--ghost"
-        >
-          Continue with GitHub
-        </a>
+      {% if socialaccount_providers %}
+        {% for provider in socialaccount_providers %}
+          <a
+            href="{% provider_login_url provider.id process="login" next=redirect_field_value %}"
+            class="button button--ghost"
+          >
+            Continue with {{ provider.name }}
+          </a>
+        {% endfor %}
       {% else %}
-        <span class="button button--ghost" aria-disabled="true">Continue with Google</span>
-        <span class="button button--ghost" aria-disabled="true">Continue with GitHub</span>
+        <p class="muted" style="margin-bottom: 0;">
+          This deployment exposes password sign-in only. Use the demo-password
+          path above to continue.
+        </p>
       {% endif %}
     </div>
   </section>

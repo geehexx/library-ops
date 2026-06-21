@@ -6,7 +6,7 @@ owner: Engineering
 source_of_truth: true
 taskmaster_profile: rpg
 constitution: .specify/memory/constitution.md
-last_reviewed: 2026-06-17
+last_reviewed: 2026-06-20
 ---
 
 # Library Ops — Canonical RPG PRD
@@ -55,7 +55,7 @@ The prompt also lists optional bonuses:
 - deployed live app URL;
 - demo video;
 - authentication with SSO, roles, and permissions;
-- AI features;
+- AI features, if revisited, are deferred from the current release;
 - additional creative features.
 
 Evaluation criteria are completeness, creativity, product quality, and usability.
@@ -195,7 +195,7 @@ The project uses formal standards selectively. The goal is disciplined structure
 | Requirements | ISO/IEC/IEEE 29148-inspired structure | Stakeholders, requirements, acceptance criteria, traceability. |
 | Normative terms | RFC 2119 / RFC 8174 | `MUST`, `SHOULD`, `MAY` only when binding. |
 | Architecture | C4 + arc42 + pragmatic domain modeling | C4 views for navigation, arc42 quality/risk framing, Django-friendly domain boundaries. |
-| Interface | Server-rendered Django views + HTMX | First-party app interaction; no dedicated API surface in the current scope. |
+| Interface | Server-rendered Django views + HTMX | First-party app interaction; no public API surface in the current scope. |
 | Security controls | OWASP ASVS | Level 1-style web app security requirements. |
 | Security program | OWASP SAMM | Lightweight SDLC security framing. |
 | Accessibility | WCAG 2.2 AA | Usability and accessibility baseline. |
@@ -342,7 +342,7 @@ templates use explicit app namespaces such as `templates/web/`, `templates/catal
 flow. `tests/control_plane/`, `tests/smoke/`, and `tests/e2e/` are current stable anchors. Domain folders are
 transitional waypoints that should migrate toward `tests/unit/`, `tests/integration/`, and `tests/property/`.
 
-**Reasoning:** Kind-first organization keeps meta-system checks, bootstrap checks, domain invariants, DB-backed
+**Reasoning:** Kind-first organization keeps meta-system checks, setup checks, domain invariants, DB-backed
 orchestration, and evaluator-visible browser flows distinct. That lowers review friction and keeps future test growth
 from collapsing into monolithic domain buckets.
 
@@ -364,8 +364,8 @@ Create a reproducible, agent-friendly project foundation.
 #### Feature: C1.F1 Repository and toolchain baseline
 
 - **Description:** Initialize the Python/Django repository baseline, toolchain, and verification scripts.
-- **Inputs:** Existing control-plane package bootstrap, Python 3.12+, Node 20+, uv, GitHub repository.
-- **Outputs:** Verified repository with documented bootstrap and local quality gates.
+- **Inputs:** Existing control-plane package baseline, Python 3.12+, Node 20+, uv, GitHub repository.
+- **Outputs:** Verified repository with documented setup and local quality gates.
 - **Behavior:** Provide deterministic setup commands and enforce no-junk/no-secret hygiene.
 - **Acceptance criteria:**
   - `codex doctor --summary --ascii --no-color` reports a healthy local control-plane state.
@@ -373,11 +373,11 @@ Create a reproducible, agent-friendly project foundation.
   - `npm install` or `npm ci` succeeds.
   - `.pytest_cache`, `.venv`, corpora, model caches, and secrets are not committed.
 
-#### Feature: C1.F2 Django project bootstrap
+#### Feature: C1.F2 Django project foundation
 
 - **Description:** Harden the existing Django project under `src/libraryops/config` with local/test/production settings, real `DATABASE_URL` support, and root URL composition that can mount app-owned URLConfs cleanly.
 - **Inputs:** Existing `manage.py`, `src/libraryops/config/*`, `pyproject.toml`, environment variables, database URL.
-- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable bootstrap.
+- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable foundation.
 - **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, production settings require explicit secure environment, and root routing stays thin enough to compose app-based UI surfaces.
 - **Acceptance criteria:**
   - `uv run python manage.py check` succeeds.
@@ -391,7 +391,7 @@ Create a reproducible, agent-friendly project foundation.
 - **Description:** Configure Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint.
 - **Inputs:** `pyproject.toml`, package configuration, GitHub workflows.
 - **Outputs:** Local and CI quality gates.
-- **Behavior:** Gates fail on real violations and skip only where bootstrap is not yet present.
+- **Behavior:** Gates fail on real violations and skip only where the target stack is not yet present.
 - **Acceptance criteria:**
   - Ruff format/lint runs.
   - Pyright runs with strict defaults and pragmatic exceptions documented.
@@ -502,7 +502,7 @@ Support role-based app access with Admin, Librarian, and Member roles.
 
 #### Feature: C3.F2 Server-side authorization services
 
-- **Description:** Provide permission checks used by views, APIs, and services.
+- **Description:** Provide permission checks used by views, request handlers, and services.
 - **Inputs:** `request.user`, role, operation, target object.
 - **Outputs:** allow/deny decision or exception.
 - **Behavior:** UI and API both call shared authorization utilities.
@@ -511,15 +511,18 @@ Support role-based app access with Admin, Librarian, and Member roles.
   - Anonymous direct POST fails.
   - Librarian can mutate catalog/circulation but not manage roles.
 
-#### Feature: C3.F3 OAuth-ready SSO
+#### Feature: C3.F3 Secret-free startup with release-proven social login
 
-- **Description:** Configure django-allauth so deployed demo can support social login when credentials are supplied.
+- **Description:** Configure django-allauth so the app starts cleanly with password login only, while the evaluated release proves Google and GitHub social login when credentials are supplied.
 - **Inputs:** OAuth provider client ID/secret from environment.
 - **Outputs:** OAuth login flow.
-- **Behavior:** Local demo can run with username/password; OAuth is optional and environment-driven.
+- **Behavior:** Local/demo startup works with username/password and no provider secrets; provider links are environment-driven and shown only when configured.
 - **Acceptance criteria:**
   - App runs without OAuth secrets.
-  - README explains optional OAuth setup.
+  - Password-login fallback remains documented and supported.
+  - Google and GitHub provider buttons appear only when configured.
+  - Release evidence proves Google and GitHub callback completion on local and Render.
+  - README explains the provider setup required for release proof.
 
 ### Capability: C4 Catalog Management
 
@@ -546,6 +549,7 @@ Provide evaluator-facing catalog workflows and internal admin support.
 - **Acceptance criteria:**
   - Required fields are enforced.
   - Archive hides records from default catalog results.
+  - Archive actions require explicit confirmation before submission.
   - Audit event records before/after fields where practical.
 
 #### Feature: C4.F3 Cover image support
@@ -601,10 +605,11 @@ Implement checkout/borrow and checkin/return lifecycle.
 - **Description:** Provide checkout/return workflows for librarians/admins.
 - **Inputs:** Book detail actions, copy barcode, patron search, due date.
 - **Outputs:** App-owned circulation URL, views, and HTML/HTMX modal or page response.
-- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer.
+- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer. Lookup interactions must scale beyond raw browser datalist behavior by surfacing a repeatable search-select path for borrower/copy selection.
 - **Acceptance criteria:**
   - Checkout can be completed from book detail or circulation page.
   - Return can be completed from active loans dashboard.
+  - Borrower/copy selection remains understandable at evaluator scale through a search-select style interaction.
 
 #### Feature: C5.F4 Loan dashboard
 
@@ -615,6 +620,7 @@ Implement checkout/borrow and checkin/return lifecycle.
 - **Acceptance criteria:**
   - Overdue status is derived from `due_at` and `returned_at`.
   - Member cannot see other members’ loans.
+  - Active, overdue, and returned loan rows remain readable without cramped layout.
 
 ### Capability: C6 Search and Discovery
 
@@ -631,6 +637,7 @@ Provide exact-identifier-first lexical catalog search with PostgreSQL full-text 
 - **Acceptance criteria:**
   - Exact ISBN ranks first.
   - Exact barcode routes directly to copy/edition context.
+  - Exact-identifier results surface the matched identifier value and current availability in a visible, evaluator-readable position in the rendered UI.
 
 #### Feature: C6.F2 PostgreSQL full-text search
 
@@ -662,6 +669,7 @@ Provide exact-identifier-first lexical catalog search with PostgreSQL full-text 
   - Ranking is deterministic for the same dataset/query.
   - Exact identifier match always outranks keyword-only results.
   - Explanations describe why a result matched.
+  - Exact-identifier explanations stay aligned with the rendered card so evaluator-visible result state shows identifier, availability, and match reason consistently.
 
 ### Capability: C7 Superseded Product AI
 
@@ -779,6 +787,9 @@ Ship a live, reviewable product and documentation evidence.
   quality gates, release tag, and known limitations.
 - **Acceptance:** An evaluator can verify the deployed app and understand how it was built without reading the
   entire PRD.
+- **Proof payload:** The release-evidence payload SHOULD stay compact and reviewer-facing: current branch/PR head,
+  current local gate results, current CI-quality lane result, live-host status when available, and any remaining
+  blocked external proof such as provider-console social-auth completion.
 
 #### Feature: C11.F4 Reusable SDLC pattern
 
@@ -812,6 +823,9 @@ Ship a live, reviewable product and documentation evidence.
   or the planning model shifts.
 - **Acceptance:** Repeated planning lessons are promoted into tracked repo docs or skills rather than staying
   memory-only.
+- **Lane split:** Durable docs SHOULD distinguish the authoritative local pre-push lane (`checks:prepush`), the
+  broader CI-quality lane (`checks:ci`), and the deeper product/runtime proof lanes (`verify:core`, `verify:all`)
+  so reviewers can tell which proof applies locally, in CI, and at release closeout.
 
 ## 6. Structural Decomposition
 
@@ -996,10 +1010,33 @@ lose the path to a deployed demo.
 - control-plane package verification passes;
 - PRD can be parsed by Task Master;
 - current task graph has no circular dependencies;
-- focused governance and smoke checks cover the meta-system and bootstrap surfaces that exist;
+- focused governance and smoke checks cover the meta-system and setup surfaces that exist;
 - CI skeleton is ready.
 
 **Delivers:** An implementable plan and governed agent workspace.
+
+### Current Active Tranche: Release Convergence
+
+**Goal:** Close the evaluator-facing release truth gap without reopening product scope.
+
+**Entry criteria:** Core catalog, circulation, search, seed, and deployment paths already exist in source and Task Master; the open queue is Tasks 14 through 16.
+
+**Tasks:**
+
+- align PRD, Spec Kit, README/demo guidance, and the supporting OpenAPI surface to the implemented lexical-only Django release;
+- define local-vs-CI gate authority, then codify the coordinator/Spark pre-push gatekeeper protocol from that model;
+- validate dependency closure against the chosen gate authority boundary;
+- prove PostgreSQL search/circulation behavior, provider-enabled social-auth flows, and final evaluator-visible rendered states;
+- refresh deployment, screenshot, and release evidence against the actual candidate commit.
+
+**Exit criteria:**
+
+- PRD/spec/task graph/continuation surfaces describe one release-convergence story;
+- local-vs-CI gate authority and pre-push protocol are explicit in Task Master and durable docs;
+- release evidence is current, truthful, and tied to the release candidate;
+- no superseded setup-era, semantic-search, or dedicated-API instructions remain active in planning surfaces.
+
+**Delivers:** A coherent release-convergence queue grounded in current product truth and reproducible proof paths.
 
 ### Phase 1: Django Bootstrap, Domain, and RBAC
 
@@ -1009,7 +1046,7 @@ lose the path to a deployed demo.
 
 **Tasks:**
 
-- bootstrap Django project;
+- establish the Django foundation;
 - establish app-owned route/view/template skeletons for the first evaluator-facing flows;
 - implement models/migrations;
 - seed roles/users;
@@ -1561,8 +1598,8 @@ Every PR must include:
 - lint;
 - type check;
 - import architecture check when Django package exists;
-- Django system checks when bootstrap exists;
-- migration drift check when bootstrap exists;
+- Django system checks when the target stack exists;
+- migration drift check when the target stack exists;
 - pytest suite;
 - property tests;
 - commitlint;
@@ -1604,7 +1641,7 @@ Every PR must include:
 - Production settings enforce secure secret handling.
 - Debug mode disabled in production.
 - Demo credentials are disposable and resettable.
-- AI outputs are reviewed before persistence.
+- Social-auth providers request only the minimum scopes needed for login and remain hidden unless configured.
 
 ### 17.3 Privacy Scope
 
@@ -1616,9 +1653,9 @@ This is a demo product. It should not store real patron data. Demo users and loa
 
 ```text
 tests/control_plane/   agent workflow, governance, hooks, docs/process gates
-tests/smoke/           deterministic bootstrap and environment checks
+tests/smoke/           deterministic setup and environment checks
 tests/unit/            isolated rules, normalization, serializers/forms/helpers
-tests/integration/     services, views, APIs, DB constraints, management commands
+tests/integration/     services, views, request handlers, DB constraints, management commands
 tests/property/        invariant-heavy generated input/state transitions
 tests/e2e/             evaluator-visible browser and navigation flows
 ```
@@ -1714,11 +1751,11 @@ Scenario: Librarian returns an active loan
 ### 19.5 Search
 
 ```gherkin
-Scenario: Exact ISBN outranks semantic match
+Scenario: Exact ISBN outranks broader lexical matches
   Given the catalog contains a book with ISBN "9780141439518"
   When I search for "9780141439518"
   Then that exact edition is the first result
-  And the result explanation includes "ISBN exact match"
+  And the result explanation includes "Exact identifier match"
 ```
 
 ### 19.6 Seed Refresh
@@ -1755,14 +1792,14 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 | Blind MCP/tool adoption | High | Medium | Socratic decision gates + alternatives register | Ask user before new trust/cost/scope changes |
 | Filtered command output hides failure detail | Medium | Medium | RTK/raw evidence policy + tee/raw reruns | Rerun raw commands |
 | Code graph output treated as proof | Medium | Medium | Source/test inspection required after graph findings | Fall back to raw source review |
-| Django bootstrap conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
+| Django setup conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
 | Evaluator UI drifts into a monolithic shared web layer | Medium | Medium | App-owned URL/view/template rules plus review | Split routes/views/templates by app before adding more flows |
 | Search overengineered | Medium | Medium | Baseline exact + FTS first | Keep the release scope lexical-only |
 | ParadeDB unavailable on deployment | Low | High | Optional adapter only | Use standard FTS |
 | Public data licensing confusion | Medium | Medium | Store provenance and license notes; use official dumps/catalogs | Use synthetic seed records |
 | Free hosting limits | Medium | Medium | Keep corpus small; document local fallback | Provide local demo only if needed |
 | File upload security | Medium | Medium | Validate size/type/decode; limit uploads | External cover URLs only |
-| CI ignores real failures while bootstrap incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until bootstrap exists |
+| CI ignores real failures while setup incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until the target stack exists |
 | Test topology migration stalls in temporary domain folders | Medium | Medium | Kind-first placement rules and governance tests | Finish the split before broadening coverage further |
 
 ## 22. Task Master Parsing Contract
@@ -1837,10 +1874,10 @@ Exa, or web research before making version-sensitive implementation changes.
 
 ### 24.1 Current Artifact Review Status
 
-The current archive has been reviewed as a **governed control-plane package bootstrap**. It contains PRD, constitution,
-agent configuration, ADRs, CI bootstraping, evaluator demo surfaces, and wireframes. It does not yet contain the completed
-Django application. The PRD and agent instructions MUST therefore describe the app as planned, not as
-already implemented.
+The current repository should be treated as a **release-convergence codebase**, not a setup archive. It already contains
+implemented Django product surfaces, seeded-demo workflows, lexical search, circulation behavior, deployment wiring, and a governed
+control plane. The planning surfaces MUST therefore describe the product as implemented-but-still-needing-current-proof, not as a
+future setup plan.
 
 A personal-context lookup during the 2026-06-12 review returned no additional relevant memory. The review
 therefore used the current conversation, original control-plane package archive, updated control-plane package archive, and current
@@ -1893,7 +1930,7 @@ If a review session lacks direct connector access, the agent MUST say so rather 
 | Command-output optimization | RTK | User-accepted optimization for noisy shell output | Raw reruns/full logs remain required for evidence |
 | Code intelligence | code-review-graph + Serena + ast-grep + bounded Repomix | Graph, symbol, AST, and context packaging without replacing source review | New MCPs/broad context layers require approval |
 | Decisioning | Socratic decision framework | Prevents guessing and unexamined tool adoption | Pause and ask for trust/cost/scope decisions |
-| Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after bootstrap exists |
+| Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after the target stack exists |
 | Deployment | Render + managed PostgreSQL | Familiar Django deployment path with a small operational surface | Fly/Railway/Heroku/container host if Render limits apply |
 | SDLC | GitHub Actions + reviewed PR branch flow + Conventional Commits + SemVer | Visible, enforceable solo-project governance | Merge queue optional and likely excessive for solo demo |
 
@@ -1935,5 +1972,5 @@ As of this PRD revision:
 
 - **Verified:** standards/tooling/deployment claims recorded in the source register and research register.
 - **Mechanically verified:** control-plane package archive hygiene and Markdown/Python static checks.
-- **Planned but not implemented:** app-based Django UI slices, database models, search services, kind-first test end state, seed importers, API, and deployment.
-- **Implementation-time checks required:** selected PostgreSQL host extension support, ParadeDB availability, final Codex model availability/cost policy, strict required-tooling check, and actual Task Master-generated task graph quality.
+- **Implemented and release-converging:** Django product surfaces, database models, lexical search, seeded demo workflows, circulation behavior, deployment wiring, and the governed control plane are present and must be described as implemented-but-still-needing-current-proof rather than future scope.
+- **Implementation-time checks still required:** current PR/CI proof, final release evidence and changelog alignment, current Task Master/task-note consistency, and external provider/Render social-auth proof that remains blocked outside the repo.

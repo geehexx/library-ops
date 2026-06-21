@@ -9,9 +9,9 @@
 model = "gpt-5.4"
 model_reasoning_effort = "medium"
 model_reasoning_summary = "auto"
+model_context_window = 500000
 plan_mode_reasoning_effort = "xhigh"
 review_model = "gpt-5.4"
-model_context_window = 500000
 approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 default_permissions = "coordinator_root"
@@ -27,14 +27,16 @@ multi_agent = true
 goals = true
 tool_call_mcp_elicitation = true
 
-# Root coordinator plus direct specialists. The default root session stays
-# read-only so planning, synthesis, and user interaction remain separate from
-# command, implementation, and monitoring work that should go to specialists.
+# Root coordinator plus direct specialists. Spark lanes are the default first
+# pass for bounded or noisy work, while planning, synthesis, and user
+# interaction stay separate from command, implementation, and monitoring work
+# that should go to specialists.
 # Depth-2 delegation stays available for explicit expert-panel or
 # micro-worker chains, not habitual recursive fan-out.
 # The thread budget is sized for active fan-out plus a few completed-but-not-yet-
-# closed workers; if the pool starts to saturate, close finished agents first
-# and reuse live agents by role before widening the pool further.
+# closed workers; if the pool starts to saturate, close completed or idle
+# workers promptly and reuse active forks with useful context before widening
+# the pool further.
 [agents]
 max_threads = 24
 max_depth = 2
@@ -89,7 +91,7 @@ description = "Reviews threat model, RBAC, MCP trust, secret handling, dependenc
 config_file = "agents/security-architect.toml"
 
 [agents.search_architect]
-description = "Owns exact, FTS, BM25, pgvector, and ranking/fusion design."
+description = "Owns exact search, PostgreSQL FTS, lexical ranking, and search-test design."
 config_file = "agents/search-architect.toml"
 
 [agents.seed_data_engineer]
@@ -136,6 +138,9 @@ extends = ":workspace"
 ":slash_tmp" = "write"
 ":tmpdir" = "write"
 
+# Repo-owned writable roots stop here. External mounts such as `/mnt/c/...`
+# are not implied workspace roots and may still require escalation or a
+# differently-scoped session even when the host path exists.
 [permissions.workspace.workspace_roots]
 "~/.cache/ms-playwright" = true
 "~/.cache/pip" = true
