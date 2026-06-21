@@ -56,7 +56,7 @@ uv run python scripts/check_hosted_demo.py \
   --expect-provider github
 ```
 
-After the demo refresh and once the shared demo password is available:
+After the refresh is live and once the shared demo password is available:
 
 ```bash
 LIBRARYOPS_DEMO_ACCESS_CODE='<demo access code>' \
@@ -78,17 +78,21 @@ login page is expected to expose the live OAuth links.
 
 ### Current live snapshot
 
-<!-- cspell:ignore pgtl gvqtc ribcfaqgkc bjjab tablename schemaname -->
+<!-- cspell:ignore pgtl gvqtc ribcfaqgkc bjjab onrender socialapp socialtoken tablename schemaname -->
 - Live URL: `https://library-ops.onrender.com`
 - Render service id: `srv-d8pgtl6gvqtc7396ra10`
-- Live deploy: `dep-d8s3b2v7f7vs73bkechg`
-- Probes: `/` and `/health/` both returned `200`
+- Current Render state: live demo data has been refreshed to the medium seeded
+  corpus, the pushed code commit `0e169d1` is waiting on CI before Render
+  auto-deploys it, and the hosted login surface exposes live provider links.
+- Remaining hosted gap: deploy propagation plus real Google/GitHub callback
+  proof on the provider-enabled path.
 - Django site row: `library-ops.onrender.com`
 - OAuth app tables now exist after the full rebuild/deploy:
   `socialaccount_socialaccount`, `socialaccount_socialapp`,
   `socialaccount_socialapp_sites`, and `socialaccount_socialtoken`
-- Login page now returns `200`, exposes live Google/GitHub provider links, and
-  the hosted seeded proof passed after the manual refresh sequence.
+- Login page currently exposes live Google/GitHub provider links; the current
+  code refresh still needs CI plus Render auto-deploy propagation before the
+  hosted proof is fully current.
 
 Copyable checks for the current state:
 

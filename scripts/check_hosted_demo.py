@@ -8,15 +8,16 @@ import html
 import http.cookiejar
 import json
 import os
-from pathlib import Path
 import re
 import sys
 import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Final
 
+# cspell:ignore referer
 DEFAULT_BASE_URL: Final[str] = "https://library-ops.onrender.com"
 DEFAULT_QUERY: Final[str] = "9780141439518"
 DEFAULT_PASSWORD_ENV: Final[str] = "LIBRARYOPS_DEMO_ACCESS_CODE"
@@ -347,8 +348,11 @@ def expect_role_login(
     checks: list[CheckResult] = [
         build_check(
             name=f"auth.{role}.login_redirect",
-            passed=login_response.status == 200 and login_response.url.rstrip("/") == base_url.rstrip("/"),
-            detail=f"Final login URL was `{login_response.url}` with status {login_response.status}.",
+            passed=login_response.status == 200
+            and login_response.url.rstrip("/") == base_url.rstrip("/"),
+            detail=(
+                f"Final login URL was `{login_response.url}` with status {login_response.status}."
+            ),
             url=login_response.url,
         ),
         build_check(
@@ -384,7 +388,9 @@ def expect_role_login(
                             "CIRC-DEMO-003",
                         )
                     ),
-                    detail="Expected the seeded active, overdue, and returned circulation snapshot.",
+                    detail=(
+                        "Expected the seeded active, overdue, and returned circulation snapshot."
+                    ),
                     url=circulation_response.url,
                 ),
             ]
@@ -395,7 +401,10 @@ def expect_role_login(
             build_check(
                 name="catalog.librarian_create_access",
                 passed=create_response.status == 200,
-                detail=f"Expected librarian access to `/catalog/create/`, got {create_response.status}.",
+                detail=(
+                    "Expected librarian access to `/catalog/create/`, got "
+                    f"{create_response.status}."
+                ),
                 url=create_response.url,
             )
         )
@@ -406,7 +415,9 @@ def expect_role_login(
                 name="catalog.member_create_denied",
                 passed=create_response.status == 403
                 and contains(create_response.body, "Access denied"),
-                detail=f"Expected member denial on `/catalog/create/`, got {create_response.status}.",
+                detail=(
+                    f"Expected member denial on `/catalog/create/`, got {create_response.status}."
+                ),
                 url=create_response.url,
             )
         )
@@ -533,7 +544,8 @@ def main() -> int:
                     name="seeded.role_checks_skipped",
                     passed=False,
                     detail=(
-                        "Seeded mode was requested without a demo password; role-aware checks were skipped. "
+                        "Seeded mode was requested without a demo password; "
+                        "role-aware checks were skipped. "
                         "Provide --demo-password or set the configured password env var."
                     ),
                     url=f"{base_url}/accounts/login/",

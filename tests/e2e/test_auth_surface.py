@@ -60,7 +60,7 @@ class TestAuthSurfaceE2E:
 
         primary_nav.get_by_role("link", name="Sign in").click()
         expect(page).to_have_url(f"{live_server.url}/accounts/login/")
-        expect(page.get_by_role("heading", name="Sign In")).to_be_visible()
+        expect(page.get_by_role("heading", name="Sign In", exact=True)).to_be_visible()
         expect(page.locator('input[type="email"]')).to_be_visible()
         expect(page.locator('input[type="password"]')).to_be_visible()
         expect(page.get_by_role("button", name="Sign In")).to_be_visible()
@@ -84,9 +84,7 @@ class TestAuthSurfaceE2E:
                     "Use the seeded demo password path above to continue."
                 )
             ).to_be_visible()
-            expect(
-                page.get_by_role("heading", name="Optional OAuth providers")
-            ).to_be_visible()
+            expect(page.get_by_role("heading", name="Optional OAuth providers")).to_be_visible()
             expect(
                 page.get_by_role("link", name=re.compile("Google", re.IGNORECASE))
             ).to_have_count(0)
@@ -118,10 +116,8 @@ class TestAuthSurfaceE2E:
 
         page.goto(f"{live_server.url}/accounts/login/")
 
-        expect(page.get_by_role("heading", name="Sign In")).to_be_visible()
-        expect(
-            page.get_by_role("heading", name="Continue with Google or GitHub")
-        ).to_be_visible()
+        expect(page.get_by_role("heading", name="Sign In", exact=True)).to_be_visible()
+        expect(page.get_by_role("heading", name="Continue with Google or GitHub")).to_be_visible()
         expect(
             page.get_by_text("Google and GitHub sign-in use optional OAuth credentials.")
         ).to_be_visible()

@@ -19,6 +19,7 @@ from libraryops.catalog.models import (
     normalize_name,
 )
 
+# cspell:ignore Moby
 SOURCE_OPENLIBRARY = "openlibrary"
 SOURCE_GUTENBERG = "gutenberg"
 

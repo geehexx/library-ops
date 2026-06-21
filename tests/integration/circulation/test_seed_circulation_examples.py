@@ -18,9 +18,9 @@ from libraryops.catalog.management.commands.import_public_domain_catalog import 
 )
 from libraryops.circulation.management.commands.seed_circulation_examples import (
     EXAMPLE_ACTOR_EMAILS,
-    HISTORY_COPY_PREFIX,
     EXAMPLE_LOAN_PLANS,
     EXAMPLE_MEMBER_EMAIL,
+    HISTORY_COPY_PREFIX,
 )
 from libraryops.circulation.models import Loan
 from libraryops.inventory.models import BookCopy, BookCopyStatus
@@ -58,7 +58,9 @@ class SeedCirculationExamplesCommandTests(TestCase):
         assert BookCopy.objects.filter(
             barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]
         ).count() == len(EXAMPLE_LOAN_PLANS)
-        assert Loan.objects.filter(copy__barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]).count() == len(EXAMPLE_LOAN_PLANS)
+        assert Loan.objects.filter(
+            copy__barcode__in=[plan.barcode for plan in EXAMPLE_LOAN_PLANS]
+        ).count() == len(EXAMPLE_LOAN_PLANS)
 
         now = datetime.fromisoformat(self.ANCHOR)
         for plan in EXAMPLE_LOAN_PLANS:
@@ -96,7 +98,9 @@ class SeedCirculationExamplesCommandTests(TestCase):
             plan.barcode: Loan.objects.get(copy__barcode=plan.barcode).pk
             for plan in EXAMPLE_LOAN_PLANS
         }
-        first_history_count = Loan.objects.filter(copy__barcode__startswith=HISTORY_COPY_PREFIX).count()
+        first_history_count = Loan.objects.filter(
+            copy__barcode__startswith=HISTORY_COPY_PREFIX
+        ).count()
 
         call_command("seed_circulation_examples", as_of=self.ANCHOR)
 
@@ -106,7 +110,10 @@ class SeedCirculationExamplesCommandTests(TestCase):
             for plan in EXAMPLE_LOAN_PLANS
         }
         assert first_snapshot == second_snapshot
-        assert Loan.objects.filter(copy__barcode__startswith=HISTORY_COPY_PREFIX).count() == first_history_count
+        assert (
+            Loan.objects.filter(copy__barcode__startswith=HISTORY_COPY_PREFIX).count()
+            == first_history_count
+        )
 
     def test_refresh_rebuilds_the_demo_snapshot_without_duplicates(self) -> None:
         """Refresh should restore the fixed example state even after drift."""

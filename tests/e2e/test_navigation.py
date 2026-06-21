@@ -37,7 +37,7 @@ class TestNavigationE2E:
 
         page.get_by_role("navigation", name="Primary").get_by_role("link", name="Sign in").click()
         expect(page).to_have_url(f"{live_server.url}/accounts/login/")
-        expect(page.get_by_role("heading", name="Sign In")).to_be_visible()
+        expect(page.get_by_role("heading", name="Sign In", exact=True)).to_be_visible()
 
     def test_librarian_sees_create_flow_and_validation_errors(
         self,

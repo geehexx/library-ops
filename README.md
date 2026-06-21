@@ -94,21 +94,20 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-The current branch is in release convergence. The release-evidence slice has a
-working live Render deployment on the active service. The most recent verified
-state showed `/health/` and `/` both returning `200` after the Render service
-settings were patched to the free-tier-safe build/start path and redeployed.
-The latest fully green PR proof was on head `a6a1191`, and the current local
-branch head is `fb4228a`.
+The current branch is in release convergence. Live demo data has been refreshed
+on Render to the medium seeded corpus. The pushed code commit `0e169d1` is
+still waiting on CI before Render auto-deploys it. Provider links are live on
+the hosted login surface, and the remaining hosted gap is deploy propagation
+plus real provider callback proof.
 
 Evaluator-facing expectations:
 
 - use the Render deployment path as the current review target;
-- sign in with the documented demo accounts after seeding or on the seeded live
-  environment;
+- sign in with the documented demo accounts after seeding or on the refreshed
+  live environment;
 - expect password-based demo auth to work first; configured social login
-  remains part of the release-evidence lane when provider and deployment-domain
-  configuration are available;
+  remains part of the release-evidence lane while provider-callback proof and
+  deploy propagation finish;
 - expect release evidence to come from the server-rendered app, README, the
   demo script, and smoke tests rather than a dedicated API surface.
 
@@ -117,11 +116,17 @@ Known limitations:
 - release tagging and the final release PR are still pending;
 - the evaluator-facing demo script now lives at
   [docs/evaluation/demo-script.md](docs/evaluation/demo-script.md);
-- the smoke surface now passes locally, and the live service is reachable but
-  remains unseeded until the manual demo refresh sequence is run;
+- the smoke surface now passes locally, and the live service has refreshed demo
+  data but still needs the current pushed commit to finish CI and auto-deploy
+  propagation before that code refresh is fully reflected;
+- real Google/GitHub callback completion still needs browser-backed proof on
+  the live provider-enabled path;
 - the deployment contract now targets the Render free-tier path, which means
   migrations must be handled without `preDeployCommand`, and demo seed refresh
   must be run manually via the operator sequence in [SETUP.md](SETUP.md);
+- the repo now includes `scripts/check_hosted_demo.py` so the current live
+  state and the post-refresh seeded state can be verified with one repeatable
+  pass/fail helper before treating the host as release evidence;
 
 The product work should continue from the canonical graph, while the control-
 plane state remains governed by the PRD, Task Master graph, agent config,

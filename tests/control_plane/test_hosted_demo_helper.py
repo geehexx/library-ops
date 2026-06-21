@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -105,12 +105,13 @@ def test_unreachable_host_returns_structured_failure_json(
 
         def request(
             self,
-            path: str,
+            _path: str,
             *,
             data: dict[str, str] | None = None,
             query: dict[str, str] | None = None,
             referer: str | None = None,
         ) -> Any:
+            _ = (data, query, referer)
             raise RuntimeError("Request to `https://offline.example/` failed: [Errno 111] refused")
 
     monkeypatch.setattr(module, "parse_args", lambda: args)
@@ -122,7 +123,10 @@ def test_unreachable_host_returns_structured_failure_json(
     payload = json.loads(capsys.readouterr().out)
     assert payload["passed"] is False
     assert payload["failure_count"] == 1
-    assert payload["request_error"] == "Request to `https://offline.example/` failed: [Errno 111] refused"
+    assert (
+        payload["request_error"]
+        == "Request to `https://offline.example/` failed: [Errno 111] refused"
+    )
     assert payload["checks"][0]["name"] == "host.reachable"
     report_payload = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
     assert report_payload == payload

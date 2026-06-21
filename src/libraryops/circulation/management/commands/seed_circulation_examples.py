@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import random
 from typing import Any, cast
 
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from django.utils.dateparse import parse_date, parse_datetime
 from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
 
 from libraryops.accounts.roles import ROLE_MEMBER
 from libraryops.catalog.models import BookEdition
@@ -108,7 +108,9 @@ def _load_editions() -> list[BookEdition]:
 def _clear_example_snapshot() -> None:
     """Remove the dedicated demo circulation rows before rebuilding them."""
 
-    example_copies = BookCopy.objects.filter(barcode__in={plan.barcode for plan in EXAMPLE_LOAN_PLANS})
+    example_copies = BookCopy.objects.filter(
+        barcode__in={plan.barcode for plan in EXAMPLE_LOAN_PLANS}
+    )
     history_copies = BookCopy.objects.filter(barcode__startswith=HISTORY_COPY_PREFIX)
     Loan.objects.filter(copy__in=example_copies).delete()
     example_copies.delete()
@@ -236,13 +238,14 @@ def _seed_background_history(
     if BookCopy.objects.filter(barcode__startswith=HISTORY_COPY_PREFIX).exists():
         return 0, 0
 
-    rng = random.Random(HISTORY_RANDOM_SEED)
+    # Deterministic pseudo-randomness for synthetic history only.
+    rng = random.Random(HISTORY_RANDOM_SEED)  # nosec B311
     history_loan_count = 0
     history_copy_count = 0
     history_span_days = max(HISTORY_RETURN_BUFFER_DAYS + 30, HISTORY_YEARS * 365)
 
     for rank, edition in enumerate(editions, start=1):
-        loan_target = _history_loan_target(rank, random_value=rng.random())
+        loan_target = _history_loan_target(rank, random_value=rng.random())  # nosec B311
         if loan_target <= 0:
             continue
         copy_count = _copy_target_for_history(loan_target)
@@ -259,21 +262,21 @@ def _seed_background_history(
         for loan_index in range(loan_target):
             copy = copies[loan_index % len(copies)]
             borrower = borrowers[(loan_index + rank) % len(borrowers)]
-            return_age_days = HISTORY_RETURN_BUFFER_DAYS + rng.randint(
+            return_age_days = HISTORY_RETURN_BUFFER_DAYS + rng.randint(  # nosec B311
                 0,
                 history_span_days - HISTORY_RETURN_BUFFER_DAYS,
             )
             returned_at = anchor - timedelta(
                 days=return_age_days,
-                hours=rng.randint(0, 23),
-                minutes=rng.randint(0, 59),
+                hours=rng.randint(0, 23),  # nosec B311
+                minutes=rng.randint(0, 59),  # nosec B311
             )
-            checkout_length_days = 7 + rng.randint(0, 21)
+            checkout_length_days = 7 + rng.randint(0, 21)  # nosec B311
             checked_out_at = returned_at - timedelta(
                 days=checkout_length_days,
-                hours=rng.randint(0, 12),
+                hours=rng.randint(0, 12),  # nosec B311
             )
-            due_at = checked_out_at + timedelta(days=14 + rng.randint(-2, 7))
+            due_at = checked_out_at + timedelta(days=14 + rng.randint(-2, 7))  # nosec B311
             Loan.objects.create(
                 copy=copy,
                 borrower=borrower,
@@ -311,7 +314,6 @@ def _prune_duplicate_loans(copy: BookCopy, keep: Loan | None) -> None:
 
 def _sync_active_loan(
     *,
-    actor: Any,
     borrower: Any,
     copy: BookCopy,
     plan: ExampleLoanPlan,
@@ -345,7 +347,6 @@ def _sync_active_loan(
 
 def _sync_returned_loan(
     *,
-    actor: Any,
     borrower: Any,
     copy: BookCopy,
     plan: ExampleLoanPlan,
@@ -420,7 +421,6 @@ class Command(BaseCommand):
             copy = _ensure_copy(actor=actor, edition=edition, barcode=plan.barcode)
             if plan.is_returned:
                 _sync_returned_loan(
-                    actor=actor,
                     borrower=member,
                     copy=copy,
                     plan=plan,
@@ -428,7 +428,6 @@ class Command(BaseCommand):
                 )
             else:
                 _sync_active_loan(
-                    actor=actor,
                     borrower=member,
                     copy=copy,
                     plan=plan,

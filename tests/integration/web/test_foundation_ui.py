@@ -329,11 +329,27 @@ class FoundationCatalogSearchTests(TestCase):
         self.assertContains(response, 'name="subject"', status_code=200)
         self.assertContains(response, 'name="language"', status_code=200)
         self.assertContains(response, 'name="source"', status_code=200)
-        self.assertContains(response, 'type="hidden" name="availability" value="available"',  html=False, status_code=200)
-        self.assertContains(response, 'type="hidden" name="contributor" value="Exact Search Author"', html=False, status_code=200)
-        self.assertContains(response, 'type="hidden" name="subject" value="Classics"', html=False, status_code=200)
-        self.assertContains(response, 'type="hidden" name="language" value="en"', html=False, status_code=200)
-        self.assertContains(response, 'type="hidden" name="source" value="openlibrary"', html=False, status_code=200)
+        self.assertContains(
+            response,
+            'type="hidden" name="availability" value="available"',
+            html=False,
+            status_code=200,
+        )
+        self.assertContains(
+            response,
+            'type="hidden" name="contributor" value="Exact Search Author"',
+            html=False,
+            status_code=200,
+        )
+        self.assertContains(
+            response, 'type="hidden" name="subject" value="Classics"', html=False, status_code=200
+        )
+        self.assertContains(
+            response, 'type="hidden" name="language" value="en"', html=False, status_code=200
+        )
+        self.assertContains(
+            response, 'type="hidden" name="source" value="openlibrary"', html=False, status_code=200
+        )
         self.assertContains(response, "Availability: Available", status_code=200)
         self.assertContains(response, "Contributor: Exact Search Author", status_code=200)
         self.assertContains(response, "Subject: Classics", status_code=200)

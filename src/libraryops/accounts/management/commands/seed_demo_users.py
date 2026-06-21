@@ -11,6 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 
+# cspell:ignore Okafor Hana Mori Karim Hassan
 DEMO_ACCESS_CODE_ENV_VAR = "LIBRARYOPS_DEMO_ACCESS_CODE"
 DEMO_USERS = (
     ("admin@libraryops.demo", ROLE_ADMIN, True, True),
