@@ -17,9 +17,9 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `b2785c0`; local branch is ahead again with the `16.3` visual-baseline closeout packet).
-- Latest fully green PR proof landed on head `b2785c0`: `commitlint`, `policy`, `quality`, `security`, and `workflow-security` all passed on `2026-06-20` / `2026-06-21` (CI run `27886934252`, commitlint run `27886934277`).
-- Current PR state has no known failed checks, but draft status remains open and local head drift is intentional until the `16.3` closeout packet is pushed.
+- PR: `#28` (open draft, target `development`, current head `a6a1191`).
+- Latest fully green PR proof is on head `a6a1191`: `commitlint`, `policy`, `quality`, `security`, and `workflow-security` all passed on `2026-06-20` / `2026-06-21` (CI run `27887454334`, commitlint run `27887454337`).
+- Current PR state is merge-clean (`mergeStateStatus=CLEAN`), draft is still open, and there are no live review requests or PR comments to address from the GitHub surface checked in this session.
 - Major completed slices to carry forward:
   - pre-push authority
   - planning/spec reconciliation
@@ -35,8 +35,12 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
   - AI-remnant prune
   - Spark-default control-plane packet
 - External blocker: `16.6` remains blocked on provider-console / Render host / Site(SocialApp) configuration.
+- Remaining local governance queue to keep explicit but out of the merge blocker list:
+  - `14.6` milestone-board checkpointing and evidence capture
+  - `14.7` post-merge local branch/worktree/stash cleanup
+  - `14.11` keep tiny hygiene slices off the coordinator root
 - Remaining active queue under PR pressure:
-  - `16.6` external proof blocker
+  - `16.6` external proof blocker only
 - Dependabot queue (`15.*`) remains separate from this handoff queue and should stay out of PR `#28`.
 - Local validation proof on `2026-06-21`: `checks:prepush`, `taskmaster:validate`, `verify:core`, and `verify:all` all passed when rerun with writable UV/XDG temp roots under `/tmp`; use that env override for future `uvx` / Semgrep-based gate reruns in this environment.
 - Keep this file concise, evidence-first, and this branch/PR as the current coordination root.
@@ -45,4 +49,8 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 
 - Re-check live Task Master/task graph before assuming unverified assumptions.
 - Keep work in coordinator-first, Spark-first slices with bounded ownership.
+- For any remaining delegated slice on this branch, declare fork vs fresh-spawn
+  status, name the inherited context, state expected commit scope plus local
+  gates before push, and move overlapping write scopes into separate worktrees
+  before the diffs entangle.
 - Preserve notice-only stop-hook expectations unless repo surfaces are changed.

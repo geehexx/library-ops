@@ -39,5 +39,7 @@ This file is managed by Python Semantic Release.
 
 - External Google/GitHub social-auth proof on local plus Render remains blocked
   on provider-console and hosted-environment state outside the repo.
-- Final evaluator-visible evidence and UX closeout still needs to close the
-  remaining `16.3` release-convergence slice.
+- Remaining in-repo merge/governance work is limited to explicit post-merge
+  cleanup and milestone-board follow-through; the screenshot matrix route
+  inventory is already closed, and the only remaining evaluator-visible blocker
+  is external social-auth proof under `16.6`.
