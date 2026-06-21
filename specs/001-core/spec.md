@@ -8,8 +8,8 @@ Supporting Spec Kit artifact. The canonical product contract is `.taskmaster/doc
 
 For the current release branch, deliver the evaluator-visible Django product:
 role-aware login, catalog browsing and management, lexical search, circulation
-workflows, deterministic seed/import paths, and deployment/demo evidence owned
-by the repo-local source-of-truth surfaces.
+workflows, deterministic seed/import paths, and deployment/demo evidence
+owned by the repo-local source-of-truth surfaces.
 
 ## Primary participants
 
@@ -55,9 +55,9 @@ by the repo-local source-of-truth surfaces.
 
 ## Deferred from this branch
 
-- dedicated API surfaces
-- semantic/vector search
-- AI metadata suggestions
+- dedicated public API surfaces
+- non-lexical search variants
+- AI-assisted metadata suggestions
 - additional post-release product experiments
 
 ## Acceptance evidence

@@ -95,13 +95,13 @@ Every pull request to `development` or `main` MUST pass the applicable subset of
 - migration checks,
 - unit and integration tests,
 - property-based tests for core invariants,
-- E2E tests for user-critical flows once bootstraped.
+- E2E tests for user-critical flows once the target stack exists.
 
 Validation planning SHOULD stay kind-first: lower-level invariants and
 constraints first, request and integration coverage next, and browser/E2E
 coverage only where the user flow requires it.
 
-Checks MAY be conditionally skipped only while their target bootstrap does not yet
+Checks MAY be conditionally skipped only while their target stack does not yet
 exist, and the skip MUST be explicit in CI output.
 
 ## VII. Agent Compatibility

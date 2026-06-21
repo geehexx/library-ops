@@ -43,7 +43,7 @@ npm run taskmaster:validate
 npm run verify:core
 ```
 
-### Control-plane bootstrap loop
+### Control-plane setup loop
 
 Run this before broad implementation when agent/config/hook surfaces changed:
 

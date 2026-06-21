@@ -17,8 +17,8 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
 ## Current Handoff Snapshot
 
 - Branch: `release-convergence-20260621` (active local branch for continuation).
-- PR: `#28` (open draft, target `development`, current head `a6a1191`).
-- Latest fully green PR proof is on head `a6a1191`: `commitlint`, `policy`, `quality`, `security`, and `workflow-security` all passed on `2026-06-20` / `2026-06-21` (CI run `27887454334`, commitlint run `27887454337`).
+- PR: `#28` (open draft, target `development`, current head `6dad4bb`).
+- Latest fully green PR proof is on prior head `a6a1191`: `commitlint`, `policy`, `quality`, `security`, and `workflow-security` all passed on `2026-06-20` / `2026-06-21` (CI run `27887454334`, commitlint run `27887454337`). The current local head is a follow-on housekeeping commit and has not been revalidated yet.
 - Current PR state is merge-clean (`mergeStateStatus=CLEAN`), draft is still open, and there are no live review requests or PR comments to address from the GitHub surface checked in this session.
 - Major completed slices to carry forward:
   - pre-push authority
@@ -34,7 +34,7 @@ Freshness marker: last refreshed `2026-06-21`. Treat unverifiable items as provi
   - search accessibility proof
   - AI-remnant prune
   - Spark-default control-plane packet
-- External blocker: `16.6` remains blocked on provider-console / Render host / Site(SocialApp) configuration.
+- External blocker: `16.6` remains blocked on provider-console / Render deployment / Site(SocialApp) configuration.
 - Remaining local governance queue to keep explicit but out of the merge blocker list:
   - `14.6` milestone-board checkpointing and evidence capture
   - `14.7` post-merge local branch/worktree/stash cleanup

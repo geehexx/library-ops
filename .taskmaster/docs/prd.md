@@ -55,7 +55,7 @@ The prompt also lists optional bonuses:
 - deployed live app URL;
 - demo video;
 - authentication with SSO, roles, and permissions;
-- AI features;
+- AI features, if revisited, are deferred from the current release;
 - additional creative features.
 
 Evaluation criteria are completeness, creativity, product quality, and usability.
@@ -195,7 +195,7 @@ The project uses formal standards selectively. The goal is disciplined structure
 | Requirements | ISO/IEC/IEEE 29148-inspired structure | Stakeholders, requirements, acceptance criteria, traceability. |
 | Normative terms | RFC 2119 / RFC 8174 | `MUST`, `SHOULD`, `MAY` only when binding. |
 | Architecture | C4 + arc42 + pragmatic domain modeling | C4 views for navigation, arc42 quality/risk framing, Django-friendly domain boundaries. |
-| Interface | Server-rendered Django views + HTMX | First-party app interaction; no dedicated API surface in the current scope. |
+| Interface | Server-rendered Django views + HTMX | First-party app interaction; no public API surface in the current scope. |
 | Security controls | OWASP ASVS | Level 1-style web app security requirements. |
 | Security program | OWASP SAMM | Lightweight SDLC security framing. |
 | Accessibility | WCAG 2.2 AA | Usability and accessibility baseline. |
@@ -342,7 +342,7 @@ templates use explicit app namespaces such as `templates/web/`, `templates/catal
 flow. `tests/control_plane/`, `tests/smoke/`, and `tests/e2e/` are current stable anchors. Domain folders are
 transitional waypoints that should migrate toward `tests/unit/`, `tests/integration/`, and `tests/property/`.
 
-**Reasoning:** Kind-first organization keeps meta-system checks, bootstrap checks, domain invariants, DB-backed
+**Reasoning:** Kind-first organization keeps meta-system checks, setup checks, domain invariants, DB-backed
 orchestration, and evaluator-visible browser flows distinct. That lowers review friction and keeps future test growth
 from collapsing into monolithic domain buckets.
 
@@ -364,8 +364,8 @@ Create a reproducible, agent-friendly project foundation.
 #### Feature: C1.F1 Repository and toolchain baseline
 
 - **Description:** Initialize the Python/Django repository baseline, toolchain, and verification scripts.
-- **Inputs:** Existing control-plane package bootstrap, Python 3.12+, Node 20+, uv, GitHub repository.
-- **Outputs:** Verified repository with documented bootstrap and local quality gates.
+- **Inputs:** Existing control-plane package baseline, Python 3.12+, Node 20+, uv, GitHub repository.
+- **Outputs:** Verified repository with documented setup and local quality gates.
 - **Behavior:** Provide deterministic setup commands and enforce no-junk/no-secret hygiene.
 - **Acceptance criteria:**
   - `codex doctor --summary --ascii --no-color` reports a healthy local control-plane state.
@@ -373,11 +373,11 @@ Create a reproducible, agent-friendly project foundation.
   - `npm install` or `npm ci` succeeds.
   - `.pytest_cache`, `.venv`, corpora, model caches, and secrets are not committed.
 
-#### Feature: C1.F2 Django project bootstrap
+#### Feature: C1.F2 Django project foundation
 
 - **Description:** Harden the existing Django project under `src/libraryops/config` with local/test/production settings, real `DATABASE_URL` support, and root URL composition that can mount app-owned URLConfs cleanly.
 - **Inputs:** Existing `manage.py`, `src/libraryops/config/*`, `pyproject.toml`, environment variables, database URL.
-- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable bootstrap.
+- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable foundation.
 - **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, production settings require explicit secure environment, and root routing stays thin enough to compose app-based UI surfaces.
 - **Acceptance criteria:**
   - `uv run python manage.py check` succeeds.
@@ -391,7 +391,7 @@ Create a reproducible, agent-friendly project foundation.
 - **Description:** Configure Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint.
 - **Inputs:** `pyproject.toml`, package configuration, GitHub workflows.
 - **Outputs:** Local and CI quality gates.
-- **Behavior:** Gates fail on real violations and skip only where bootstrap is not yet present.
+- **Behavior:** Gates fail on real violations and skip only where the target stack is not yet present.
 - **Acceptance criteria:**
   - Ruff format/lint runs.
   - Pyright runs with strict defaults and pragmatic exceptions documented.
@@ -502,7 +502,7 @@ Support role-based app access with Admin, Librarian, and Member roles.
 
 #### Feature: C3.F2 Server-side authorization services
 
-- **Description:** Provide permission checks used by views, APIs, and services.
+- **Description:** Provide permission checks used by views, request handlers, and services.
 - **Inputs:** `request.user`, role, operation, target object.
 - **Outputs:** allow/deny decision or exception.
 - **Behavior:** UI and API both call shared authorization utilities.
@@ -1004,7 +1004,7 @@ lose the path to a deployed demo.
 - control-plane package verification passes;
 - PRD can be parsed by Task Master;
 - current task graph has no circular dependencies;
-- focused governance and smoke checks cover the meta-system and bootstrap surfaces that exist;
+- focused governance and smoke checks cover the meta-system and setup surfaces that exist;
 - CI skeleton is ready.
 
 **Delivers:** An implementable plan and governed agent workspace.
@@ -1028,7 +1028,7 @@ lose the path to a deployed demo.
 - PRD/spec/task graph/continuation surfaces describe one release-convergence story;
 - local-vs-CI gate authority and pre-push protocol are explicit in Task Master and durable docs;
 - release evidence is current, truthful, and tied to the release candidate;
-- no superseded bootstrap, semantic-search, or dedicated-API instructions remain active in planning surfaces.
+- no superseded setup-era, semantic-search, or dedicated-API instructions remain active in planning surfaces.
 
 **Delivers:** A coherent release-convergence queue grounded in current product truth and reproducible proof paths.
 
@@ -1040,7 +1040,7 @@ lose the path to a deployed demo.
 
 **Tasks:**
 
-- bootstrap Django project;
+- establish the Django foundation;
 - establish app-owned route/view/template skeletons for the first evaluator-facing flows;
 - implement models/migrations;
 - seed roles/users;
@@ -1592,8 +1592,8 @@ Every PR must include:
 - lint;
 - type check;
 - import architecture check when Django package exists;
-- Django system checks when bootstrap exists;
-- migration drift check when bootstrap exists;
+- Django system checks when the target stack exists;
+- migration drift check when the target stack exists;
 - pytest suite;
 - property tests;
 - commitlint;
@@ -1647,9 +1647,9 @@ This is a demo product. It should not store real patron data. Demo users and loa
 
 ```text
 tests/control_plane/   agent workflow, governance, hooks, docs/process gates
-tests/smoke/           deterministic bootstrap and environment checks
+tests/smoke/           deterministic setup and environment checks
 tests/unit/            isolated rules, normalization, serializers/forms/helpers
-tests/integration/     services, views, APIs, DB constraints, management commands
+tests/integration/     services, views, request handlers, DB constraints, management commands
 tests/property/        invariant-heavy generated input/state transitions
 tests/e2e/             evaluator-visible browser and navigation flows
 ```
@@ -1786,14 +1786,14 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 | Blind MCP/tool adoption | High | Medium | Socratic decision gates + alternatives register | Ask user before new trust/cost/scope changes |
 | Filtered command output hides failure detail | Medium | Medium | RTK/raw evidence policy + tee/raw reruns | Rerun raw commands |
 | Code graph output treated as proof | Medium | Medium | Source/test inspection required after graph findings | Fall back to raw source review |
-| Django bootstrap conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
+| Django setup conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
 | Evaluator UI drifts into a monolithic shared web layer | Medium | Medium | App-owned URL/view/template rules plus review | Split routes/views/templates by app before adding more flows |
 | Search overengineered | Medium | Medium | Baseline exact + FTS first | Keep the release scope lexical-only |
 | ParadeDB unavailable on deployment | Low | High | Optional adapter only | Use standard FTS |
 | Public data licensing confusion | Medium | Medium | Store provenance and license notes; use official dumps/catalogs | Use synthetic seed records |
 | Free hosting limits | Medium | Medium | Keep corpus small; document local fallback | Provide local demo only if needed |
 | File upload security | Medium | Medium | Validate size/type/decode; limit uploads | External cover URLs only |
-| CI ignores real failures while bootstrap incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until bootstrap exists |
+| CI ignores real failures while setup incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until the target stack exists |
 | Test topology migration stalls in temporary domain folders | Medium | Medium | Kind-first placement rules and governance tests | Finish the split before broadening coverage further |
 
 ## 22. Task Master Parsing Contract
@@ -1868,10 +1868,10 @@ Exa, or web research before making version-sensitive implementation changes.
 
 ### 24.1 Current Artifact Review Status
 
-The current repository should be treated as a **release-convergence codebase**, not a bootstrap archive. It already contains
+The current repository should be treated as a **release-convergence codebase**, not a setup archive. It already contains
 implemented Django product surfaces, seeded-demo workflows, lexical search, circulation behavior, deployment wiring, and a governed
 control plane. The planning surfaces MUST therefore describe the product as implemented-but-still-needing-current-proof, not as a
-future bootstrap plan.
+future setup plan.
 
 A personal-context lookup during the 2026-06-12 review returned no additional relevant memory. The review
 therefore used the current conversation, original control-plane package archive, updated control-plane package archive, and current
@@ -1924,7 +1924,7 @@ If a review session lacks direct connector access, the agent MUST say so rather 
 | Command-output optimization | RTK | User-accepted optimization for noisy shell output | Raw reruns/full logs remain required for evidence |
 | Code intelligence | code-review-graph + Serena + ast-grep + bounded Repomix | Graph, symbol, AST, and context packaging without replacing source review | New MCPs/broad context layers require approval |
 | Decisioning | Socratic decision framework | Prevents guessing and unexamined tool adoption | Pause and ask for trust/cost/scope decisions |
-| Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after bootstrap exists |
+| Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after the target stack exists |
 | Deployment | Render + managed PostgreSQL | Familiar Django deployment path with a small operational surface | Fly/Railway/Heroku/container host if Render limits apply |
 | SDLC | GitHub Actions + reviewed PR branch flow + Conventional Commits + SemVer | Visible, enforceable solo-project governance | Merge queue optional and likely excessive for solo demo |
 
