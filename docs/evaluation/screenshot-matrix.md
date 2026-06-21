@@ -2,8 +2,8 @@
 
 Use this matrix as the evaluator-facing route inventory for release evidence.
 It tracks which user-visible surfaces already have browser-backed proof, which
-ones have tracked visual baselines, and which still need follow-up under
-`16.3` or the external social-auth blocker `16.6`.
+ones have tracked visual baselines, and which still need follow-up in the
+remaining external social-auth blocker `16.6`.
 
 ## Status Legend
 

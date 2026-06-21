@@ -1,6 +1,6 @@
 ---
 name: search-design
-description: Use when designing exact search, PostgreSQL full-text search, pgvector, BM25, ranking, or search tests.
+description: Use when designing exact search, PostgreSQL full-text search, lexical ranking, or search tests.
 ---
 
 # Search Design Skill
@@ -10,16 +10,14 @@ description: Use when designing exact search, PostgreSQL full-text search, pgvec
 1. Exact ISBN/barcode/external ID.
 2. Exact title/author phrase.
 3. PostgreSQL `tsvector` full-text.
-4. Optional ParadeDB/BM25 adapter.
-5. pgvector semantic search.
-6. Reciprocal rank fusion and business boosts.
+4. Deterministic business boosts and tie ordering.
 
 ## Rules
 
 - Availability comes from database state only.
-- Semantic search never overrides exact identifiers.
+- Semantic/vector search is out of the current release scope.
 - Result explanation must disclose ranking sources.
-- Add tests for exact, keyword, subject, semantic, and empty queries.
+- Add tests for exact, phrase, keyword, subject, facet, availability, and empty queries.
 
 ## Output
 

@@ -102,8 +102,10 @@ Evaluator-facing expectations:
 - use the Render deployment path as the current review target;
 - sign in with the documented demo accounts after seeding or on the seeded live
   environment;
-- expect password-based demo auth to work first; OAuth/social auth remains
-  optional and environment-driven;
+- expect password-based demo auth to work first; Google/GitHub social auth is
+  still environment-driven for startup, but callback proof remains part of the
+  release-evidence lane when provider and deployment-domain configuration are
+  available;
 - expect release evidence to come from the server-rendered app, README, and
   smoke tests rather than a dedicated API/docs surface.
 

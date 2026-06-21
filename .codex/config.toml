@@ -91,7 +91,7 @@ description = "Reviews threat model, RBAC, MCP trust, secret handling, dependenc
 config_file = "agents/security-architect.toml"
 
 [agents.search_architect]
-description = "Owns exact, FTS, BM25, pgvector, and ranking/fusion design."
+description = "Owns exact search, PostgreSQL FTS, lexical ranking, and search-test design."
 config_file = "agents/search-architect.toml"
 
 [agents.seed_data_engineer]
