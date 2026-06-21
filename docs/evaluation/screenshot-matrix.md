@@ -40,7 +40,8 @@ rewrite product code for this slice unless the live proof reveals a real defect.
 
 ### Current live snapshot
 
-- Live host: `https://library-ops.onrender.com`
+<!-- cspell:ignore pgtl gvqtc ribcfaqgkc bjjab tablename schemaname -->
+- Live URL: `https://library-ops.onrender.com`
 - Render service id: `srv-d8pgtl6gvqtc7396ra10`
 - Live deploy: `dep-d8ribcfaqgkc73bjjab0`
 - Probes: `/` and `/health/` both returned `200`
@@ -78,7 +79,7 @@ ORDER BY tablename;
    - Verify the deployment environment exposes the OAuth client variables and
      `DJANGO_ALLOWED_HOSTS` for that hostname.
    - Verify the deployed revision is the one you are about to prove.
-   - On the current live service, the host and health checks are already green,
+   - On the current live service, the URL and health checks are already green,
      but the Django site record and social-auth tables still need admin/DB
      wiring before provider callbacks can complete.
 3. Confirm the Django auth records are wired to the same hostname.
