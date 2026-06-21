@@ -944,3 +944,23 @@ def test_product_python_modules_do_not_depend_on_type_checking_shims() -> None:
                 offenders.append(path.relative_to(REPO_ROOT).as_posix())
 
     assert offenders == []
+
+
+def test_search_design_agent_metadata_stays_lexical_only() -> None:
+    """Ensure search-design agent metadata does not drift into vector/semantic scope."""
+    policy_text = (
+        REPO_ROOT / ".agents" / "skills" / "search-design" / "SKILL.md"
+    ).read_text(encoding="utf-8")
+    search_design_prompt = (
+        REPO_ROOT / ".agents" / "skills" / "search-design" / "agents" / "openai.yaml"
+    ).read_text(encoding="utf-8")
+
+    assert "Semantic/vector search is out of the current release scope." in policy_text
+
+    lowered_prompt = search_design_prompt.lower()
+    assert "bm25" not in lowered_prompt
+    assert "semantic" not in lowered_prompt
+    assert "vector search" not in lowered_prompt
+    assert "exact identifiers" in lowered_prompt
+    assert "postgresql" in lowered_prompt
+    assert "lexical" in lowered_prompt
