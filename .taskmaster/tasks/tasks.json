@@ -1275,12 +1275,12 @@
             "id": 2,
             "title": "Merge safe dependency bumps",
             "description": "Land the clean dependency PRs first and shrink the queue.",
-            "details": "Merge merge-ready dependency updates before touching blocked batches so the queue shrinks without avoidable churn.\n<info added on 2026-06-20T23:36:05.690Z>\nLive queue update. The first safe dependency bump (`#15` `actions/setup-node`) has been merged, and the remaining open queue is now the blocked pair `#17` and `#18`.\n</info added on 2026-06-20T23:36:05.690Z>\n<info added on 2026-06-20T23:44:40.161Z>\nLive queue update. The quality failure on Dependabot PRs `#17` and `#18` has been traced to the CI service health probe. The release-convergence branch now carries a simplified in-repo fix, and the current PR #28 quality job on the branch has progressed past Initialize containers and into the normal gate ladder.\n</info added on 2026-06-20T23:44:40.161Z>\n<info added on 2026-06-21T09:21:39.119Z>\nLive queue update. PR #28 is now draft but mergeable with a clean state, indicating that it has passed all required checks (`commitlint`, `quality`, `workflow-security`, `security`, and `policy`). PRs #17 and #18 remain open, marked as MERGEABLE but UNSTABLE due to quality failures related to the Initialize containers postgres health-probe error. Both PRs are rebaseable and can be updated by the viewer. The CI fix for this issue has been validated on the base branch and only needs to be merged back into the development branch before further updates or reruns.\n</info added on 2026-06-21T09:21:39.119Z>\n<info added on 2026-06-21T09:24:22.633Z>\nSuperseding note: PRs #17 and #18 remain `MERGEABLE` but `UNSTABLE`; both latest quality failures are still the same `Initialize containers` postgres health-probe error. The already-proved fix exists on `release-convergence-20260621` / PR #28, but it has not yet landed on `origin/development`.\n</info added on 2026-06-21T09:24:22.633Z>",
+            "details": "Merge merge-ready dependency updates before touching blocked batches so the queue shrinks without avoidable churn.\n<info added on 2026-06-20T23:36:05.690Z>\nLive queue update. The first safe dependency bump (`#15` `actions/setup-node`) has been merged, and the remaining open queue is now the blocked pair `#17` and `#18`.\n</info added on 2026-06-20T23:36:05.690Z>\n<info added on 2026-06-20T23:44:40.161Z>\nLive queue update. The quality failure on Dependabot PRs `#17` and `#18` has been traced to the CI service health probe. The release-convergence branch now carries a simplified in-repo fix, and the current PR #28 quality job on the branch has progressed past Initialize containers and into the normal gate ladder.\n</info added on 2026-06-20T23:44:40.161Z>\n<info added on 2026-06-21T09:24:22.633Z>\nLive queue update. PR #28 head `a6a11915ce7a25cc6703ce9dc139657e9e9ffd1b` is still draft but now `CLEAN` with `commitlint`, `quality`, `workflow-security`, `security`, and `policy` green. PRs `#17` and `#18` remain `MERGEABLE` but `UNSTABLE`; both latest `quality` failures still stop at `Initialize containers` with the postgres health-probe error (`unknown shorthand flag: 'U' in -U`). The already-proved `--health-cmd pg_isready` fix exists on `release-convergence-20260621` / PR `#28`, but it has not yet landed on `origin/development`, so 15.2 stays blocked until that base-branch CI fix lands and the Dependabot branches are updated or rerun.\n</info added on 2026-06-21T09:24:22.633Z>",
             "status": "blocked",
             "dependencies": [],
             "parentTaskId": 15,
             "parentId": "undefined",
-            "updatedAt": "2026-06-21T09:21:41.150Z"
+            "updatedAt": "2026-06-21T09:24:22.633Z"
           },
           {
             "id": 3,
@@ -1306,7 +1306,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2026-06-21T09:21:41.150Z",
+        "updatedAt": "2026-06-21T09:24:22.633Z",
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on close dependabot queue."
@@ -1577,7 +1577,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-21T09:22:31.373Z",
+      "lastModified": "2026-06-21T09:24:22.633Z",
       "taskCount": 17,
       "completedCount": 13,
       "tags": [
