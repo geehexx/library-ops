@@ -1212,7 +1212,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=48.0.1,<49.0.0" },
     { name = "dj-database-url", specifier = ">=2.2,<3.0" },
     { name = "django", specifier = ">=5.2,<6.0" },
-    { name = "django-allauth", extras = ["socialaccount"], specifier = ">=65.0,<66.0" },
+    { name = "django-allauth", extras = ["socialaccount"], specifier = ">=65.18.0,<66.0" },
     { name = "django-guardian", specifier = ">=3.2,<4.0" },
     { name = "django-htmx", specifier = ">=1.20,<2.0" },
     { name = "django-unfold", specifier = ">=0.76,<1.0" },
