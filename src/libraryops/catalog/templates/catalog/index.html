@@ -7,11 +7,57 @@
 {% block content %}
   <section class="panel">
     <p>
-      The catalog view is intentionally small in Phase 1: it proves the work,
-      contributor, edition, and copy relationships that later phases build on.
+      Search the live catalog by identifier, title, contributor, or subject.
+      Exact identifiers rank first, followed by lexical matches from the
+      catalog index.
     </p>
+    <form class="stack" method="get" action="{% url 'catalog-index' %}">
+      <div style="display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr) auto; align-items: end;">
+        <label class="stack" style="gap: 0.35rem;">
+          <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;">Search catalog</span>
+          <input
+            aria-label="Search catalog"
+            name="q"
+            placeholder="ISBN, barcode, title, or author"
+            value="{{ search_query }}"
+          >
+        </label>
+        <div class="nav-actions" style="justify-content: flex-start;">
+          <button class="button" type="submit">Search</button>
+          {% if search_query or selected_availability or selected_contributor or selected_subject or selected_language or selected_source %}
+            <a class="button button--ghost" href="{% url 'catalog-index' %}">Clear</a>
+          {% endif %}
+        </div>
+      </div>
+      {% for key, value in request.GET.items %}
+        {% if key != "q" and value %}
+          <input type="hidden" name="{{ key }}" value="{{ value }}">
+        {% endif %}
+      {% endfor %}
+    </form>
+    {% if search_active %}
+      <p class="muted" role="status" aria-live="polite">
+        Showing {{ result_count }} result{{ result_count|pluralize }}{% if search_query %} for "{{ search_query }}"{% endif %}
+      </p>
+    {% endif %}
+    {% if selected_availability or selected_contributor or selected_subject or selected_language or selected_source %}
+      <div class="pill-row">
+        {% if selected_availability %}<span class="pill">Availability: {{ selected_availability|capfirst }}</span>{% endif %}
+        {% if selected_contributor %}<span class="pill">Contributor: {{ selected_contributor }}</span>{% endif %}
+        {% if selected_subject %}<span class="pill">Subject: {{ selected_subject }}</span>{% endif %}
+        {% if selected_language %}<span class="pill">Language: {{ selected_language }}</span>{% endif %}
+        {% if selected_source %}<span class="pill">Source: {{ selected_source }}</span>{% endif %}
+      </div>
+      <p class="muted" style="margin-top: 0.75rem; margin-bottom: 0;">
+        Advanced filters remain active through query parameters, but the main
+        catalog flow now prioritizes direct search.
+      </p>
+    {% endif %}
     {% if can_manage_catalog %}
-      <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+      <div class="nav-actions">
+        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+        <a class="button button--ghost" href="{% url 'work-create' %}">Create work</a>
+      </div>
     {% else %}
       <p class="muted">Sign in as an Admin or Librarian to create foundation records.</p>
       <a class="button button--ghost" href="{% url 'account_login' %}">Sign in</a>
@@ -23,18 +69,49 @@
       <ul class="clean">
         {% for work in works %}
           <li>
-            <a href="{% url 'catalog-detail' work_id=work.pk %}"><strong>{{ work.title }}</strong></a>
-            <div class="muted">
-              {% for relation in work.work_contributors.all %}
-                {{ relation.contributor.name }} ({{ relation.get_role_display }}){% if not forloop.last %}, {% endif %}
-              {% empty %}
-                No contributors yet.
-              {% endfor %}
+            <div
+              style="padding: 1rem 1.05rem; border: 1px solid {% if search_query and work.search_explanation == 'Exact identifier match' %}var(--accent-strong){% else %}var(--line){% endif %}; border-radius: 18px; background: {% if search_query and work.search_explanation == 'Exact identifier match' %}linear-gradient(180deg, rgba(155, 67, 46, 0.12), rgba(255, 255, 255, 0.94)){% else %}rgba(255, 255, 255, 0.55){% endif %}; box-shadow: {% if search_query and work.search_explanation == 'Exact identifier match' %}0 12px 30px rgba(155, 67, 46, 0.12){% else %}inset 0 1px 0 rgba(255, 255, 255, 0.7){% endif %};"
+            >
+              <div style="display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: baseline;">
+                {% if search_query and work.search_explanation == 'Exact identifier match' %}
+                  <span class="pill" style="border-color: transparent; background: var(--accent-soft); color: var(--accent-strong); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;">Exact identifier hit</span>
+                {% endif %}
+                <a href="{% url 'catalog-detail' work_id=work.pk %}" style="font-family: var(--display-font); font-size: {% if search_query and work.search_explanation == 'Exact identifier match' %}1.55rem{% else %}1.25rem{% endif %}; line-height: 1.1;">
+                  <strong>{{ work.title }}</strong>
+                </a>
+              </div>
+              {% if search_query and work.search_explanation == 'Exact identifier match' %}
+                <div style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.7rem;">
+                  {% if work.search_matched_identifier_value %}
+                    <span class="pill" style="border-color: rgba(155, 67, 46, 0.28); background: rgba(155, 67, 46, 0.08); color: var(--text);">Matched identifier: {{ work.search_matched_identifier_value }}</span>
+                  {% endif %}
+                  {% if work.search_availability_state == 'available' %}
+                    <span class="pill" style="border-color: rgba(64, 124, 91, 0.28); background: rgba(64, 124, 91, 0.1); color: var(--text);">Availability: Available</span>
+                  {% elif work.search_availability_state == 'unavailable' %}
+                    <span class="pill" style="border-color: rgba(160, 81, 45, 0.28); background: rgba(160, 81, 45, 0.1); color: var(--text);">Availability: Unavailable</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+              {% if search_query and work.search_explanation %}
+                <div style="margin-top: 0.45rem; {% if search_query and work.search_explanation == 'Exact identifier match' %}font-weight: 700; color: var(--accent-strong);{% else %}color: var(--muted);{% endif %}">
+                  Match: {{ work.search_explanation }}
+                </div>
+              {% endif %}
+              <div class="muted" style="margin-top: 0.45rem;">
+                {% for relation in work.work_contributors.all %}
+                  {{ relation.contributor.name }} ({{ relation.get_role_display }}){% if not forloop.last %}, {% endif %}
+                {% empty %}
+                  No contributors yet.
+                {% endfor %}
+              </div>
+              <div class="muted" style="margin-top: 0.35rem;">{{ work.editions.count }} edition{{ work.editions.count|pluralize }}</div>
             </div>
-            <div class="muted">{{ work.editions.count }} edition{{ work.editions.count|pluralize }}</div>
           </li>
         {% endfor %}
       </ul>
+    {% elif search_active %}
+      <p role="status" aria-live="polite">No matching books found.</p>
+      <p class="muted">Try a title, author, ISBN, or broader subject term.</p>
     {% else %}
       <p>No foundation records exist yet.</p>
     {% endif %}

@@ -4,7 +4,9 @@
 
 Build **Library Ops** from the canonical PRD/spec pack and derived Task Master
 graph using a coordinator-first Codex workflow, explicit specialist routing,
-and the required local toolchain.
+and the required local toolchain. Long-horizon goals stay broad and
+outcome-based. Any implementable work must be captured in Task Master before
+implementation begins.
 
 ## Source-of-truth order
 
@@ -18,23 +20,60 @@ and the required local toolchain.
 8. consolidated ADRs and supporting docs under `docs/`
 9. source code and tests
 
+Long-horizon goals stay broad and outcome-based. Any implementable work must
+be captured in Task Master tasks and subtasks before implementation begins.
+
 ## Coordinator-default contract
 
 - The interactive root agent is always the coordinator by default.
 - Do not rely on a hidden `default-agent` setting to enforce that posture.
-- Spawn direct specialists for bounded work; do not let the root absorb broad
-  implementation or recursive fan-out by habit. If a specialist already owns a
-  slice, wait for its return or an explicit scope change.
+- Prefer direct specialists for bounded work; keep the root focused on
+  coordination and synthesis. If a slice is already narrow enough for a
+  Spark lane or another specialist, delegate it instead of re-planning it at
+  the root.
+- If a specialist already owns a slice, wait for its return or an explicit
+  scope change instead of reclaiming it early.
 - Depth-2 delegation is allowed only when the root explicitly assigns a
   bounded sub-specialist chain. The root remains the only interactive
   coordinator and final decision owner.
-- Discovery is mandatory by default: start with skill discovery, then route the
-  slice to the narrowest specialist or subagent before broad root-local tool
-  use. If the root can keep widening the search, it is a coordination defect.
-- Broad direct shell or file exploration from the root is gated. Prefer
-  specialist packets or `scripts/codex-runtime-env.sh` for cache-sensitive
-  commands such as `npm` and `gh` so home-directory cache writes do not become
-  sandbox failures.
+- Discovery is mandatory by default: start with skill discovery, then route
+  the slice to the narrowest specialist or subagent before broad root-local
+  tool use. If the root can keep widening the search, treat that as a
+  coordination defect and stop widening.
+- Route explicit command work, local evidence gathering, and bounded
+  implementation to the Spark micro-workers first: `command_runner` for
+  commands and quick fixes, `context_gatherer` for local evidence and
+  debugger passes, `single_file_implementer` for one-file quick fixes, and
+  `implementer` for small multi-file implementation slices. Use
+  `researcher` / `docs_researcher` for source-backed lookups and summary when
+  the slice needs research.
+- Batch reasoning before tools: sketch the likely branch points and evidence
+  needs first, then issue the narrowest delegated or shell pass.
+- If context is thin, do not widen root-local tool use. Build a prescriptive
+  delegate packet that names the Spark lane or specialist, the matching
+  repo-local skill, the owned files or modules, and the evidence expected
+  back.
+- Default to Spark-first delegation for trivial or noisy work. Reuse a live agent
+  by forking the existing history when the next path can share context and keep
+  the same role/model; spawn a clean agent when the role or model should
+  change.
+- When writing a delegate packet, say explicitly whether it is a fork or a
+  fresh spawn, name the inherited context, prefer reuse over close+restart,
+  split overlapping slices into separate worktrees before conflicts appear,
+  and include the expected commit scope plus local gate list before push.
+- When new findings or follow-on slices appear, capture them in Task Master
+  tasks, subtasks, or notes before implementation instead of widening the
+  goal.
+- Treat repeated JIT replanning as a smell. Once the task shape is known, keep
+  the slice bounded and let the delegated agent return evidence or a blocker.
+- Ask subagents for compact envelopes: `status`, `evidence`, `gaps`,
+  `next_step` or an equivalent short structure. Bubble-up reports should be
+  brief, evidence-backed, and free of narrative padding or token waste.
+- Keep thread headroom available by closing completed agents promptly and
+  reusing live agents by role before spawning another one. A saturated pool is
+  a process defect, not a reason to absorb the work back into the root.
+- Use `scripts/codex-runtime-env.sh` for cache-sensitive commands when you
+  want controlled cache roots or predictable tool state.
 - Keep root `AGENTS.md` lean. Shared clarification, escalation, tooling, and
   continuation mechanics belong in `.codex/agents/*.toml` and the explicit
   repo-local skill entrypoints under `.agents/skills/`.
@@ -55,13 +94,18 @@ and the required local toolchain.
 3. Confirm whether the work is meta/control-plane, product-code, or both; split
    commits accordingly.
 4. Confirm the canonical continuation artifacts:
-   - `.codex-session-notes/continuation.md` is authoritative
-   - `.codex-session-notes/scratch.md` is optional scratch only
+   - the current Task Master task/subtask and its notes are the checkpoint
+     surface
+   - repo docs and skills are the durable promotion surface when a lesson
+     needs to survive beyond the session
 5. Perform skill discovery before broad work. Start with the repo-local catalog
-   under `.agents/skills/`, choose the skill whose capability and trigger best
-   match the task, then installed/global skills. Prefer explicit skill
-   workflows over ad hoc repetition and stop at ownership boundaries instead
-   of widening scope locally.
+   under `.agents/skills/`, read the relevant `SKILL.md` entrypoint directly
+   before any symbol/context tooling, then choose the skill whose capability
+   and trigger best match the task. Do not use Serena memory reads, stale
+   rollout notes, or other proxy discovery paths as a substitute for selecting
+   the skill entrypoint. Prefer explicit skill workflows over ad hoc
+   repetition and stop at ownership boundaries instead of widening scope
+   locally.
 6. Use `/plan`, native question routing, and `/goal` according to
    `.agents/skills/clarify-and-goal/SKILL.md`.
 7. Use Serena, code-review-graph, and repo-local ast-grep before broad source
@@ -69,6 +113,12 @@ and the required local toolchain.
    guessed global binary.
 8. Use RTK for noisy exploration and raw output for exact evidence.
 9. Record decisions, evidence, and validation in Task Master notes.
+
+Startup handoff contract:
+- Repository startup and stop paths are controlled by `.codex/hooks/session_start_notice.py`, `.codex/hooks/session_stop_notice.py`, and `.codex/hooks.json`.
+- Stop-hook behavior is notice-only and must output valid JSON to continue the stop flow.
+- Repo-owned write access is bounded to the workspace and the explicitly approved cache/config roots in `.codex/config.toml`. External mounts and filesystem paths such as `/mnt/c/...` are not repo-owned defaults; treat them as session-scoped reads/writes that may require escalation or a different session profile instead of inventing local workarounds.
+- Do not re-ask for known defaults (workspace/default/operator context) when those defaults are already captured in repo surfaces or explicitly confirmed by the user.
 
 ## Routing rules
 
@@ -87,12 +137,20 @@ and the required local toolchain.
 
 - When the user explicitly asks for subagents, root must delegate bounded slices
   with a clear owner and return condition.
+- When a second path can reuse the same context and should stay on the same
+  role/model, prefer forking the live history over a clean spawn. Only create a
+  new agent when the role or model should differ.
 - Do not duplicate or reclaim active owned slices early; wait for the owner to
   return, block, or hand back scope.
+- When combining slices or worktrees, force an explicit checkpoint review
+  before merging them together: inspect both diffs, confirm ownership overlap,
+  and verify the changed test surface instead of assuming the join is clean.
 - Prefer waiting or blocked status over silent local takeover when the critical
   path belongs to a specialist.
 - Treat root absorption of broad implementation after delegation as a process
   defect that should be corrected before closeout.
+- If a new slice appears, update the relevant Task Master task, subtask, or
+  note instead of widening the goal.
 - Do not stop at a merely stable-looking partial point when real blockers are
   absent and the requested end state is still incomplete. If the work is
   blocked on a decision or another agent's owned slice, stop and report the
@@ -108,21 +166,7 @@ and the required local toolchain.
 
 ## Required local checks
 
-Use these entry points:
-
-```bash
-codex doctor --summary --ascii --no-color
-npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
-npm run checks:precommit
-npm run verify:core
-npm run verify:all
-```
-
-For the current detailed validation ladder, read:
-
-```bash
-sed -n '1,220p' docs/process/quality-gates.md
-```
+Use the canonical gate ladder in `docs/process/quality-gates.md`.
 
 ## Coordinator-first launcher
 
@@ -137,8 +181,10 @@ workflow logic in untracked global wrappers.
 
 ## Continuation and retrospective
 
-- Keep `.codex-session-notes/continuation.md` updated at major checkpoints.
-- Treat `.codex-session-notes/scratch.md` as disposable working notes only.
+- Keep the current Task Master task/subtask notes updated at major
+  checkpoints.
+- Promote durable lessons into the relevant skill or repo docs; do not leave
+  them trapped as memory-only guidance.
 - Promote repeated lessons into tracked surfaces through
   `docs/process/retrospective.md` instead of letting memory-only instructions
   compound indefinitely.

@@ -2,7 +2,6 @@ name = "seed_data_engineer"
 description = "Owns public-domain corpus import, seed commands, provenance, demo users, and safe refresh behavior."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 You own demo data and import reproducibility.

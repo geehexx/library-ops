@@ -25,15 +25,22 @@ node_modules/
 npm-debug.log*
 .yarn/
 .pnpm-store/
+.husky/_/
 
 # Codex/local agent state
 .codex-local/
 .codex-log/
-.codex-session-notes/
 .codex/render-home/
+.codex/.tmp/
+.codex/tmp/
+.codex/skills/
 .mcp.json
 .codex.local.toml
 .codex/.runtime/
+.codex/skills/.system/
+.codex/*.sqlite
+.codex/*.sqlite-*
+.codex/installation_id
 
 
 # Local code-intelligence / context-tool state
@@ -73,6 +80,7 @@ dist/
 coverage.xml
 output/playwright/
 reports/
+output/
 *.egg-info/
 
 # OS/editor

@@ -1,24 +1,15 @@
 """Browser smoke tests for the Phase 1 navigation surface."""
 
+import re
 from collections.abc import Callable
-from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from playwright.sync_api import Page, expect
 from pytest_django.live_server_helper import LiveServer
-from tests.factories import LibrarianUserFactory, MemberUserFactory
-
-ARTIFACT_ROOT = Path("output/playwright/navigation")
-
-
-def _artifact_path(filename: str) -> Path:
-    """Return the on-disk path for a navigation screenshot artifact."""
-
-    path = ARTIFACT_ROOT / filename
-    path.parent.mkdir(parents=True, exist_ok=True)
-    return path
+from tests.e2e.visual_regression import assert_visual_snapshot
+from tests.factories import AdminUserFactory, LibrarianUserFactory, MemberUserFactory
 
 
 @pytest.mark.e2e
@@ -36,7 +27,7 @@ class TestNavigationE2E:
         page.goto(live_server.url)
 
         primary_nav = page.get_by_role("navigation", name="Primary")
-        expect(page.get_by_role("heading", name="Foundation Dashboard")).to_be_visible()
+        expect(page.get_by_role("heading", name="Library Dashboard")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Sign in")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Create foundation record")).to_have_count(0)
 
@@ -46,7 +37,7 @@ class TestNavigationE2E:
 
         page.get_by_role("navigation", name="Primary").get_by_role("link", name="Sign in").click()
         expect(page).to_have_url(f"{live_server.url}/accounts/login/")
-        expect(page.get_by_role("heading", name="Sign In")).to_be_visible()
+        expect(page.get_by_role("heading", name="Sign In", exact=True)).to_be_visible()
 
     def test_librarian_sees_create_flow_and_validation_errors(
         self,
@@ -79,6 +70,48 @@ class TestNavigationE2E:
             page.locator("span.error").filter(has_text="This field is required.").first
         ).to_be_visible()
 
+        title = "The Time Machine"
+        contributor_name = "H. G. Wells"
+        isbn = "9780143111597"
+        barcode = "BC-E2E-001"
+
+        page.get_by_label("Work title").fill(title)
+        page.get_by_label("Contributor name").fill(contributor_name)
+        page.get_by_label("Contributor role").select_option("author")
+        page.get_by_label("ISBN").fill(isbn)
+        page.get_by_label("Barcode").fill(barcode)
+        page.get_by_role("button", name="Create foundation record").click()
+
+        expect(page).to_have_url(re.compile(rf"{re.escape(live_server.url)}/catalog/\d+/$"))
+        expect(page.get_by_role("heading", name=title)).to_be_visible()
+        expect(page.locator("p.eyebrow").filter(has_text="Contributors")).to_be_visible()
+        expect(page.get_by_text(f"ISBN: {isbn}")).to_be_visible()
+        expect(page.locator("li").filter(has_text=barcode)).to_be_visible()
+        expect(page.get_by_role("link", name="Edit work")).to_be_visible()
+        expect(page.get_by_role("link", name="Add edition")).to_be_visible()
+        assert_visual_snapshot(page, "navigation", "catalog-create-success.png")
+
+    def test_librarian_can_open_the_loan_dashboard(
+        self,
+        live_server: LiveServer,
+        page: Page,
+        login_to_live_server: Callable[[User], None],
+    ) -> None:
+        """Verify the authenticated navigation exposes the circulation dashboard."""
+
+        call_command("seed_roles")
+        librarian = LibrarianUserFactory()
+        login_to_live_server(librarian)
+
+        page.goto(live_server.url)
+
+        primary_nav = page.get_by_role("navigation", name="Primary")
+        expect(primary_nav.get_by_role("link", name="Loans")).to_be_visible()
+        primary_nav.get_by_role("link", name="Loans").click()
+
+        expect(page).to_have_url(f"{live_server.url}/circulation/")
+        expect(page.get_by_role("heading", name="Circulation Dashboard")).to_be_visible()
+
     def test_member_sees_denied_state_for_create_flow(
         self,
         live_server: LiveServer,
@@ -94,6 +127,34 @@ class TestNavigationE2E:
         page.goto(f"{live_server.url}/catalog/create/")
 
         expect(page.get_by_role("heading", name="Access denied")).to_be_visible()
-        expect(page.get_by_text("You do not have permission")).to_be_visible()
-        expect(page.get_by_role("link", name="Browse catalog")).to_be_visible()
-        page.screenshot(path=str(_artifact_path("denied/create-flow.png")), full_page=True)
+        expect(page.get_by_text("You do not have access to this page.")).to_be_visible()
+        expect(page.get_by_role("link", name="Return home")).to_be_visible()
+        assert_visual_snapshot(page, "navigation", "denied/create-flow.png")
+
+    def test_admin_user_can_reach_django_admin_index(
+        self,
+        live_server: LiveServer,
+        page: Page,
+        login_to_live_server: Callable[[User], None],
+    ) -> None:
+        """Verify a superuser can reach the Django admin index route."""
+
+        admin = AdminUserFactory()
+        login_to_live_server(admin)
+
+        page.goto(f"{live_server.url}/admin/")
+
+        expect(page).to_have_url(f"{live_server.url}/admin/")
+        expect(page.get_by_role("heading", name="Site administration")).to_be_visible()
+
+    def test_health_route_is_browser_visible_and_returns_plain_ok(
+        self,
+        live_server: LiveServer,
+        page: Page,
+    ) -> None:
+        """Verify /health/ is reachable in-browser and returns the plain-text sentinel."""
+
+        page.goto(f"{live_server.url}/health/")
+
+        expect(page).to_have_url(f"{live_server.url}/health/")
+        expect(page.locator("body")).to_have_text("ok")

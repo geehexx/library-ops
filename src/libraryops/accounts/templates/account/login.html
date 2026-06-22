@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load i18n socialaccount demo_access %}
+
+{% block title %}Sign In | Library Ops{% endblock %}
+{% block page_title %}Sign In{% endblock %}
+
+{% block content %}
+  {% url "account_login" as login_url %}
+  {% url "account_signup" as signup_url %}
+  {% get_providers as socialaccount_providers %}
+  {% demo_auth_ready as demo_accounts_ready %}
+
+  <section class="panel" aria-labelledby="sign-in-heading">
+    <p class="eyebrow">Account Access</p>
+    <h2 id="sign-in-heading" style="margin-top: 0;">Sign in to Library Ops</h2>
+    <p class="muted lede" style="margin-bottom: 0;">
+      {% if demo_accounts_ready %}
+        Use a seeded demo account for the guided product tour, or continue with
+        a configured social provider when the deployment exposes OAuth.
+      {% else %}
+        This live deployment does not have seeded demo accounts yet. Use an
+        existing account, or refresh the demo data before treating this host as
+        fully ready.
+      {% endif %}
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+        <h3 style="margin-top: 0;">Fix the highlighted fields</h3>
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ login_url }}" novalidate>
+      {% csrf_token %}
+
+      {% for field in form %}
+        {% if field.name != "remember" %}
+          <p>
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+              <span class="muted">{{ field.help_text }}</span>
+            {% endif %}
+            {% for error in field.errors %}
+              <span class="error">{{ error }}</span>
+            {% endfor %}
+          </p>
+        {% endif %}
+      {% endfor %}
+
+      {% if form.remember %}
+        <p style="display: flex; align-items: center; gap: 0.5rem;">
+          {{ form.remember }}
+          {{ form.remember.label_tag }}
+        </p>
+      {% endif %}
+
+      {% if redirect_field_value %}
+        <input
+          type="hidden"
+          name="{{ redirect_field_name }}"
+          value="{{ redirect_field_value }}"
+        >
+      {% endif %}
+
+      <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+        <button type="submit">Sign In</button>
+        <a href="{% url 'account_reset_password' %}" class="button button--ghost">
+          Forgot your password?
+        </a>
+      </div>
+    </form>
+
+    <p class="muted" style="margin-bottom: 0;">
+      Need a local-only account? <a href="{{ signup_url }}">Create one here</a>.
+    </p>
+  </section>
+
+  <section class="panel provider-panel" aria-labelledby="social-sign-in-heading">
+    <p class="eyebrow">Optional OAuth</p>
+    <h3 id="social-sign-in-heading" style="margin-top: 0;">
+      {% if socialaccount_providers %}
+        Continue with Google or GitHub
+      {% else %}
+        Optional OAuth providers
+      {% endif %}
+    </h3>
+    <p class="muted" style="margin-bottom: 0;">
+      Google and GitHub sign-in use optional OAuth credentials. When this
+      environment does not expose them, password sign-in remains the reliable
+      fallback.
+    </p>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
+      {% if socialaccount_providers %}
+        {% for provider in socialaccount_providers %}
+          <a
+            href="{% provider_login_url provider.id process="login" next=redirect_field_value %}"
+            class="button button--ghost"
+          >
+            Continue with {{ provider.name }}
+          </a>
+        {% endfor %}
+      {% else %}
+        <p class="muted" style="margin-bottom: 0;">
+          This deployment exposes password sign-in only.
+          {% if demo_accounts_ready %}
+            Use the seeded demo password path above to continue.
+          {% else %}
+            Run the operator demo refresh before expecting seeded demo access.
+          {% endif %}
+        </p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

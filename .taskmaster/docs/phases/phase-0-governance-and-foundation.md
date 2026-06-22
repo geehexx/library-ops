@@ -21,8 +21,9 @@ configuration, and parseable planning artifacts.
 - Task graph has no circular dependencies
 - CI/governance skeleton is accurate
 
-## Suggested local regeneration command
+## Suggested local regeneration workflow
 
-```bash
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/phases/phase-0-governance-and-foundation.md --force'
-```
+Review the committed graph first. If phase-0 regeneration is genuinely needed,
+run it as a bounded draft/review lane and compare the result against
+`.taskmaster/tasks/tasks.json` before accepting any mutations. Do not use
+`task-master parse-prd --force` here as a routine refresh.

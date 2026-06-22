@@ -1,0 +1,96 @@
+<section
+  class="panel"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="workflow-title"
+  aria-describedby="workflow-description workflow-guidance"
+>
+  {% if back_url %}
+    <p><a href="{{ back_url }}">&larr; {{ back_label }}</a></p>
+  {% endif %}
+  <p class="eyebrow">Circulation workflow</p>
+  <h2 id="workflow-title" style="margin-top: 0;">{{ page_title }}</h2>
+  <p id="workflow-description" class="muted">
+    {% if page_title == "Checkout copy" %}
+      Assign an available copy to a member and open a new loan.
+    {% else %}
+      Select an active loan and close it to return the copy.
+    {% endif %}
+  </p>
+  <p id="workflow-guidance" class="muted">
+    Search first, then choose from the filtered select lists below. Each lookup
+    stays keyboard-friendly and does not depend on browser datalist behavior.
+  </p>
+  {% if page_title == "Checkout copy" %}
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin-bottom: 1rem;">
+      <form class="stack" method="get" action="{{ request.path }}">
+        <input type="hidden" name="borrower_query" value="{{ form.borrower_query }}">
+        <label class="stack" style="gap: 0.35rem;">
+          <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Search copies</span>
+          <input
+            type="search"
+            name="copy_query"
+            placeholder="Barcode or title"
+            value="{{ form.copy_query }}"
+            aria-label="Search copies"
+          >
+        </label>
+        <button type="submit">Search copies</button>
+      </form>
+      <form class="stack" method="get" action="{{ request.path }}">
+        <input type="hidden" name="copy_query" value="{{ form.copy_query }}">
+        <label class="stack" style="gap: 0.35rem;">
+          <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Search borrowers</span>
+          <input
+            type="search"
+            name="borrower_query"
+            placeholder="Name or patron code"
+            value="{{ form.borrower_query }}"
+            aria-label="Search borrowers"
+          >
+        </label>
+        <button type="submit">Search borrowers</button>
+      </form>
+    </div>
+  {% else %}
+    <form class="stack" method="get" action="{{ request.path }}" style="margin-bottom: 1rem;">
+      <label class="stack" style="gap: 0.35rem;">
+        <span class="muted" style="font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase;">Search loans</span>
+        <input
+          type="search"
+          name="loan_query"
+          placeholder="Barcode, title, or borrower"
+          value="{{ form.loan_query }}"
+          aria-label="Search loans"
+        >
+      </label>
+      <button type="submit">Search loans</button>
+    </form>
+  {% endif %}
+  {% if form.errors %}
+    <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+      <h3 style="margin-top: 0;">Fix the highlighted fields</h3>
+      {% if form.non_field_errors %}
+        {{ form.non_field_errors }}
+      {% endif %}
+    </div>
+  {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="stack" style="gap: 1rem;">
+      {% for field in form %}
+        <p>
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}
+            <span class="muted">{{ field.help_text }}</span>
+          {% endif %}
+          {% for error in field.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </p>
+      {% endfor %}
+    </div>
+    <button type="submit">{{ submit_label }}</button>
+  </form>
+</section>

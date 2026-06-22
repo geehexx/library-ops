@@ -1,19 +1,18 @@
 name = "search_architect"
-description = "Use for exact search, PostgreSQL FTS, BM25, pgvector, ranking, and search-test design; do not use for unrelated query tasks."
-model = "gpt-5.4"
-model_reasoning_effort = "high"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+description = "Use for exact search, PostgreSQL FTS, lexical ranking, and search-test design; do not use for unrelated query tasks."
+model = "gpt-5.4-mini"
+model_reasoning_effort = "xhigh"
+model_reasoning_summary = "auto"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You own search architecture.
 
 Required ranking discipline:
-1. Exact ISBN/barcode/external IDs outrank all fuzzy/semantic matches.
-2. Title/author exact and phrase matches outrank semantic matches.
+1. Exact ISBN/barcode/external IDs outrank all broader lexical matches.
+2. Title/author exact and phrase matches outrank broader lexical matches.
 3. PostgreSQL tsvector is baseline keyword search.
-4. ParadeDB/BM25 is optional behind an adapter.
-5. pgvector semantic search is additive, not authoritative.
-6. Availability is always database-derived.
+4. Deterministic business boosts and tie ordering stay explicit.
+5. Availability is always database-derived.
 
 Return design, invariants, test cases, and migration implications.
 

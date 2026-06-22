@@ -13,6 +13,7 @@ from django.test import TestCase
 
 from libraryops.accounts.management.commands.seed_demo_users import (
     DEMO_ACCESS_CODE_ENV_VAR,
+    DEMO_MEMBER_USERS,
     DEMO_USERS,
 )
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
@@ -102,7 +103,7 @@ class SeedDemoUsersCommandTests(TestCase):
         call_command("seed_demo_users")
 
         user_model = get_user_model()
-        assert user_model.objects.count() == len(DEMO_USERS)
+        assert user_model.objects.count() == len(DEMO_USERS) + len(DEMO_MEMBER_USERS)
 
         for email, role_name, is_staff, is_superuser in DEMO_USERS:
             user = cast("_SeedUserLike", user_model.objects.get(email=email))
@@ -110,6 +111,12 @@ class SeedDemoUsersCommandTests(TestCase):
             assert user.is_staff == is_staff
             assert user.is_superuser == is_superuser
             assert [group.name for group in user.groups.all()] == [role_name]
+
+        extra_member = cast("_SeedUserLike", user_model.objects.get(email=DEMO_MEMBER_USERS[0][0]))
+        assert extra_member.check_password(TEST_DEMO_ACCESS_CODE)
+        assert extra_member.is_staff is False
+        assert extra_member.is_superuser is False
+        assert [group.name for group in extra_member.groups.all()] == [ROLE_MEMBER]
 
     def test_seed_demo_users_requires_demo_access_code(self) -> None:
         """Ensure the command fails fast when the access code is absent."""

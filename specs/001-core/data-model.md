@@ -13,9 +13,7 @@
 | BookCopy | Borrowable physical/logical item. | Barcode unique; availability derived from loan state/status. |
 | Loan | Borrow/return event. | One active loan per copy; active loan has no returned timestamp. |
 | AuditEvent | Append-only evidence for important actions. | Actor/action/target/timestamp immutable after write. |
-| SearchDocument | Denormalized search projection. | Rebuildable from authoritative records. |
-| MetadataSuggestion | AI-assisted recommendation. | Requires provenance, status, and review before applying. |
-| ImportBatch / ImportSource | Seed import provenance. | Records source, license, count, timestamps, errors. |
+| ExternalSourceRecord | Seed import provenance. | Records source, license, target object, and import timestamps. |
 
 ## Boundary notes
 
@@ -24,11 +22,11 @@
 - `inventory` owns copies and availability projection.
 - `circulation` owns loan transitions.
 - `audit` owns append-only audit events.
-- `search` owns projections/ranking, not authoritative state.
-- `ai_assist` owns suggestions, not direct catalog mutation.
+- `search` owns lexical query helpers, ranking rules, and any measured
+  index/query strategy updates, not authoritative state or a standing
+  projection table.
 - `accounts` owns demo-user seeding.
 - `catalog` owns public-domain import commands and provenance.
-- `search` and `ai_assist` own search-document and embedding rebuild workflows.
 
 ## Key constraints
 

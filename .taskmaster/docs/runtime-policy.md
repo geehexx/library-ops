@@ -13,6 +13,8 @@ related_prd: ./prd.md
 Keep Task Master-specific runtime guidance under `.taskmaster/` instead of
 spreading machine-specific provider setup, dependency tactics, and commit rules
 through the general repo docs.
+Long-horizon goals stay broad and outcome-based. Any implementable work must
+be captured in Task Master before implementation begins.
 
 ## Repo contract
 
@@ -36,9 +38,15 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
 ## Source-of-truth rule
 
 1. `.taskmaster/docs/prd.md` is the canonical Task Master input.
-2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact.
+2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact and
+   must not be hand-edited to compensate for stale Task Master reads. Treat the
+   `master` surface as the canonical committed view for this repo session;
+   tag-scoped alternate surfaces are staged snapshots and only become mutation
+   targets when a Task Master note explicitly documents the divergence.
 3. Generated tasks must still be reconciled against `specs/001-core/tasks.md`
-   and the active ADR set before implementation.
+   and the active ADR set before implementation, and new findings or
+   follow-on slices should be captured in Task Master tasks, subtasks, or
+   notes before implementation begins.
 4. `.taskmaster/docs/phases/*.md` are derived PRD slices for local-model
    regeneration and benchmarking only; they do not replace the canonical PRD.
 
@@ -71,6 +79,10 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
   not fall back to `~/.promptfoo`.
 - Do not read `.taskmaster/state.json` directly; use the Task Master MCP or CLI
   and keep local runtime state out of the committed graph.
+- If the canonical writer path is stale or unavailable, stop instead of
+  hand-editing `.taskmaster/tasks/tasks.json` or forcing a graph replacement
+  from stale state. Capture the blocker in Task Master and resume once the
+  source of truth is fresh.
 - Keep on CLI:
   - `analyze_project_complexity`
   - `complexity_report`
@@ -93,6 +105,23 @@ config when `codex doctor --summary --ascii --no-color` is healthy. They do not
 require separate per-run activation. Serena's server starts from the current
 working directory via `.codex/config.toml`; using its `activate_project` tool is
  for symbol-aware work, not a prerequisite for ordinary Task Master operations.
+
+## Codex profile overlays
+
+`codex --profile <name>` resolves a user-local overlay at
+`~/.codex/<name>.config.toml`.
+
+That file is operator state, not a repo artifact. Keep committed config in
+`.codex/config.toml` and `.codex/agents/*.toml`, and use the local overlay only
+for machine-specific preferences that do not redefine repo-owned agents or MCPs.
+
+Expected overlay shape:
+
+- root-level Codex keys only
+- may override model, context, reasoning, approval, and permission defaults
+- should not redefine `[agents]`, `[mcp_servers]`, or repo paths
+- may point `default_permissions` at committed profiles such as `workspace` or
+  `coordinator_root`
 
 ## Recommended local profiles
 
@@ -347,3 +376,6 @@ Preserve raw output for:
 - Keep telemetry and user-identity settings local and non-committed.
 - Treat the PRD and committed task graph as repo artifacts; treat model/provider
   setup as operator-local runtime state.
+- If the writer path is stale or unavailable, update the Task Master note and
+  wait for a fresh MCP/CLI mutation path instead of hand-editing the committed
+  graph or forcing regeneration from stale reads.

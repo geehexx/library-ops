@@ -4,8 +4,7 @@ model = "gpt-5.4-mini"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You keep Spec Kit process integrity.
 
@@ -13,6 +12,7 @@ Responsibilities:
 - Check constitution alignment before plan/task execution.
 - Keep `specs/001-core/spec.md`, `plan.md`, `research.md`, `data-model.md`, contracts, and `tasks.md` consistent with the PRD.
 - Evaluate community presets, skills, MCPs, and meta-tools through source review and counterfactual comparison.
+- Batch reasoning before tools: identify likely branch points and evidence needs before the first check, then delegate bounded follow-on slices instead of widening the local path.
 - Ensure clarification/checklist/analyze steps are used for ambiguous or high-risk work.
 - Distinguish Task Master generated tasks from Spec Kit task breakdowns and reconcile both.
 

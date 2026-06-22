@@ -2,8 +2,7 @@ name = "retrospective_analyst"
 description = "Use at closeout or after failed checks to propose process, skill, hook, and documentation improvements; do not edit files directly."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You summarize sessions and improve the process.
 

@@ -24,6 +24,40 @@ evidence that can be copied into Task Master notes or a PR.
 npm run checks:precommit
 ```
 
+### Pre-push authority
+
+```bash
+npm run checks:prepush
+```
+
+`checks:prepush` is the authoritative local gate list before a push. It runs
+`commitlint:range` before `checks:precommit` so commit-scope violations fail
+before the broader hygiene checks. GitHub Actions runs `checks:ci` after a
+shallow checkout, and the dedicated `commitlint.yml` workflow handles commit
+range validation separately.
+
+### CI quality loop
+
+```bash
+npm run checks:quality
+```
+
+`checks:quality` is the required GitHub Actions quality job. It keeps the
+runtime-critical type, migration, import, and test lane authoritative while the
+docs/bootstrap work moves to the sibling `docs-bootstrap` job via
+`npm run docs:bootstrap`. Use `npm run checks:ci` when you want the full local
+CI bundle in one command, or `npm run checks:ci:docs` when you want the
+composite local docs bundle as well.
+
+Current proof payload for release-convergence doc/meta work should stay short:
+
+- the current local head and, if different, the last fully green PR/CI head;
+- `checks:prepush` result as local gate authority;
+- `checks:quality` result as the mirrored required-quality path;
+- `docs-bootstrap` result for the sibling docs/bootstrap lane when relevant;
+- any deeper `verify:core` / `verify:all` runtime proof relevant to the slice;
+- any remaining external blocker that cannot be proved from repo state alone.
+
 ### Control-plane loop
 
 ```bash
@@ -31,6 +65,25 @@ codex doctor --summary --ascii --no-color
 npm run taskmaster:validate
 npm run verify:core
 ```
+
+### Control-plane setup loop
+
+Run this before broad implementation when agent/config/hook surfaces changed:
+
+<!-- cspell:disable -->
+```bash
+python - <<'PY'
+import pathlib,tomllib
+paths=[pathlib.Path('.codex/config.toml'),*sorted(pathlib.Path('.codex/agents').glob('*.toml'))]
+for p in paths:
+    tomllib.loads(p.read_text())
+    print("OK", p)
+PY
+codex features list
+codex mcp list
+codex doctor --summary --ascii --no-color
+```
+<!-- cspell:enable -->
 
 ### Full local loop
 
@@ -43,6 +96,7 @@ npm run verify:all
 ```bash
 uv run ruff format --check .
 uv run ruff check .
+npm run python:lint
 uv run python manage.py check
 uv run python manage.py makemigrations --check --dry-run
 PYTHONPATH=src uv run lint-imports
@@ -64,6 +118,7 @@ uv run pytest tests/smoke tests/web tests/e2e
 - policy checks
 - release readiness
 - Ruff, Django `check`, Django `makemigrations --check --dry-run`, Pyright, pytest, and Import Linter
+- source complexity and docstring lint (`npm run python:lint`)
 - Task Master validation
 
 `npm run verify:all` adds:
@@ -85,6 +140,11 @@ npm run docstrings:lint
 - Use RTK for noisy exploratory output, not for final security or release proof.
 - Use graph/symbol tools for planning, then confirm with source inspection and
   tests.
+- Use Context7 first for official API, SDK, and library documentation; fall
+  back to Exa or web research for discovery, examples, and counter-evidence.
+- When a Django module grows into multiple behavior groups, split it into a
+  package and enforce the public surface with `__all__` re-exports plus a
+  governance test.
 - Preserve raw scanner output for security, supply chain, and release evidence.
 - Keep Task Master runtime/provider policy in `.taskmaster/docs/runtime-policy.md`.
 

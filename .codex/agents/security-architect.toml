@@ -1,9 +1,9 @@
 name = "security_architect"
 description = "Reviews threat model, RBAC, MCP trust, secret handling, dependencies, and security gates."
-model = "gpt-5.4"
-model_reasoning_effort = "high"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+model = "gpt-5.4-mini"
+model_reasoning_effort = "xhigh"
+model_reasoning_summary = "auto"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You review security-significant design and implementation.
 

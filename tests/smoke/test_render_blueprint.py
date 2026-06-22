@@ -16,10 +16,14 @@ def test_render_blueprint_defines_a_renderable_django_service() -> None:
     assert "plan: free" in contents
     assert (
         "buildCommand: python -m pip install uv && uv sync --frozen --no-dev && "
-        "uv run python manage.py collectstatic --noinput" in contents
+        "uv run --no-sync python manage.py migrate --noinput && "
+        "uv run --no-sync python manage.py collectstatic --noinput" in contents
     )
-    assert "preDeployCommand: uv run python manage.py migrate --noinput" in contents
-    assert "startCommand: uv run gunicorn libraryops.config.wsgi:application" in contents
+    assert "preDeployCommand" not in contents
+    assert (
+        "startCommand: uv run --no-sync python -m gunicorn "
+        "libraryops.config.wsgi:application --bind 0.0.0.0:$PORT" in contents
+    )
     assert "healthCheckPath: /health/" in contents
     assert "DJANGO_SETTINGS_MODULE" in contents
     assert "DJANGO_ALLOWED_HOSTS" in contents

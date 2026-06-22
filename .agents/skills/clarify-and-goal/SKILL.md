@@ -7,12 +7,32 @@ description: Use when a task is ambiguous, needs Codex Plan mode, native user-qu
 
 ## Purpose
 
-Use this skill to turn ambiguous work into native Codex questions, clear
-decision packets, and safe partial work.
+Use this skill to turn ambiguous work, unclear acceptance criteria, or fuzzy
+test-quality expectations into native Codex questions, clear decision packets,
+and safe partial work.
+Keep long-horizon goals broad and measurable; push implementation detail into Task Master tasks, subtasks, and notes so the goal stays stable as new slices appear.
+Batch reasoning before tools: decide whether the slice is deterministic or
+decision-dependent before the first command, then prefer a Spark lane for the
+smallest bounded pass.
 
 Use the installed `$define-goal` skill alongside this one when the main need is
 to shape or improve the actual goal text. This repo-local skill owns the
 Library Ops routing rules, native question path, and escalation contract.
+Broad goals stay broad and measurable. Concrete implementation detail belongs in Task Master tasks, subtasks, or notes before coding. If new slices appear, promote them into Task Master instead of widening the goal.
+When a slice branches, hand off a bounded child worker instead of widening the
+root-local pass.
+
+Use `command_runner`, `context_gatherer`, and `implementer` as the first
+delegation lanes for command, evidence, and small implementation slices; keep
+root-local shell/file exploration available when the coordinator owns the
+slice or when a direct pass is the clearest proof path.
+When you delegate, say whether the worker is a fork or a fresh spawn, name the
+inherited context, prefer reuse over close+respawn, split overlapping slices
+into separate worktrees before conflicts appear, and include the expected
+commit scope plus local gate list before push.
+If a branch has been force-pushed, replaced, or superseded, refresh live PR
+checks and mergeability evidence against the current head before treating
+earlier results as current.
 
 ## Current sources
 
@@ -22,13 +42,21 @@ Treat these as the durable repo-local sources for this workflow:
 - `.taskmaster/docs/prd.md` and `specs/001-core/` for requirements.
 - `.codex/agents/*.toml` for agent routing metadata.
 - `.agents/skills/code-intelligence/SKILL.md` for tool-routing boundaries.
+- Read the matching `SKILL.md` entrypoint from `.agents/skills/` directly.
+  Do not use Serena memory reads or other proxy lookups to decide which skill
+  or goal route applies.
 - `docs/process/quality-gates.md` for the validation ladder.
 
 ## Procedure
 
-1. Read the current Task Master task, PRD section, and relevant spec.
-2. Decide whether the issue is deterministic or decision-dependent.
-3. If deterministic, run the next validation or inspection step.
+1. Read the current Task Master task, PRD section, relevant spec, and the
+   matching `SKILL.md` entrypoint from `.agents/skills/` directly.
+2. Decide whether the issue is deterministic or decision-dependent. Treat
+   unclear acceptance criteria, pass/fail evidence, or test-quality
+   expectations as decision-dependent.
+3. If deterministic, route the narrow command, evidence, or implementation
+   slice to `command_runner`, `context_gatherer`, or `implementer` before
+   broadening root-local work or running the next validation.
 4. If decision-dependent and interactive Codex exposes native user-input tooling, use it with the Question packet shape.
 5. If native user-input tooling is unavailable or non-interactive, print the Question packet and stop with `needs-user`.
 6. If the task is long-running, route goal shaping through `$define-goal` and
@@ -36,6 +64,8 @@ Treat these as the durable repo-local sources for this workflow:
 7. If a subagent raised a concern, normalize it into an Escalation packet, stop
    the blocked branch, and pass it to the coordinator without continuing
    adjacent implementation work.
+8. If the branch changed beneath you, refresh live PR checks and mergeability
+   evidence before using older review or deployment claims.
 
 ## Native Codex question preference
 

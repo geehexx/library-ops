@@ -11,11 +11,31 @@ from django.core.management.base import BaseCommand, CommandError
 
 from libraryops.accounts.roles import ROLE_ADMIN, ROLE_LIBRARIAN, ROLE_MEMBER
 
+# cspell:ignore Okafor Hana Mori Karim Hassan
 DEMO_ACCESS_CODE_ENV_VAR = "LIBRARYOPS_DEMO_ACCESS_CODE"
 DEMO_USERS = (
     ("admin@libraryops.demo", ROLE_ADMIN, True, True),
     ("librarian@libraryops.demo", ROLE_LIBRARIAN, True, False),
     ("member@libraryops.demo", ROLE_MEMBER, False, False),
+)
+DEMO_USER_NAMES = {
+    "admin@libraryops.demo": ("Alex", "Morgan"),
+    "librarian@libraryops.demo": ("Sam", "Rivera"),
+    "member@libraryops.demo": ("Jamie", "Cole"),
+}
+DEMO_MEMBER_USERS = (
+    ("ada.brooks@libraryops.demo", "Ada", "Brooks"),
+    ("amelia.ward@libraryops.demo", "Amelia", "Ward"),
+    ("benito.flores@libraryops.demo", "Benito", "Flores"),
+    ("clara.nguyen@libraryops.demo", "Clara", "Nguyen"),
+    ("darius.kim@libraryops.demo", "Darius", "Kim"),
+    ("elena.singh@libraryops.demo", "Elena", "Singh"),
+    ("felix.turner@libraryops.demo", "Felix", "Turner"),
+    ("grace.okafor@libraryops.demo", "Grace", "Okafor"),
+    ("hana.mori@libraryops.demo", "Hana", "Mori"),
+    ("isaac.bennett@libraryops.demo", "Isaac", "Bennett"),
+    ("jules.carter@libraryops.demo", "Jules", "Carter"),
+    ("karim.hassan@libraryops.demo", "Karim", "Hassan"),
 )
 
 
@@ -69,12 +89,15 @@ class Command(BaseCommand):
 
         user_model = cast("type[User]", get_user_model())
         for email, role_name, is_staff, is_superuser in DEMO_USERS:
+            first_name, last_name = DEMO_USER_NAMES.get(email, ("", ""))
             user, created = user_model.objects.get_or_create(
                 email=email,
                 defaults={
                     "username": email,
                     "is_staff": is_staff,
                     "is_superuser": is_superuser,
+                    "first_name": first_name,
+                    "last_name": last_name,
                 },
             )
             if created or bool(options["reset_passwords"]):
@@ -82,8 +105,30 @@ class Command(BaseCommand):
             user.is_staff = is_staff
             user.is_superuser = is_superuser
             user.username = email
+            user.first_name = first_name
+            user.last_name = last_name
             user.save()
             user_any = cast("Any", user)
             user_any.groups.set([Group.objects.get(name=role_name)])
+
+        for email, first_name, last_name in DEMO_MEMBER_USERS:
+            user, created = user_model.objects.get_or_create(
+                email=email,
+                defaults={
+                    "username": email,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                },
+            )
+            if created or bool(options["reset_passwords"]):
+                user.set_password(default_access_code)
+            user.is_staff = False
+            user.is_superuser = False
+            user.username = email
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            user_any = cast("Any", user)
+            user_any.groups.set([Group.objects.get(name=ROLE_MEMBER)])
 
         self.stdout.write(self.style.SUCCESS("Seeded disposable demo users."))

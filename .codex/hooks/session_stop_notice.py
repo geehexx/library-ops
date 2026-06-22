@@ -1,7 +1,7 @@
+#!/usr/bin/env python3
 """Stop hook for Codex sessions.
 
 The Stop hook must return valid JSON. Returning ``{}`` accepts the stop.
-Returning ``{"decision": "block", "reason": "..."}`` forces a continuation.
 """
 
 from __future__ import annotations
@@ -12,24 +12,6 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any, cast
-
-VALIDATION_PHRASES = (
-    "test",
-    "tests",
-    "pytest",
-    "verify",
-    "validation",
-    "lint",
-    "pyright",
-    "check",
-)
-BLOCKER_PHRASES = (
-    "blocked",
-    "waiting on",
-    "need user input",
-    "need more info",
-    "need more time",
-)
 
 
 def load_payload() -> dict[str, Any]:
@@ -42,18 +24,6 @@ def load_payload() -> dict[str, Any]:
     if not isinstance(payload, dict):
         return {}
     return cast("dict[str, Any]", payload)
-
-
-def normalize_message(value: Any) -> str:
-    """Return a lowercase string for hook-message checks."""
-    if not value:
-        return ""
-    return str(value).strip().lower()
-
-
-def contains_any(message: str, phrases: tuple[str, ...]) -> bool:
-    """Check whether any tracked phrase appears in the message."""
-    return any(phrase in message for phrase in phrases)
 
 
 def git_status_short(cwd: Path) -> list[str]:
@@ -73,33 +43,14 @@ def git_status_short(cwd: Path) -> list[str]:
     return [line for line in completed.stdout.splitlines() if line.strip()]
 
 
-def build_block_reason(dirty_entries: list[str]) -> str:
-    """Build the continuation reason for a dirty worktree."""
-    preview = ", ".join(dirty_entries[:3])
-    if preview:
-        return (
-            "Worktree still has uncommitted changes: "
-            f"{preview}. Run validation or explain the remaining work before stopping."
-        )
-    return (
-        "Worktree still has uncommitted changes. Run validation or explain "
-        "the remaining work before stopping."
+def build_notice(dirty_entries: list[str]) -> str:
+    """Build a lightweight notice for a dirty worktree."""
+    preview = ", ".join(
+        entry[3:].strip() if len(entry) > 3 else entry.strip() for entry in dirty_entries[:3]
     )
-
-
-def should_block_stop(payload: dict[str, Any], dirty_entries: list[str]) -> str | None:
-    """Return a continuation reason when the stop request should be blocked."""
-    if payload.get("stop_hook_active"):
-        return None
-    if not dirty_entries:
-        return None
-
-    message = normalize_message(payload.get("last_assistant_message"))
-    if contains_any(message, BLOCKER_PHRASES):
-        return None
-    if contains_any(message, VALIDATION_PHRASES):
-        return None
-    return build_block_reason(dirty_entries)
+    if preview:
+        return f"Worktree has uncommitted changes: {preview}."
+    return "Worktree has uncommitted changes."
 
 
 def emit_json(payload: dict[str, Any]) -> int:
@@ -109,13 +60,12 @@ def emit_json(payload: dict[str, Any]) -> int:
 
 
 def main() -> int:
-    """Decide whether Codex should stop or continue."""
+    """Emit a lightweight dirty-worktree notice, if needed."""
     payload = load_payload()
     cwd = Path(payload.get("cwd") or os.getcwd()).resolve()
     dirty_entries = git_status_short(cwd)
-    block_reason = should_block_stop(payload, dirty_entries)
-    if block_reason is not None:
-        return emit_json({"decision": "block", "reason": block_reason})
+    if dirty_entries:
+        return emit_json({"notice": build_notice(dirty_entries)})
     return emit_json({})
 
 

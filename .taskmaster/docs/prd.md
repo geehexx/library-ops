@@ -6,7 +6,7 @@ owner: Engineering
 source_of_truth: true
 taskmaster_profile: rpg
 constitution: .specify/memory/constitution.md
-last_reviewed: 2026-06-17
+last_reviewed: 2026-06-20
 ---
 
 # Library Ops — Canonical RPG PRD
@@ -24,7 +24,7 @@ last_reviewed: 2026-06-17
 - [9. Requirements](#9-requirements)
 - [10. Architecture](#10-architecture)
 - [11. Data Model](#11-data-model)
-- [12. Search and AI Design](#12-search-and-ai-design)
+- [12. Lexical Search Design](#12-lexical-search-design)
 - [13. Seed Data and Demo Corpus](#13-seed-data-and-demo-corpus)
 - [14. UX and Accessibility Workflow](#14-ux-and-accessibility-workflow)
 - [15. Agent System and MCP Workflow](#15-agent-system-and-mcp-workflow)
@@ -55,7 +55,7 @@ The prompt also lists optional bonuses:
 - deployed live app URL;
 - demo video;
 - authentication with SSO, roles, and permissions;
-- AI features;
+- AI features, if revisited, are deferred from the current release;
 - additional creative features.
 
 Evaluation criteria are completeness, creativity, product quality, and usability.
@@ -70,7 +70,7 @@ than a real integrated library system, but it should demonstrate mature engineer
 - predictable spec-driven delivery;
 - secure role-based operations;
 - reproducible seed data;
-- hybrid search that respects exact library identifiers;
+- lexical search that respects exact library identifiers;
 - clear test and CI gates;
 - deployable Python/Django implementation;
 - kind-first test topology that keeps control-plane, smoke, product, and evaluator evidence distinct;
@@ -95,16 +95,22 @@ The MVP is:
 6. deployed demo;
 7. README and demo evidence.
 
-The primary bonus is not a broad chatbot. The primary bonus is **hybrid catalog search and AI-assisted
-metadata/search workflows that are grounded in stored records**.
+The primary bonus is not a broad chatbot. The primary bonus is **Render-native lexical catalog search with
+exact-identifier priority, grounded in stored records**.
+
+For the active release-finalization tranche, evaluator-critical work takes
+priority over bonus AI scope. Embeddings, AI metadata suggestions, and broader
+search experimentation are superseded for the current release
+unless they are already merged, tested, and truthfully documented as historical
+scope.
 
 ### 1.4 Success Metrics
 
 - Evaluator can run the app locally in under 10 minutes after prerequisites are installed.
 - Evaluator can use a live deployment with documented disposable demo accounts.
 - Minimum assignment flows work end-to-end: create/edit/archive book, borrow, return, search.
-- Search returns exact ISBN/barcode matches before fuzzy or semantic matches.
-- Member role cannot mutate catalog or circulation through UI or direct POST/API calls.
+- Search returns exact ISBN/barcode matches before fuzzy or keyword matches.
+- Member role cannot mutate catalog or circulation through UI or direct POST requests.
 - CI validates formatting, linting, typing, architecture imports, migrations, tests, and seed hygiene.
 - README maps every assignment criterion to visible evidence.
 - Task Master task graph is generated from this PRD and remains traceable.
@@ -119,6 +125,7 @@ metadata/search workflows that are grounded in stored records**.
 - Fines, payments, procurement, acquisition workflows, or interlibrary loan.
 - Multi-branch library administration.
 - A generic ungrounded AI chatbot.
+- A product AI / vector-search release slice.
 - A separate React/Next.js frontend unless scope changes.
 
 ## 2. Source-of-Truth and Governance Model
@@ -172,12 +179,12 @@ The repository SHOULD avoid a sprawling documentation tree. Durable docs are lim
 - `AGENTS.md` for agent workflow;
 - `.specify/memory/constitution.md` for governance;
 - `.taskmaster/docs/prd.md` for product/architecture/execution;
-- `docs/runbook.md` for setup/deployment/operations;
+- `docs/evaluation/demo-script.md` for evaluator walk-through and proof sequence;
 - `docs/design/wireframes.md` for implementation-ready UX guidance;
 - `docs/adr/*.md` for decision records when a decision deserves independent review.
 
 New docs require a PRD or ADR justification. Routine details should go into code comments, tests, the PRD,
-the research/evidence register, or the runbook instead of new standalone documents.
+the research/evidence register, or the maintained README/demo surfaces instead of new standalone documents.
 
 ## 3. Standards Profile
 
@@ -188,7 +195,7 @@ The project uses formal standards selectively. The goal is disciplined structure
 | Requirements | ISO/IEC/IEEE 29148-inspired structure | Stakeholders, requirements, acceptance criteria, traceability. |
 | Normative terms | RFC 2119 / RFC 8174 | `MUST`, `SHOULD`, `MAY` only when binding. |
 | Architecture | C4 + arc42 + pragmatic domain modeling | C4 views for navigation, arc42 quality/risk framing, Django-friendly domain boundaries. |
-| API | OpenAPI | Django Ninja-generated OpenAPI document. |
+| Interface | Server-rendered Django views + HTMX | First-party app interaction; no public API surface in the current scope. |
 | Security controls | OWASP ASVS | Level 1-style web app security requirements. |
 | Security program | OWASP SAMM | Lightweight SDLC security framing. |
 | Accessibility | WCAG 2.2 AA | Usability and accessibility baseline. |
@@ -248,39 +255,38 @@ not a designed product.
 
 ### Q5. Should we use Python, Django, or FastAPI?
 
-**Decision:** Use Python with Django and Django Ninja.
+**Decision:** Use Python with Django and server-rendered templates/HTMX.
 
 **Reasoning:** The assignment is workflow-heavy: auth, roles, admin, forms, database models, migrations,
-management commands, and deployment. Django standardizes more of this than a custom FastAPI stack. Django
-Ninja adds typed API/OpenAPI ergonomics without giving up Django’s batteries-included foundation.
+management commands, and deployment. Django standardizes more of this than a custom FastAPI stack, while
+server-rendered templates keep the implementation aligned with the evaluator-facing UX.
 
 ### Q6. Should search be vector-only?
 
-**Decision:** No. Search MUST be hybrid and must prioritize exact identifiers before semantic retrieval.
+**Decision:** No. Search MUST be exact-identifier-first lexical search with PostgreSQL full-text ranking.
 
 **Reasoning:** In library systems, ISBNs, barcodes, Open Library IDs, titles, and author names are high-precision
-signals. Vector search is useful for natural-language discovery, but it must not outrank exact identifiers.
+signals. The current release stays deterministic and testable without a semantic/vector layer.
 
 ### Q7. Should ParadeDB be required?
 
-**Decision:** No. Baseline search uses PostgreSQL `tsvector` and `pgvector`. ParadeDB/BM25 is optional behind
-an adapter.
+**Decision:** No. Baseline search uses PostgreSQL full-text search only.
 
-**Reasoning:** ParadeDB can provide BM25-style Postgres search, but it adds deployment coupling. A demo should
-remain reliable on standard Postgres plus pgvector.
+**Reasoning:** The release must remain reliable on standard Postgres. Extra search adapters add deployment
+coupling without improving the current evaluator path.
 
 ### Q8. Which embedding strategy should be default?
 
-**Decision:** Use a small local Sentence Transformers-compatible model by default for demo embeddings, with
-hosted embeddings as an optional extension.
+**Decision:** No embedding pipeline is part of the current release.
 
-**Reasoning:** Local embeddings reduce demo cost and secret-key dependency. The model cache must stay out of git.
+**Reasoning:** The release goal is a grounded, reproducible evaluator path. Any future ML workflow must be
+planned explicitly rather than carried in as a hidden dependency.
 
 ### Q9. Should AI generate catalog data automatically?
 
-**Decision:** AI suggestions MUST require human review before persistence.
+**Decision:** No. The current release does not include AI-generated catalog data or metadata suggestions.
 
-**Reasoning:** Metadata suggestions are useful, but unchecked generated metadata can reduce trust.
+**Reasoning:** The active scope stays focused on deterministic catalog, circulation, search, and evidence flows.
 
 ### Q10. Should demo passwords be public?
 
@@ -336,7 +342,7 @@ templates use explicit app namespaces such as `templates/web/`, `templates/catal
 flow. `tests/control_plane/`, `tests/smoke/`, and `tests/e2e/` are current stable anchors. Domain folders are
 transitional waypoints that should migrate toward `tests/unit/`, `tests/integration/`, and `tests/property/`.
 
-**Reasoning:** Kind-first organization keeps meta-system checks, bootstrap checks, domain invariants, DB-backed
+**Reasoning:** Kind-first organization keeps meta-system checks, setup checks, domain invariants, DB-backed
 orchestration, and evaluator-visible browser flows distinct. That lowers review friction and keeps future test growth
 from collapsing into monolithic domain buckets.
 
@@ -358,8 +364,8 @@ Create a reproducible, agent-friendly project foundation.
 #### Feature: C1.F1 Repository and toolchain baseline
 
 - **Description:** Initialize the Python/Django repository baseline, toolchain, and verification scripts.
-- **Inputs:** Existing control-plane package bootstrap, Python 3.12+, Node 20+, uv, GitHub repository.
-- **Outputs:** Verified repository with documented bootstrap and local quality gates.
+- **Inputs:** Existing control-plane package baseline, Python 3.12+, Node 20+, uv, GitHub repository.
+- **Outputs:** Verified repository with documented setup and local quality gates.
 - **Behavior:** Provide deterministic setup commands and enforce no-junk/no-secret hygiene.
 - **Acceptance criteria:**
   - `codex doctor --summary --ascii --no-color` reports a healthy local control-plane state.
@@ -367,12 +373,12 @@ Create a reproducible, agent-friendly project foundation.
   - `npm install` or `npm ci` succeeds.
   - `.pytest_cache`, `.venv`, corpora, model caches, and secrets are not committed.
 
-#### Feature: C1.F2 Django project bootstrap
+#### Feature: C1.F2 Django project foundation
 
 - **Description:** Harden the existing Django project under `src/libraryops/config` with local/test/production settings, real `DATABASE_URL` support, and root URL composition that can mount app-owned URLConfs cleanly.
 - **Inputs:** Existing `manage.py`, `src/libraryops/config/*`, `pyproject.toml`, environment variables, database URL.
-- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable bootstrap.
-- **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, production settings require explicit secure environment, and root routing stays thin enough to compose app-based UI/API surfaces.
+- **Outputs:** Verified settings modules, root URL config, WSGI/ASGI config, and smoke-testable foundation.
+- **Behavior:** Local settings support development, test settings respect `DATABASE_URL` when present, production settings require explicit secure environment, and root routing stays thin enough to compose app-based UI surfaces.
 - **Acceptance criteria:**
   - `uv run python manage.py check` succeeds.
   - SQLite remains the fallback when `DATABASE_URL` is absent.
@@ -385,7 +391,7 @@ Create a reproducible, agent-friendly project foundation.
 - **Description:** Configure Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint.
 - **Inputs:** `pyproject.toml`, package configuration, GitHub workflows.
 - **Outputs:** Local and CI quality gates.
-- **Behavior:** Gates fail on real violations and skip only where bootstrap is not yet present.
+- **Behavior:** Gates fail on real violations and skip only where the target stack is not yet present.
 - **Acceptance criteria:**
   - Ruff format/lint runs.
   - Pyright runs with strict defaults and pragmatic exceptions documented.
@@ -395,15 +401,16 @@ Create a reproducible, agent-friendly project foundation.
 
 - **Description:** Configure Codex, Task Master, Spec Kit, Context7, Exa, RTK-aware operating rules, and bounded context budgets.
 - **Inputs:** `.codex/config.toml`, `AGENTS.md`, skills, MCP credentials in local environment only.
-- **Outputs:** Agent-compatible project workspace with secrets excluded and main-agent context contract set to 1M.
+- **Outputs:** Agent-compatible project workspace with secrets excluded and coordinator-root context contract set to `500,000` tokens.
 - **Behavior:** Agents can research current docs, inspect Task Master tasks, use design context, optimize noisy shell output with RTK, and preserve raw evidence.
 - **Acceptance criteria:**
   - MCP examples document required local authentication.
   - No real MCP keys are committed.
   - Repo wireframes remain the non-private implementation source.
   - `default_permissions` and root context settings remain root-scoped in `.codex/config.toml`.
-  - Main agent context contract is documented and validated as `1,000,000` tokens.
-  - Subagent context budgets are bounded and recursive fan-out remains disabled.
+  - Main agent context contract is documented and validated as `500,000` tokens.
+  - Subagent context budgets are bounded, and bounded child-worker fan-out is
+    allowed when a slice branches.
 
 #### Feature: C1.F5 Code-intelligence and Socratic tooling governance
 
@@ -495,7 +502,7 @@ Support role-based app access with Admin, Librarian, and Member roles.
 
 #### Feature: C3.F2 Server-side authorization services
 
-- **Description:** Provide permission checks used by views, APIs, and services.
+- **Description:** Provide permission checks used by views, request handlers, and services.
 - **Inputs:** `request.user`, role, operation, target object.
 - **Outputs:** allow/deny decision or exception.
 - **Behavior:** UI and API both call shared authorization utilities.
@@ -504,15 +511,18 @@ Support role-based app access with Admin, Librarian, and Member roles.
   - Anonymous direct POST fails.
   - Librarian can mutate catalog/circulation but not manage roles.
 
-#### Feature: C3.F3 OAuth-ready SSO
+#### Feature: C3.F3 Secret-free startup with release-proven social login
 
-- **Description:** Configure django-allauth so deployed demo can support social login when credentials are supplied.
+- **Description:** Configure django-allauth so the app starts cleanly with password login only, while the evaluated release proves Google and GitHub social login when credentials are supplied.
 - **Inputs:** OAuth provider client ID/secret from environment.
 - **Outputs:** OAuth login flow.
-- **Behavior:** Local demo can run with username/password; OAuth is optional and environment-driven.
+- **Behavior:** Local/demo startup works with username/password and no provider secrets; provider links are environment-driven and shown only when configured.
 - **Acceptance criteria:**
   - App runs without OAuth secrets.
-  - README explains optional OAuth setup.
+  - Password-login fallback remains documented and supported.
+  - Google and GitHub provider buttons appear only when configured.
+  - Release evidence proves Google and GitHub callback completion on local and Render.
+  - README explains the provider setup required for release proof.
 
 ### Capability: C4 Catalog Management
 
@@ -539,6 +549,7 @@ Provide evaluator-facing catalog workflows and internal admin support.
 - **Acceptance criteria:**
   - Required fields are enforced.
   - Archive hides records from default catalog results.
+  - Archive actions require explicit confirmation before submission.
   - Audit event records before/after fields where practical.
 
 #### Feature: C4.F3 Cover image support
@@ -594,10 +605,11 @@ Implement checkout/borrow and checkin/return lifecycle.
 - **Description:** Provide checkout/return workflows for librarians/admins.
 - **Inputs:** Book detail actions, copy barcode, patron search, due date.
 - **Outputs:** App-owned circulation URL, views, and HTML/HTMX modal or page response.
-- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer.
+- **Behavior:** Use progressive enhancement; actions work without large frontend framework; circulation-specific routes/templates stay with the circulation surface rather than accumulating inside a generic web layer. Lookup interactions must scale beyond raw browser datalist behavior by surfacing a repeatable search-select path for borrower/copy selection.
 - **Acceptance criteria:**
   - Checkout can be completed from book detail or circulation page.
   - Return can be completed from active loans dashboard.
+  - Borrower/copy selection remains understandable at evaluator scale through a search-select style interaction.
 
 #### Feature: C5.F4 Loan dashboard
 
@@ -608,24 +620,15 @@ Implement checkout/borrow and checkin/return lifecycle.
 - **Acceptance criteria:**
   - Overdue status is derived from `due_at` and `returned_at`.
   - Member cannot see other members’ loans.
+  - Active, overdue, and returned loan rows remain readable without cramped layout.
 
 ### Capability: C6 Search and Discovery
 
-Provide exact, keyword, faceted, BM25-optional, and semantic catalog search.
+Provide exact-identifier-first lexical catalog search with PostgreSQL full-text ranking and filters.
 
 **Depends on:** [C2, C4]
 
-#### Feature: C6.F1 Search document projection
-
-- **Description:** Build a denormalized `SearchDocument` projection for catalog search.
-- **Inputs:** Work, edition, contributor, subject, copy availability data.
-- **Outputs:** Search document rows with text, identifiers, FTS vector, embedding status.
-- **Behavior:** Rebuildable by management command and updated on catalog mutations.
-- **Acceptance criteria:**
-  - Projection includes title, contributors, subjects, description, identifiers, availability summary.
-  - Projection can be rebuilt idempotently.
-
-#### Feature: C6.F2 Exact identifier search
+#### Feature: C6.F1 Exact identifier search
 
 - **Description:** Prioritize ISBN-10, ISBN-13, barcode, Open Library ID, Gutenberg ID, and internal IDs.
 - **Inputs:** Query string.
@@ -634,8 +637,9 @@ Provide exact, keyword, faceted, BM25-optional, and semantic catalog search.
 - **Acceptance criteria:**
   - Exact ISBN ranks first.
   - Exact barcode routes directly to copy/edition context.
+  - Exact-identifier results surface the matched identifier value and current availability in a visible, evaluator-readable position in the rendered UI.
 
-#### Feature: C6.F3 PostgreSQL full-text search
+#### Feature: C6.F2 PostgreSQL full-text search
 
 - **Description:** Use weighted `tsvector` and `websearch_to_tsquery`/safe query construction for keyword search.
 - **Inputs:** Normalized query and filters.
@@ -645,7 +649,7 @@ Provide exact, keyword, faceted, BM25-optional, and semantic catalog search.
   - Title and author searches work case-insensitively.
   - Description/subject matches work but do not outrank exact title/author matches.
 
-#### Feature: C6.F4 Facets and filters
+#### Feature: C6.F3 Facets and filters
 
 - **Description:** Add filters for availability, contributor, subject/genre, language, and source.
 - **Inputs:** Search query and selected facets.
@@ -655,70 +659,27 @@ Provide exact, keyword, faceted, BM25-optional, and semantic catalog search.
   - Availability filter is database-derived.
   - Empty facets do not break search.
 
-#### Feature: C6.F5 Semantic search with pgvector
+#### Feature: C6.F4 Deterministic ranking and explanations
 
-- **Description:** Use embeddings for natural-language search over catalog metadata.
-- **Inputs:** Query string and embedding model.
-- **Outputs:** Semantic-ranked results.
-- **Behavior:** Semantic search is additive and never outranks exact identifiers by default.
-- **Acceptance criteria:**
-  - Natural-language query returns relevant stored catalog records.
-  - Result explanation indicates semantic match when used.
-
-#### Feature: C6.F6 Optional ParadeDB/BM25 adapter
-
-- **Description:** Provide optional adapter for BM25 if deployment supports `pg_search`/ParadeDB.
-- **Inputs:** Environment flag and database extension availability.
-- **Outputs:** BM25 result list for fusion.
-- **Behavior:** App works without ParadeDB; unsupported extension disables adapter.
-- **Acceptance criteria:**
-  - Disabled adapter does not affect baseline search.
-  - Enabling adapter requires documented migration/setup.
-
-#### Feature: C6.F7 Rank fusion and explanations
-
-- **Description:** Merge exact, FTS, BM25, and semantic results with deterministic ranking.
+- **Description:** Merge exact and FTS results with deterministic ranking and human-readable explanations.
 - **Inputs:** Result lists and ranks.
-- **Outputs:** Fused ranked results and human-readable explanation.
-- **Behavior:** Use reciprocal-rank-fusion-style rank merging plus small business boosts.
+- **Outputs:** Ranked results and explanation text.
+- **Behavior:** Exact identifiers outrank keyword matches, and available copies can be boosted without hiding exact matches.
 - **Acceptance criteria:**
   - Ranking is deterministic for the same dataset/query.
-  - Availability boost does not override exact identifier match.
+  - Exact identifier match always outranks keyword-only results.
+  - Explanations describe why a result matched.
+  - Exact-identifier explanations stay aligned with the rendered card so evaluator-visible result state shows identifier, availability, and match reason consistently.
 
-### Capability: C7 AI Assistance
+### Capability: C7 Superseded Product AI
 
-Add bounded AI features that improve catalog quality and discovery.
+This capability is retained only as historical context. It is **not part of the current release** and must not
+produce active implementation tasks for the evaluator release.
 
 **Depends on:** [C6]
 
-#### Feature: C7.F1 Local embedding management
-
-- **Description:** Generate embeddings locally with a small sentence-transformer model.
-- **Inputs:** Search documents and selected model name.
-- **Outputs:** Embedding vectors stored in Postgres via pgvector.
-- **Behavior:** Model cache is local and excluded from git.
-- **Acceptance criteria:**
-  - `build_embeddings` supports `--limit`, `--model`, `--dry-run`, `--refresh`.
-  - Embeddings can be regenerated from stored catalog data.
-
-#### Feature: C7.F2 Metadata suggestions
-
-- **Description:** Suggest subjects, tags, and short description from existing edition metadata.
-- **Inputs:** Title, authors, existing description, optional external metadata.
-- **Outputs:** Suggested metadata object.
-- **Behavior:** Suggestions require librarian/admin review before saving.
-- **Acceptance criteria:**
-  - AI suggestions are never auto-persisted.
-  - Provenance shows generated vs imported vs user-entered metadata.
-
-#### Feature: C7.F3 AI safety and grounding
-
-- **Description:** Prevent AI from inventing availability or non-existent catalog records.
-- **Inputs:** AI feature requests and retrieved records.
-- **Outputs:** Grounded responses only.
-- **Behavior:** Availability always comes from database query, never model output.
-- **Acceptance criteria:**
-  - If no stored records match, response is empty/no-result rather than invented.
+- Historical vector/embedding and AI-assist ideas are superseded by the current lexical-search release scope.
+- If a later release reintroduces AI, update the PRD and task graph deliberately rather than reviving this section by habit.
 
 ### Capability: C8 Seed Data and Demo Dataset
 
@@ -740,11 +701,12 @@ Create reproducible demo data with recognized public-domain works and disposable
 
 - **Description:** Import up to 1,000 curated public-domain-recognizable records.
 - **Inputs:** Open Library dumps and/or Project Gutenberg metadata.
-- **Outputs:** Works, editions, contributors, subjects, provenance records.
+- **Outputs:** Works, editions, contributors, provenance records.
 - **Behavior:** Prefer bulk dumps/catalogs over API scraping.
 - **Acceptance criteria:**
   - Import supports `--source`, `--limit`, `--dry-run`, and `--refresh`.
   - Records include source and license/copyright note.
+  - Subject metadata is preserved in imported source data when available, but dedicated subject entities are not yet part of the current release slice.
 
 #### Feature: C8.F3 Copies and loan examples
 
@@ -756,37 +718,16 @@ Create reproducible demo data with recognized public-domain works and disposable
   - Dashboard has visible active and overdue loan examples.
   - Search results show available and unavailable books.
 
-### Capability: C9 API and OpenAPI
+### Capability: C9 Release Evidence and Review Surfaces
 
-Expose typed API contracts for inspection and future integrations.
-
-**Depends on:** [C2, C3, C4, C5, C6]
-
-#### Feature: C9.F1 Django Ninja API shell
-
-- **Description:** Provide API router and OpenAPI documentation.
-- **Inputs:** Django Ninja routers.
-- **Outputs:** `/api/docs` and `/api/openapi.json`.
-- **Behavior:** API exposes read endpoints and selected protected mutations.
-- **Acceptance criteria:**
-  - OpenAPI docs load locally.
-  - Schema export is available in CI or management command.
-
-#### Feature: C9.F2 Catalog/search/circulation endpoints
-
-- **Description:** Add typed endpoints for catalog, search, checkout, and return.
-- **Inputs:** Validated schemas and current user.
-- **Outputs:** JSON responses.
-- **Behavior:** Endpoints delegate to selectors/services, not inline business logic.
-- **Acceptance criteria:**
-  - Protected endpoints enforce role checks.
-  - Invalid payloads return structured validation errors.
+Keep evaluator-facing evidence in the README, deployment checks, demo materials, and review
+tracking. No dedicated API layer is planned in the current scope.
 
 ### Capability: C10 Deployment and Demo Evidence
 
 Ship a live, reviewable product and documentation evidence.
 
-**Depends on:** [C1, C2, C3, C4, C5, C6, C7, C8, C9]
+**Depends on:** [C1, C2, C3, C4, C5, C6, C7, C8]
 
 #### Feature: C10.F1 Render deployment
 
@@ -797,7 +738,8 @@ Ship a live, reviewable product and documentation evidence.
 - **Acceptance criteria:**
   - Live URL loads.
   - Static assets are served.
-  - Database migrations run.
+  - Database migrations run through a deterministic host-appropriate path.
+  - Free-tier Render deployment does not rely on `preDeployCommand`.
 
 #### Feature: C10.F2 README evaluator evidence
 
@@ -823,7 +765,7 @@ Ship a live, reviewable product and documentation evidence.
 - **Purpose:** Maintain evaluator-facing and agent-facing documentation that proves what was planned,
   researched, implemented, tested, deployed, and learned.
 - **Depends on:** [C1]
-- **Priority:** P1 throughout the project; P0 for README/runbook essentials.
+- **Priority:** P1 throughout the project; P0 for README/demo essentials.
 
 #### Feature: C11.F1 Research and evidence discipline
 
@@ -841,16 +783,49 @@ Ship a live, reviewable product and documentation evidence.
 
 #### Feature: C11.F3 Deployment evidence package
 
-- **Description:** Keep README/runbook evidence current with live URL, demo credentials, smoke-test checklist,
+- **Description:** Keep README/demo evidence current with live URL, demo credentials, smoke-test checklist,
   quality gates, release tag, and known limitations.
 - **Acceptance:** An evaluator can verify the deployed app and understand how it was built without reading the
   entire PRD.
+- **Proof payload:** The release-evidence payload SHOULD stay compact and reviewer-facing: current branch/PR head,
+  current local gate results, current CI-quality lane result, live-host status when available, and any remaining
+  blocked external proof such as provider-console social-auth completion.
 
 #### Feature: C11.F4 Reusable SDLC pattern
 
 - **Description:** Document the governance pattern—constitution, RPG PRD, Task Master, Spec Kit, ADRs, CI gates,
-  research register, and runbook—so it can scale to other projects.
+  research register, and demo script—so it can scale to other projects.
 - **Acceptance:** The project explains which process artifacts are project-specific and which can be reused.
+
+### Capability: C12 Context Recovery and Planning Hygiene
+
+- **Purpose:** Keep long-horizon planning synchronized with user direction by re-gathering durable context from
+  previous compacts, prior conversations, memory surfaces, and external context packs when accessible, then
+  converting durable findings into Task Master tasks and tracked docs.
+- **Depends on:** [C11]
+- **Priority:** P1 ongoing; P0 whenever scope drift or missing context is detected.
+
+#### Feature: C12.F1 Context re-grounding
+
+- **Description:** Reconstruct the current planning baseline from prior compacts, user messages, and durable
+  repository surfaces before broadening into new work.
+- **Acceptance:** The active plan reflects the latest durable user intent and identifies any gaps or stale claims.
+
+#### Feature: C12.F2 Task synthesis from durable findings
+
+- **Description:** Convert durable findings into Task Master tasks, subtasks, or notes instead of leaving them as
+  untracked chat history.
+- **Acceptance:** New or revised scope appears in Task Master with concise evidence and a bounded owner.
+
+#### Feature: C12.F3 Meta-surface reconciliation
+
+- **Description:** Update PRD, phase docs, AGENTS, and related governance surfaces when the same lesson repeats
+  or the planning model shifts.
+- **Acceptance:** Repeated planning lessons are promoted into tracked repo docs or skills rather than staying
+  memory-only.
+- **Lane split:** Durable docs SHOULD distinguish the authoritative local pre-push lane (`checks:prepush`), the
+  broader CI-quality lane (`checks:ci`), and the deeper product/runtime proof lanes (`verify:core`, `verify:all`)
+  so reviewers can tell which proof applies locally, in CI, and at release closeout.
 
 ## 6. Structural Decomposition
 
@@ -871,7 +846,7 @@ library-ops/
   .taskmaster/tasks/                  # derived execution graph; tasks.json is committed, runtime notes stay local
   .codex/config.toml
   .agents/skills/
-  docs/runbook.md
+  docs/evaluation/demo-script.md
   docs/design/wireframes.md
   docs/adr/
   src/libraryops/
@@ -886,7 +861,6 @@ library-ops/
       urls.py
       views/
     search/
-    ai_assist/
     audit/
     web/
       urls.py
@@ -940,16 +914,9 @@ library-ops/
 #### Module: `search`
 
 - **Maps to capability:** C6 search.
-- **Responsibility:** search documents, normalization, exact/FTS/vector adapters, rank fusion.
-- **Exports:** `search_catalog`, `rebuild_search_documents`.
+- **Responsibility:** exact identifier lookup, PostgreSQL full-text search, facet filtering, deterministic ranking.
+- **Exports:** `search_catalog`.
 - **Dependencies:** `core`, `catalog`, `inventory`.
-
-#### Module: `ai_assist`
-
-- **Maps to capability:** C7 AI assistance.
-- **Responsibility:** local embeddings, optional hosted suggestions, safety wrappers.
-- **Exports:** embedding builders, metadata suggestion DTOs.
-- **Dependencies:** `core`, `search`, `catalog`.
 
 #### Module: `audit`
 
@@ -961,7 +928,7 @@ library-ops/
 #### Seed workflows
 
 - **Maps to capability:** C8 seed data.
-- **Responsibility:** app-owned management commands for demo roles/users, public-domain import/provenance, search-document rebuilds, embeddings rebuilds, and circulation examples; no standalone `seed` app directory.
+- **Responsibility:** app-owned management commands for demo roles/users, public-domain import/provenance, and circulation examples; no standalone `seed` app directory.
 - **Exports:** management commands and importer/rebuild services in the owning app modules.
 - **Dependencies:** domain modules, not web views.
 
@@ -981,7 +948,6 @@ library-ops/
 - `services.py` contains transactional mutations.
 - `forms.py` validates template flows.
 - `urls.py` belongs to the owning Django app when that app exposes evaluator-facing routes.
-- `api.py` contains Django Ninja endpoints only.
 - non-trivial UI surfaces SHOULD use `views/` packages or split modules by page/flow family instead of one growing `views.py`.
 - templates live under explicit app namespaces such as `templates/web/`, `templates/catalog/`, and `templates/circulation/`.
 - `config/urls.py` composes app URL trees and cross-cutting endpoints rather than becoming a feature catch-all.
@@ -1008,11 +974,10 @@ library-ops/
 - `circulation`: depends on `core`, `accounts`, `inventory`, `audit`.
 - `search`: depends on `core`, `catalog`, `inventory`.
 
-### Presentation/API Layer — Phase 3
+### Presentation Layer — Phase 3
 
 - `web`: depends on selectors/services.
 - `templates`: depend on view contexts only.
-- `api`: endpoints depend on schemas/selectors/services.
 
 ### Deployment/Demo Layer — Phase 4
 
@@ -1033,7 +998,7 @@ lose the path to a deployed demo.
 
 **Tasks:**
 
-- update PRD, constitution, AGENTS, runbook, design notes;
+- update PRD, constitution, AGENTS, demo/evidence notes, design notes;
 - remove generated junk from repo;
 - verify scripts and CI are accurate;
 - initialize Task Master and Spec Kit in-place;
@@ -1045,10 +1010,33 @@ lose the path to a deployed demo.
 - control-plane package verification passes;
 - PRD can be parsed by Task Master;
 - current task graph has no circular dependencies;
-- focused governance and smoke checks cover the meta-system and bootstrap surfaces that exist;
+- focused governance and smoke checks cover the meta-system and setup surfaces that exist;
 - CI skeleton is ready.
 
 **Delivers:** An implementable plan and governed agent workspace.
+
+### Current Active Tranche: Release Convergence
+
+**Goal:** Close the evaluator-facing release truth gap without reopening product scope.
+
+**Entry criteria:** Core catalog, circulation, search, seed, and deployment paths already exist in source and Task Master; the open queue is Tasks 14 through 16.
+
+**Tasks:**
+
+- align PRD, Spec Kit, README/demo guidance, and the supporting OpenAPI surface to the implemented lexical-only Django release;
+- define local-vs-CI gate authority, then codify the coordinator/Spark pre-push gatekeeper protocol from that model;
+- validate dependency closure against the chosen gate authority boundary;
+- prove PostgreSQL search/circulation behavior, provider-enabled social-auth flows, and final evaluator-visible rendered states;
+- refresh deployment, screenshot, and release evidence against the actual candidate commit.
+
+**Exit criteria:**
+
+- PRD/spec/task graph/continuation surfaces describe one release-convergence story;
+- local-vs-CI gate authority and pre-push protocol are explicit in Task Master and durable docs;
+- release evidence is current, truthful, and tied to the release candidate;
+- no superseded setup-era, semantic-search, or dedicated-API instructions remain active in planning surfaces.
+
+**Delivers:** A coherent release-convergence queue grounded in current product truth and reproducible proof paths.
 
 ### Phase 1: Django Bootstrap, Domain, and RBAC
 
@@ -1058,7 +1046,7 @@ lose the path to a deployed demo.
 
 **Tasks:**
 
-- bootstrap Django project;
+- establish the Django foundation;
 - establish app-owned route/view/template skeletons for the first evaluator-facing flows;
 - implement models/migrations;
 - seed roles/users;
@@ -1106,17 +1094,14 @@ lose the path to a deployed demo.
 
 - public-domain seed corpus;
 - cover image upload;
-- pgvector embeddings;
-- semantic search;
-- optional metadata suggestions;
-- OpenAPI docs;
+- exact-identifier search quality regression tests;
+- PostgreSQL full-text ranking and filter coverage;
 - Playwright E2E suite.
 
 **Exit criteria:**
 
-- hybrid search works on seeded corpus;
+- lexical search works on seeded corpus;
 - generated/demo data is reproducible;
-- OpenAPI docs load;
 - E2E tests cover core flows.
 
 **Delivers:** Creativity and product-quality evidence.
@@ -1162,12 +1147,12 @@ The key words `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`, `MAY`, and `OPTIONAL` 
 | FR-007 | The system MUST allow Admins and Librarians to return an active loan. |
 | FR-008 | The system MUST provide search by title and author/contributor. |
 | FR-009 | The system SHOULD provide search by ISBN, barcode, subject, description, language, and source. |
-| FR-010 | Exact identifiers MUST outrank keyword, BM25, and semantic search results. |
+| FR-010 | Exact identifiers MUST outrank keyword search results. |
 | FR-011 | The system SHOULD provide role-based navigation and server-side authorization. |
 | FR-012 | The system SHOULD provide disposable demo accounts. |
 | FR-013 | The system SHOULD import a reproducible public-domain-oriented demo corpus. |
-| FR-014 | The system MAY provide AI-assisted metadata suggestions after core flows are complete. |
-| FR-015 | AI-generated metadata MUST require human review before persistence. |
+| FR-014 | Historical AI-assisted metadata suggestions are out of current release scope. |
+| FR-015 | No AI-generated metadata is persisted in the current release scope. |
 | FR-016 | Availability MUST always be derived from database copy/loan state. |
 
 ### 9.2 Non-Functional Requirements
@@ -1192,15 +1177,15 @@ The key words `MUST`, `MUST NOT`, `SHOULD`, `SHOULD NOT`, `MAY`, and `OPTIONAL` 
 | Book management | C2, C4 | catalog UI, admin, tests |
 | Add/edit/delete | C4 | create/edit/archive flows |
 | Check-in/check-out | C5 | borrow/return flows and invariant tests |
-| Search | C6 | exact/FTS/semantic search |
+| Search | C6 | exact/FTS search |
 | Working product | C1–C10 | local run + live deployment |
 | README | C10 | evaluator-ready README |
 | Deployment bonus | C10 | Render URL |
 | Demo video bonus | C10 | Loom/script |
 | Auth/SSO/roles bonus | C3 | allauth-ready auth and RBAC tests |
-| AI bonus | C6, C7 | semantic search + reviewed metadata suggestions |
-| Creativity | C6, C7, C8 | hybrid search, seed corpus, provenance |
-| Product quality | C1, C15, C18 equivalent sections | CI, tests, ADRs, runbook |
+| AI bonus | C7 | historical context only; not part of the current release |
+| Creativity | C6, C8 | lexical search, seed corpus, provenance |
+| Product quality | C1, C15, C18 equivalent sections | CI, tests, ADRs, evaluator docs |
 | Usability | C4, C5, C6, C14 equivalent sections | wireframes, accessibility, HTMX UI |
 
 ## 10. Architecture
@@ -1215,9 +1200,8 @@ Library Ops Web Application
         |
         +-- GitHub repository / CI
         +-- Render or equivalent Django host
-        +-- PostgreSQL with pgvector
+        +-- PostgreSQL with lexical search indexes
         +-- Repo-local wireframes for design workflow
-        +-- Optional OpenAI/hosted AI for metadata suggestions
         +-- Open Library and Project Gutenberg metadata sources
 ```
 
@@ -1229,45 +1213,41 @@ Browser
   v
 Django Web App
   |-- Django templates and views
-  |-- Django Ninja API
   |-- Django auth/allauth
   |-- service/selector/domain layers
   |-- management commands
   v
 PostgreSQL
   |-- relational catalog/circulation data
-  |-- tsvector search projection
-  |-- pgvector embeddings
+  |-- lexical search indexes / tsvector data
 ```
 
 ### 10.3 C4 Component View
 
 ```text
 catalog app
-  models/forms/views/api/services/selectors
+  models/forms/views/services/selectors
 inventory app
   copy state and barcode management
 circulation app
   checkout/return services and loan queries
 search app
-  exact search, FTS, vector search, fusion
-ai_assist app
-  embeddings and reviewed metadata suggestions
+  exact search, FTS, facet filtering, deterministic ranking
 audit app
   audit and provenance records
 seed workflows
   accounts: demo roles and demo users
   catalog: public-domain import and provenance
-  search/ai_assist: search documents and embeddings rebuild
+  search: lexical refresh / rebuild helpers
 ```
 
 ### 10.4 Architectural Constraints
 
 - The web layer MUST NOT implement business rules directly.
-- The API layer MUST NOT bypass service-layer authorization.
+- Any auxiliary HTTP surface MUST preserve authorization and is not part of the current evaluator release path.
 - Search relevance code SHOULD be deterministic and testable.
 - Seed/import management commands MUST be idempotent.
-- App must remain useful without optional hosted AI.
+- App must remain useful without optional external services.
 
 ## 11. Data Model
 
@@ -1342,20 +1322,7 @@ Loan
 - due_at
 - returned_at
 
-SearchDocument
-- id
-- work_id
-- edition_id
-- title_text
-- contributor_text
-- subject_text
-- description_text
-- identifier_text
-- weighted_fts
-- embedding
-- availability_count
-- source_quality_score
-- updated_at
+- Search is derived directly from `BibliographicWork`, `BookEdition`, `BookCopy`, and `Loan` records via query helpers and full-text indexes. No persisted `SearchDocument` projection exists in the current release scope.
 
 AuditEvent
 - id
@@ -1369,14 +1336,14 @@ AuditEvent
 
 ExternalSourceRecord
 - id
-- entity_type
-- entity_id
 - source_name
 - source_identifier
 - source_url
 - license_note
-- raw_json
+- work_id
+- edition_id
 - imported_at
+- fetched_at
 ```
 
 ### 11.2 Critical Invariants
@@ -1388,18 +1355,15 @@ ExternalSourceRecord
 - Archived records are excluded from public catalog results by default.
 - Search availability is recomputed from copy/loan state, not generated by AI.
 
-## 12. Search and AI Design
-
-### 12.1 Ranking Policy
+## 12. Lexical Search Design
 
 Search ranking MUST use this priority order:
 
 1. exact identifiers: ISBN-13, ISBN-10, barcode, Open Library ID, Gutenberg ID;
 2. exact normalized title/contributor phrase;
 3. PostgreSQL full-text search with weighted `tsvector`;
-4. optional ParadeDB/BM25 adapter;
-5. pgvector semantic search;
-6. rank fusion and business boosts.
+4. optional fuzzy/typo tolerance only if it stays lexical and does not outrank exact matches;
+5. deterministic ranking and business boosts.
 
 ### 12.2 Baseline PostgreSQL FTS
 
@@ -1412,63 +1376,29 @@ Use weighted vectors:
 
 Queries should use safe PostgreSQL functions such as `websearch_to_tsquery` or `plainto_tsquery` rather than manually interpolating user input.
 
-### 12.3 pgvector Semantic Search
+### 12.3 Lexical ranking and explanations
 
-The vector path supports natural-language queries such as:
+- Exact identifiers outrank full-text matches.
+- Exact normalized title/contributor phrases outrank looser keyword matches.
+- Availability boosts may improve ordering within the lexical tier but MUST not hide exact identifier matches.
+- Result explanations should say why a record matched and which lexical signals contributed.
 
-- “books about surveillance and authoritarianism”;
-- “classic novels about class and marriage”;
-- “adventure stories for young readers.”
-
-Semantic results are fused with keyword results but do not override exact matches.
-
-### 12.4 Optional BM25/ParadeDB
-
-ParadeDB/`pg_search` is an optional adapter. Implementation requirements:
-
-- environment flag controls use;
-- migration/setup documented separately;
-- baseline app works without it;
-- tests should skip gracefully when extension is unavailable.
-
-### 12.5 Fusion
-
-Use reciprocal rank fusion or a similar deterministic rank-based merge:
-
-```text
-score(document) = sum(1 / (k + rank_in_result_list)) + business_boosts
-```
-
-Recommended default `k = 60`, subject to search quality tests.
-
-### 12.6 Search Quality Tests
+### 12.4 Search Quality Tests
 
 | Query | Expected |
 |---|---|
 | `9780141439518` | exact ISBN result first |
 | `OL7353617M` | Open Library ID result first if present |
 | `barcode:COPY-0001` | copy context first |
-| `austen pride prejudice` | title/contributor results above semantic-only matches |
-| `books about social class and marriage` | relevant classics via semantic/subject search |
+| `austen pride prejudice` | title/contributor results above looser keyword-only matches |
+| `books about social class and marriage` | relevant classics via lexical title/subject/description matches |
 | `dystopian surveillance authoritarian` | relevant dystopia records if seeded |
 | whitespace/case variants | same normalized intent |
 | nonsense query | empty state, no crash |
 
-### 12.7 AI Metadata Suggestions
+### 12.5 Superseded AI metadata suggestions
 
-AI metadata suggestions MAY use a hosted LLM if an API key is configured, or local heuristics if not. Suggestions are returned as a structured object:
-
-```json
-{
-  "subjects": ["string"],
-  "tags": ["string"],
-  "short_description": "string",
-  "confidence": "low|medium|high",
-  "rationale": "string"
-}
-```
-
-The UI must label these as suggestions and require explicit save.
+AI metadata suggestions are out of scope for the current release. If a later release reintroduces them, they MUST be added through a new PRD update and a new Task Master slice rather than revived implicitly.
 
 ## 13. Seed Data and Demo Corpus
 
@@ -1481,8 +1411,6 @@ uv run python manage.py seed_roles
 uv run python manage.py seed_demo_users --reset-passwords
 uv run python manage.py import_public_domain_catalog --source=openlibrary --limit=1000 --dry-run
 uv run python manage.py import_public_domain_catalog --source=openlibrary --limit=1000
-uv run python manage.py build_search_documents --refresh
-uv run python manage.py build_embeddings --model=BAAI/bge-small-en-v1.5 --limit=1000
 uv run python manage.py seed_circulation_examples --refresh
 ```
 
@@ -1520,7 +1448,7 @@ For a recognizable 1,000-record demo corpus, prefer records that have:
 
 ### 14.1 Product Screens
 
-The MVP UI includes:
+The current route inventory includes:
 
 - public landing page;
 - login page;
@@ -1532,7 +1460,10 @@ The MVP UI includes:
 - return/active loans page;
 - member loans page;
 - admin/user role page;
-- API/docs page link for evaluators.
+- evaluator help or release notes link if needed.
+
+This is the current route inventory for audit and evidence, not an aspirational
+screen map; only claim screens and routes that exist on the branch.
 
 ### 14.2 UX Principles
 
@@ -1667,8 +1598,8 @@ Every PR must include:
 - lint;
 - type check;
 - import architecture check when Django package exists;
-- Django system checks when bootstrap exists;
-- migration drift check when bootstrap exists;
+- Django system checks when the target stack exists;
+- migration drift check when the target stack exists;
 - pytest suite;
 - property tests;
 - commitlint;
@@ -1710,7 +1641,7 @@ Every PR must include:
 - Production settings enforce secure secret handling.
 - Debug mode disabled in production.
 - Demo credentials are disposable and resettable.
-- AI outputs are reviewed before persistence.
+- Social-auth providers request only the minimum scopes needed for login and remain hidden unless configured.
 
 ### 17.3 Privacy Scope
 
@@ -1722,9 +1653,9 @@ This is a demo product. It should not store real patron data. Demo users and loa
 
 ```text
 tests/control_plane/   agent workflow, governance, hooks, docs/process gates
-tests/smoke/           deterministic bootstrap and environment checks
+tests/smoke/           deterministic setup and environment checks
 tests/unit/            isolated rules, normalization, serializers/forms/helpers
-tests/integration/     services, views, APIs, DB constraints, management commands
+tests/integration/     services, views, request handlers, DB constraints, management commands
 tests/property/        invariant-heavy generated input/state transitions
 tests/e2e/             evaluator-visible browser and navigation flows
 ```
@@ -1820,11 +1751,11 @@ Scenario: Librarian returns an active loan
 ### 19.5 Search
 
 ```gherkin
-Scenario: Exact ISBN outranks semantic match
+Scenario: Exact ISBN outranks broader lexical matches
   Given the catalog contains a book with ISBN "9780141439518"
   When I search for "9780141439518"
   Then that exact edition is the first result
-  And the result explanation includes "ISBN exact match"
+  And the result explanation includes "Exact identifier match"
 ```
 
 ### 19.6 Seed Refresh
@@ -1846,7 +1777,7 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 |---|---|---|
 | ADR-0001 | Source of truth and planning model: PRD + Spec Kit + Task Master + ADR/supporting docs. | Accepted |
 | ADR-0002 | Application architecture: C4 views, arc42 quality/risk framing, pragmatic domain boundaries, Django service/selector layering. | Accepted |
-| ADR-0003 | Search, AI assistance, and data provenance: exact + FTS + vector baseline, AI suggestions reviewed, deterministic seed import. | Accepted |
+| ADR-0003 | Search and data provenance scope: exact identifiers plus PostgreSQL FTS, deterministic seed import, and no active AI-assist scope in the current release. | Superseded and reconciled |
 | ADR-0004 | Agent toolchain, MCP, and context optimization: required Codex/RTK/code-review-graph/Serena/ast-grep/Repomix stack. | Accepted |
 | ADR-0005 | Delivery, quality, security, and release governance: CI, branches, quality gates, security, release, deployment. | Accepted |
 | ADR-0006 | Design and UX workflow: repo-local wireframes as the design authority. | Accepted |
@@ -1861,14 +1792,14 @@ The standalone ADR set is consolidated so humans and agents can navigate consequ
 | Blind MCP/tool adoption | High | Medium | Socratic decision gates + alternatives register | Ask user before new trust/cost/scope changes |
 | Filtered command output hides failure detail | Medium | Medium | RTK/raw evidence policy + tee/raw reruns | Rerun raw commands |
 | Code graph output treated as proof | Medium | Medium | Source/test inspection required after graph findings | Fall back to raw source review |
-| Django bootstrap conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
+| Django setup conflicts with strict Pyright | Medium | Medium | Type pure modules strictly; document pragmatic suppressions | Relax dynamic Django files only |
 | Evaluator UI drifts into a monolithic shared web layer | Medium | Medium | App-owned URL/view/template rules plus review | Split routes/views/templates by app before adding more flows |
-| Search overengineered | Medium | Medium | Baseline exact + FTS first | Defer vectors/BM25 |
+| Search overengineered | Medium | Medium | Baseline exact + FTS first | Keep the release scope lexical-only |
 | ParadeDB unavailable on deployment | Low | High | Optional adapter only | Use standard FTS |
 | Public data licensing confusion | Medium | Medium | Store provenance and license notes; use official dumps/catalogs | Use synthetic seed records |
 | Free hosting limits | Medium | Medium | Keep corpus small; document local fallback | Provide local demo only if needed |
 | File upload security | Medium | Medium | Validate size/type/decode; limit uploads | External cover URLs only |
-| CI ignores real failures while bootstrap incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until bootstrap exists |
+| CI ignores real failures while setup incomplete | High | Medium | Conditional gates that become strict once files exist | Manual checklist until the target stack exists |
 | Test topology migration stalls in temporary domain folders | Medium | Medium | Kind-first placement rules and governance tests | Finish the split before broadening coverage further |
 
 ## 22. Task Master Parsing Contract
@@ -1909,13 +1840,13 @@ Exa, or web research before making version-sensitive implementation changes.
 | S02 | Task Master docs: https://docs.task-master.dev/capabilities/task-structure | Task fields, dependencies, metadata, best practices. |
 | S03 | Spec Kit quickstart: https://github.github.com/spec-kit/quickstart.html | Constitution/spec/plan/tasks workflow. |
 | S04 | Django 5.2 auth docs: https://docs.djangoproject.com/en/5.2/topics/auth/ and Django download/support matrix: https://www.djangoproject.com/download/ | Users, groups, permissions, sessions, and LTS baseline. |
-| S05 | Django Ninja docs: https://django-ninja.dev/ and https://django-ninja.dev/guides/api-docs/ | Typed API and OpenAPI docs. |
+| S05 | Django docs: https://docs.djangoproject.com/ and HTMX docs: https://htmx.org/docs/ | Server-rendered Django and HTMX references. |
 | S06 | HTMX docs: https://htmx.org/ | Hypermedia interactions without large frontend framework. |
 | S07 | django-htmx docs: https://django-htmx.readthedocs.io/ | Django integration with HTMX. |
 | S08 | PostgreSQL FTS docs: https://www.postgresql.org/docs/current/textsearch-controls.html | `tsvector`, `tsquery`, ranking. |
-| S09 | pgvector docs: https://github.com/pgvector/pgvector and https://supabase.com/docs/guides/database/extensions/pgvector | Vector storage and similarity search. |
-| S10 | Supabase hybrid search docs: https://supabase.com/docs/guides/ai/hybrid-search | Hybrid FTS/vector search and fusion pattern. |
-| S11 | ParadeDB docs: https://www.paradedb.com/ and https://github.com/paradedb/paradedb | Optional BM25/Postgres search adapter. |
+| S09 | Django ORM query docs: https://docs.djangoproject.com/en/5.2/topics/db/queries/ | Query composition for lexical search helpers. |
+| S10 | PostgreSQL indexes docs: https://www.postgresql.org/docs/current/indexes.html | Search and filter indexing strategy. |
+| S11 | PostgreSQL query planner docs: https://www.postgresql.org/docs/current/using-explain.html | Explain plans for search performance checks. |
 | S12 | Library of Congress BIBFRAME model: https://www.loc.gov/bibframe/docs/bibframe2-model.html | Work/Instance/Item domain inspiration. |
 | S13 | Library of Congress MARC 21: https://www.loc.gov/marc/bibliographic/ | Bibliographic metadata context. |
 | S14 | Dublin Core DCMI Terms: https://www.dublincore.org/specifications/dublin-core/dcmi-terms/ | Simple metadata terms. |
@@ -1943,10 +1874,10 @@ Exa, or web research before making version-sensitive implementation changes.
 
 ### 24.1 Current Artifact Review Status
 
-The current archive has been reviewed as a **governed control-plane package bootstrap**. It contains PRD, constitution,
-agent configuration, ADRs, CI bootstraping, runbook, and wireframes. It does not yet contain the completed
-Django application. The PRD and agent instructions MUST therefore describe the app as planned, not as
-already implemented.
+The current repository should be treated as a **release-convergence codebase**, not a setup archive. It already contains
+implemented Django product surfaces, seeded-demo workflows, lexical search, circulation behavior, deployment wiring, and a governed
+control plane. The planning surfaces MUST therefore describe the product as implemented-but-still-needing-current-proof, not as a
+future setup plan.
 
 A personal-context lookup during the 2026-06-12 review returned no additional relevant memory. The review
 therefore used the current conversation, original control-plane package archive, updated control-plane package archive, and current
@@ -1963,11 +1894,11 @@ The updated control-plane package preserved the prior strategic decisions:
 - consolidated documentation rather than many competing docs;
 - Work/Edition/Copy/Loan domain model;
 - Borrow/Return terminology for check-in/check-out ambiguity;
-- hybrid search with exact identifiers before lexical/vector search;
+- exact-identifier-first lexical search;
 - deterministic seed-data management commands;
 - reviewed-PR, CI, Conventional Commits, and SemVer workflow.
 
-The updated control-plane package added repo-local wireframes, UX design skill/agent, runbook, deterministic-seed ADR,
+The updated control-plane package added repo-local wireframes, UX design skill/agent, evaluator demo surfaces, deterministic-seed ADR,
 evidence register, and context-drift review. It removed committed `.pytest_cache` artifacts.
 
 ### 24.3 Connector Verification Policy
@@ -1986,20 +1917,20 @@ If a review session lacks direct connector access, the agent MUST say so rather 
 
 | Category | Baseline choice | Why | Alternatives / constraints |
 |---|---|---|---|
-| Product framework | Django 5.2 LTS | Auth, admin, ORM, migrations, forms, management commands, long support window | Django 6.x later; FastAPI if API-first scope changes |
-| API | Django Ninja | Typed API and OpenAPI without leaving Django | DRF if broader REST ecosystem is needed |
+| Product framework | Django 5.2 LTS | Auth, admin, ORM, migrations, forms, management commands, long support window | Django 6.x later; FastAPI only if the project pivots away from the current server-rendered scope |
+| Interface | Django templates + HTMX | Server-rendered first-party UI without a dedicated API layer | DRF only if the scope ever expands to a public REST API |
 | UI | Django templates + HTMX | Low-code, server-driven UI with good demo velocity | React/Next.js only if frontend complexity grows |
 | Planning | Task Master RPG PRD | Explicit dependencies and parseable task graph | Standard PRD for smaller projects |
 | Governance | Spec Kit constitution | Enforceable principles before implementation | Plain ADRs alone are less process-oriented |
 | Agent | Codex with MCP config | Repo-local agent config and MCP-capable workflow | Claude Code/Cursor/Windsurf should remain compatible |
 | Research | Context7 + Exa | Versioned docs plus broader current research | Official web research fallback when connectors unavailable |
 | Design | Repo wireframes | Portable source and implementation authority | Private design-tool state must not become the only source |
-| Search | Exact IDs + Postgres FTS + pgvector | Correct library identifier behavior plus semantic discovery | ParadeDB/BM25 optional behind adapter |
+| Search | Exact IDs + Postgres FTS | Correct library identifier behavior plus deterministic lexical discovery | Optional adapters are out of current scope |
 | Seed data | Django management commands | Reproducible, refreshable, auditable seed process | Fixtures only for tests/small examples |
 | Command-output optimization | RTK | User-accepted optimization for noisy shell output | Raw reruns/full logs remain required for evidence |
 | Code intelligence | code-review-graph + Serena + ast-grep + bounded Repomix | Graph, symbol, AST, and context packaging without replacing source review | New MCPs/broad context layers require approval |
 | Decisioning | Socratic decision framework | Prevents guessing and unexamined tool adoption | Pause and ask for trust/cost/scope decisions |
-| Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after bootstrap exists |
+| Quality | Ruff, Pyright, Import Linter, pytest, Hypothesis, Playwright | Static, architectural, unit/property/E2E coverage | Tighten gradually after the target stack exists |
 | Deployment | Render + managed PostgreSQL | Familiar Django deployment path with a small operational surface | Fly/Railway/Heroku/container host if Render limits apply |
 | SDLC | GitHub Actions + reviewed PR branch flow + Conventional Commits + SemVer | Visible, enforceable solo-project governance | Merge queue optional and likely excessive for solo demo |
 
@@ -2013,8 +1944,9 @@ A release is not evaluator-ready until the repo can show:
 - AGENTS instructions for repeatable agent work;
 - research register showing material evidence and assumptions;
 - context-drift review for major revisions;
-- runbook for local setup, deployment, seed refresh, smoke tests, and rollback;
-- wireframes or implementation screenshots for key flows;
+- evaluator demo script and README sections for local setup, deployment, seed refresh, smoke tests, and rollback;
+- manual UX audit notes, screenshot matrix, and implementation screenshots for key flows;
+- PR-attached screenshots, validation artifacts, and audit notes for key evaluator-visible flows;
 - CI results and test commands;
 - release tag and changelog when release automation exists.
 
@@ -2023,8 +1955,8 @@ A release is not evaluator-ready until the repo can show:
 Deployment work MUST cover application hosting and operational evidence:
 
 1. production Django settings;
-2. managed PostgreSQL connection with migration path;
-3. pgvector enablement or vector feature flag fallback;
+2. managed PostgreSQL connection with a deterministic migration path appropriate to host constraints;
+3. search index and full-text ranking configuration appropriate to the release scope;
 4. static files through WhiteNoise or host-supported equivalent;
 5. media upload strategy for book covers;
 6. environment variables without committed secrets;
@@ -2040,5 +1972,5 @@ As of this PRD revision:
 
 - **Verified:** standards/tooling/deployment claims recorded in the source register and research register.
 - **Mechanically verified:** control-plane package archive hygiene and Markdown/Python static checks.
-- **Planned but not implemented:** app-based Django UI slices, database models, search services, kind-first test end state, seed importers, API, and deployment.
-- **Implementation-time checks required:** selected PostgreSQL host extension support, ParadeDB availability, final Codex model availability/cost policy, strict required-tooling check, and actual Task Master-generated task graph quality.
+- **Implemented and release-converging:** Django product surfaces, database models, lexical search, seeded demo workflows, circulation behavior, deployment wiring, and the governed control plane are present and must be described as implemented-but-still-needing-current-proof rather than future scope.
+- **Implementation-time checks still required:** current PR/CI proof, final release evidence and changelog alignment, current Task Master/task-note consistency, and external provider/Render social-auth proof that remains blocked outside the repo.

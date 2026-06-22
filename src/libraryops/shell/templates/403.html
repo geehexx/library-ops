@@ -7,10 +7,10 @@
   <section class="panel">
     <p class="eyebrow">Permission denied</p>
     <p>
-      You do not have permission to create catalog foundation records.
-      Sign in with an Admin or Librarian account to continue.
+      You do not have access to this page.
+      Use an account with the right role, or contact an administrator if you expected access.
     </p>
-    <a class="button" href="/catalog/">Browse catalog</a>
+    <a class="button" href="/">Return home</a>
     {% if not user.is_authenticated %}
       <a class="button button--ghost" href="/accounts/login/">Sign in</a>
     {% endif %}

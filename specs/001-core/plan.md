@@ -4,6 +4,23 @@
 
 Supporting Spec Kit plan. Task Master generated tasks remain the execution graph.
 
+## Current Release-Convergence Tranche
+
+Current execution is no longer in setup discovery. The active queue is the
+release-convergence lane under Task Master Tasks `14`, `15`, and `16`.
+
+- `14.9` owns the local-vs-CI gate authority model and any required parity or
+  enforcement decisions.
+- `15.4` closes the dependency queue against that chosen gate boundary.
+- `16.1` owns the canonical truth sweep across PRD/spec/README/release-facing
+  planning surfaces.
+- `16.20` codifies the coordinator/Spark pre-push gatekeeper protocol from
+  `14.9` plus the packet discipline in `16.15`.
+
+The earlier phase plan remains below for traceability, but new implementation
+or reconciliation work should follow the live Task Master graph rather than
+reopening these historical phases.
+
 ## Phase 0: Meta-system and repository readiness
 
 - Validate Codex config, required MCPs, hooks, skills, ADR consolidation, and
@@ -18,12 +35,12 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 
 ## Phase 1: Django foundation
 
-- Treat the committed bootstrap as fixed reality and finish the remaining
+- Treat the committed Django foundation as fixed reality and finish the remaining
   hardening/verification work in place.
 - Wire in app-owned presentation surfaces, templates, and auth settings needed
   for the first evaluator-visible experience.
 - Keep `manage.py`, `src/libraryops/config/settings/*`, and `/health/` as the
-  bootstrap contract.
+  foundation contract.
 
 ## Phase 2: Domain model and boundaries
 
@@ -51,19 +68,19 @@ Supporting Spec Kit plan. Task Master generated tasks remain the execution graph
 ## Phase 5: Seed and search
 
 - Implement catalog-owned public-domain import commands with provenance.
-- Build search documents, exact/FTS/vector ranking, result explanations, and tests.
+- Build search documents, exact/FTS ranking, result explanations, and tests.
 
-## Phase 6: AI assist, API, and UI polish
+## Phase 6: UI and interaction polish
 
-- Add reviewed AI metadata suggestion flow.
-- Add Django Ninja endpoints.
+- Keep the product centered on Django templates and HTMX; no public API layer
+  is planned in the current scope.
 - Complete HTMX flows, empty/error states, accessibility annotations, and Playwright tests.
 
 ## Phase 7: Deployment and release evidence
 
-- Deploy to Render with managed Postgres/pgvector.
-- Run seed refresh, smoke tests, and release gates.
-- Update README with evaluator evidence.
+- Deploy to Render with managed Postgres.
+- Run seed refresh, smoke tests, and release gates on the active branch.
+- Update README with evaluator evidence that matches the route inventory and screenshots actually present on the branch.
 
 ## Cross-cutting gates
 

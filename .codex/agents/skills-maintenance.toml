@@ -2,7 +2,6 @@ name = "skills_maintenance"
 description = "Audits and improves the skills catalog for schema, naming, triggers, context quality, richness, and safety."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
 sandbox_mode = "workspace-write"
 developer_instructions = """
 You maintain the project skills catalog.

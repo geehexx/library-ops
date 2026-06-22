@@ -38,8 +38,8 @@ Finish the required assignment product flows: catalog management, circulation,
   must not outrank ISBN, barcode, or external ID matches.
 - Keep circulation writes transactional and continue to derive availability from
   database state instead of presentation flags.
-- Add Django Ninja catalog/circulation endpoints only after the corresponding
-  server-side services and selectors are stable.
+- Keep the product on server-rendered Django views and HTMX for the Phase 2
+  assignment slice; do not add a separate API surface.
 
 ## Out of scope
 
@@ -54,8 +54,9 @@ Finish the required assignment product flows: catalog management, circulation,
 - search returns exact identifiers ahead of broader matches
 - property tests cover circulation invariants
 
-## Suggested local regeneration command
+## Suggested local regeneration workflow
 
-```bash
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/phases/phase-2-core-assignment-features.md --force'
-```
+Review the committed graph first. If phase-2 regeneration is genuinely needed,
+run it as a bounded draft/review lane and compare the result against
+`.taskmaster/tasks/tasks.json` before accepting any mutations. Do not use
+`task-master parse-prd --force` here as a routine refresh.

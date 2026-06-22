@@ -1,44 +1,123 @@
 {% extends "base.html" %}
 
 {% block title %}Home | Library Ops{% endblock %}
-{% block page_title %}Foundation Dashboard{% endblock %}
+{% block page_title %}Library Dashboard{% endblock %}
 
 {% block content %}
-  <section class="panel">
-    <p class="eyebrow">Phase 1 slice</p>
-    <p>
-      This branch proves the bootstrap, role model, core entities, and protected
-      catalog foundation flow before the later catalog, circulation, and search
-      branches expand the product.
-    </p>
-    {% if user.is_authenticated %}
-      <p><strong>Signed in as:</strong> {{ user.email }}{% if role %} ({{ role }}){% endif %}</p>
-    {% else %}
-      <p class="muted">Sign in with a demo account to see role-aware navigation.</p>
-      <a class="button" href="{% url 'account_login' %}">Sign in</a>
-    {% endif %}
+  <section class="panel split-hero">
+    <div class="stack">
+      <div>
+        <p class="eyebrow">
+          {% if demo_data_ready and demo_auth_ready %}
+            Demo-ready library
+          {% else %}
+            Deployment status
+          {% endif %}
+        </p>
+        <p class="lede">
+          {% if demo_data_ready and demo_auth_ready %}
+            Explore a server-rendered library workflow with seeded catalog
+            records, circulation states, role-aware access, and exact-match
+            search states.
+          {% else %}
+            This deployment is live, but demo data and accounts need
+            an operator refresh before the full catalog and circulation workflow
+            can be reviewed end to end.
+          {% endif %}
+        </p>
+      </div>
+      {% if user.is_authenticated %}
+        <p><strong>Signed in as:</strong> {{ user.email }}{% if role %} ({{ role }}){% endif %}</p>
+      {% else %}
+        <div class="pill-row">
+          {% if demo_auth_ready %}
+            <span class="pill">Seeded users</span>
+          {% else %}
+            <span class="pill">Operator refresh required</span>
+          {% endif %}
+          <span class="pill">Catalog search</span>
+          <span class="pill">Circulation dashboard</span>
+        </div>
+        <div class="nav-actions" style="justify-content: flex-start;">
+          <a class="button" href="{% url 'account_login' %}">
+            {% if demo_auth_ready %}Sign in to the demo{% else %}Sign in{% endif %}
+          </a>
+          <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog first</a>
+        </div>
+      {% endif %}
+    </div>
+    <aside class="hero-note">
+      <p class="eyebrow">Current live state</p>
+      <p class="muted" style="margin: 0;">
+        {% if demo_data_ready %}
+          This host now exposes seeded catalog counts, circulation examples,
+          and role-aware entry points for the full product walkthrough.
+        {% else %}
+          The host is reachable and the role-aware routes are wired, but this
+          environment is currently unseeded. Run the demo refresh sequence in
+          `SETUP.md` before using it for the full walkthrough.
+        {% endif %}
+      </p>
+    </aside>
   </section>
 
-  <section class="grid">
-    <article class="panel">
+  <section class="metric-grid">
+    <article class="panel metric-card">
       <p class="eyebrow">Catalog works</p>
-      <p style="font-size: 2rem; margin: 0;">{{ work_count }}</p>
+      <p class="metric-value">{{ work_count }}</p>
+      <p class="muted" style="margin: 0;">
+        {% if work_count %}
+          Imported works currently visible in the seeded browse flow.
+        {% else %}
+          No seeded catalog data is loaded yet for the live demo.
+        {% endif %}
+      </p>
     </article>
-    <article class="panel">
+    <article class="panel metric-card">
       <p class="eyebrow">Inventory copies</p>
-      <p style="font-size: 2rem; margin: 0;">{{ copy_count }}</p>
+      <p class="metric-value">{{ copy_count }}</p>
+      <p class="muted" style="margin: 0;">
+        {% if copy_count %}
+          Physical copies available to drive checkout, return, and search states.
+        {% else %}
+          Run the demo refresh sequence to populate circulation-ready copies.
+        {% endif %}
+      </p>
     </article>
+  </section>
+
+  <section class="panel">
+    <h2 style="margin-top: 0;">Circulation</h2>
+    <p>
+      {% if demo_data_ready %}
+        Review active, overdue, and recently returned loans on the circulation
+        dashboard.
+      {% else %}
+        The live service is up, but seeded loan examples are not loaded yet.
+        Refresh the demo data before using circulation as release evidence.
+      {% endif %}
+    </p>
+    {% if user.is_authenticated %}
+      <a class="button button--ghost" href="{% url 'loan-dashboard' %}">Open loan dashboard</a>
+    {% else %}
+      <a class="button button--ghost" href="{% url 'account_login' %}">Sign in to view loans</a>
+    {% endif %}
   </section>
 
   <section class="panel">
     <h2 style="margin-top: 0;">Next action</h2>
     {% if can_manage_catalog %}
-      <p>You can create the foundation catalog records used by later phases.</p>
+      <p>Manage the catalog, then move directly into borrower and return workflows from the circulation surface.</p>
       <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
     {% else %}
       <p>
-        Browse the read-only catalog surface. The protected create flow remains
-        restricted to Admin and Librarian users.
+        {% if demo_data_ready %}
+          Browse the live catalog, review seeded availability, and sign in when
+          you want to test the role-aware staff flows.
+        {% else %}
+          Browse the live catalog shell now, then run the demo refresh before
+          testing search and staff workflows.
+        {% endif %}
       </p>
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog</a>
     {% endif %}

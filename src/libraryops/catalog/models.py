@@ -2,19 +2,68 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from contextlib import suppress
+from pathlib import Path
 from typing import Any, ClassVar
+from uuid import uuid4
 
-from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
-from django.db.models import Prefetch
+from django.db import models
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
+from PIL import Image, UnidentifiedImageError
 
-from libraryops.accounts.roles import iter_role_definitions
-from libraryops.audit.services import record_audit_event
-from libraryops.inventory.models import BookCopy, BookCopyStatus
+from libraryops.catalog.managers import BibliographicWorkManager, BookEditionManager
+
+EDITION_COVER_ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
+EDITION_COVER_MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+
+
+def edition_cover_upload_to(instance: BookEdition, filename: str) -> str:
+    """Build a stable storage path for an uploaded edition cover."""
+
+    suffix = Path(filename).suffix.lower()
+    work_id = getattr(instance, "work_id", None) or "new"
+    return f"catalog/edition-covers/work-{work_id}/{uuid4().hex}{suffix}"
+
+
+def validate_cover_image_size(value: Any) -> None:
+    """Reject oversized cover uploads before storage writes the file."""
+
+    size = getattr(value, "size", None)
+    if size is None or size <= EDITION_COVER_MAX_UPLOAD_BYTES:
+        return
+    raise ValidationError(
+        f"Cover images must be {EDITION_COVER_MAX_UPLOAD_BYTES // (1024 * 1024)} MB or smaller."
+    )
+
+
+def validate_cover_image_format(value: Any) -> None:
+    """Allow only JPEG, PNG, or WebP cover uploads."""
+
+    if value in (None, ""):
+        return
+
+    image_format = ""
+    try:
+        file_obj: Any = getattr(value, "file", None)
+        with suppress(AttributeError):
+            value.seek(0)
+        with suppress(AttributeError):
+            file_obj.seek(0)
+        with Image.open(value) as image:
+            image.verify()
+            image_format = (image.format or "").upper()
+    except (OSError, UnidentifiedImageError) as exc:
+        raise ValidationError("Upload a JPEG, PNG, or WebP cover image.") from exc
+    finally:
+        file_obj = getattr(value, "file", None)
+        with suppress(AttributeError):
+            value.seek(0)
+        with suppress(AttributeError):
+            file_obj.seek(0)
+
+    if image_format not in EDITION_COVER_ALLOWED_FORMATS:
+        raise ValidationError("Upload a JPEG, PNG, or WebP cover image.")
 
 
 def normalize_name(value: str) -> str:
@@ -36,14 +85,19 @@ def clean_isbn(value: str) -> str:
         ValidationError: The ISBN is empty or invalid.
     """
 
+    # ISBN-10 and ISBN-13 allow different checksum schemes; we normalize both
+    # to ISBN-13 so the catalog stores one canonical representation.
     digits = "".join(ch for ch in value if ch.isdigit() or ch.upper() == "X").upper()
     if len(digits) == 10:
+        # ISBN-10 uses a modulo-11 checksum where a trailing X represents 10.
         total = sum(
             (10 - index) * (10 if digit == "X" else int(digit))
             for index, digit in enumerate(digits)
         )
         if total % 11 != 0:
             raise ValidationError("Enter a valid ISBN-10 or ISBN-13 value.")
+        # Convert the validated ISBN-10 payload into an ISBN-13 prefix before
+        # recomputing the ISBN-13 check digit.
         base = "978" + digits[:-1]
         check_total = sum(
             (1 if index % 2 == 0 else 3) * int(digit) for index, digit in enumerate(base)
@@ -51,6 +105,7 @@ def clean_isbn(value: str) -> str:
         check_digit = (10 - (check_total % 10)) % 10
         return f"{base}{check_digit}"
     if len(digits) == 13 and digits.isdigit():
+        # ISBN-13 uses alternating 1/3 weights across the first 12 digits.
         total = sum(
             (1 if index % 2 == 0 else 3) * int(digit) for index, digit in enumerate(digits[:-1])
         )
@@ -58,21 +113,6 @@ def clean_isbn(value: str) -> str:
             raise ValidationError("Enter a valid ISBN-10 or ISBN-13 value.")
         return digits
     raise ValidationError("Enter a valid ISBN-10 or ISBN-13 value.")
-
-
-@dataclass(frozen=True, slots=True)
-class CatalogFoundationData:
-    """Validated input for the Phase 1 catalog create flow."""
-
-    title: str
-    contributor_name: str
-    contributor_role: str
-    isbn: str
-    barcode: str
-    publisher: str
-    publication_year: int | None
-    language: str
-    shelf_location: str
 
 
 class ContributorRole(models.TextChoices):
@@ -83,105 +123,6 @@ class ContributorRole(models.TextChoices):
     TRANSLATOR = "translator", "Translator"
     ILLUSTRATOR = "illustrator", "Illustrator"
     OTHER = "other", "Other"
-
-
-class BibliographicWorkQuerySet(models.QuerySet["BibliographicWork"]):
-    """Query helpers for foundation catalog views."""
-
-    def active(self) -> BibliographicWorkQuerySet:
-        """Return only non-archived works."""
-
-        return self.filter(archived_at__isnull=True)
-
-    def with_foundation_graph(self) -> BibliographicWorkQuerySet:
-        """Prefetch the related foundation graph for evaluator-facing pages."""
-
-        contributor_queryset = WorkContributor.objects.select_related("contributor").order_by(
-            "sort_order",
-            "id",
-        )
-        edition_queryset = BookEdition.objects.prefetch_related("copies")
-        return self.prefetch_related(
-            Prefetch("work_contributors", queryset=contributor_queryset),
-            Prefetch("editions", queryset=edition_queryset),
-        )
-
-
-class BibliographicWorkManager(models.Manager["BibliographicWork"]):
-    """Own write orchestration and read-optimized catalog query helpers."""
-
-    def get_queryset(self) -> BibliographicWorkQuerySet:
-        """Return the project queryset with catalog-specific helpers."""
-
-        return BibliographicWorkQuerySet(self.model, using=self._db)
-
-    def foundation_index(self) -> BibliographicWorkQuerySet:
-        """Return the read-optimized queryset for foundation pages."""
-
-        return self.get_queryset().with_foundation_graph().active()
-
-    @transaction.atomic
-    def create_foundation_record(
-        self,
-        *,
-        actor: User,
-        data: CatalogFoundationData,
-    ) -> BibliographicWork:
-        """Create the Phase 1 work, contributor, edition, copy, and audit event atomically."""
-
-        work = self.create(title=data.title)
-        contributor, _ = Contributor.objects.get_or_create(
-            normalized_name=normalize_name(data.contributor_name),
-            defaults={"name": data.contributor_name},
-        )
-        WorkContributor.objects.create(
-            work=work,
-            contributor=contributor,
-            role=data.contributor_role,
-        )
-        edition = BookEdition.objects.create(
-            work=work,
-            isbn=data.isbn,
-            publisher=data.publisher,
-            publication_year=data.publication_year,
-            language=data.language,
-        )
-        copy = BookCopy.objects.create(
-            edition=edition,
-            barcode=data.barcode,
-            shelf_location=data.shelf_location,
-            status=BookCopyStatus.AVAILABLE,
-        )
-        self._assign_object_permissions(work, edition, copy)
-        record_audit_event(
-            actor=actor,
-            action="catalog.foundation.create",
-            target=work,
-            metadata={
-                "edition_id": edition.pk,
-                "copy_id": copy.pk,
-                "contributor_id": contributor.pk,
-            },
-        )
-        return work
-
-    def _assign_object_permissions(self, *objects: models.Model) -> None:
-        """Grant object permissions to the committed role groups."""
-
-        for role_definition in iter_role_definitions():
-            for group in Group.objects.filter(name=role_definition.name):
-                for obj in objects:
-                    for permission_name in role_definition.object_permissions:
-                        permission_app_label, permission_codename = permission_name.split(
-                            ".",
-                            maxsplit=1,
-                        )
-                        if permission_app_label != obj._meta.app_label:
-                            continue
-                        model_name = obj._meta.model_name or ""
-                        if not permission_codename.endswith(model_name):
-                            continue
-                        assign_perm(permission_codename, group, obj)
 
 
 class BibliographicWork(models.Model):
@@ -306,6 +247,13 @@ class BookEdition(models.Model):
         unique=True,
         null=True,
     )
+    cover_url: models.URLField[str, str] = models.URLField(blank=True)
+    cover_image: models.ImageField = models.ImageField(
+        blank=True,
+        null=True,
+        upload_to=edition_cover_upload_to,
+        validators=[validate_cover_image_size, validate_cover_image_format],
+    )
     description: models.TextField[str, str] = models.TextField(blank=True)
     external_identifiers: models.JSONField[dict[str, object], dict[str, object]] = models.JSONField(
         default=dict,
@@ -317,6 +265,7 @@ class BookEdition(models.Model):
     )
     created_at: models.DateTimeField[Any, Any] = models.DateTimeField(auto_now_add=True)
     updated_at: models.DateTimeField[Any, Any] = models.DateTimeField(auto_now=True)
+    objects: ClassVar[BookEditionManager] = BookEditionManager()  # pyright: ignore[reportIncompatibleVariableOverride]
 
     class Meta:
         """Default ordering for edition rows."""
@@ -339,6 +288,17 @@ class BookEdition(models.Model):
 
         if self.isbn:
             self.isbn = clean_isbn(self.isbn)
+
+    @property
+    def cover_preview_url(self) -> str | None:
+        """Return the best available cover preview URL for UI consumption."""
+
+        if self.cover_image:
+            try:
+                return self.cover_image.url
+            except ValueError:
+                return None
+        return self.cover_url or None
 
 
 class ExternalSourceRecord(models.Model):

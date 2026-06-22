@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=80", "wheel"]
+requires = ["setuptools>=82.0.1", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,15 +9,14 @@ description = "Spec-driven Django library management demo with Codex agent gover
 requires-python = ">=3.12"
 dependencies = [
   "django>=5.2,<6.0",
-  "django-ninja>=1.4,<2.0",
-  "django-allauth[socialaccount]>=65.0,<66.0",
+  "django-allauth[socialaccount]>=65.18.0,<66.0",
   "django-guardian>=3.2,<4.0",
   "django-unfold>=0.76,<1.0",
   "django-htmx>=1.20,<2.0",
   "dj-database-url>=2.2,<3.0",
   "gunicorn>=23.0,<24.0",
   "cryptography>=48.0.1,<49.0.0",
-  "psycopg[binary]>=3.2,<4.0",
+  "psycopg[binary]>=3.3.4,<4.0",
   "pydantic>=2.10,<3.0",
   "python-dotenv>=1.0,<2.0",
   "pillow>=12.2,<13.0",
@@ -59,6 +58,11 @@ select = [
   "E", "F", "I", "B", "UP", "SIM", "C4", "DTZ", "DJ", "TCH", "RUF", "PT", "ARG", "RET"
 ]
 ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"src/libraryops/catalog/forms/*.py" = ["TC002", "TC006", "RUF012"]
+"src/libraryops/catalog/views/*.py" = ["B009", "ARG002", "TC006"]
+"src/libraryops/inventory/models.py" = ["TC006"]
 
 [tool.pyright]
 include = ["src", "tests"]
@@ -102,7 +106,6 @@ forbidden_modules = [
   "libraryops.inventory",
   "libraryops.circulation",
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.audit",
   "libraryops.web",
   "libraryops.shell",
@@ -122,7 +125,6 @@ source_modules = ["libraryops.inventory"]
 forbidden_modules = [
   "libraryops.circulation",
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.web",
   "libraryops.shell",
 ]
@@ -133,7 +135,6 @@ type = "forbidden"
 source_modules = ["libraryops.circulation"]
 forbidden_modules = [
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.web",
   "libraryops.shell",
 ]
@@ -157,7 +158,6 @@ source_modules = [
   "libraryops.inventory",
   "libraryops.circulation",
   "libraryops.search",
-  "libraryops.ai_assist",
   "libraryops.audit",
 ]
 forbidden_modules = ["libraryops.web", "libraryops.shell"]

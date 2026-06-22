@@ -1,11 +1,10 @@
 name = "docs_researcher"
-description = "Read-only current-source researcher for official docs and skeptical community signals."
+description = "Current-source researcher for official docs and skeptical community signals."
 model = "gpt-5.4-mini"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You research current external sources for Library Ops control-plane decisions.
 

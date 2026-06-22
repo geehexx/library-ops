@@ -25,11 +25,11 @@ def load_hook_module() -> ModuleType:
     return module
 
 
-def test_task_graph_status_reports_task_count_for_current_repo() -> None:
-    """Ensure the startup notice reports the current Task Master graph size."""
+def test_task_graph_status_reports_present_task_graph_for_current_repo() -> None:
+    """Ensure the startup notice reports that the Task Master graph is present."""
     hook: Any = load_hook_module()
 
-    assert hook.task_graph_status(REPO_ROOT) == "present:tasks=12"
+    assert hook.task_graph_status(REPO_ROOT).startswith("present:tasks=")
 
 
 def test_mcp_summary_mentions_required_servers() -> None:
@@ -46,17 +46,54 @@ def test_mcp_summary_mentions_required_servers() -> None:
     assert "serena(" in summary
 
 
-def test_startup_notice_mentions_cache_safe_defaults_and_specialist_routing(
+def test_startup_notice_mentions_cache_safe_defaults_and_spark_lanes(
     monkeypatch: Any, capsys: Any
 ) -> None:
-    """Ensure the startup notice advertises cache-safe defaults and delegation."""
+    """Ensure the startup notice advertises cache-safe defaults and Spark lanes."""
     hook: Any = load_hook_module()
     monkeypatch.setattr(hook.sys, "stdin", StringIO(json.dumps({"cwd": str(REPO_ROOT)})))
 
     assert hook.main() == 0
     output = capsys.readouterr().out
 
-    assert "approval=approve" in output
-    assert "npm_config_cache=" in output
-    assert "XDG_CACHE_HOME=" in output
-    assert "specialist or subagent packets" in output
+    for expected_fragment in (
+        "approval=approve",
+        "npm_config_cache=",
+        "XDG_CACHE_HOME=",
+        "command_runner",
+        "context_gatherer",
+        "debugger",
+        "single_file_implementer",
+        "implementer",
+        "continue, checkpoint, evidence, handoff",
+        "multiple turns",
+        "stop hook emits JSON only",
+        "/mnt/c/...",
+        "graph replacement as an explicit regeneration event",
+    ):
+        assert expected_fragment in output
+
+    assert "Ralph loop" not in output
+    assert "parse-prd --force" not in output
+
+
+def test_resume_notice_is_more_compact_and_taskmaster_focused(
+    monkeypatch: Any, capsys: Any
+) -> None:
+    """Ensure the resume notice is shorter and centered on Task Master context."""
+    hook: Any = load_hook_module()
+    payload = {
+        "cwd": str(REPO_ROOT),
+        "hook_event_name": "resume",
+    }
+    monkeypatch.setattr(hook.sys, "stdin", StringIO(json.dumps(payload)))
+
+    assert hook.main() == 0
+    output = capsys.readouterr().out
+
+    assert "resume context" in output
+    assert ".codex-session-notes" not in output
+    assert "Task Master task/subtask notes" in output
+    assert "instructions=" not in output
+    assert "cache_hint=" not in output
+    assert "mcps=" not in output

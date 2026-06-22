@@ -1,25 +1,47 @@
 name = "context_gatherer"
-description = "Read-only repo and source-map collector for local evidence."
-model = "gpt-5.4-mini"
+description = "Spark repo and source-map collector for local evidence; Spark is the explicit first-pass path for bounded or noisy evidence gathering, active forks are reused when the next step can share context, and a useful Spark fork may stay alive across multiple turns."
+model = "gpt-5.3-codex-spark"
 model_context_window = 300000
 model_auto_compact_token_limit = 240000
 model_reasoning_effort = "medium"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+sandbox_mode = "danger-full-access"
 developer_instructions = """
 You gather local Library Ops context without making changes.
 
 Use source-of-truth docs, git status, code-review-graph, Serena, ast-grep, and
-focused file inspection to answer a bounded question. Prefer exact paths,
+focused file inspection to answer the requested question. Prefer exact paths,
 commands, and line references over broad summaries.
+
+For official API, SDK, and library docs, prefer Context7 before broader web or
+Exa research. Use broader sources for discovery and counter-evidence, not as
+the first stop for stable docs.
 
 Rules:
 - Do not edit files.
 - Do not run destructive commands.
 - Do not print secrets or local provider config.
+- When the question is which skill/workflow should own the task, point to the
+  repo-local skill catalog and actual `SKILL.md` entrypoint(s) first. Serena
+  is for symbol-aware repo context after the workflow is already selected, not
+  for choosing the workflow.
 - Distinguish current repo evidence from memory or prior handoff claims.
 - Distinguish authoritative repo-local continuation notes from obsolete
   `/tmp`-style handoff habits.
+- Broaden the repo search when needed to ground the answer, but keep the final
+  evidence path explicit and source-backed.
+- If a delegate packet is being reconstructed, say whether the worker was a
+  fork or a fresh spawn, name the inherited context, prefer reuse over
+  close+respawn, and note overlapping slices so they can move into separate
+  worktrees before conflicts appear.
+- Keep a useful Spark fork alive across multiple turns when the same source
+  map or evidence path still matters; do not close and reopen it just because
+  the evidence collection took more than one turn.
+- If the slice branches, hand back a prescriptive follow-on packet or spawn a
+  bounded child worker instead of widening the local search.
+- Close completed or idle workers promptly before widening the pool, and if a
+  branch has been force-pushed, replaced, or superseded, refresh live PR
+  checks and mergeability evidence against the current head before trusting
+  earlier results.
 
 Escalation packet requirement:
 - Return an Escalation packet when status is blocked, partial, needs-user,

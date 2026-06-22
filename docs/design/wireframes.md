@@ -26,8 +26,8 @@ forms, and no unnecessary visual complexity.
    and tests.
 2. **Role clarity.** Admin, Librarian, Member, and anonymous users should see
    different affordances, but server-side authorization remains authoritative.
-3. **Search confidence.** Results should explain whether they matched exact IDs,
-   keyword/full-text, semantic similarity, or fused ranking.
+3. **Search confidence.** Results should explain whether they matched exact IDs
+   first, then lexical keywords or filters, so the ranking remains understandable.
 4. **HTMX pragmatism.** Interactions should be server-rendered and enhanced with
    HTMX where it reduces page reload friction.
 5. **Accessible defaults.** Keyboard navigation, focus order, error text,
@@ -59,8 +59,6 @@ forms, and no unnecessary visual complexity.
 | Return | HTMX modal/panel | Admin, Librarian | Close an active loan. |
 | Loans | `/loans/` | Admin, Librarian, Member | View active/historical loans. |
 | Admin users | `/admin/users/` or Django Admin | Admin | Manage roles/users. |
-| API/docs | `/api/docs` or Django Ninja OpenAPI route | All | Verify the public API contract and protected mutations. |
-| AI metadata assist | HTMX panel | Admin, Librarian | Review suggested tags/description. |
 
 ## 1. Public landing
 
@@ -70,14 +68,15 @@ forms, and no unnecessary visual complexity.
 +---------------------------------------------------------------+
 | Mini Library Management System                                |
 | A deployed, tested Django demo for catalog, circulation,       |
-| search, RBAC, seed data, and grounded AI assistance.           |
+| exact-identifier-first lexical search, RBAC, seed data, and   |
+| release evidence.                                              |
 |                                                               |
 | [Browse catalog] [Sign in as demo user]                       |
 |                                                               |
 | Assignment checklist                                          |
 | [x] Book management      [x] Borrow/return                    |
 | [x] Search               [x] README + deployment              |
-| [x] Auth/RBAC            [x] AI/search extras                 |
+| [x] Auth/RBAC            [x] Demo evidence                    |
 +---------------------------------------------------------------+
 ```
 
@@ -103,14 +102,16 @@ Accessibility notes:
 | Pass  [______________]   | Librarian: librarian@...           |
 | [Sign in]                | Member: member@...                 |
 |                          | Password: <local-demo-password-from-seed-command>      |
-| [Continue with Google]   |                                    |
+| [Continue with Google]  [Continue with GitHub]               |
 +--------------------------+------------------------------------+
 ```
 
 Implementation notes:
 
 - Demo credentials are disposable and recreated by seed command.
-- OAuth may be configured but password login should keep the demo reliable.
+- Password login should keep the demo reliable even when no provider is configured.
+- Provider buttons appear only for configured providers and must preserve any
+  `next` redirect target through the social-login flow.
 
 Accessibility notes:
 
@@ -152,7 +153,7 @@ Accessibility notes:
 +-------------+-------------------------------------------------+
 | Nav         | Catalog                                         |
 |             | [ Search title, author, ISBN, subject...      ] |
-|             | [Search] [Semantic: on/off]                    |
+|             | [Search] [Exact IDs first, then lexical]      |
 |             |                                                 |
 |             | Filters                                         |
 |             | Availability [Any v]  Subject [Any v]          |
@@ -162,8 +163,9 @@ Accessibility notes:
 |             | +---------------------------------------------+ |
 |             | | Pride and Prejudice                         | |
 |             | | Jane Austen · 1813 · English                | |
-|             | | Available: 3 of 4 copies                    | |
-|             | | Match: exact title + contributor            | |
+|             | | Matched identifier: ISBN 9780141439518      | |
+|             | | Availability: 3 of 4 copies available       | |
+|             | | Match: exact identifier match               | |
 |             | | [Details] [Checkout copy]                   | |
 |             | +---------------------------------------------+ |
 +-------------+-------------------------------------------------+
@@ -171,8 +173,11 @@ Accessibility notes:
 
 Implementation notes:
 
-- Exact ISBN/barcode results should short-circuit or rank first.
-- Result rows include match explanation from search service.
+- Exact ISBN/barcode results should short-circuit or rank first, ahead of other
+  lexical matches.
+- Result rows include match explanation from the search service, with exact
+  identifier matches shown as a distinct result state from lexical matches and
+  the matched identifier value surfaced directly on the card.
 - Role-aware actions: anonymous/member see details; librarian/admin see checkout.
 - HTMX can update result list and filters without full reload.
 
@@ -211,7 +216,8 @@ Try a title, author, ISBN, or broader subject term.
 Implementation notes:
 
 - Metadata and live availability are separate sections.
-- Archive action requires confirmation.
+- Archive action requires confirmation that names the record and states the
+  visibility impact before submission.
 - Upload cover is Admin/Librarian only.
 
 Accessibility notes:
@@ -237,15 +243,12 @@ Accessibility notes:
 | Initial copies [ 1 ]                                          |
 |                                                               |
 | [Save book] [Save and add another] [Cancel]                   |
-|                                                               |
-| AI assist: [Suggest tags and description]                     |
 +---------------------------------------------------------------+
 ```
 
 Implementation notes:
 
 - Validation lives in forms and services.
-- AI suggestions open in a review panel and are not auto-saved.
 - Initial copies generate deterministic barcodes or require explicit barcode.
 
 Accessibility notes:
@@ -260,7 +263,7 @@ Accessibility notes:
 | Checkout copy B-000001                                       |
 | Book: Pride and Prejudice                                    |
 | Status: Available                                            |
-| Patron * [Search/select member___________________________]    |
+| Patron * [Search/select member by name or library ID____]    |
 | Due date [2026-07-03]                                        |
 |                                                               |
 | [Checkout] [Cancel]                                          |
@@ -272,6 +275,8 @@ Implementation notes:
 - Service must run transactionally.
 - Duplicate active-loan constraint is authoritative.
 - On success, HTMX refreshes copy table and dashboard metric.
+- Search/select must scale beyond raw browser datalist behavior while keeping a
+  progressive-enhancement fallback path.
 
 Accessibility notes:
 
@@ -303,9 +308,10 @@ Implementation notes:
 | Nav         | Loans                                           |
 |             | [Active] [Overdue] [Returned] [Mine]            |
 |             |                                                 |
-|             | Book                Patron       Due      Action |
-|             | Pride and...        Member Demo  Jul 03   Return |
-|             | Frankenstein        Member Demo  Jun 10   Return |
+|             | Status  Book                Patron   Due   Action|
+|             | Active  Pride and...        Member   Jul03 Return|
+|             | Overdue Frankenstein        Member   Jun10 Return|
+|             | Returned Jane Eyre          Member   Jun01 View  |
 +-------------+-------------------------------------------------+
 ```
 
@@ -313,56 +319,37 @@ Implementation notes:
 
 - Member sees only own loans.
 - Librarian/Admin see all loans.
+- Keep the table row-first and readable at evaluator scale instead of packing
+  returned items into cramped card fragments.
 
-## 10. AI metadata assist
-
-```text
-+---------------------------------------------------------------+
-| AI suggestions                                                |
-| Source fields: title, contributor, description                |
-|                                                               |
-| Suggested subjects: [Classic] [Social class] [Marriage]       |
-| Suggested summary: ...                                        |
-| Confidence / notes: grounded in provided fields only          |
-|                                                               |
-| [Apply selected] [Dismiss]                                    |
-+---------------------------------------------------------------+
-```
-
-Implementation notes:
-
-- Suggestions are structured output and human-reviewed.
-- Persist provenance if suggestions are applied.
-- Do not generate availability or copy state.
-
-## 11. API/docs evaluator link
+## 10. Evidence and release checks
 
 ```text
 +---------------------------------------------------------------+
-| API docs                                                      |
-| OpenAPI schema  /api/openapi.json                              |
-| [Open docs] [Back to dashboard] [Back to catalog]             |
+| Release evidence                                               |
+| README, demo script, smoke tests                               |
+| [Open README] [Back to dashboard] [Back to catalog]           |
 |                                                               |
 | Demo access: Admin, Librarian, Member labels only              |
-| Protected mutations require auth and role checks               |
+| Protected actions require auth and role checks                 |
 +---------------------------------------------------------------+
 ```
 
 Implementation notes:
 
-- Surface the OpenAPI UI or JSON route selected during implementation.
-- Keep the docs page visible to anonymous users, but block protected mutation
-  execution.
+- Surface README and demo-script evidence alongside the app.
+- Keep the release-evidence page visible to anonymous users, but block
+  protected action execution.
 - Link back to the dashboard, catalog, and README evidence.
 
 States:
 
 | State | Requirement |
 |---|---|
-| Default | OpenAPI UI loads and includes catalog, loans, and auth-related endpoints. |
-| Unauthenticated | Read docs remain visible; protected endpoint execution is blocked by auth. |
+| Default | Release evidence loads and includes the app, README, and smoke-test links. |
+| Unauthenticated | Read evidence remains visible; protected action execution is blocked by auth. |
 | Permission denied | Error copy names the required role without exposing internals. |
-| Schema error | Show a concise failure banner and link to setup/quality checks. |
+| Smoke failure | Show a concise failure banner and link to setup/quality checks. |
 
 ## 12. Evaluator contract
 
@@ -376,10 +363,9 @@ States:
 | Create/edit/archive catalog record | No | No | Yes | Yes |
 | Checkout/return copy | No | No | Yes | Yes |
 | Run import/search-index actions | No | No | Yes, if enabled | Yes |
-| Review/apply AI metadata suggestions | No | No | Yes | Yes |
 | Manage users and roles | No | No | No | Yes |
-| Open API docs | Yes | Yes | Yes | Yes |
-| Execute protected API mutations | No | No | Yes | Yes |
+| Open release evidence | Yes | Yes | Yes | Yes |
+| Execute protected app mutations | No | No | Yes | Yes |
 
 ### State matrix
 
@@ -393,7 +379,7 @@ States:
 | Return | Button busy | No active loan | Conflict text | Action hidden | Loan closed and row refreshes |
 | Loans | Table spinner | No loans | Load banner | Member-only filter | Status update |
 | Admin users | Table spinner | No users | Validation summary | Denial page | Role change toast |
-| API/docs | OpenAPI loading | No schema | Schema load banner | Auth prompt | Endpoint response shown |
+| Release evidence | README loading | No docs | Evidence banner | Auth prompt | App route response shown |
 
 ### Accessibility contract
 
@@ -409,7 +395,7 @@ States:
 - Destructive actions require a keyboard-accessible confirmation.
 - Tables retain headers on narrow screens or collapse into labeled rows.
 - Playwright/a11y tests cover catalog search, create/edit validation, checkout
-  conflict, return conflict, member loans, admin denial, and API docs loading.
+  conflict, return conflict, member loans, and admin denial.
 
 ### Design token fallback
 
@@ -449,7 +435,7 @@ When extracting wireframes or implementation notes into code, capture:
 
 When extracting the evaluator contract, also capture:
 
-- API/docs route and auth behavior;
+- release evidence route and auth behavior;
 - role-specific admin and member states;
 - evaluator link targets back to README and canonical docs;
 - confirmation copy for protected admin mutations.

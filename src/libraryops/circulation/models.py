@@ -9,6 +9,8 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
+from libraryops.circulation.managers import LoanManager
+
 
 def default_due_at() -> datetime:
     """Return the default due date for a new loan."""
@@ -51,6 +53,8 @@ class Loan(models.Model):
     def __str__(self) -> str:
         """Return a human-readable loan label."""
         return f"{self.copy} -> {self.borrower}"
+
+    objects: LoanManager = LoanManager()  # pyright: ignore[reportIncompatibleVariableOverride]
 
     @property
     def is_active(self) -> bool:

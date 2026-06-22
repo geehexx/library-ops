@@ -60,7 +60,7 @@
 - [ ] `conftest test .codex/config.toml --policy policy`
 - [ ] `npm run markdownlint`
 - [ ] `npm audit --audit-level=moderate`
-- [ ] `npm run commitlint`
+- [ ] `npm run checks:prepush` (authoritative local pre-push gate)
 
 ## Self-review
 

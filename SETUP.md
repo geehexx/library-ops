@@ -81,6 +81,68 @@ ollama ps
 curl -sS http://127.0.0.1:11434/api/generate -d '{"model":"qwen3.5:0.8b","prompt":"Return JSON only: {\"ok\":true}","stream":false}'
 ```
 
+### Render demo refresh
+
+Render free-tier deploys do not run a seed hook during build, so the live demo
+state must be refreshed manually after a deploy or database reset. Set
+`LIBRARYOPS_DEMO_ACCESS_CODE` in the Render service environment or the shell
+session first, then run:
+
+```bash
+uv run python manage.py seed_roles
+uv run python manage.py seed_demo_users --reset-passwords
+uv run python manage.py import_public_domain_catalog --source openlibrary --limit 5 --refresh
+uv run python manage.py import_public_domain_catalog --source gutenberg --limit 5 --refresh
+uv run python manage.py seed_circulation_examples --refresh
+```
+
+This sequence is idempotent and can be rerun safely to restore the seeded demo
+accounts, a medium-sized catalog slice, and deterministic circulation examples
+without hardcoding secrets.
+
+### Hosted demo verification
+
+Use the hosted verification helper to capture pass/fail evidence before calling
+the live host demo-ready.
+
+Current truthful-state probe:
+
+```bash
+uv run python scripts/check_hosted_demo.py --base-url https://library-ops.onrender.com --mode unseeded
+```
+
+If the host is still unseeded but OAuth provider links are expected to be live:
+
+```bash
+uv run python scripts/check_hosted_demo.py \
+  --base-url https://library-ops.onrender.com \
+  --mode unseeded \
+  --auth-mode provider-enabled \
+  --expect-provider google \
+  --expect-provider github
+```
+
+Post-refresh seeded proof:
+
+```bash
+LIBRARYOPS_DEMO_ACCESS_CODE='<demo access code>' \
+  uv run python scripts/check_hosted_demo.py \
+  --base-url https://library-ops.onrender.com \
+  --mode seeded \
+  --auth-mode provider-enabled \
+  --expect-provider google \
+  --expect-provider github \
+  --report-file reports/validation/hosted-demo-seeded.json
+```
+
+This helper proves the public home/login/catalog surfaces and, when the demo
+password is available, the seeded librarian/member/admin flows too. It does not
+replace browser-backed OAuth callback proof for Task `16.6`; use it to tighten
+the seeded-host evidence before or alongside the browser run.
+
+Add `--expect-provider google --expect-provider github` once the hosted login
+page is supposed to expose live provider links.
+
 ### Review-graph lane
 
 ```bash
@@ -108,9 +170,11 @@ Feature work should branch from `development`.
 
 ## 7. Handoff artifacts
 
-- `.codex-session-notes/continuation.md` is authoritative.
-- `.codex-session-notes/scratch.md` is disposable scratch space.
+- The current Task Master task/subtask and its notes are the checkpoint
+  surface.
 - Record command, blocker, and validation evidence in Task Master notes.
+- Promote durable lessons into repo docs or skills instead of adding a new
+  scratch handoff file.
 
 ## 8. Canonical references
 

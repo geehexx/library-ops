@@ -1,11 +1,9 @@
 name = "prd_architect"
 description = "Use for canonical PRD structure, capability decomposition, acceptance criteria, and PRD-to-task readiness; do not use for implementation."
-model = "gpt-5.4"
-model_context_window = 400000
-model_auto_compact_token_limit = 320000
-model_reasoning_effort = "high"
-model_reasoning_summary = "concise"
-sandbox_mode = "read-only"
+model = "gpt-5.4-mini"
+model_reasoning_effort = "xhigh"
+model_reasoning_summary = "auto"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 You design and review the canonical RPG PRD.
 

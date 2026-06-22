@@ -40,8 +40,9 @@ Ship a live, evaluator-ready deployment and supporting demo evidence.
 - README maps requirements to evidence
 - release tag corresponds to the deployed commit
 
-## Suggested local regeneration command
+## Suggested local regeneration workflow
 
-```bash
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/phases/phase-4-deployment-and-demo.md --force'
-```
+Review the committed graph first. If phase-4 regeneration is genuinely needed,
+run it as a bounded draft/review lane and compare the result against
+`.taskmaster/tasks/tasks.json` before accepting any mutations. Do not use
+`task-master parse-prd --force` here as a routine refresh.

@@ -58,9 +58,8 @@ Evaluator / Admin / Librarian / Member
         v
 Library Ops web application
         |
-        +-- PostgreSQL + pgvector
-        +-- optional external metadata APIs for public-domain import
-        +-- optional hosted AI provider for grounded metadata suggestions
+        +-- PostgreSQL
+        +-- optional external metadata sources for public-domain import
         +-- GitHub Actions / Render for delivery
 ```
 
@@ -69,9 +68,8 @@ Library Ops web application
 ```text
 Browser
   -> Django web + HTMX templates
-  -> Django Ninja API
-  -> PostgreSQL + pgvector
-  -> background/management commands for seed import and search document refresh
+  -> PostgreSQL
+  -> background/management commands for seed import and search refresh
   -> CI/CD and deployment runtime
 ```
 
@@ -83,9 +81,8 @@ catalog         works, editions, contributors, subjects, cover metadata
 inventory       physical/digital copies and availability projection
 circulation     checkout, return, renewal, loan invariants
 audit           append-only user/action evidence
-search          exact, FTS, vector, fusion, result explanations
-ai_assist       grounded metadata suggestion boundary
-web/api         templates, HTMX endpoints, Django Ninja endpoints
+search          exact identifier search, lexical ranking, result explanations
+web             templates, HTMX endpoints, and request/response orchestration
 ```
 
 ### C4/code-level guidance
@@ -112,8 +109,7 @@ decision changes deployment topology.
 | `catalog` | work/edition/contributor/subject metadata | copy availability, active loans |
 | `inventory` | copies, copy status, location, availability projection | member borrowing rules |
 | `circulation` | loan workflow, transactional checkout/return/renewal | search ranking, metadata import |
-| `search` | search documents, ranking, explanations, vector/BM25 adapters | loan mutation |
-| `ai_assist` | grounded suggestion prompts/results | authoritative metadata writes without review |
+| `search` | exact identifiers, lexical ranking, filters, explanations | loan mutation |
 | `audit` | append-only evidence | primary business state |
 
 ## Django layer contract
@@ -125,7 +121,6 @@ decision changes deployment topology.
 | `services.py` | transactional writes and workflow invariants | template rendering, HTTP response construction |
 | `selectors.py` | read/query access and projection assembly | state mutation |
 | `forms.py` | request/form validation for template flows | business mutations outside services |
-| `api.py` | Django Ninja boundary and schema mapping | domain mutation not delegated to services |
 | `views.py` | request/response orchestration | direct circulation/catalog state mutation |
 | `tasks.py` / management commands | batch/import/search-refresh orchestration | hidden schema changes or non-idempotent seed writes |
 | `tests/` | executable behavior and architecture evidence | brittle tests coupled to irrelevant internals |
@@ -133,27 +128,8 @@ decision changes deployment topology.
 ## Validation model
 
 Architecture is considered valid only when prose, generated tasks, source
-layout, and automated gates agree.
-
-Required validation once the application bootstrap exists:
-
-```bash
-uv run lint-imports
-uv run python manage.py check
-uv run python manage.py makemigrations --check --dry-run
-uv run pytest
-uv run pytest tests/property
-uv run pytest tests/e2e
-```
-
-Required meta-system validation before application bootstrap:
-
-```bash
-codex doctor --summary --ascii --no-color
-npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'
-npm run skills:lint
-npm run markdownlint
-```
+layout, and the canonical gates agree.
+Use `docs/process/quality-gates.md` for the exact command ladder.
 
 The sandbox profile may be used only when the execution environment cannot
 install the required local tools. It is a constrained-environment waiver, not a
@@ -166,9 +142,9 @@ project policy.
 | Domain invariants | unit/property | checkout cannot create duplicate active loans; return is idempotent only where specified |
 | Transactions | integration | concurrent checkout races; copy state and loan state commit/rollback together |
 | Authorization | integration/E2E | member cannot manage catalog; librarian can checkout/return; admin can manage users |
-| Search ranking | unit/integration/property | exact ISBN wins; subject search finds seeded works; semantic result cannot outrank exact identifier |
+| Search ranking | unit/integration/property | exact ISBN wins; subject search finds seeded works; keyword ranking remains explainable |
 | Seed import | unit/integration | provenance captured; `--limit` respected; refresh is idempotent |
-| API contract | integration/schema | Ninja schema matches PRD acceptance examples |
+| UI contract | integration/schema | Server-rendered forms and views match PRD acceptance examples |
 | UI flows | Playwright | login, add book, search, checkout, return, role boundary |
 | Meta-system | config/CI | Codex config, skills, MCP/toolchain, ADR/index, and direct validation gates |
 
@@ -177,7 +153,7 @@ project policy.
 Stop and correct the design if any of these appear:
 
 - views mutate loan/catalog state directly instead of calling services;
-- selectors import views/forms/API modules;
+- selectors import views/forms/response modules;
 - search writes authoritative catalog state;
 - AI suggestion output is applied without provenance and human review;
 - seed commands require private credentials for the demo path;

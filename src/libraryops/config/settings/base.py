@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import tempfile
 from pathlib import Path
 from typing import Any, cast
 
@@ -112,10 +113,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "libraryops.accounts",  # This must be before allauth to ensure our templates over-ride.
     "allauth",
     "allauth.account",
     "guardian",
-    "libraryops.accounts",
     "libraryops.catalog",
     "libraryops.inventory",
     "libraryops.circulation",
@@ -130,6 +131,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -163,6 +165,10 @@ USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = Path(
+    os.getenv("DJANGO_MEDIA_ROOT", str(Path(tempfile.gettempdir()) / "libraryops-media"))
+)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SITE_ID = 1
 LOGIN_REDIRECT_URL = "home"
@@ -176,3 +182,6 @@ ANONYMOUS_USER_NAME = None
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+# This demo does not expose a social-account connect flow, so skipping the
+# allauth confirmation interstitial keeps hosted login UX intentional.
+SOCIALACCOUNT_LOGIN_ON_GET = True

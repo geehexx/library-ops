@@ -2,4 +2,5 @@ openapi: 3.1.0
 info:
   title: Library Ops API
   version: 0.1.0
+  description: Supporting contract surface only. No dedicated API is part of the current release scope, so this file remains intentionally empty unless a future PRD and Task Master slice reintroduce API work.
 paths: {}

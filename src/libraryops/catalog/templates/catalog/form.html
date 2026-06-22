@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | Library Ops{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    {% if back_url %}
+      <p><a href="{{ back_url }}">&larr; {{ back_label }}</a></p>
+    {% endif %}
+    {% if form.errors %}
+      <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+        <h2 style="margin-top: 0;">Fix the highlighted fields</h2>
+        {% if form.non_field_errors %}
+          {{ form.non_field_errors }}
+        {% endif %}
+      </div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <p>
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}
+            <span class="muted">{{ field.help_text }}</span>
+          {% endif %}
+          {% for error in field.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </p>
+      {% endfor %}
+      <button type="submit">{{ submit_label }}</button>
+    </form>
+  </section>
+{% endblock %}

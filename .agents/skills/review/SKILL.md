@@ -11,6 +11,8 @@ description: Use when conducting PR review, pre-merge review, security review, a
 - Correctness and edge cases.
 - Server-side authorization.
 - Database constraints and transactions.
+- For bounded or single-file reviews, use the Spark lanes first and gather exact evidence before broader inspection.
+- Acceptance criteria and pass/fail evidence.
 - Tests and quality gates.
 - Layering/import boundaries.
 - Secrets and generated junk.
@@ -25,6 +27,8 @@ addition to this review skill.
 
 - Blocking issues:
 - Non-blocking issues:
+- Acceptance criteria:
+- Pass/fail evidence:
 - Missing tests:
 - Security concerns:
 - Minimal fixes:
