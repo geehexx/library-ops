@@ -32,7 +32,7 @@ The current public experience successfully demonstrates the catalog hierarchy an
 | **Show the physical truth** | Availability belongs to copies. A work-level summary must expand to edition and copy detail. |
 | **Make role boundaries legible** | Explain why an action is unavailable; do not rely only on hiding controls. |
 | **Optimize the common path** | Public browse/search and staff borrow/return require minimal navigation and clear confirmation. |
-| **Prevent, then recover** | Disable or reject invalid actions with specific guidance; preserve form input and context. |
+| **Prevent, then recover** | Disable or reject disallowed actions with specific guidance; preserve form input and context. |
 | **Use progressive disclosure** | Show a concise work summary first, then editions, copies, history, and staff actions. |
 | **Design for keyboard and assistive technology** | Semantic structure, focus order, labels, errors, status announcements, and target size are first-class requirements. |
 | **Calibrate claims** | A configured OAuth button, planned AI feature, or hidden staff route is not presented as public proof without evidence. |
@@ -240,7 +240,7 @@ This is a focused heuristic review, not a formal WCAG conformance audit or compl
 | Check in / check out without context | Borrow / Return | Removes ambiguity in the assignment wording. |
 | Foundation record | Catalog record, work, edition, or copy | Implementation phase is not a user concept. |
 | Delete | Archive, unless deletion is truly safe | Preserves history and communicates consequence. |
-| Invalid | Explain the specific problem and correction | Supports recovery. |
+| Incorrect input | Explain the specific issue and correction | Supports recovery. |
 | Unauthorized | “You need a Librarian or Admin account to…” | Makes the role boundary actionable. |
 | AI search | Semantic search, only when it is actually shipped | Avoids vague or overstated capability. |
 
@@ -486,7 +486,7 @@ Try:
 #### Behavior notes
 
 - labels stay visible; placeholders are examples only;
-- errors appear near fields and in a summary linked to invalid inputs;
+- errors appear near fields and in a summary linked to incorrect inputs;
 - password-manager/autocomplete attributes are correct;
 - OAuth availability text distinguishes configured providers from fallback;
 - return destination is preserved after successful sign-in where safe.
@@ -711,7 +711,7 @@ Scenario: Search can be completed with a keyboard
 
 ```gherkin
 Scenario: Validation errors are announced and linked
-  Given I submit an invalid staff form
+  Given I submit a staff form with errors
   Then focus moves to an error summary
   And each error links to its field
   And the entered values remain available for correction

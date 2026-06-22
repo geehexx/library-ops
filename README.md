@@ -23,7 +23,7 @@
 > [!IMPORTANT]
 > This README is written for a reviewer of the deployed product. It is intentionally self-contained: the demo path, product scope, architecture, autonomous agent system, SDLC, development history, trade-offs, UX findings, limitations, and team-scale application are all explained here. It is not a workstation installation guide.
 > [!NOTE]
-> The first request can be slower after an idle period while the Render service wakes. Refresh once if the host initially shows a loading or transient error page.
+> The first request can be slower after an idle interval while the Render service wakes. Refresh once if the deployment initially shows a loading or transient error page.
 
 **Live review date:** 22 June 2026
 **Observed demo state:** 9 works · 10 editions · 16 physical copies
@@ -172,7 +172,7 @@ erDiagram
 | **Borrow** | A member receives an available physical copy | `AVAILABLE → ON_LOAN` |
 | **Return** | Staff closes the active loan for that copy | `ON_LOAN → AVAILABLE` |
 
-The core invariant is simple and important:
+The core invariant is foundational and important:
 
 > **One physical copy can have at most one active loan.**
 
@@ -207,7 +207,7 @@ flowchart TD
     I[Implementer<br/>small bounded diff + tests]
     V[Reviewer<br/>correctness · security · architecture · missing tests]
     X[Command runner<br/>lint · type · tests · security · docs]
-    M[Task steward<br/>state · dependencies · evidence]
+    M[Task coordinator<br/>state · dependencies · evidence]
     L[Retrospective / skills maintainer<br/>learn and improve the system]
 
     G[Quality and policy gates]
@@ -243,8 +243,8 @@ Within an approved task boundary, the system can perform the following loop with
 5. **Delegate bounded work.** Direct specialist agents research, explore, implement, review, or run checks in parallel where useful.
 6. **Implement the smallest complete change.** The implementer stays inside the current task and updates tests with behavior.
 7. **Verify independently.** A reviewer looks for correctness, authorization gaps, data-integrity risks, architecture drift, and missing tests.
-8. **Run deterministic gates.** The command runner executes the applicable lint, type, test, security, documentation, migration, and build checks.
-9. **Record evidence.** The task steward updates notes, status, files changed, checks run, blockers, and remaining work.
+8. **Run deterministic gates.** The command runner runs the applicable lint, type, test, security, documentation, migration, and build checks.
+9. **Record evidence.** The task coordinator updates notes, status, files changed, checks run, blockers, and remaining work.
 10. **Learn after delivery.** A retrospective agent proposes improvements to policies, skills, tests, or tasks so repeated friction becomes reusable automation.
 
 This is **bounded autonomy**: the system can move a well-defined task from “ready” to “verified,” but it cannot redefine the product, bypass permissions, hide failed checks, or silently turn a plan into a completion claim.
@@ -259,7 +259,7 @@ This is **bounded autonomy**: the system can move a well-defined task from “re
 | **Implementer** | Produce one small, reviewable change tied to acceptance criteria | Workspace write, no unrestricted machine access | Task boundary exceeded, migration/security risk, or tests cannot be made reliable |
 | **Reviewer** | Challenge correctness, authorization, integrity, maintainability, and test sufficiency | Read-only | Blocking issue remains |
 | **Command runner** | Execute explicit quality commands and summarize exact results | Restricted shell; destructive commands forbidden | Non-zero gate or unavailable required dependency |
-| **Task Master steward** | Maintain dependency order, notes, status, and completion evidence | Task-state access; no manual state-file corruption | Evidence does not support the requested status |
+| **Task Master coordinator** | Maintain dependency order, notes, status, and completion evidence | Task-state access; no manual state-file corruption | Evidence does not support the requested status |
 | **Retrospective / skills maintainer** | Convert recurring mistakes into improved skills, policy, or automation | Read-only analysis; proposed patches reviewed before adoption | Suggested change would bloat global context or weaken a gate |
 
 ### No uncontrolled agent hierarchy
@@ -530,7 +530,7 @@ The project does not present planned features as shipped features.
 | Enterprise SAML SSO | OAuth is sufficient for a portfolio deployment | Enterprise tenant and identity-provider requirements |
 | MARC / Z39.50 integration | Disproportionate scope for the assignment | Real interoperability requirement |
 | Native mobile client | The responsive web product is the review target | Validated mobile-only workflows |
-| Production-scale observability and load testing | The host and dataset are demonstration-oriented | Defined SLOs, traffic assumptions, retention, alerting, and paid infrastructure |
+| Production-scale observability and load testing | The environment and dataset are demonstration-oriented | Defined SLOs, traffic assumptions, retention, alerting, and paid infrastructure |
 
 ---
 

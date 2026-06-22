@@ -27,7 +27,7 @@ The repository also contains a separate **engineering control plane**. Spec Kit,
 - **Server-side authorization and transactions.** Hidden UI controls are not security boundaries.
 - **Exact and lexical retrieval first.** Semantic retrieval is deferred and must remain additive.
 - **Evidence-calibrated delivery.** Planned, configured, authenticated, public, and verified are distinct states.
-- **Shallow agent orchestration.** One coordinator delegates direct specialists; recursive fan-out is disabled by default.
+- **Shallow agent orchestration.** One coordinator delegates direct specialists; recursive fan-out is limited to one level by default.
 
 ---
 
@@ -97,7 +97,7 @@ The architecture exists to support decisions, implementation, review, onboarding
 
 - Django 5.2 LTS is the selected application framework family.
 - PostgreSQL is the production data store.
-- Render hosts the public web application and managed database path.
+- Render serves the public web application and managed database path.
 - GitHub is the source and CI/CD integration point.
 - Node/npm support documentation, agent-control-plane, and browser/evaluation tooling; they are not the application runtime.
 
@@ -133,14 +133,14 @@ flowchart LR
     App -->|authoritative data| DB
     App -->|optional identity flow| OAuth
     Render -->|runs| App
-    Render -->|hosts/manages| DB
+    Render -->|operates| DB
     GitHub -->|reviewed delivery| Render
     Sources -->|reproducible import with provenance| App
 ```
 
-### Actors
+### Roles and participants
 
-| Actor | Primary intent | Trust level |
+| Role | Primary intent | Trust level |
 | --- | --- | --- |
 | **Anonymous visitor / evaluator** | Inspect catalog, domain model, seeded state, and account entry points | Untrusted public request |
 | **Member** | Browse/search and access permitted account information | Authenticated, least privilege |
@@ -296,14 +296,14 @@ flowchart LR
 
 - borrowing and returning;
 - active, overdue, returned, and historical loan views;
-- due dates and processing actors;
+- due dates and processing participants;
 - copy-state transition consistency.
 
 #### Key rules
 
 - one copy has at most one active loan;
-- borrow requires an available copy and authorized staff actor;
-- return requires an active loan and authorized staff actor;
+- borrow requires an available copy and authorized staff member;
+- return requires an active loan and authorized staff member;
 - loan and copy changes occur transactionally;
 - historical loans remain queryable after catalog archival.
 
@@ -453,7 +453,7 @@ This is a conceptual schema. Exact field names and user/profile relationships re
 
 ```mermaid
 sequenceDiagram
-    actor Visitor
+    participant Visitor
     participant View as Django view/form
     participant Search as Search service/query
     participant DB as PostgreSQL
@@ -474,7 +474,7 @@ sequenceDiagram
 
 #### Failure behavior
 
-- invalid or empty input produces a usable browse state;
+- malformed or empty input produces a usable browse state;
 - no results provide recovery guidance rather than an error page;
 - identifiers are normalized carefully without turning arbitrary text into an identifier;
 - archived records are excluded from ordinary results unless an authorized workflow needs them.
@@ -483,7 +483,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    actor Staff
+    participant Staff
     participant View as Staff circulation view
     participant Auth as Authorization
     participant Service as Circulation service
@@ -492,7 +492,7 @@ sequenceDiagram
     Staff->>View: Submit borrow request
     View->>Auth: Require Admin or Librarian
     Auth-->>View: Authorized
-    View->>Service: borrow(copy, member, due date, actor)
+    View->>Service: borrow(copy, member, due date, requester)
     Service->>DB: BEGIN
     Service->>DB: Lock/read copy and active loans
     alt Copy is available and no active loan exists
@@ -514,7 +514,7 @@ Concurrency control should rely on database-enforced uniqueness and transaction 
 
 ```mermaid
 sequenceDiagram
-    actor Staff
+    participant Staff
     participant View as Staff circulation view
     participant Auth as Authorization
     participant Service as Circulation service
@@ -522,7 +522,7 @@ sequenceDiagram
 
     Staff->>View: Submit return
     View->>Auth: Require Admin or Librarian
-    View->>Service: return(active loan, actor)
+    View->>Service: return(active loan, handler)
     Service->>DB: BEGIN
     Service->>DB: Lock/read active loan and copy
     alt Active loan exists
@@ -540,7 +540,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    actor User
+    participant User
     participant App as Library Ops
     participant Provider as OAuth provider
     participant DB as PostgreSQL
@@ -562,7 +562,7 @@ Provider identity and local authorization remain separate concerns.
 
 ```mermaid
 sequenceDiagram
-    actor Operator
+    participant Operator
     participant Command as Management command
     participant Source as Approved source/dump
     participant Validate as Normalization and validation
@@ -582,7 +582,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-    actor Engineer
+    participant Engineer
     participant GitHub
     participant CI
     participant Render
@@ -700,9 +700,9 @@ flowchart LR
 | Session security | Secure cookie and HTTPS settings in production; appropriate logout/session expiry behavior |
 | Secrets | Environment or platform secret store; denied from agent/repo read where possible |
 | Data integrity | Foreign keys, uniqueness, transactions, protected/archive semantics |
-| Auditability | Loan actor/timestamps and operational logs; expand mutation audit trail when required |
+| Auditability | Loan processor identity/timestamps and operational logs; expand mutation audit trail when required |
 | Supply chain | Lockfiles, dependency audit, CI checks, least-privilege Actions permissions, SBOM-oriented release tooling |
-| Deployment | HTTPS, trusted hosts/origins, controlled migrations, smoke tests, rollback path |
+| Deployment | HTTPS, trusted endpoints/origins, controlled migrations, smoke tests, rollback path |
 | Agent security | Sandboxed permissions, rules, MCP allowlisting, human gates, evidence requirements |
 
 The project uses OWASP ASVS as a verification baseline and OWASP Top 10 as risk framing, not as a claim of formal compliance certification.

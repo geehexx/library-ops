@@ -193,7 +193,7 @@ The planning process began with questions that force trade-offs into the open:
 | Question | Why it matters | Current decision |
 | --- | --- | --- |
 | Are we managing titles or physical inventory? | A title-wide status fails when multiple copies exist. | Model Work, Edition, Copy, and Loan separately. |
-| What does delete mean when history exists? | Hard deletion can destroy circulation truth. | Archive referenced records; hard delete only when safe. |
+| What does delete mean when history exists? | Hard deletion can erase circulation truth. | Archive referenced records; hard delete only when safe. |
 | Who may perform each operation? | Bonus roles are meaningful only with server enforcement. | Admin/Librarian/Member with least privilege. |
 | Should AI be decorative or useful? | A generic chatbot can overpromise and hallucinate availability. | Defer product AI; use AI in governed engineering delivery. |
 | What proves quality? | Feature lists do not prove integrity or usability. | Acceptance criteria, invariant tests, CI, live deployment, UX review, explicit evidence. |
@@ -383,7 +383,7 @@ The Django path reduced integration surface and made the assignment easier to re
 
 ### 5.6 Engineering agent
 
-**Need:** execute one approved engineering task with sufficient context and bounded capabilities.
+**Need:** complete one approved engineering task with sufficient context and bounded capabilities.
 
 **Primary journey:** policy → canonical requirement → task → risk classification → specialist work → deterministic verification → evidence → stop or handoff.
 
@@ -397,7 +397,7 @@ The Django path reduced integration surface and made the assignment easier to re
 | **Work** | The conceptual intellectual creation, independent of a publication. |
 | **Edition** | A publication/manifestation of a work with edition-specific metadata. |
 | **Copy** | A physical inventory item belonging to an edition. |
-| **Loan** | A borrowing lifecycle connecting one copy, a member, staff actors, due date, and return state. |
+| **Loan** | A borrowing lifecycle connecting one copy, a member, staff participants, due date, and return state. |
 | **Borrow** | Create an active loan and make a copy unavailable. |
 | **Return** | Close an active loan and make the copy available. |
 | **Available** | A copy is eligible to be borrowed now. |
@@ -474,7 +474,7 @@ The seed set exists to demonstrate behavior, not to approximate a production col
 | FR-WORK-004 | A work **SHOULD** support descriptive metadata and subjects. | Shipped / partial public evidence | Search framing includes subjects. |
 | FR-WORK-005 | Admin or Librarian **MUST** be able to create a work. | Implemented / authenticated | Requires evaluator-safe staff evidence. |
 | FR-WORK-006 | Admin or Librarian **MUST** be able to edit a work. | Implemented / authenticated | Requires evaluator-safe staff evidence. |
-| FR-WORK-007 | The system **MUST** reject anonymous/member work mutation. | Implemented / authenticated | Server-side authorization expected and tested. |
+| FR-WORK-007 | The system **MUST** block anonymous/member work mutation. | Implemented / authenticated | Server-side authorization expected and tested. |
 | FR-WORK-008 | Referenced works **SHOULD** be archived rather than hard-deleted. | Implemented architectural requirement | Preserve edition/copy/loan history. |
 | FR-WORK-009 | Public catalog copy **MUST NOT** use implementation-stage terms such as “foundation records.” | Not yet met | P1 content correction. |
 
@@ -855,7 +855,7 @@ Coordinator
 └── Retrospective / skills maintainer
 ```
 
-Direct specialists MAY run in parallel when work is separable. Recursive delegation is disabled by default.
+Direct specialists MAY run in parallel when work is separable. Recursive delegation is off by default.
 
 ### 12.3 Functional control-plane requirements
 
@@ -994,7 +994,7 @@ Scenario: Librarian creates a work, edition, and copy
 Scenario: Member is denied catalog mutation
   Given I am authenticated as a Member
   When I submit a direct request to create or edit a catalog record
-  Then the server rejects the operation
+  Then the server blocks the operation
   And no catalog state changes
   And the response explains the required role or safe destination
 ```
@@ -1122,9 +1122,9 @@ Scenario: Agent encounters a high-risk decision
 ### 14.2 High-value invariant tests
 
 - at most one active loan per copy across generated action sequences;
-- borrow rejects unavailable/archived copies;
-- return rejects or safely handles completed loans;
-- borrow/return never create or destroy copies;
+- borrow is denied for unavailable/archived copies;
+- return requests for completed loans are denied, or handled safely;
+- borrow/return never create or remove copies;
 - member actions never mutate protected state;
 - exact identifier normalization is stable;
 - archived works do not appear in public search;
@@ -1540,7 +1540,7 @@ An agent-generated implementation is not done until these conditions are support
 
 #### Why it was not the final path
 
-- the assignment did not require a client-heavy SPA architecture;
+- the assignment did not require a client-heavy single-page web app architecture;
 - Django provided a more direct server-rendered route to the full product;
 - integrated forms/auth/admin/ORM reduced delivery surface;
 - Render fit the selected Python stack;
@@ -1643,7 +1643,7 @@ These are not blockers to the current demo but need explicit resolution before r
 1. What evaluator-safe authenticated access method should be standard: disposable account, read-only guided role, screenshot/video, or temporary credentials?
 2. What exact copy states beyond Available/On loan are implemented and supported by current migrations?
 3. Is member self-service loan history part of the current release or a future capability?
-4. What audit coverage exists beyond loan processing actors/timestamps?
+4. What audit coverage exists beyond loan processing participants/timestamps?
 5. Which management command is the canonical seed/import entry point, and what dry-run/refresh guarantees does it provide?
 6. Which accessibility checks run in CI, and which remain manual?
 7. Which MCP servers and workstation tools are currently verified in the implementation profile after bootstrap repairs?
