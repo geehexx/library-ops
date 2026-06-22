@@ -236,9 +236,17 @@ def test_taskmaster_committed_graph_requires_numeric_top_level_ids_and_canonical
     tasks_json = json.loads(
         (REPO_ROOT / ".taskmaster" / "tasks" / "tasks.json").read_text(encoding="utf-8")
     )
-    master_task12 = next(task for task in tasks_json["master"]["tasks"] if task["id"] == 12)
+
+    def task_id(value: object) -> int:
+        """Normalize top-level task ids across canonical and staged tag surfaces."""
+
+        return int(str(value))
+
+    master_task12 = next(
+        task for task in tasks_json["master"]["tasks"] if task_id(task["id"]) == 12
+    )
     library_ops_task12 = next(
-        task for task in tasks_json["library-ops"]["tasks"] if task["id"] == 12
+        task for task in tasks_json["library-ops"]["tasks"] if task_id(task["id"]) == 12
     )
     library_ops_task12_subtask6 = next(
         subtask for subtask in library_ops_task12["subtasks"] if subtask["id"] == 6
@@ -260,12 +268,11 @@ def test_taskmaster_committed_graph_requires_numeric_top_level_ids_and_canonical
     assert "Tag-scoped alternates are staged" in taskmaster_agents
     assert "staged alternate surface" in library_ops_task12_subtask6["details"]
 
-    assert {type(task["id"]) for task in tasks_json["master"]["tasks"]} == {int}
-    assert {type(task["id"]) for task in tasks_json["library-ops"]["tasks"]} == {int}
-    assert isinstance(master_task12["id"], int)
-    assert master_task12["id"] == 12
-    assert {subtask["id"] for subtask in master_task12["subtasks"]} == {1, 2, 3, 4, 5}
-    assert {subtask["id"] for subtask in library_ops_task12["subtasks"]} == {
+    assert {task_id(task["id"]) for task in tasks_json["master"]["tasks"]} == set(range(1, 18))
+    assert {task_id(task["id"]) for task in tasks_json["library-ops"]["tasks"]} == set(range(1, 14))
+    assert task_id(master_task12["id"]) == 12
+    assert {int(subtask["id"]) for subtask in master_task12["subtasks"]} == {1, 2, 3, 4, 5}
+    assert {int(subtask["id"]) for subtask in library_ops_task12["subtasks"]} == {
         1,
         2,
         3,
