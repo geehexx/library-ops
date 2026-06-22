@@ -1,1 +1,1 @@
-"""Library Ops package."""
+"""Core package marker for import-linter and shared boundaries."""

@@ -12,7 +12,7 @@ this repo is view-only, so it is not a reliable writable implementation lane.
 
 ## Decision
 
-`docs/design/wireframes.md` is the repo-local design source of truth. Private
+`docs/DESIGN.md` is the repo-local design source of truth. Private
 design tools do not form part of the committed control-plane baseline, and
 implementation decisions must be represented in repo-local docs and tests.
 
@@ -31,5 +31,6 @@ implementation decisions must be represented in repo-local docs and tests.
 
 ## Validation
 
-- UX tasks must cite wireframes and update them when UI behavior changes.
+- UX tasks must cite the maintained design document and update it when UI
+  behavior changes.
 - E2E/accessibility tests verify key flows after bootstrap.

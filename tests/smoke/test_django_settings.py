@@ -86,6 +86,12 @@ def test_base_settings_disable_socialaccount_by_default(monkeypatch: Any) -> Non
     assert "allauth.socialaccount.providers.google" not in settings_module.INSTALLED_APPS
     assert "allauth.socialaccount.providers.github" not in settings_module.INSTALLED_APPS
     assert settings_module.SOCIALACCOUNT_PROVIDERS == {}
+    assert settings_module.ACCOUNT_FORMS == {
+        "signup": "libraryops.accounts.signup.RoleSelectingAccountSignupForm"
+    }
+    assert settings_module.SOCIALACCOUNT_FORMS == {
+        "signup": "libraryops.accounts.social_signup.RoleSelectingSocialSignupForm"
+    }
     assert settings_module.SOCIALACCOUNT_LOGIN_ON_GET is True
 
 
@@ -141,6 +147,12 @@ def test_base_settings_enable_socialaccount_provider_from_env(
     assert "allauth.socialaccount" in settings_module.INSTALLED_APPS
     assert provider_app in settings_module.INSTALLED_APPS
     assert set(settings_module.SOCIALACCOUNT_PROVIDERS) == {provider}
+    assert settings_module.ACCOUNT_FORMS == {
+        "signup": "libraryops.accounts.signup.RoleSelectingAccountSignupForm"
+    }
+    assert settings_module.SOCIALACCOUNT_FORMS == {
+        "signup": "libraryops.accounts.social_signup.RoleSelectingSocialSignupForm"
+    }
     assert settings_module.SOCIALACCOUNT_LOGIN_ON_GET is True
     assert settings_module.SOCIALACCOUNT_PROVIDERS[provider] == {
         "APPS": [

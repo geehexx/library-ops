@@ -29,11 +29,11 @@ class TestNavigationE2E:
         primary_nav = page.get_by_role("navigation", name="Primary")
         expect(page.get_by_role("heading", name="Library Dashboard")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Sign in")).to_be_visible()
-        expect(primary_nav.get_by_role("link", name="Create foundation record")).to_have_count(0)
+        expect(primary_nav.get_by_role("link", name="Add catalog record")).to_have_count(0)
 
         primary_nav.get_by_role("link", name="Catalog").click()
         expect(page).to_have_url(f"{live_server.url}/catalog/")
-        expect(page.get_by_role("heading", name="Catalog Foundation")).to_be_visible()
+        expect(page.get_by_role("heading", name="Library Catalog")).to_be_visible()
 
         page.get_by_role("navigation", name="Primary").get_by_role("link", name="Sign in").click()
         expect(page).to_have_url(f"{live_server.url}/accounts/login/")
@@ -54,17 +54,17 @@ class TestNavigationE2E:
         page.goto(live_server.url)
 
         primary_nav = page.get_by_role("navigation", name="Primary")
-        expect(primary_nav.get_by_role("link", name="Create foundation record")).to_be_visible()
+        expect(primary_nav.get_by_role("link", name="Add catalog record")).to_be_visible()
         expect(primary_nav.get_by_role("link", name="Sign out")).to_be_visible()
 
-        primary_nav.get_by_role("link", name="Create foundation record").click()
+        primary_nav.get_by_role("link", name="Add catalog record").click()
         expect(page).to_have_url(f"{live_server.url}/catalog/create/")
-        expect(page.get_by_role("heading", name="Create Foundation Record")).to_be_visible()
+        expect(page.get_by_role("heading", name="Add catalog record")).to_be_visible()
         expect(page.get_by_label("Work title")).to_be_visible()
         expect(page.get_by_label("Contributor name")).to_be_visible()
         expect(page.get_by_label("Contributor role")).to_be_visible()
 
-        page.get_by_role("button", name="Create foundation record").click()
+        page.get_by_role("button", name="Add catalog record").click()
         expect(page.get_by_role("heading", name="Fix the highlighted fields")).to_be_visible()
         expect(
             page.locator("span.error").filter(has_text="This field is required.").first
@@ -80,7 +80,7 @@ class TestNavigationE2E:
         page.get_by_label("Contributor role").select_option("author")
         page.get_by_label("ISBN").fill(isbn)
         page.get_by_label("Barcode").fill(barcode)
-        page.get_by_role("button", name="Create foundation record").click()
+        page.get_by_role("button", name="Add catalog record").click()
 
         expect(page).to_have_url(re.compile(rf"{re.escape(live_server.url)}/catalog/\d+/$"))
         expect(page.get_by_role("heading", name=title)).to_be_visible()

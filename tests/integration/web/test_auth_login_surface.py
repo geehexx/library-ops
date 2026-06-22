@@ -123,6 +123,18 @@ class LoginSurfaceTests(TestCase):
             "Use the seeded demo password path above to continue.",
             status_code=200,
         )
+        self.assertContains(response, "shared access code", status_code=200)
+        self.assertContains(response, "reviewer or host operator packet", status_code=200)
+
+    def test_password_reset_page_uses_the_branded_shell(self) -> None:
+        """The password-reset page should use the same evaluator-facing UI system."""
+
+        response = self.client.get(reverse("account_reset_password"))
+
+        assert response.status_code == 200
+        self.assertContains(response, "Reset your Library Ops password", status_code=200)
+        self.assertContains(response, "Send reset link", status_code=200)
+        self.assertContains(response, "Back to sign in", status_code=200)
 
     def test_login_page_shows_only_one_provider_and_preserves_next(self) -> None:
         """A one-provider deployment should expose only the configured provider link."""

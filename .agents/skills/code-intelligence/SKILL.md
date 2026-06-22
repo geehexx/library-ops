@@ -36,12 +36,12 @@ bounded child workers if the slice branches again.
 Treat these as the durable repo-local sources for control-plane work:
 
 - `AGENTS.md` for coordinator posture and source order.
-- `.taskmaster/docs/prd.md`, `specs/001-core/`, and current Task Master state.
+- `docs/PRD.md`, `specs/001-core/`, and current Task Master state.
 - `.codex/agents/*.toml` for agent routing metadata.
 - `.agents/skills/*/SKILL.md` for explicit capability entrypoints. Read the
   relevant `SKILL.md` directly to select the skill; Serena only comes after
   that choice for symbol-aware context.
-- `docs/process/quality-gates.md` for the validation ladder.
+- `SETUP.md` and `package.json` for the validation ladder.
 
 ## Required stack
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Supporting Spec Kit artifact. The canonical product contract is `.taskmaster/docs/prd.md`; this file summarizes the implementation slice for Spec Kit consistency and agent execution.
+Supporting Spec Kit artifact. The canonical product contract is `docs/PRD.md`; this file summarizes the implementation slice for Spec Kit consistency and agent execution.
 
 ## User-visible goal
 
@@ -68,6 +68,6 @@ owned by the repo-local source-of-truth surfaces.
 - CI green on PR.
 - Manual UX audit notes and screenshot matrix covering the current route
   inventory and key evaluator-visible flows.
-- README/demo-script updates for local setup, demo-user usage, and proof surfaces where changed.
+- README and kept-doc updates for local setup, demo-user usage, and proof surfaces where changed.
 - Task Master notes mapping work to PRD sections and checks.
 - Phase planning continues to expose the route through deployment and release.

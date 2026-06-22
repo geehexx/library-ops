@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Complete Social Sign Up | Library Ops{% endblock %}
+{% block page_title %}Choose your role{% endblock %}
+
+{% block content %}
+  <section class="panel" aria-labelledby="social-signup-heading">
+    <p class="eyebrow">Social sign-up</p>
+    <h2 id="social-signup-heading" style="margin-top: 0;">Finish account setup</h2>
+    <p class="muted lede" style="margin-bottom: 0;">
+      {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+        You have authenticated with {{ provider_name }} for {{ site_name }}.
+        Choose one Library Ops role so the right permission bundle can be
+        attached before you continue.
+      {% endblocktrans %}
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+        <h3 style="margin-top: 0;">Fix the highlighted fields</h3>
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {% url 'socialaccount_signup' as action_url %}
+    <form method="post" action="{{ action_url }}" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <p>
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.help_text %}
+            <span class="muted">{{ field.help_text }}</span>
+          {% endif %}
+          {% for error in field.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </p>
+      {% endfor %}
+      {{ redirect_field }}
+      <div class="nav-actions" style="justify-content: flex-start;">
+        <button type="submit">Complete sign up</button>
+        <a class="button button--ghost" href="{% url 'account_login' %}">Back to sign in</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}

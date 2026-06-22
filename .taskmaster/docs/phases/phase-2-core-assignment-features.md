@@ -1,6 +1,6 @@
 # Library Ops Phase 2 PRD View
 
-Canonical source: `.taskmaster/docs/prd.md`
+Canonical source: `docs/PRD.md`
 
 ## Goal
 

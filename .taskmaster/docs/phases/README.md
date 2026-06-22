@@ -1,14 +1,14 @@
 # Task Master phase PRDs
 
 These files are **derived working views** of the canonical PRD in
-`.taskmaster/docs/prd.md`.
+`docs/PRD.md`.
 
 Use them when a local provider is strong enough for one phase slice but not yet
 reliable enough for the full canonical PRD.
 
 Rules:
 
-- The canonical source of truth remains `.taskmaster/docs/prd.md`.
+- The canonical source of truth remains `docs/PRD.md`.
 - If a phase PRD and the canonical PRD disagree, update the canonical PRD first.
 - Keep phase PRDs intentionally few and implementation-facing; expand them when
   the active branch needs decision-complete detail, and consolidate them when

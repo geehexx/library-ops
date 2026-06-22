@@ -9,6 +9,8 @@ from libraryops.accounts.permissions import RoleContextMixin
 from libraryops.catalog.models import BibliographicWork
 from libraryops.inventory.models import BookCopy
 
+README_URL = "https://github.com/geehexx/library-ops#readme"
+
 
 class HomeView(RoleContextMixin, TemplateView):
     """Render the role-aware foundation dashboard."""
@@ -23,4 +25,5 @@ class HomeView(RoleContextMixin, TemplateView):
         context["copy_count"] = BookCopy.objects.count()
         context["demo_auth_ready"] = demo_auth_ready()
         context["demo_data_ready"] = demo_data_ready(context["work_count"], context["copy_count"])
+        context["about_demo_url"] = README_URL
         return context

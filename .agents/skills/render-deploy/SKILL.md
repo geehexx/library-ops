@@ -195,6 +195,10 @@ After MCP is configured, have the user set the active Render workspace with a pr
 Set my Render workspace to [WORKSPACE_NAME]
 ```
 
+If `list_workspaces` shows exactly one workspace, or the repo/user has already
+confirmed the default workspace name `My Workspace`, use that default directly
+instead of re-asking.
+
 **5. Check Authentication (CLI fallback only)**
 
 If MCP isn't available, use the CLI instead and verify you can access your account:

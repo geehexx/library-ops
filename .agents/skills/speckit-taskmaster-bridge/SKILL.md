@@ -12,7 +12,7 @@ Keep Spec Kit and Task Master aligned without creating competing sources of trut
 ## Rules
 
 1. Constitution is governance.
-2. `.taskmaster/docs/prd.md` is canonical execution PRD.
+2. `docs/PRD.md` is canonical execution PRD.
 3. Spec Kit specs/plans/tasks are supporting planning artifacts.
 4. Community presets require source review before installation.
 5. If Spec Kit and Task Master disagree, update PRD/ADR first, then regenerate tasks.

@@ -1,7 +1,7 @@
 # RPG PRD Template
 
 Use this only as a local structure reference. The canonical project PRD is
-`.taskmaster/docs/prd.md`.
+`docs/PRD.md`.
 
 ## Required sections
 
