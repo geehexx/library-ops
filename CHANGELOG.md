@@ -10,6 +10,8 @@ branch history.
 
 ## [Unreleased]
 
+Target release: `0.1.1`
+
 ### Added
 
 - Added role-selecting local signup and social-signup completion flows that
