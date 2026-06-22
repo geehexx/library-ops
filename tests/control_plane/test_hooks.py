@@ -87,10 +87,9 @@ def test_stop_hook_dirty_notice_remains_advisory(
     response = json.loads(stdout)
 
     assert result == 0
-    assert isinstance(response.get("systemMessage"), str)
-    assert response["systemMessage"].strip()
-    assert response.get("decision") != "block"
-    assert response.get("continue") is not False
+    assert set(response.keys()) == {"notice"}
+    assert isinstance(response.get("notice"), str)
+    assert response["notice"].strip()
 
 
 def test_serena_activate_emits_valid_session_start_json(

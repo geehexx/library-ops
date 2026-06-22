@@ -433,6 +433,8 @@ def test_postgresql_query_compiles_with_independent_aggregate_subqueries() -> No
         "search_keyword_rank",
         "search_rank",
         "search_explanation",
+        "search_availability_state",
+        "search_matched_identifier_value",
     }
     assert isinstance(PostgresKeywordRankBackend().rank_expression(term), SearchRank)
 
