@@ -2,8 +2,8 @@
 
 Use this matrix as the evaluator-facing route inventory for release evidence.
 It tracks which user-visible surfaces already have browser-backed proof, which
-ones have tracked visual baselines, and which still need follow-up outside the
-current release-critical path.
+ones have tracked visual baselines, and which still need follow-up after the
+release merge.
 
 ## Status Legend
 
@@ -84,9 +84,10 @@ login page is expected to expose the live OAuth links.
 - Current Render state: live demo data has been refreshed to the medium seeded
   corpus, the provider-enabled login surface is live, and the seeded hosted
   verifier now passes end to end.
-- Remaining hosted gap on the release-critical path: restore the full
-  GitHub-hosted CI workflows, rerun them on the draft release PR, and finish
-  the final seeded evaluator walkthrough.
+- Remaining hosted gap after the release merge: tighten any optional
+  role-aware/browser evidence that is still useful for the evaluator deck, but
+  do not treat it as a blocker to the released product state already live on
+  Render.
 - Django site row: `library-ops.onrender.com`
 - OAuth app tables now exist after the full rebuild/deploy:
   `socialaccount_socialaccount`, `socialaccount_socialapp`,

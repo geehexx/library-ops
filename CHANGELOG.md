@@ -47,12 +47,13 @@ This file is managed by Python Semantic Release.
 - Reconciled release-convergence planning truth so the PRD, continuation
   surfaces, and Task Master status no longer describe the implemented Django
   product surfaces as merely planned or bootstrap-only.
+- Merged release PR `#29` from `development` into `main` after restoring the
+  real GitHub gate set and clearing the final commitlint scope drift on the
+  release range.
 
 ### Remaining Release-Convergence Work
 
-- Rerun the real GitHub-hosted CI and PR gate workflows on release PR `#29`
-  and fix any final remote-only failures against the true release candidate.
-- Reconcile README, Task Master, and release-status wording to the live GitHub
-  and Render state after the real remote gates rerun.
-- Run one final seeded hosted evaluator walkthrough, merge `development` into
-  `main`, and then finish the post-merge cleanup lane.
+- Finish the post-merge branch/worktree/stash cleanup lane tracked under
+  Task `14.7`.
+- Tighten any remaining hosted evaluator evidence that is still optional or
+  environment-limited, without reopening the released product scope.

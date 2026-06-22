@@ -94,13 +94,12 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-`development` is the current release candidate branch, and draft release PR
-`#29` is the active promotion path into `main`. The hosted Render environment
-is seeded with the medium demo corpus, the seeded hosted verifier passes
-end-to-end, and the provider-enabled login surface is live. The main remaining
-closeout work is truthful remote gate proof, final release-surface
-reconciliation, and the last short hosted evaluator QA pass on the real
-release candidate.
+Release PR `#29` has been merged into `main`, and the hosted Render
+environment on `development` is live at the same released product state. The
+current deployment shows the seeded medium demo corpus, exact-identifier catalog
+search, and the provider-enabled login surface. Remaining closeout work is now
+limited to post-merge cleanup and any optional hosted-evidence tightening that
+does not change the released product behavior.
 
 Evaluator-facing expectations:
 
@@ -115,14 +114,12 @@ Evaluator-facing expectations:
 
 Known limitations:
 
-- release tagging and merge of draft release PR `#29` are still pending;
+- the merge-to-`main` release cut is complete, but local branch/worktree/stash
+  cleanup is still tracked separately;
 - the evaluator-facing demo script now lives at
   [docs/evaluation/demo-script.md](docs/evaluation/demo-script.md);
-- the smoke surface passes locally, and the live hosted seeded proof now passes
-  against the Render review target;
-- the final `development` -> `main` closeout still requires the real
-  GitHub-hosted CI and PR gate workflows to pass on the live release PR, not
-  just local hooks;
+- the smoke surface passes locally, and the live hosted public seeded proof now
+  matches the Render review target;
 - the deployment contract now targets the Render free-tier path, which means
   migrations must be handled without `preDeployCommand`, and demo seed refresh
   must be run manually via the operator sequence in [SETUP.md](SETUP.md);
@@ -130,9 +127,9 @@ Known limitations:
   state and the post-refresh seeded state can be verified with one repeatable
   pass/fail helper before treating the deployment as release evidence;
 
-The product work should continue from the canonical graph, while the control-
-plane state remains governed by the PRD, Task Master graph, agent config,
-skills, and thin durable docs.
+Further product work should continue from the canonical graph, while the
+control-plane state remains governed by the PRD, Task Master graph, agent
+config, skills, and thin durable docs.
 
 ## Documentation map
 
