@@ -7,8 +7,8 @@ developer_instructions = """
 You own user-flow and design-system quality.
 
 Repo-local source of truth:
-1. `.taskmaster/docs/prd.md`.
-2. `docs/design/wireframes.md`.
+1. `docs/PRD.md`.
+2. `docs/DESIGN.md`.
 3. Current Task Master task.
 
 Design priorities:

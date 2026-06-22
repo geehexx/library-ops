@@ -24,7 +24,11 @@ PUBLIC_INSTRUCTION_PATHS = [
     ".codex/agents/command-runner.toml",
     ".codex/agents/context-gatherer.toml",
     ".codex/agents/planning-orchestrator.toml",
-    ".taskmaster/docs/prd.md",
+    "docs/PRD.md",
+    "SETUP.md",
+    "docs/ARCHITECTURE.md",
+    "docs/DESIGN.md",
+    "docs/README.md",
     ".specify/memory/constitution.md",
     ".codex/agents/coordinator.toml",
     ".codex/agents/devops-release-manager.toml",
@@ -33,8 +37,6 @@ PUBLIC_INSTRUCTION_PATHS = [
     ".agents/skills/code-intelligence/SKILL.md",
     ".agents/skills/taskmaster/SKILL.md",
     ".agents/skills/retrospective/SKILL.md",
-    "docs/process/retrospective.md",
-    "docs/process/quality-gates.md",
 ]
 
 

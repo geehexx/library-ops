@@ -100,7 +100,7 @@ class TestAuthSurfaceE2E:
         expect(page).to_have_url(f"{live_server.url}/")
         primary_nav = page.get_by_role("navigation", name="Primary")
         expect(primary_nav.get_by_role("link", name="Sign out")).to_be_visible()
-        expect(primary_nav.get_by_role("link", name="Create foundation record")).to_be_visible()
+        expect(primary_nav.get_by_role("link", name="Add catalog record")).to_be_visible()
         assert_visual_snapshot(page, "auth_surface", "default/signed-in.png")
 
     @pytest.mark.skipif(

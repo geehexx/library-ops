@@ -13,7 +13,7 @@ of creating a local exception.
 2. `tests/AGENTS.md`
 3. Child `tests/**/AGENTS.md`
 4. `pyproject.toml`
-5. `docs/process/quality-gates.md`
+5. `SETUP.md`
 6. Current task / PRD acceptance criteria
 7. Existing tests in the same subtree
 
@@ -124,7 +124,7 @@ of creating a local exception.
   `src/libraryops/`.
 - `tests/conftest.py` fails fast if a test file lands outside the kind-first
   top-level directories.
-- `tests/control_plane/test_governance_surfaces.py` must continue checking that
+- `tests/control_plane/test_contracts.py` must continue checking that
   `src/libraryops/` stays free of `test_*.py` and `*_test.py`.
 - CI and local verification should stop on topology regressions before broader
   pytest runs.

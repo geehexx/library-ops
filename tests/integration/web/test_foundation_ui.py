@@ -198,13 +198,21 @@ class FoundationCatalogPagesTests(TestCase):
         )
 
         assert index_response.status_code == 200
+        self.assertContains(index_response, "Library Catalog", status_code=200)
         self.assertContains(index_response, "Pride and Prejudice", status_code=200)
         self.assertContains(index_response, "Jane Austen", status_code=200)
         self.assertContains(index_response, "1 edition", status_code=200)
+        self.assertContains(index_response, "1 available", status_code=200)
+        self.assertContains(index_response, "0 on loan", status_code=200)
 
         assert detail_response.status_code == 200
         self.assertContains(detail_response, "BC-0001", status_code=200)
         self.assertContains(detail_response, "9780141439518", status_code=200)
+        self.assertContains(
+            detail_response,
+            "groups each work into one or more editions",
+            status_code=200,
+        )
 
     def test_home_page_switches_to_seeded_copy_when_demo_data_exists(self) -> None:
         """The home page should advertise seeded proof only when data is present."""
@@ -226,6 +234,7 @@ class FoundationCatalogPagesTests(TestCase):
             "Imported works currently visible in the seeded browse flow.",
             status_code=200,
         )
+        self.assertContains(response, "About this demo", status_code=200)
 
 
 class FoundationCatalogSearchTests(TestCase):

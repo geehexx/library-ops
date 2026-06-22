@@ -1,0 +1,66 @@
+# Deliberate, machine-readable repository policy for the Codex control plane.
+# Change this file only when the intended architecture changes. The checker
+# validates structure and security properties; Promptfoo owns prompt semantics.
+
+[codex]
+config = ".codex/config.toml"
+hooks = ".codex/hooks.json"
+agent_dir = ".codex/agents"
+
+[agents]
+required_string_fields = ["name", "description", "developer_instructions"]
+
+[mcp]
+required = [
+  "context7",
+  "exa",
+  "taskmaster-ai",
+  "code-review-graph",
+  "serena",
+  "render",
+]
+
+[hooks]
+allowed_events = ["SessionStart", "Stop"]
+required_events = ["SessionStart", "Stop"]
+forbidden_events = ["PreToolUse"]
+require_git_root_for_project_scripts = true
+forbid_stop_matcher = true
+
+[skills]
+directory = ".agents/skills"
+explicit_reference_skills = [
+  "playwright",
+  "promptfoo-evals",
+  "render-deploy",
+  "security-ownership-map",
+  "security-threat-model",
+]
+
+[adrs]
+directory = "docs/adr"
+index = "docs/adr/index.md"
+
+[security]
+bidi_scan_globs = [
+  "AGENTS.md",
+  ".codex/**/*.toml",
+  ".codex/**/*.json",
+  ".codex/**/*.py",
+  ".agents/skills/**/*.md",
+  "docs/**/*.md",
+  "policy/**/*.rego",
+  "rules/**/*.yml",
+  "scripts/**/*.py",
+  "scripts/**/*.sh",
+  "tests/control_plane/**/*.py",
+  "tests/control_plane/**/*.toml",
+]
+
+[package]
+file = "package.json"
+
+[package.required_wrappers]
+"eval:validate" = "scripts/codex-runtime-env.sh"
+"eval:smoke" = "scripts/codex-runtime-env.sh"
+"eval:provider:local" = "scripts/codex-runtime-env.sh"

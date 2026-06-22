@@ -3,7 +3,7 @@ id: TASKMASTER-RUNTIME-POLICY
 title: Task Master Runtime and Commit Policy
 status: active
 last_reviewed: 2026-06-16
-related_prd: ./prd.md
+related_prd: ../../docs/PRD.md
 ---
 
 # Task Master Runtime and Commit Policy
@@ -20,7 +20,7 @@ be captured in Task Master before implementation begins.
 
 Committed:
 
-- `.taskmaster/docs/prd.md`
+- `docs/PRD.md`
 - `.taskmaster/tasks/tasks.json`
 - `.taskmaster/config.example.json`
 - `.taskmaster/AGENTS.md`
@@ -37,7 +37,7 @@ Do not commit provider keys, OAuth state, or ad hoc local exports.
 
 ## Source-of-truth rule
 
-1. `.taskmaster/docs/prd.md` is the canonical Task Master input.
+1. `docs/PRD.md` is the canonical Task Master input.
 2. `.taskmaster/tasks/tasks.json` is a reviewed derived execution artifact and
    must not be hand-edited to compensate for stale Task Master reads. Treat the
    `master` surface as the canonical committed view for this repo session;
@@ -285,7 +285,9 @@ Follow this process before declaring a local model unusable:
 - `qwen3.5:0.8b`: fit comfortably, but produced malformed JSON for the Task
   Master structured-output path.
 - `qwen2.5-coder:7b-instruct`: best proven local Task Master CLI lane so far
-  for bounded PRD parsing on this machine.
+  for bounded PRD parsing on this machine, but a 2026-06-22 comparison parse of
+  the full `docs/PRD.md` still collapsed into eight generic waterfall tasks and
+  is not acceptable evidence for committed graph replacement.
 - `qwen3:latest`: best already-proven local structured-output fallback, and the
   next candidate to test for a heavier end-to-end Task Master operation.
 - `deepseek-r1:7b`: can run, but it is no longer the preferred local planning
@@ -295,7 +297,8 @@ Follow this process before declaring a local model unusable:
   than the proven Qwen lane.
 - `gemini-2.5-pro`: rate-limited on the current account.
 - `gemini-2.5-flash`: useful off-box rescue lane when local providers cannot
-  prove the needed operation, but no longer the committed default profile.
+  prove the needed operation; prefer it or another stronger non-Ollama lane for
+  future full `docs/PRD.md` graph-refresh attempts.
 - `codex-cli gpt-5.4-mini`: rejected because the installed Codex CLI is too old
   for that model.
 - `codex-cli gpt-5.2-codex`: rejected on the current ChatGPT-backed account.

@@ -1,6 +1,6 @@
 # Task Master agent rules
 
-- `.taskmaster/docs/prd.md` is canonical Task Master input.
+- `docs/PRD.md` is canonical Task Master input.
 - `.taskmaster/tasks/tasks.json` is the committed derived execution graph.
 - Long-horizon goals stay broad and outcome-based. Any implementable work must
   be captured in Task Master before implementation begins.

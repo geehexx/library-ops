@@ -28,7 +28,8 @@ local pass.
   coordinator TOML for delegation, implementer TOML for slice boundaries, or
   code-intelligence for tool-ladder changes.
 - If the lesson is truly recurring and global, promote it out of this skill;
-  otherwise keep it here or in `docs/process/retrospective.md`.
+  otherwise keep it here, in Task Master notes, or in the narrowest durable
+  repo-local skill or agent surface.
 - If the same lesson is likely to recur, prefer a tracked skill, agent TOML,
   or docs update before writing anything to memory.
 - If a branch is rewritten, force-pushed, or replaced, refresh live PR checks

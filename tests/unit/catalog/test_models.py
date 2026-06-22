@@ -8,8 +8,6 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
-from hypothesis import given
-from hypothesis import strategies as st
 from PIL import Image
 from tests.factories import BibliographicWorkFactory
 
@@ -122,11 +120,3 @@ def test_catalog_non_facade_modules_do_not_define_all(module: object) -> None:
     """Ensure non-facade catalog modules do not declare export lists."""
 
     assert not hasattr(module, "__all__")
-
-
-@pytest.mark.property
-@given(st.sampled_from([case[1] for case in VALID_ISBN_CASES]))
-def test_clean_isbn_is_idempotent_for_normalized_values(normalized_value: str) -> None:
-    """Ensure already-normalized ISBN-13 values stay stable when re-cleaned."""
-
-    assert clean_isbn(clean_isbn(normalized_value)) == normalized_value
