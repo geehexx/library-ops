@@ -11,7 +11,7 @@ implementation begins.
 ## Source-of-truth order
 
 1. `.specify/memory/constitution.md`
-2. `.taskmaster/docs/prd.md`
+2. `docs/PRD.md`
 3. `specs/001-core/*`
 4. committed `.taskmaster/tasks/tasks.json`
 5. current Task Master task/subtask
@@ -119,6 +119,9 @@ Startup handoff contract:
 - Stop-hook behavior is notice-only and must output valid JSON to continue the stop flow.
 - Repo-owned write access is bounded to the workspace and the explicitly approved cache/config roots in `.codex/config.toml`. External mounts and filesystem paths such as `/mnt/c/...` are not repo-owned defaults; treat them as session-scoped reads/writes that may require escalation or a different session profile instead of inventing local workarounds.
 - Do not re-ask for known defaults (workspace/default/operator context) when those defaults are already captured in repo surfaces or explicitly confirmed by the user.
+- For Render MCP actions in this repo, prefer the workspace named
+  `My Workspace` when the connector reports a single available workspace or
+  the user has already confirmed that default.
 
 ## Routing rules
 
@@ -166,7 +169,8 @@ Startup handoff contract:
 
 ## Required local checks
 
-Use the canonical gate ladder in `docs/process/quality-gates.md`.
+Use the canonical validation ladder in `SETUP.md` and the repo gate commands in
+`package.json`.
 
 ## Coordinator-first launcher
 
@@ -185,9 +189,10 @@ workflow logic in untracked global wrappers.
   checkpoints.
 - Promote durable lessons into the relevant skill or repo docs; do not leave
   them trapped as memory-only guidance.
-- Promote repeated lessons into tracked surfaces through
-  `docs/process/retrospective.md` instead of letting memory-only instructions
-  compound indefinitely.
+- Promote repeated lessons into tracked surfaces such as `AGENTS.md`,
+  `.codex/agents/*.toml`, `.agents/skills/*`, `SETUP.md`, `docs/ARCHITECTURE.md`,
+  or Task Master notes instead of letting memory-only instructions compound
+  indefinitely.
 
 ## Repository hygiene
 

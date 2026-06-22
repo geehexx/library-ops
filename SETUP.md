@@ -5,7 +5,8 @@
 This is the canonical bootstrap and operator guide for Library Ops. Use it for
 local setup, common maintenance commands, and evaluator handoff. Deep rationale
 lives in `docs/ARCHITECTURE.md`; docs-local decisioning guidance lives in
-`docs/AGENTS.md`; validation policy lives in `docs/process/quality-gates.md`.
+`docs/AGENTS.md`; validation policy lives in this file and the repo gate
+commands in `package.json`.
 
 ## 1. First-time bootstrap
 
@@ -179,14 +180,11 @@ Feature work should branch from `development`.
 ## 8. Canonical references
 
 - `README.md`
+- `docs/PRD.md`
 - `docs/ARCHITECTURE.md`
 - `docs/AGENTS.md`
+- `docs/DESIGN.md`
 - `docs/README.md`
-- `docs/design/wireframes.md`
-- `docs/evaluation/eval-strategy.md`
-- `docs/process/quality-gates.md`
-- `docs/process/sdlc.md`
-- `.taskmaster/docs/prd.md`
 - `AGENTS.md`
 
 ## 9. Notes

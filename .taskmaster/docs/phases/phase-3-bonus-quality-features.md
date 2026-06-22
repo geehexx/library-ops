@@ -2,7 +2,7 @@
 
 Status: Cancelled / superseded by the trimmed release plan.
 
-Canonical source: `.taskmaster/docs/prd.md`
+Canonical source: `docs/PRD.md`
 
 ## Goal
 

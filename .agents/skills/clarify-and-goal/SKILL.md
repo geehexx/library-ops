@@ -39,13 +39,13 @@ earlier results as current.
 Treat these as the durable repo-local sources for this workflow:
 
 - `AGENTS.md` for coordinator posture and source order.
-- `.taskmaster/docs/prd.md` and `specs/001-core/` for requirements.
+- `docs/PRD.md` and `specs/001-core/` for requirements.
 - `.codex/agents/*.toml` for agent routing metadata.
 - `.agents/skills/code-intelligence/SKILL.md` for tool-routing boundaries.
 - Read the matching `SKILL.md` entrypoint from `.agents/skills/` directly.
   Do not use Serena memory reads or other proxy lookups to decide which skill
   or goal route applies.
-- `docs/process/quality-gates.md` for the validation ladder.
+- `SETUP.md` and `package.json` for the validation ladder.
 
 ## Procedure
 

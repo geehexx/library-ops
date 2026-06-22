@@ -13,7 +13,7 @@ The project is both an interview demo and a Codex-driven implementation workspac
 Use the following source-of-truth order:
 
 1. `.specify/memory/constitution.md` for immutable project principles and governance rules.
-1. `.taskmaster/docs/prd.md` for product scope, requirements, acceptance criteria, task-generation hints, and current accepted constraints.
+1. `docs/PRD.md` for product scope, requirements, acceptance criteria, task-generation hints, and current accepted constraints.
 1. `specs/001-core/*` for supporting Spec Kit consistency, implementation plan, data model, contracts, quickstart, and task breakdown.
 1. Task Master generated tasks for execution order after `task-master parse-prd` and complexity analysis.
 1. The current Task Master task/subtask.

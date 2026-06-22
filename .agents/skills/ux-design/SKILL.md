@@ -18,7 +18,7 @@ Use this skill when work involves:
 
 ## Rules
 
-- Treat `docs/design/wireframes.md` as the repo-local design source of truth.
+- Treat `docs/DESIGN.md` as the repo-local design source of truth.
 - Every major screen must specify: purpose, users, entry points, primary actions, empty state, error state, accessibility notes, and tests.
 - Role permissions must be visible in the UI but enforced server-side.
 - Prefer simple Django template + HTMX interactions over a custom client application.

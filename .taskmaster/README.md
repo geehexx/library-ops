@@ -5,7 +5,7 @@ state, and runtime policy.
 
 ## Start here
 
-- `.taskmaster/docs/prd.md`
+- `docs/PRD.md`
   is the canonical Task Master input.
 - `.taskmaster/tasks/tasks.json`
   is the committed derived execution graph.
@@ -32,7 +32,6 @@ Committed:
 
 - `.taskmaster/AGENTS.md`
 - `.taskmaster/config.example.json`
-- `.taskmaster/docs/prd.md`
 - `.taskmaster/docs/runtime-policy.md`
 - `.taskmaster/templates/rpg-prd-template.md`
 - `.taskmaster/tasks/tasks.json`
@@ -50,7 +49,7 @@ Local-only, never commit:
 cp .taskmaster/config.example.json .taskmaster/config.json
 npx --yes --package task-master-ai@0.43.1 -c 'task-master models --setup'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master models'
-npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd .taskmaster/docs/prd.md --research'
+npx --yes --package task-master-ai@0.43.1 -c 'task-master parse-prd docs/PRD.md --research'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master list'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master analyze-complexity --research'
 npx --yes --package task-master-ai@0.43.1 -c 'task-master expand --all --research'
@@ -84,6 +83,9 @@ surfaces unless the owning Task Master task explicitly calls for graph
 replacement. If the canonical writer path is stale or unavailable, stop and
 capture the blocker in Task Master instead of hand-editing
 `.taskmaster/tasks/tasks.json` or forcing a refresh from stale state.
+The current local Ollama lane is acceptable for bounded or phase-slice parsing,
+but a full `docs/PRD.md` refresh should use a stronger reviewed provider path
+when the local output collapses into generic tasks.
 Within the committed graph, treat the `master` surface as the canonical
 committed view for this repo session. Alternate tag surfaces are staged
 snapshots and should only diverge when a Task Master note makes that intent

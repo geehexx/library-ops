@@ -178,7 +178,7 @@ traceable to at least one of:
 
 - a primary source recorded in the PRD source register,
 - a relevant ADR, Task Master note, or current supporting reference such as
-  `docs/reference/context-lineage.md`,
+  `docs/README.md`, `docs/ARCHITECTURE.md`, or `docs/PRD.md`,
 - a tool log or command output preserved in the implementation notes,
 - or an explicitly marked assumption/open question.
 
