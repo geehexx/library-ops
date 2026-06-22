@@ -71,14 +71,17 @@ class SignupSurfaceTests(TestCase):
                 response = self.client.get(reverse("account_signup"))
 
         assert response.status_code == 200
+        self.assertContains(response, "Create a local Library Ops account", status_code=200)
         self.assertContains(response, "Application role", status_code=200)
         self.assertContains(
             response,
-            "Choose one application role now. Permissions follow the role group on your account.",
+            "Choose one application role now.",
             status_code=200,
         )
         self.assertContains(response, 'name="role"', status_code=200)
         self.assertNotContains(response, "Or use a third-party")
+        self.assertContains(response, "Create account", status_code=200)
+        self.assertContains(response, "Already have an account?", status_code=200)
 
     @skipUnless(
         "allauth.socialaccount" in settings.INSTALLED_APPS,
@@ -95,7 +98,7 @@ class SignupSurfaceTests(TestCase):
             response = self.client.get(reverse("account_signup"))
 
         assert response.status_code == 200
-        self.assertContains(response, "Or use a third-party", status_code=200)
+        self.assertContains(response, "Or continue with a provider", status_code=200)
         self.assertContains(response, 'href="/accounts/google/login/"', status_code=200)
         self.assertContains(response, 'href="/accounts/github/login/"', status_code=200)
         assert google.login_calls == [{"process": "login"}]

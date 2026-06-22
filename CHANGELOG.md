@@ -24,6 +24,11 @@ Target release: `0.1.1`
 - Changed the canonical PRD root to `docs/PRD.md` and reduced
   `.taskmaster/docs/prd.md` to a compatibility shim instead of a second source
   of truth.
+- Changed the evaluator-facing UX slice so account recovery and signup pages
+  use the branded shell, catalog language now prefers "catalog record" over
+  "foundation record", dashboard cards and demo guidance are easier to follow,
+  and exact-identifier search cards visibly show the matched identifier plus
+  live availability.
 - Changed the importer/search validation story so the public-domain catalog
   import command and its focused integration suite are fully green under the
   touched-scope checks.

@@ -39,7 +39,7 @@
           <p>
             {{ field.label_tag }}
             {{ field }}
-            {% if field.help_text %}
+            {% if field.help_text and field.name != "password" %}
               <span class="muted">{{ field.help_text }}</span>
             {% endif %}
             {% for error in field.errors %}
@@ -74,6 +74,21 @@
 
     <p class="muted" style="margin-bottom: 0;">
       Need a local-only account? <a href="{{ signup_url }}">Create one here</a>.
+    </p>
+  </section>
+
+  <section class="panel" aria-labelledby="demo-access-heading">
+    <p class="eyebrow">Demo access</p>
+    <h3 id="demo-access-heading" style="margin-top: 0;">Evaluator login guidance</h3>
+    <p class="muted" style="margin-bottom: 0;">
+      {% if demo_accounts_ready %}
+        Use one of the seeded demo identities and the shared access code from
+        your reviewer or host operator packet. Password access remains the
+        reliable fallback even when optional OAuth providers are enabled.
+      {% else %}
+        This host is live but the shared demo credentials are not ready yet.
+        Treat password access as operator-managed until the next seed refresh.
+      {% endif %}
     </p>
   </section>
 

@@ -31,12 +31,12 @@
       {% else %}
         <div class="pill-row">
           {% if demo_auth_ready %}
-            <span class="pill">Seeded users</span>
+            <a class="pill" href="{% url 'account_login' %}">Seeded users</a>
           {% else %}
             <span class="pill">Operator refresh required</span>
           {% endif %}
-          <span class="pill">Catalog search</span>
-          <span class="pill">Circulation dashboard</span>
+          <a class="pill" href="{% url 'catalog-index' %}">Catalog search</a>
+          <a class="pill" href="{% url 'account_login' %}">Circulation dashboard</a>
         </div>
         <div class="nav-actions" style="justify-content: flex-start;">
           <a class="button" href="{% url 'account_login' %}">
@@ -58,11 +58,14 @@
           `SETUP.md` before using it for the full walkthrough.
         {% endif %}
       </p>
+      <p style="margin: 0.85rem 0 0;">
+        <a href="{{ about_demo_url }}">About this demo</a>
+      </p>
     </aside>
   </section>
 
   <section class="metric-grid">
-    <article class="panel metric-card">
+    <a class="panel metric-card metric-card-link" href="{% url 'catalog-index' %}">
       <p class="eyebrow">Catalog works</p>
       <p class="metric-value">{{ work_count }}</p>
       <p class="muted" style="margin: 0;">
@@ -72,8 +75,11 @@
           No seeded catalog data is loaded yet for the live demo.
         {% endif %}
       </p>
-    </article>
-    <article class="panel metric-card">
+    </a>
+    <a
+      class="panel metric-card metric-card-link"
+      href="{% if user.is_authenticated %}{% url 'loan-dashboard' %}{% else %}{% url 'account_login' %}{% endif %}"
+    >
       <p class="eyebrow">Inventory copies</p>
       <p class="metric-value">{{ copy_count }}</p>
       <p class="muted" style="margin: 0;">
@@ -83,7 +89,7 @@
           Run the demo refresh sequence to populate circulation-ready copies.
         {% endif %}
       </p>
-    </article>
+    </a>
   </section>
 
   <section class="panel">
@@ -108,7 +114,7 @@
     <h2 style="margin-top: 0;">Next action</h2>
     {% if can_manage_catalog %}
       <p>Manage the catalog, then move directly into borrower and return workflows from the circulation surface.</p>
-      <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+      <a class="button" href="{% url 'catalog-create' %}">Add catalog record</a>
     {% else %}
       <p>
         {% if demo_data_ready %}
@@ -119,7 +125,10 @@
           testing search and staff workflows.
         {% endif %}
       </p>
-      <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog</a>
+      <div class="nav-actions" style="justify-content: flex-start;">
+        <a class="button button--ghost" href="{% url 'catalog-index' %}">Browse catalog</a>
+        <a class="button button--ghost" href="{{ about_demo_url }}">Read the project guide</a>
+      </div>
     {% endif %}
   </section>
 {% endblock %}

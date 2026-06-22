@@ -8,9 +8,11 @@ from typing import TYPE_CHECKING
 
 from django.db.models import (
     Case,
+    Exists,
     F,
     FloatField,
     IntegerField,
+    OuterRef,
     Q,
     TextField,
     Value,
@@ -18,6 +20,8 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast, Coalesce
 from django.db.models.lookups import GreaterThan
+
+from libraryops.inventory.models import BookCopy, BookCopyStatus
 
 from .identifiers import IdentifierMatchBuilder, any_identifier_hit_expression
 from .matching import TextMatchBuilder, any_phrase_hit_expression
@@ -93,6 +97,14 @@ class DeterministicRankingPolicy:
                 Value(0.0),
                 output_field=FloatField(),
             ),
+            _search_available_copy_hit=Exists(
+                BookCopy.objects.filter(
+                    edition__work_id=OuterRef("pk"),
+                    edition__archived_at__isnull=True,
+                    archived_at__isnull=True,
+                    status=BookCopyStatus.AVAILABLE,
+                ).order_by()
+            ),
         )
         queryset = queryset.alias(
             _search_keyword_hit=GreaterThan(F("_search_keyword_rank"), Value(0.0)),
@@ -107,6 +119,8 @@ class DeterministicRankingPolicy:
             search_keyword_rank=F("_search_keyword_rank"),
             search_rank=self._rank_expression(),
             search_explanation=self._explanation_expression(),
+            search_matched_identifier_value=self._matched_identifier_expression(term),
+            search_availability_state=self._availability_expression(),
         ).order_by(
             "search_rank",
             "-search_keyword_rank",
@@ -141,5 +155,35 @@ class DeterministicRankingPolicy:
             When(_search_phrase_hit=True, then=Value(MatchExplanation.EXACT_PHRASE.value)),
             When(_search_keyword_hit=True, then=Value(MatchExplanation.KEYWORD.value)),
             default=Value(MatchExplanation.BROAD_LEXICAL.value),
+            output_field=TextField(),
+        )
+
+    @staticmethod
+    def _availability_expression() -> Case:
+        """Return the public availability annotation for exact identifier cards."""
+
+        return Case(
+            When(
+                _search_identifier_hit=True,
+                _search_available_copy_hit=True,
+                then=Value("available"),
+            ),
+            When(_search_identifier_hit=True, then=Value("unavailable")),
+            default=Value(""),
+            output_field=TextField(),
+        )
+
+    @staticmethod
+    def _matched_identifier_expression(term: SearchTerm) -> Case:
+        """Return the exact identifier value surfaced on exact-hit result cards."""
+
+        exact_isbn = term.exact_isbn or ""
+        exact_text = term.text
+        return Case(
+            When(_search_isbn_hit=True, then=Value(exact_isbn)),
+            When(_search_barcode_hit=True, then=Value(exact_text)),
+            When(_search_source_identifier_hit=True, then=Value(exact_text)),
+            When(_search_external_identifier_hit=True, then=Value(exact_text)),
+            default=Value(""),
             output_field=TextField(),
         )

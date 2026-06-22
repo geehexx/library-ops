@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 
 {% block title %}Catalog | Library Ops{% endblock %}
-{% block page_title %}Catalog Foundation{% endblock %}
+{% block page_title %}Library Catalog{% endblock %}
 
 {% block content %}
   <section class="panel">
@@ -18,7 +18,7 @@
           <input
             aria-label="Search catalog"
             name="q"
-            placeholder="ISBN, barcode, title, or author"
+            placeholder="Try 9780141439518, Austen, or Pride and Prejudice"
             value="{{ search_query }}"
           >
         </label>
@@ -28,6 +28,11 @@
             <a class="button button--ghost" href="{% url 'catalog-index' %}">Clear</a>
           {% endif %}
         </div>
+      </div>
+      <div class="pill-row" aria-label="Example catalog searches">
+        <span class="pill">ISBN 9780141439518</span>
+        <span class="pill">Author Austen</span>
+        <span class="pill">Title Pride and Prejudice</span>
       </div>
       {% for key, value in request.GET.items %}
         {% if key != "q" and value %}
@@ -55,11 +60,11 @@
     {% endif %}
     {% if can_manage_catalog %}
       <div class="nav-actions">
-        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+        <a class="button" href="{% url 'catalog-create' %}">Add catalog record</a>
         <a class="button button--ghost" href="{% url 'work-create' %}">Create work</a>
       </div>
     {% else %}
-      <p class="muted">Sign in as an Admin or Librarian to create foundation records.</p>
+      <p class="muted">Sign in as an Admin or Librarian to add or edit catalog records.</p>
       <a class="button button--ghost" href="{% url 'account_login' %}">Sign in</a>
     {% endif %}
   </section>
@@ -82,12 +87,10 @@
               </div>
               {% if search_query and work.search_explanation == 'Exact identifier match' %}
                 <div style="display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.7rem;">
-                  {% if work.search_matched_identifier_value %}
-                    <span class="pill" style="border-color: rgba(155, 67, 46, 0.28); background: rgba(155, 67, 46, 0.08); color: var(--text);">Matched identifier: {{ work.search_matched_identifier_value }}</span>
-                  {% endif %}
-                  {% if work.search_availability_state == 'available' %}
+                  <span class="pill" style="border-color: rgba(155, 67, 46, 0.28); background: rgba(155, 67, 46, 0.08); color: var(--text);">Matched identifier: {{ search_query }}</span>
+                  {% if work.available_copy_count > 0 %}
                     <span class="pill" style="border-color: rgba(64, 124, 91, 0.28); background: rgba(64, 124, 91, 0.1); color: var(--text);">Availability: Available</span>
-                  {% elif work.search_availability_state == 'unavailable' %}
+                  {% else %}
                     <span class="pill" style="border-color: rgba(160, 81, 45, 0.28); background: rgba(160, 81, 45, 0.1); color: var(--text);">Availability: Unavailable</span>
                   {% endif %}
                 </div>
@@ -104,7 +107,11 @@
                   No contributors yet.
                 {% endfor %}
               </div>
-              <div class="muted" style="margin-top: 0.35rem;">{{ work.editions.count }} edition{{ work.editions.count|pluralize }}</div>
+              <div class="muted" style="margin-top: 0.35rem;">
+                {{ work.editions.count }} edition{{ work.editions.count|pluralize }}
+                · {{ work.available_copy_count }} available
+                · {{ work.on_loan_copy_count }} on loan
+              </div>
             </div>
           </li>
         {% endfor %}
@@ -113,7 +120,7 @@
       <p role="status" aria-live="polite">No matching books found.</p>
       <p class="muted">Try a title, author, ISBN, or broader subject term.</p>
     {% else %}
-      <p>No foundation records exist yet.</p>
+      <p>No catalog records exist yet.</p>
     {% endif %}
   </section>
 {% endblock %}

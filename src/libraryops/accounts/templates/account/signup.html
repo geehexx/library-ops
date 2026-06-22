@@ -1,50 +1,79 @@
-{% extends "account/base_entrance.html" %}
-{% load allauth i18n %}
+{% extends "base.html" %}
+{% load i18n socialaccount %}
 
-{% block head_title %}
-    {% trans "Signup" %}
-{% endblock head_title %}
+{% block title %}Sign Up | Library Ops{% endblock %}
+{% block page_title %}Create account{% endblock %}
 
 {% block content %}
-    {% element h1 %}
-        {% trans "Sign Up" %}
-    {% endelement %}
-    {% setvar link %}
-        <a href="{{ login_url }}">
-    {% endsetvar %}
-    {% setvar end_link %}
-        </a>
-    {% endsetvar %}
-    {% element p %}
-        {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
-    {% endelement %}
-    {% element p %}
-        {% trans "Choose one application role now. Permissions follow the role group on your account." %}
-    {% endelement %}
+  {% get_providers as socialaccount_providers %}
+
+  <section class="panel" aria-labelledby="signup-heading">
+    <p class="eyebrow">Account setup</p>
+    <h2 id="signup-heading" style="margin-top: 0;">Create a local Library Ops account</h2>
+    <p class="muted lede" style="margin-bottom: 0;">
+      Choose one application role now. Permissions follow the single role
+      group attached to your account, and Library Ops keeps authorization
+      local even when sign-in starts with OAuth.
+    </p>
+
+    {% if form.non_field_errors %}
+      <div class="panel" role="alert" aria-live="polite" style="border-color: #c46a53;">
+        <h3 style="margin-top: 0;">Fix the highlighted fields</h3>
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
     {% if not SOCIALACCOUNT_ONLY %}
-        {% url 'account_signup' as action_url %}
-        {% element form form=form method="post" action=action_url tags="entrance,signup" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% element fields form=form unlabeled=True %}
-                {% endelement %}
-                {{ redirect_field }}
-            {% endslot %}
-            {% slot actions %}
-                {% element button tags="prominent,signup" type="submit" %}
-                    {% trans "Sign Up" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
+      {% url 'account_signup' as action_url %}
+      <form method="post" action="{{ action_url }}" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <p>
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+              <span class="muted">{{ field.help_text }}</span>
+            {% endif %}
+            {% for error in field.errors %}
+              <span class="error">{{ error }}</span>
+            {% endfor %}
+          </p>
+        {% endfor %}
+        {{ redirect_field }}
+        <div class="nav-actions" style="justify-content: flex-start;">
+          <button type="submit">Create account</button>
+          <a class="button button--ghost" href="{{ login_url }}">Already have an account?</a>
+        </div>
+      </form>
     {% endif %}
+
     {% if PASSKEY_SIGNUP_ENABLED %}
-        {% element hr %}
-        {% endelement %}
-        {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
-            {% trans "Sign up using a passkey" %}
-        {% endelement %}
+      <div class="nav-actions" style="justify-content: flex-start; margin-top: 1rem;">
+        <a class="button button--ghost" href="{{ signup_by_passkey_url }}">
+          {% trans "Sign up using a passkey" %}
+        </a>
+      </div>
     {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    {% endif %}
-{% endblock content %}
+  </section>
+
+  {% if SOCIALACCOUNT_ENABLED and socialaccount_providers %}
+    <section class="panel provider-panel" aria-labelledby="oauth-signup-heading">
+      <p class="eyebrow">Optional OAuth</p>
+      <h3 id="oauth-signup-heading" style="margin-top: 0;">Or continue with a provider</h3>
+      <p class="muted" style="margin-bottom: 0;">
+        If you start with GitHub or Google, Library Ops still asks you to pick
+        a local application role before the account is ready.
+      </p>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem;">
+        {% for provider in socialaccount_providers %}
+          <a
+            href="{% provider_login_url provider.id process="login" %}"
+            class="button button--ghost"
+          >
+            Continue with {{ provider.name }}
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+{% endblock %}

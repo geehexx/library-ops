@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from contextlib import suppress
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import Any, ClassVar, cast
 from uuid import uuid4
 
 from django.core.exceptions import ValidationError
@@ -159,6 +159,28 @@ class BibliographicWork(models.Model):
 
         self.normalized_title = normalize_name(self.title)
         super().save(*args, **kwargs)
+
+    @property
+    def available_copy_count(self) -> int:
+        """Return the number of active copies currently available."""
+
+        return self._copy_count_for_status("available")
+
+    @property
+    def on_loan_copy_count(self) -> int:
+        """Return the number of active copies currently on loan."""
+
+        return self._copy_count_for_status("on_loan")
+
+    def _copy_count_for_status(self, status: str) -> int:
+        """Count active copies for one status across prefetched editions."""
+
+        return sum(
+            1
+            for edition in cast("Any", self).editions.all()
+            for copy in edition.copies.all()
+            if copy.archived_at is None and copy.status == status
+        )
 
 
 class Contributor(models.Model):

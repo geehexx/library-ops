@@ -23,9 +23,14 @@
         No contributors linked.
       {% endfor %}
     </p>
+    <p class="muted" style="margin-bottom: 0;">
+      Library Ops groups each work into one or more editions, then shows the
+      physical copies attached to that edition. Use this page to understand
+      what is conceptually the same book versus what is actually on the shelf.
+    </p>
     {% if can_manage_catalog %}
       <div class="nav-actions">
-        <a class="button" href="{% url 'catalog-create' %}">Create foundation record</a>
+        <a class="button" href="{% url 'catalog-create' %}">Add catalog record</a>
         <a class="button button--ghost" href="{% url 'work-edit' work_id=work.pk %}">Edit work</a>
         <a class="button button--ghost" href="{% url 'edition-create' work_id=work.pk %}">Add edition</a>
       </div>
@@ -45,6 +50,9 @@
         </div>
       </details>
     {% else %}
+      <p class="muted">
+        Sign in as a Librarian or Admin when you want to borrow, return, or edit copies from here.
+      </p>
       <a class="button button--ghost" href="{% url 'catalog-index' %}">Back to catalog</a>
     {% endif %}
   </section>
@@ -93,7 +101,19 @@
       <ul class="clean">
         {% for copy in edition.copies.all %}
           <li>
-            {{ copy.barcode }} — {{ copy.get_status_display }}{% if copy.shelf_location %} — shelf {{ copy.shelf_location }}{% endif %}
+            <div style="display: flex; flex-wrap: wrap; gap: 0.55rem; align-items: center;">
+              <strong>{{ copy.barcode }}</strong>
+              {% if copy.status == "available" %}
+                <span class="status-badge status-badge--available">{{ copy.get_status_display }}</span>
+              {% elif copy.status == "on_loan" %}
+                <span class="status-badge status-badge--on-loan">{{ copy.get_status_display }}</span>
+              {% else %}
+                <span class="status-badge status-badge--other">{{ copy.get_status_display }}</span>
+              {% endif %}
+              {% if copy.shelf_location %}
+                <span class="muted">Shelf {{ copy.shelf_location }}</span>
+              {% endif %}
+            </div>
             {% if can_manage_catalog %}
               <div class="nav-actions" style="justify-content: flex-start; margin-top: 0.5rem;">
                 <a class="button button--ghost" href="{% url 'copy-edit' copy_id=copy.pk %}">Edit</a>

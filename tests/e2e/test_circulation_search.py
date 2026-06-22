@@ -140,7 +140,7 @@ class TestCirculationAndSearchE2E:
 
         page.goto(f"{live_server.url}/catalog/?q=9780141439518")
 
-        expect(page.get_by_role("heading", name="Catalog Foundation")).to_be_visible()
+        expect(page.get_by_role("heading", name="Library Catalog")).to_be_visible()
         status = page.get_by_role("status")
         expect(status).to_have_attribute("aria-live", "polite")
         expect(status).to_have_text('Showing 2 results for "9780141439518"')
