@@ -14,6 +14,7 @@ from tests.control_plane._support import load_repo_module
 
 
 def _checker(repo_root: Path) -> ModuleType:
+    """Load the control-plane checker module."""
     return load_repo_module(
         repo_root,
         "scripts/check_control_plane.py",
@@ -22,6 +23,7 @@ def _checker(repo_root: Path) -> ModuleType:
 
 
 def _codes(issues: list[Any]) -> set[str]:
+    """Collect issue codes into a set."""
     return {cast("str", issue.code) for issue in issues}
 
 

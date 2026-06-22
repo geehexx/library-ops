@@ -47,6 +47,7 @@ class SignupFormTests(TestCase):
 
     @classmethod
     def setUpTestData(cls) -> None:
+        """Seed the committed role fixtures once for this test class."""
         call_command("seed_roles")
 
     def test_application_role_choices_follow_committed_roles(self) -> None:

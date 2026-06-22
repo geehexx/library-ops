@@ -21,6 +21,7 @@ class RoleSelectingSocialSignupForm(RoleSelectingSignupFormMixin, SocialSignupFo
     role = build_application_role_field()
 
     def save(self, request: Any) -> User:
+        """Save the user and persist the selected application role."""
         user = cast("User", super().save(request))
         self._save_application_role(user)
         return user

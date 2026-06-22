@@ -23,6 +23,7 @@ def _invoke(
     payload: dict[str, Any] | str,
     argv: list[str] | None = None,
 ) -> tuple[int, str, str]:
+    """Run the hook entrypoint and capture its output."""
     raw = payload if isinstance(payload, str) else json.dumps(payload)
     monkeypatch.setattr(sys, "stdin", io.StringIO(raw))
     if argv is not None:
