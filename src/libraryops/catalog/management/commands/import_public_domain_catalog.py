@@ -1173,7 +1173,10 @@ def _upsert_record(
             )
 
         edition = existing.edition
-        assert edition is not None
+        if edition is None:
+            raise CommandError(
+                "Existing catalog-import provenance must target exactly one edition."
+            )
         work = edition.work
         work.title = record.title
         work.description = record.description

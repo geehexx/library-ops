@@ -100,6 +100,7 @@
         "GGUF",
         "graphignore",
         "gunicorn",
+        "GUTENDEX",
         "htmlcov",
         "hostnames",
         "HTMX",
@@ -224,6 +225,7 @@
         "renderable",
         "whitenoise",
         "worktree",
-        "worktrees"
+        "worktrees",
+        "keepalive"
     ]
 }
