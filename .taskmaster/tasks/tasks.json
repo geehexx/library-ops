@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": 1,
+        "id": "1",
         "title": "Project Repository and Initial Toolchain Setup",
         "description": "Initialize the Python/Django repository baseline, dependency toolchain, and direct validation path. This includes the foundational `pyproject.toml`, `uv.lock`, repo-local Node tooling, and `.gitignore` coverage for generated artifacts.",
         "details": "As per Capability C1.F1, this task establishes Python 3.12+, Node 22+, uv, npm, and the direct-tool workflow used by the repo. Ensure `uv sync --all-groups`, `npm ci`, `codex doctor --summary --ascii --no-color`, and `npx --yes --package task-master-ai@0.43.1 -c 'task-master validate-dependencies'` all succeed. `.pytest_cache`, `.venv`, corpora, model caches, and secrets must remain untracked. The project structure from section 6.1 should be present without relying on custom verifier scripts.",
@@ -86,7 +86,7 @@
         "expansionPrompt": "What additional subtasks could be added to improve the completeness of Task 1? How does the current complexity score reflect the effort required for this task, and what steps might be taken to optimize the process?"
       },
       {
-        "id": 2,
+        "id": "2",
         "title": "Configure Core Quality and Agent Tooling",
         "description": "Configure static analysis, testing, and agent-specific tools for predictable development. This includes Ruff, Pyright, pytest, Hypothesis, Import Linter, coverage, pip-audit, markdownlint, and the agent stack like Codex, Task Master, Spec Kit, Context7, Exa, RTK, code-review-graph, Serena, ast-grep, and Repomix.",
         "details": "This task aligns with Capability C1.F3, C1.F4, and C1.F5. Configure `pyproject.toml` for Ruff, Pyright (strict defaults), pytest (with Hypothesis), Import Linter (for module boundaries once apps exist), coverage, pip-audit, and markdownlint. For agent tooling, set up `.codex/config.toml`, `AGENTS.md`, and relevant skills to enable Context7, Exa, RTK-aware operating rules, bounded context budgets, code-review-graph, Serena, ast-grep, and Repomix. Ensure no real MCP keys are committed and the project permission profile stays on the current workspace-scoped model. Validate with direct-tool commands rather than custom readiness scripts.",
@@ -158,7 +158,7 @@
         "updatedAt": "2026-06-16T08:10:23.837Z"
       },
       {
-        "id": 3,
+        "id": "3",
         "title": "Harden Existing Django Bootstrap and Settings",
         "description": "Harden the existing Django project structure and configure settings for local development, testing, and production environments without re-bootstraping the project tree.",
         "details": "This covers Capability C1.F2. Treat the committed Django bootstrap as current reality: root `manage.py`, `src/libraryops/config/settings/base.py`, `local.py`, and `test.py`. Strengthen that bootstrap with real `DATABASE_URL` handling, explicit production env requirements, smoke-testable URLs, and CI parity so the repo is ready for the first domain-app implementation slice rather than a second `django-admin startproject` pass.",
@@ -243,7 +243,7 @@
         "expansionPrompt": "What additional measures could be taken to further harden the Django bootstrap in Task 3? How might adding more comprehensive testing or validation improve the task's complexity score?"
       },
       {
-        "id": 4,
+        "id": "4",
         "title": "Implement Core Library Domain Models",
         "description": "Define the Django models representing the core library domain, including works, editions, copies, loans, audit events, and external source records.",
         "status": "done",
@@ -327,7 +327,7 @@
         "expansionPrompt": "What advanced features could be added to the RBAC implementation in Task 4? How might integrating third-party libraries affect the complexity and scope of this task?"
       },
       {
-        "id": 5,
+        "id": "5",
         "title": "Configure Authentication and Role-Based Access Control",
         "description": "Set up user authentication, define role-based access control (RBAC) using Django groups and permissions, and integrate `django-allauth` for optional OAuth readiness.",
         "details": "This task aligns with Capability C3. Use Django's built-in authentication system. Create `Admin`, `Librarian`, and `Member` groups and assign default permissions as per the RBAC matrix (section 17.1). Develop server-side authorization services (`accounts` module) that provide permission checks (e.g., `require_librarian`, `can_manage_catalog`) for views, APIs, and services (FR-011, NFR-003). Integrate `django-allauth` for OAuth-ready SSO, ensuring local demo can run with username/password and OAuth is environment-driven and optional (C3.F3).",
@@ -408,7 +408,7 @@
         "expansionPrompt": "What additional functionalities could be included in the catalog management system to enhance its usability or compliance with Capability C4? How might these additions impact the overall complexity of Task 5?"
       },
       {
-        "id": 6,
+        "id": "6",
         "title": "Implement Catalog Management UI and API",
         "description": "Develop user-facing catalog browse and detail pages, forms for creating/editing/archiving works, editions, and copies, cover image support, and configure Django Admin for internal management. Keep catalog management server-rendered through Django views, forms, selectors, and templates.",
         "details": "This task covers Capability C4. Create Django templates and views (`web` module) for catalog list and detail pages (C4.F1), showing availability and role-aware actions. Implement forms for `Admin`/`Librarian` to create, edit, and archive works, editions, and copies (C4.F2). Integrate cover image support, allowing external URLs or uploaded files with validation (C4.F3). Configure Django Admin (`admin.py` in `catalog`, `inventory` apps) for internal management, including list filters and search (C4.F4). Ensure audit events are recorded for all mutations (FR-001, FR-002, FR-003, NFR-010).",
@@ -499,7 +499,7 @@
         "expansionPrompt": "What additional features or optimizations could be added to the circulation system in Task 6? How might these enhancements affect the task's complexity and testing requirements?"
       },
       {
-        "id": 7,
+        "id": "7",
         "title": "Implement Circulation System",
         "description": "Implement the core checkout/borrow and checkin/return lifecycle services, transactional integrity, UI workflows for librarians/admins, and a loan dashboard.",
         "details": "This task addresses Capability C5. Develop `checkout_copy` and `return_copy` services within the `circulation` module, ensuring they are transactional (NFR-005) and enforce the 'only one active loan per copy' invariant (FR-006, NFR-006). Implement UI workflows (`web` module) for `Librarians`/`Admins` to perform checkout/return actions, potentially using HTMX modals (C5.F3). Create a loan dashboard (`web` module) to display active, overdue, and recent loans, with role-based visibility (C5.F4). Ensure audit events are recorded for all circulation actions (NFR-010).",
@@ -594,7 +594,7 @@
         "expansionPrompt": "What additional data sources or scenarios could be included in the seed data for Task 7? How might expanding the demo corpus improve the overall functionality and test coverage of the application?"
       },
       {
-        "id": 8,
+        "id": "8",
         "title": "Implement Render-native Lexical Search",
         "description": "Implement exact-identifier-first lexical catalog search with PostgreSQL full-text ranking, faceted filtering, and deterministic result ordering.",
         "details": "This task covers Capability C6. Implement exact identifier search for ISBNs, barcodes, and external IDs (C6.F1). Configure PostgreSQL full-text search using weighted `tsvector` for keyword searches (C6.F2, section 12.2). Add filters/facets for availability, contributor, subject, language, and source (C6.F3). Implement deterministic ranking and human-readable explanations so exact identifiers outrank keyword matches and relevant lexical matches are understandable (C6.F4, section 12.3). No `SearchDocument` projection, embeddings, ParadeDB/BM25 adapter, or semantic/vector search is in scope for the current release.",
@@ -662,7 +662,7 @@
         "updatedAt": "2026-06-19T13:24:54.833Z"
       },
       {
-        "id": 9,
+        "id": "9",
         "title": "Superseded Product AI Scope",
         "description": "Historical placeholder for vector/AI release ideas that are not part of the current release.",
         "details": "This task exists only to record that the product AI and vector-search path was intentionally removed from the current release scope. Do not implement embeddings, metadata suggestions, semantic search, or related management commands for this release.",
@@ -724,7 +724,7 @@
         ]
       },
       {
-        "id": 10,
+        "id": "10",
         "title": "Implement Reproducible Seed Data and Demo Corpus",
         "description": "Create app-owned Django management commands to seed demo roles, users, import a public-domain catalog, generate copies, and create example loan states for a reproducible demo dataset.",
         "details": "This task covers Capability C8. Implement management commands as outlined in section 13.1, keeping the work in the owning app modules instead of a standalone `seed` package: `seed_roles`, `seed_demo_users` (with password reset, FR-012), `import_public_domain_catalog` (from Open Library/Project Gutenberg, FR-013), and `seed_circulation_examples`. Commands MUST be idempotent and support refresh/dry-run options. Seed Admin, Librarian, and Member demo accounts with documented credentials (C8.F1, section 13.2). Import curated public-domain records (up to 1,000) with provenance (C8.F2, FR-013). Generate realistic copies and example loans (C8.F3). Ensure imported corpora and downloaded dumps are not committed (section 13.3).\n<info added on 2026-06-17T13:29:42Z>\nRemoved the empty seed package anchor, removed import-linter references, and reworded the PRD/spec planning surfaces to keep seed behavior in app-owned management-command workflows. Validated with import-linter, ast-grep, and import smoke checks.\n</info added on 2026-06-17T13:29:42Z>",
@@ -814,7 +814,7 @@
         "expansionPrompt": "What additional documentation or validation steps could be included in Task 10 to ensure full alignment and completeness? How might these enhancements affect the complexity and quality of the final deliverables?"
       },
       {
-        "id": 11,
+        "id": "11",
         "title": "Prepare for Deployment and Generate Demo Evidence",
         "description": "Configure the Django application for live deployment, update evaluation-facing documentation, create a demo script, and tag a release to deliver a complete, reviewable product.",
         "details": "This task covers Capability C10 and C11. Configure Django app for deployment to Render or equivalent (C10.F1, section 24.6). Ensure production environment variables are managed securely and database migrations run. Update `README.md` (C10.F2) with the live URL, demo accounts, a feature checklist, setup instructions, and known limitations (section 19.3, 24.5). Prepare a Loom/demo script covering product, architecture, tests, and tradeoffs (C10.F3, section 16.2). Tag a SemVer release from `main` (C10.F3, section 16.4). Keep evaluator-facing documentation in the canonical README, runbook, and release surfaces rather than reviving deleted evidence-doc trees or a dedicated API surface.",
@@ -913,7 +913,7 @@
         "updatedAt": "2026-06-19T14:42:01.621Z"
       },
       {
-        "id": 12,
+        "id": "12",
         "title": "Finalize Control-Plane Consolidation",
         "description": "Collapse remaining duplicate and stale control-plane documentation into the right source-of-truth surfaces, reconcile Task Master and Spec Kit artifacts to the implemented command/runtime model, and keep the repo in a coherent low-drift state while product implementation begins.",
         "details": "This task covers the remaining meta/control-plane work after Tasks 1 and 2. Focus on reducing duplicated human-facing docs, reconciling supporting Spec Kit artifacts with the implemented externalized Task Master/runtime model, simplifying stale or overlapping skill/agent instructions, and keeping release/governance surfaces aligned with the actual packaging flow. Do not reintroduce historical transcript-like notes; prefer concise durable summaries and current command surfaces.",
@@ -985,7 +985,7 @@
         "expansionPrompt": "What advanced design features or user interaction patterns could be included in Task 12 to enhance usability and accessibility? How might these enhancements impact the complexity and testing requirements of UI/UX tasks?"
       },
       {
-        "id": 13,
+        "id": "13",
         "title": "Codify Coordinator Handoff Policy",
         "description": "Ensure Spark-first coordinator handoff, batch reasoning before tools, and bounded recursive child-worker fan-out are explicitly documented across repo-local agent, config, hook, docs, and notes surfaces. Use the current Task Master task/subtask and Task Master notes as the durable checkpoint path, and promote lessons into repo docs or skills when they need to survive beyond the session.",
         "status": "done",
@@ -1099,7 +1099,7 @@
         "updatedAt": "2026-06-21T13:47:25.262Z"
       },
       {
-        "id": 14,
+        "id": "14",
         "title": "Finalize Branch Landing and Release Polish",
         "description": "Stabilize the current release branch, remove remaining drift, and make the branch merge-ready without expanding product scope.",
         "details": "Use this task for the final narrow pass over code, tests, generated artifacts, and review leftovers after Task 13. Normalize stale branch notes, resolve residual lint or test failures, remove diff noise, and ensure the branch tip is the exact release candidate intended for merge and tagging. Record final merge-ready evidence.",
@@ -1251,7 +1251,7 @@
         "expansionPrompt": "Break down this task with a focus on finalize branch landing and release polish."
       },
       {
-        "id": 15,
+        "id": "15",
         "title": "Close Dependabot Queue",
         "description": "Drain the dependency-update queue, merge safe bumps, and confirm dependency hygiene stays green.",
         "details": "Inventory open dependency-update PRs, group them by risk, land safe updates, and resolve resulting lockfile or config drift. Keep updates aligned with the repo pinned tooling and validation model and end with every open dependency PR merged or explicitly closed.",
@@ -1315,7 +1315,7 @@
         "expansionPrompt": "Break down this task with a focus on close dependabot queue."
       },
       {
-        "id": 16,
+        "id": "16",
         "title": "Reconcile Docs, Specs, and Constitution",
         "description": "Bring README, PRD, Spec Kit artifacts, constitution, and durable docs back into one aligned source-of-truth set after the final polish pass.",
         "details": "Update durable documentation surfaces so they agree on current branch policy, release evidence, deployment path, auth posture, and current scope boundaries. Remove stale references to retired workflows and ensure the PRD, specs, constitution, and docs do not contradict the implemented state.",
@@ -1566,26 +1566,26 @@
         "expansionPrompt": "Break down this task with a focus on reconcile docs, specs, and constitution."
       },
       {
-        "id": 17,
+        "id": "17",
         "title": "Refactor lexical search architecture",
         "description": "Refactor src/libraryops/search/lexical.py toward strategy-based, subclass-friendly boundaries without expanding scope beyond lexical-only search.",
         "details": "Keep this strictly within the current lexical search scope: no vector search, no API surface expansion, and no new search modes. Rework the existing lexical search implementation toward clearer OO or strategy boundaries so exact-match handling, PostgreSQL FTS ranking, faceting, and result explanation assembly are easier to extend without accumulating ad hoc branching. Preserve `search_catalog` as the stable facade and keep the current `search_*` annotation / exact-identifier-first contract stable while allowing internal service/strategy decomposition. Preserve current behavior while improving internal structure and subclassability, then update the narrow lexical tests needed to prove the refactor is behavior-preserving.\n<info added on 2026-06-20T17:05:00Z>\nThe lexical.py refactor remains its own planning/implementation lane and must not be conflated with release-landing or gate-architecture work. Use notes or a successor task rather than hijacking Task 17 for unrelated landing tasks; reopen Task 17 only if fresh repo evidence shows the stable `search_catalog` facade or exact-identifier-first contract was not actually preserved.\n</info added on 2026-06-20T17:05:00Z>",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "8"
         ],
         "priority": "high",
-        "updatedAt": "2026-06-22T07:23:49.132Z",
+        "updatedAt": "2026-06-22T08:07:02.904Z",
         "subtasks": [
           {
             "id": 1,
             "title": "Integrate lexical package split and property topology overlay",
             "description": "Adopt the incoming search package split and property-test topology redesign while preserving the exact-first lexical contract.",
-            "details": "",
-            "status": "in-progress",
+            "details": "<info added on 2026-06-22T08:07:02.769Z>\nValidation passed for lexical package split / property topology overlay slice. Code changes completed without further edits. All unit tests green. Exact-first contract, package split facade, ISBN-save normalization, and property test topology under focused gate set.\n</info added on 2026-06-22T08:07:02.769Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 17,
-            "updatedAt": "2026-06-22T07:23:49.132Z",
+            "updatedAt": "2026-06-22T08:07:02.904Z",
             "parentId": "undefined"
           }
         ]
@@ -1593,14 +1593,12 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-06-22T07:23:49.134Z",
+      "lastModified": "2026-06-22T08:07:02.907Z",
       "taskCount": 17,
-      "completedCount": 14,
+      "completedCount": 15,
       "tags": [
         "master"
-      ],
-      "created": "2026-06-22T07:26:16.826Z",
-      "description": "Tasks for master context"
+      ]
     }
   },
   "rpg": {

@@ -280,6 +280,9 @@ class BookEdition(models.Model):
     def save(self, *args: object, **kwargs: object) -> None:
         """Persist the edition after validation."""
 
+        # Normalize ISBN before field validation so raw 10-digit inputs can
+        # expand to ISBN-13 before Django enforces max_length.
+        self.clean()
         self.full_clean()
         super().save(*args, **kwargs)
 

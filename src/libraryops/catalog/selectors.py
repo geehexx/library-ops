@@ -15,7 +15,10 @@ from libraryops.catalog.models import (
     WorkContributor,
 )
 from libraryops.inventory.models import BookCopy
-from libraryops.search import search_catalog
+from libraryops.search.lexical.criteria import CatalogSearchCriteria
+from libraryops.search.lexical.engine import CatalogSearchEngine
+
+_CATALOG_SEARCH_ENGINE = CatalogSearchEngine()
 
 
 def work_list(
@@ -27,16 +30,34 @@ def work_list(
     language: str | None = None,
     source: str | None = None,
 ) -> QuerySet[BibliographicWork]:
-    """Return the read-optimized active work queryset."""
+    """Return active works, optionally filtered and lexically ranked.
 
-    return search_catalog(
+    Args:
+        query: Free text or exact identifier. Supported identifier qualifiers
+            include ``isbn:``, ``barcode:``, and ``source:``/``id:``.
+        availability: Requested active-copy state.
+        contributor: Exact contributor facet.
+        subject: Edition-subject facet.
+        language: Edition-language facet.
+        source: Provenance-source facet.
+
+    Returns:
+        A lazy read-optimized work queryset. Ranked searches expose
+        ``search_rank``, ``search_keyword_rank``, and
+        ``search_explanation`` annotations.
+    """
+
+    criteria = CatalogSearchCriteria.from_values(
         query,
-        queryset=BibliographicWork.objects.foundation_index(),
         availability=availability,
         contributor=contributor,
         subject=subject,
         language=language,
         source=source,
+    )
+    return _CATALOG_SEARCH_ENGINE.search(
+        BibliographicWork.objects.foundation_index(),
+        criteria,
     )
 
 

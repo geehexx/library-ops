@@ -1,13 +1,19 @@
-"""Unit tests for lexical catalog search ranking."""
+"""Unit and query-compilation tests for exact-first lexical catalog search."""
 
 from __future__ import annotations
 
-from typing import Any, cast
-from unittest.mock import patch
+from dataclasses import FrozenInstanceError, dataclass
+from pathlib import Path
+from typing import TYPE_CHECKING, Protocol, cast
 
+import pytest
 from django.contrib.postgres.search import SearchRank
+from django.db import connection
 from django.db.models import Case, FloatField, Value, When
+from django.db.utils import ConnectionHandler
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
+from django.utils import timezone
 from tests.factories import (
     BookCopyFactory,
     BookEditionFactory,
@@ -16,30 +22,96 @@ from tests.factories import (
 )
 
 from libraryops.catalog import selectors
-from libraryops.catalog.models import ExternalSourceRecord
+from libraryops.catalog.models import BibliographicWork, ExternalSourceRecord
 from libraryops.inventory.models import BookCopyStatus
-from libraryops.search.lexical import postgres_keyword_rank_expression
+from libraryops.search.lexical.backends import PostgresKeywordRankBackend
+from libraryops.search.lexical.criteria import (
+    CatalogSearchCriteria,
+    IdentifierNamespace,
+    SearchTerm,
+)
+from libraryops.search.lexical.engine import CatalogSearchEngine
+from libraryops.search.lexical.ranking import DeterministicRankingPolicy
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.db.models.expressions import Combinable
+
+    from libraryops.search.lexical.backends import KeywordRankBackend
+
+
+class RankedWork(Protocol):
+    """Describe public annotations added to ranked work instances."""
+
+    pk: int | None
+    search_keyword_rank: float
+    search_rank: int
+    search_explanation: str
+
+
+@dataclass(frozen=True, slots=True)
+class _TitleContainsKeywordBackend:
+    """Provide deterministic positive keyword scores for focused tests."""
+
+    def rank_expression(self, term: SearchTerm) -> Combinable:
+        """Rank titles containing the normalized query payload.
+
+        Args:
+            term: Normalized search term.
+
+        Returns:
+            A deterministic floating-point ``CASE`` expression.
+        """
+
+        return Case(
+            When(title__icontains=term.text, then=Value(1.0)),
+            default=Value(0.0),
+            output_field=FloatField(),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class _StaticBackendSelector:
+    """Return one injected keyword backend regardless of database vendor."""
+
+    backend: KeywordRankBackend
+
+    def resolve(self, queryset: QuerySet[BibliographicWork]) -> KeywordRankBackend:
+        """Return the configured backend.
+
+        Args:
+            queryset: Queryset accepted to satisfy the resolver protocol.
+
+        Returns:
+            The configured keyword backend.
+        """
+
+        _ = queryset
+        return self.backend
 
 
 class CatalogLexicalSearchTests(TestCase):
-    """Prove exact identifiers and exact phrases outrank broader matches."""
+    """Prove exact identifiers, phrases, facets, and fallback behavior."""
 
     @classmethod
     def setUpTestData(cls) -> None:
-        """Seed one exact-hit work and broad title/contributor distractors."""
+        """Seed exact matches, broad distractors, facets, and archived rows."""
 
         cls.exact_work = WorkContributorFactory(
-            work__title="Exact Match Work",
-            contributor__name="Exact Author",
+            work__title="Pride and Prejudice",
+            work__description="A novel about manners and social class.",
+            contributor__name="Jane Austen",
         ).work
         cls.exact_edition = BookEditionFactory(
             work=cls.exact_work,
+            publisher="T. Egerton",
+            description="Classic English literature.",
             isbn="9780141439518",
             language="en",
             external_identifiers={
                 "openlibrary_work_id": "OL1W",
-                "gutenberg_ebook_id": "1342",
-                "subjects": ["Classics"],
+                "gutenberg_ebook_id": 1342,
+                "subjects": ["Classics", "Romance"],
             },
         )
         BookCopyFactory(edition=cls.exact_edition, barcode="BC-1001")
@@ -50,218 +122,330 @@ class CatalogLexicalSearchTests(TestCase):
             work=cls.exact_work,
         )
 
-        cls.broad_identifier_work = WorkContributorFactory(
+        cls.identifier_distractor = WorkContributorFactory(
             work__title="Reference 9780141439518 BC-1001 OL1W 1342",
             contributor__name="Broader Author",
         ).work
-        BookEditionFactory(work=cls.broad_identifier_work, isbn=build_isbn13(2))
+        BookEditionFactory(work=cls.identifier_distractor, isbn=build_isbn13(2))
 
-        cls.exact_title_work = WorkContributorFactory(
-            work__title="Pride and Prejudice",
-            contributor__name="Title Author",
-        ).work
-        BookEditionFactory(work=cls.exact_title_work, isbn=build_isbn13(3))
-
-        cls.broad_title_work = WorkContributorFactory(
+        cls.broad_work = WorkContributorFactory(
             work__title="Pride and Prejudice Annotated",
-            contributor__name="Title Author 2",
-        ).work
-        BookEditionFactory(work=cls.broad_title_work, isbn=build_isbn13(4))
-
-        cls.exact_author_work = WorkContributorFactory(
-            work__title="Author Exact Work",
-            contributor__name="Jane Austen",
-        ).work
-        BookEditionFactory(work=cls.exact_author_work, isbn=build_isbn13(5))
-
-        cls.broad_author_work = WorkContributorFactory(
-            work__title="Author Broad Work",
+            work__description="Critical commentary.",
             contributor__name="Jane Austen Society",
         ).work
-        BookEditionFactory(work=cls.broad_author_work, isbn=build_isbn13(6))
-
-        cls.unavailable_work = WorkContributorFactory(
-            work__title="Unavailable Filter Work",
-            contributor__name="Unavailable Author",
-        ).work
-        cls.unavailable_edition = BookEditionFactory(
-            work=cls.unavailable_work,
-            isbn=build_isbn13(7),
+        cls.broad_edition = BookEditionFactory(
+            work=cls.broad_work,
+            publisher="Essay House",
+            description="Literary criticism.",
+            isbn=build_isbn13(3),
             language="fr",
-            external_identifiers={"subjects": ["History"]},
+            external_identifiers={"subjects": ["Essays"]},
         )
-        cls.unavailable_copy = BookCopyFactory(
-            edition=cls.unavailable_edition,
+        cls.broad_copy = BookCopyFactory(
+            edition=cls.broad_edition,
             barcode="BC-2001",
         )
-        cls.unavailable_copy.status = BookCopyStatus.ON_LOAN.value
-        cls.unavailable_copy.save(update_fields=["status", "updated_at"])
+        cls.broad_copy.status = BookCopyStatus.ON_LOAN.value
+        cls.broad_copy.save(update_fields=["status", "updated_at"])
         ExternalSourceRecord.objects.create(
             source_name="gutenberg",
-            source_identifier="2001",
+            source_identifier="PG-ESSAYS",
             source_url="https://www.gutenberg.org/ebooks/2001",
-            edition=cls.unavailable_edition,
+            edition=cls.broad_edition,
         )
 
-    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
-    def test_exact_identifiers_rank_ahead_of_keyword_matches(self) -> None:
-        """ISBN, barcode, Open Library, and Gutenberg hits should outrank keyword hits."""
+        cls.cross_field_work = WorkContributorFactory(
+            work__title="Cross-field Search",
+            work__description="A portable fallback fixture.",
+            contributor__name="Grace Hopper",
+        ).work
+        cls.cross_field_edition = BookEditionFactory(
+            work=cls.cross_field_work,
+            publisher="Compiler Press",
+            description="Distributed systems handbook.",
+            isbn=build_isbn13(4),
+            language="en",
+            external_identifiers={"subjects": ["Computing"]},
+        )
+        cls.cross_field_copy = BookCopyFactory(
+            edition=cls.cross_field_edition,
+            barcode="BC-3001",
+        )
+        cls.cross_field_copy.status = BookCopyStatus.MAINTENANCE.value
+        cls.cross_field_copy.save(update_fields=["status", "updated_at"])
 
-        def _keyword_rank_expression(_query: str) -> Case:
-            return Case(
-                When(title__icontains=query, then=Value(1.0)),
-                default=Value(0.0),
-                output_field=FloatField(),
+        archived_at = timezone.now()
+        cls.archived_edition = BookEditionFactory(
+            work=cls.exact_work,
+            publisher="Archived Press",
+            description="Archived-only metadata.",
+            isbn=build_isbn13(5),
+            language="de",
+            external_identifiers={
+                "openlibrary_id": "ARCHIVED-OL-ID",
+                "subjects": ["Archived Subject"],
+            },
+            archived_at=archived_at,
+        )
+        BookCopyFactory(
+            edition=cls.archived_edition,
+            barcode="ARCHIVED-COPY",
+            status=BookCopyStatus.ARCHIVED,
+            archived_at=archived_at,
+        )
+        ExternalSourceRecord.objects.create(
+            source_name="openlibrary-archive",
+            source_identifier="ARCHIVED-SOURCE",
+            edition=cls.archived_edition,
+        )
+
+    @staticmethod
+    def _search_with_keyword_backend(query: str) -> QuerySet[BibliographicWork]:
+        """Return search results using the deterministic test backend.
+
+        Args:
+            query: Free text or identifier query.
+
+        Returns:
+            A lazy ranked work queryset.
+        """
+
+        engine = CatalogSearchEngine(
+            backend_selector=_StaticBackendSelector(_TitleContainsKeywordBackend())
+        )
+        return engine.search(
+            BibliographicWork.objects.foundation_index(),
+            CatalogSearchCriteria.from_values(query),
+        )
+
+    def test_search_construction_is_lazy(self) -> None:
+        """Building a search queryset must not execute SQL."""
+
+        criteria = CatalogSearchCriteria.from_values("Pride and Prejudice")
+        with CaptureQueriesContext(connection) as captured:
+            queryset = CatalogSearchEngine().search(
+                BibliographicWork.objects.foundation_index(),
+                criteria,
             )
+        assert captured.captured_queries == []
+        assert queryset.query is not None
 
-        def _keyword_annotations(query: str) -> dict[str, Any]:
-            return {
-                "search_contributor_text": Value(""),
-                "search_publisher_text": Value(""),
-                "search_keyword_rank": _keyword_rank_expression(query),
-            }
+    def test_exact_identifiers_rank_ahead_of_keyword_distractors(self) -> None:
+        """Qualified and unqualified identifiers always occupy tier zero."""
 
-        with patch(
-            "libraryops.search.lexical._postgres_keyword_annotations",
-            side_effect=_keyword_annotations,
+        for query in (
+            "9780141439518",
+            "isbn:9780141439518",
+            "bc-1001",
+            "barcode:bc-1001",
+            "ol1w",
+            "source:ol1w",
+            "1342",
+            "id:1342",
         ):
-            for query in ("9780141439518", "BC-1001", "OL1W", "1342"):
-                with self.subTest(query=query):
-                    results = list(selectors.work_list(query=query))
-                    assert results[0].pk == self.exact_work.pk
-                    assert cast("Any", results[0]).search_explanation == "Exact identifier match"
-                    assert cast("Any", results[0]).search_matched_identifier_value == query
-                    assert cast("Any", results[0]).search_availability_state == "available"
-                    assert results[1].pk == self.broad_identifier_work.pk
-                    assert cast("Any", results[1]).search_explanation == "Keyword match"
+            with self.subTest(query=query):
+                results = [
+                    cast("RankedWork", work) for work in self._search_with_keyword_backend(query)
+                ]
+                assert results[0].pk == self.exact_work.pk
+                assert results[0].search_rank == 0
+                assert results[0].search_explanation == "Exact identifier match"
+                assert results[1].pk == self.identifier_distractor.pk
+                assert results[1].search_rank == 2
+                assert results[1].search_explanation == "Keyword match"
 
-    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
-    def test_exact_title_phrase_ranks_ahead_of_broader_title_text_hits(self) -> None:
-        """An exact normalized title phrase should keep the exact label while
-        looser hits stay keyword-ranked."""
+    def test_identifier_prefix_restricts_unrelated_exact_namespaces(self) -> None:
+        """A qualifier prevents the payload matching another identifier type."""
 
-        def _keyword_rank_expression(_query: str) -> Case:
-            return Case(
-                When(title__icontains="Pride and Prejudice", then=Value(1.0)),
-                default=Value(0.0),
-                output_field=FloatField(),
+        assert (
+            not selectors.work_list(query="barcode:9780141439518")
+            .filter(pk=self.exact_work.pk)
+            .exists()
+        )
+        assert not selectors.work_list(query="isbn:BC-1001").filter(pk=self.exact_work.pk).exists()
+
+    def test_exact_phrases_rank_ahead_of_broad_matches(self) -> None:
+        """Exact normalized title and contributor equality occupy tier one."""
+
+        for query in ("Pride and Prejudice", "Jane Austen"):
+            with self.subTest(query=query):
+                results = [cast("RankedWork", work) for work in selectors.work_list(query=query)]
+                assert results[0].pk == self.exact_work.pk
+                assert results[0].search_rank == 1
+                assert results[0].search_explanation == "Exact phrase match"
+                assert self.broad_work.pk in {work.pk for work in results[1:]}
+
+    def test_keyword_explanation_stays_aligned_with_keyword_tier(self) -> None:
+        """A positive backend score produces the keyword tier and explanation."""
+
+        results = [
+            cast("RankedWork", work)
+            for work in self._search_with_keyword_backend("Pride and Prejudice")
+        ]
+        assert results[0].pk == self.exact_work.pk
+        assert results[0].search_explanation == "Exact phrase match"
+        assert results[1].pk == self.broad_work.pk
+        assert results[1].search_rank == 2
+        assert results[1].search_explanation == "Keyword match"
+
+    def test_portable_fallback_requires_every_token_across_fields(self) -> None:
+        """SQLite broad search approximates web-search AND semantics."""
+
+        result_ids = list(
+            selectors.work_list(query="Grace Compiler distributed").values_list(
+                "pk",
+                flat=True,
             )
+        )
+        assert result_ids == [self.cross_field_work.pk]
+        assert not selectors.work_list(query="Grace missing-token").exists()
 
-        def _keyword_annotations(query: str) -> dict[str, Any]:
-            return {
-                "search_contributor_text": Value(""),
-                "search_publisher_text": Value(""),
-                "search_keyword_rank": _keyword_rank_expression(query),
-            }
+    def test_facets_compose_without_free_text(self) -> None:
+        """All facets compose over live catalog, inventory, and provenance data."""
 
-        with patch(
-            "libraryops.search.lexical._postgres_keyword_annotations",
-            side_effect=_keyword_annotations,
-        ):
-            results = list(selectors.work_list(query="Pride and Prejudice"))
-
-        assert results[0].pk == self.exact_title_work.pk
-        assert cast("Any", results[0]).search_explanation == "Exact phrase match"
-        assert self.broad_title_work.pk in [work.pk for work in results]
-        assert cast("Any", results[1]).search_explanation == "Keyword match"
-
-    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
-    def test_exact_author_phrase_ranks_ahead_of_broader_author_text_hits(self) -> None:
-        """An exact normalized contributor phrase should keep the exact label
-        while looser hits stay keyword-ranked."""
-
-        def _keyword_rank_expression(_query: str) -> Case:
-            return Case(
-                When(
-                    work_contributors__contributor__name__icontains="Jane Austen", then=Value(1.0)
-                ),
-                default=Value(0.0),
-                output_field=FloatField(),
-            )
-
-        def _keyword_annotations(query: str) -> dict[str, Any]:
-            return {
-                "search_contributor_text": Value(""),
-                "search_publisher_text": Value(""),
-                "search_keyword_rank": _keyword_rank_expression(query),
-            }
-
-        with patch(
-            "libraryops.search.lexical._postgres_keyword_annotations",
-            side_effect=_keyword_annotations,
-        ):
-            results = list(selectors.work_list(query="Jane Austen"))
-
-        assert results[0].pk == self.exact_author_work.pk
-        assert cast("Any", results[0]).search_explanation == "Exact phrase match"
-        assert self.broad_author_work.pk in [work.pk for work in results]
-        assert cast("Any", results[1]).search_explanation == "Keyword match"
-
-    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
-    def test_keyword_match_explanation_is_stable(self) -> None:
-        """A keyword-ranked result should carry the keyword explanation text."""
-
-        def _keyword_rank_expression(_query: str) -> Case:
-            return Case(
-                When(title__icontains="Annotated", then=Value(1.0)),
-                default=Value(0.0),
-                output_field=FloatField(),
-            )
-
-        def _keyword_annotations(query: str) -> dict[str, Any]:
-            return {
-                "search_contributor_text": Value(""),
-                "search_publisher_text": Value(""),
-                "search_keyword_rank": _keyword_rank_expression(query),
-            }
-
-        with patch(
-            "libraryops.search.lexical._postgres_keyword_annotations",
-            side_effect=_keyword_annotations,
-        ):
-            results = list(selectors.work_list(query="Pride and Prejudice"))
-
-        assert results[0].pk == self.exact_title_work.pk
-        assert cast("Any", results[0]).search_explanation == "Exact phrase match"
-        assert results[1].pk == self.broad_title_work.pk
-        assert cast("Any", results[1]).search_explanation == "Keyword match"
-
-    def test_facets_filter_live_catalog_inventory_and_provenance_state(self) -> None:
-        """Facet helpers should filter by live catalog, inventory, and provenance data."""
-
-        results = list(
+        result_ids = list(
             selectors.work_list(
-                availability="available",
-                contributor="Exact Author",
+                availability=" AVAILABLE ",
+                contributor="  Jane   Austen ",
                 subject="Classics",
-                language="en",
-                source="openlibrary",
-            )
+                language="EN",
+                source="OpenLibrary",
+            ).values_list("pk", flat=True)
         )
+        assert result_ids == [self.exact_work.pk]
 
-        assert [work.pk for work in results] == [self.exact_work.pk]
+    def test_availability_uses_active_copy_and_edition_state(self) -> None:
+        """Unavailable means inventory exists but no active available copy."""
 
-    def test_availability_filter_uses_copy_status_state(self) -> None:
-        """Availability filtering should exclude works whose active copy is on loan."""
+        available_ids = set(
+            selectors.work_list(availability="available").values_list("pk", flat=True)
+        )
+        unavailable_ids = set(
+            selectors.work_list(availability="unavailable").values_list("pk", flat=True)
+        )
+        assert self.exact_work.pk in available_ids
+        assert self.broad_work.pk in unavailable_ids
+        assert self.cross_field_work.pk in unavailable_ids
 
-        available_results = list(selectors.work_list(availability="available"))
-        unavailable_results = list(selectors.work_list(availability="unavailable"))
+    def test_archived_edition_identifiers_and_facets_are_ignored(self) -> None:
+        """Archived editions cannot satisfy identifier, source, or facet paths."""
 
-        assert self.exact_work.pk in [work.pk for work in available_results]
-        assert self.unavailable_work.pk not in [work.pk for work in available_results]
-        assert self.unavailable_work.pk in [work.pk for work in unavailable_results]
+        for query in (
+            build_isbn13(5),
+            "barcode:ARCHIVED-COPY",
+            "id:ARCHIVED-OL-ID",
+            "source:ARCHIVED-SOURCE",
+        ):
+            with self.subTest(query=query):
+                assert not selectors.work_list(query=query).exists()
+        assert not selectors.work_list(subject="Archived Subject").exists()
+        assert not selectors.work_list(language="de").exists()
+        assert not selectors.work_list(source="openlibrary-archive").exists()
 
-    @patch("libraryops.search.lexical.connection.vendor", "postgresql")
-    def test_postgresql_branch_adds_weighted_keyword_rank_annotations(self) -> None:
-        """The PostgreSQL branch should add the weighted keyword rank annotation."""
+    def test_correlated_subqueries_do_not_duplicate_work_rows(self) -> None:
+        """Multiple related rows still produce one outer work result."""
 
-        queryset = selectors.work_list(query="Pride and Prejudice")
+        WorkContributorFactory(
+            work=self.exact_work,
+            contributor__name="Jane B. Austen",
+        )
+        BookEditionFactory(
+            work=self.exact_work,
+            publisher="Second Publisher",
+            isbn=build_isbn13(6),
+        )
+        result_ids = list(selectors.work_list(query="Pride").values_list("pk", flat=True))
+        assert result_ids.count(self.exact_work.pk) == 1
 
-        assert "search_contributor_text" in queryset.query.annotations
-        assert "search_publisher_text" in queryset.query.annotations
-        assert "search_keyword_rank" in queryset.query.annotations
-        assert "search_explanation" in queryset.query.annotations
-        rank_expression = postgres_keyword_rank_expression("Pride and Prejudice")
-        assert isinstance(rank_expression, SearchRank)
-        assert "search_contributor_text" in str(rank_expression)
-        assert "search_publisher_text" in str(rank_expression)
+    def test_blank_and_nonlexical_queries_are_safe(self) -> None:
+        """Blank criteria preserve facets and punctuation-only text finds nothing."""
+
+        criteria = CatalogSearchCriteria.from_values("   ", availability="unsupported")
+        assert criteria.term.is_empty
+        assert criteria.facets.availability is None
+        result_ids = set(
+            selectors.work_list(query="   ", language="fr").values_list("pk", flat=True)
+        )
+        assert result_ids == {self.broad_work.pk}
+        assert not selectors.work_list(query="---").exists()
+
+
+def test_criteria_objects_are_normalized_and_immutable() -> None:
+    """Criteria collapse whitespace, parse qualifiers, and cannot be mutated."""
+
+    criteria = CatalogSearchCriteria.from_values(
+        "  barcode :  COPY-0001  ",
+        contributor="  Jane   Austen ",
+    )
+    assert criteria.term.text == "COPY-0001"
+    assert criteria.term.normalized_phrase == "copy-0001"
+    assert criteria.term.tokens == ("copy", "0001")
+    assert criteria.term.identifier_namespace is IdentifierNamespace.BARCODE
+    assert criteria.facets.contributor == "Jane Austen"
+    with pytest.raises(FrozenInstanceError):
+        criteria.term.text = "changed"  # type: ignore[misc]
+
+
+def test_oversized_numeric_identifier_is_not_converted_to_an_integer() -> None:
+    """Hostile-size decimal input remains safe and available for text matching."""
+
+    value = "9" * 10_000
+    term = SearchTerm.from_value(value)
+
+    assert term.text == value
+    assert term.numeric_identifier is None
+
+
+def test_postgresql_query_compiles_with_independent_aggregate_subqueries() -> None:
+    """PostgreSQL SQL uses weighted FTS without outer join multiplication."""
+
+    term = SearchTerm.from_value("Jane classics Egerton")
+    queryset = DeterministicRankingPolicy().apply(
+        BibliographicWork.objects.all(),
+        term,
+        keyword_backend=PostgresKeywordRankBackend(),
+    )
+    handler = ConnectionHandler(
+        {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": "compile_only",
+                "USER": "compile_only",
+                "PASSWORD": "compile_only",
+                "HOST": "127.0.0.1",
+                "PORT": "1",
+            }
+        }
+    )
+    sql, parameters = queryset.query.get_compiler(connection=handler["default"]).as_sql()
+    normalized_sql = sql.upper()
+    assert "WEBSEARCH_TO_TSQUERY" in normalized_sql
+    assert "TS_RANK" in normalized_sql
+    assert normalized_sql.count("STRING_AGG") >= 4
+    outer_from = normalized_sql.rsplit(
+        ' FROM "CATALOG_BIBLIOGRAPHICWORK"',
+        maxsplit=1,
+    )[1].split(" WHERE ", maxsplit=1)[0]
+    assert "JOIN" not in outer_from
+    assert "GROUP BY" not in outer_from
+    assert "english" in parameters
+    assert set(queryset.query.annotation_select) == {
+        "search_keyword_rank",
+        "search_rank",
+        "search_explanation",
+    }
+    assert isinstance(PostgresKeywordRankBackend().rank_expression(term), SearchRank)
+
+
+def test_search_package_uses_split_modules_and_preserves_public_facade() -> None:
+    """The package conversion removes the flat module but keeps the top-level facade."""
+
+    import libraryops.search as search_package
+    import libraryops.search.lexical as lexical_package
+
+    search_root = Path(search_package.__file__).resolve().parent
+    assert not (search_root / "lexical.py").exists()
+    assert hasattr(search_package, "search_catalog")
+    assert not hasattr(lexical_package, "search_catalog")
+    assert not hasattr(lexical_package, "CatalogSearchEngine")
+    assert not hasattr(lexical_package, "CatalogSearchCriteria")
