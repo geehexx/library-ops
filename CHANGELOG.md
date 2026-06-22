@@ -8,9 +8,7 @@ It records what is shipped in each release, not temporary packaging iterations,
 transient agent preflight attempts, local repair states, or intermediate
 branch history.
 
-## [Unreleased]
-
-Target release: `0.1.1`
+## [0.1.1] - 2026-06-22
 
 ### Added
 
