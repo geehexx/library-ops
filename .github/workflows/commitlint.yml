@@ -3,18 +3,25 @@ name: commitlint
 on:
   pull_request:
     branches: [development, main]
-  workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
-  temporary-commitlint-disabled:
-    name: temporary-commitlint-disabled
+  commitlint:
+    name: commitlint
     runs-on: ubuntu-latest
     steps:
-      - name: Explain temporary posture
-        run: |
-          echo "Temporary commitlint stub: PR-side GitHub commitlint is disabled."
-          echo "Local commit-msg hooks remain the active guardrail."
-          echo "Restore the full workflow before the final release/main pass."
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint commits
+        run: npx commitlint --from=${{ github.event.pull_request.base.sha }} --to=${{ github.event.pull_request.head.sha }} --verbose

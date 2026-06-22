@@ -16,9 +16,9 @@ This file is managed by Python Semantic Release.
   flow readable.
 - Added a repeatable hosted verification helper plus docs/runbook updates for
   the manual Render free-tier refresh path.
-- Temporarily stubbed GitHub-hosted `ci` and `commitlint` workflows so local
-  hooks remain the active guardrail during rapid iteration; this must be
-  reverted before the final release/main pass.
+- Restored the real GitHub-hosted `ci` and `commitlint` workflows so the draft
+  `development` -> `main` release PR can regain truthful remote gate
+  authority before final promotion.
 - Reconciled the live Django bootstrap with the planning surfaces so Task Master,
   the PRD, and README no longer describe a second nested `django-admin
   startproject` pass.
@@ -50,11 +50,9 @@ This file is managed by Python Semantic Release.
 
 ### Remaining Release-Convergence Work
 
-- External Google/GitHub social-auth proof on local plus Render remains blocked
-  on provider-console and hosted-environment state outside the repo.
-- Restore the full GitHub-hosted CI and PR gate workflows, then rerun and fix
-  them against the final branch state before the release/main closeout.
-- Remaining in-repo merge/governance work is limited to explicit post-merge
-  cleanup and milestone-board follow-through; the screenshot matrix route
-  inventory is already closed, and the only remaining evaluator-visible blocker
-  is external social-auth proof under `16.6`.
+- Rerun the real GitHub-hosted CI and PR gate workflows on release PR `#29`
+  and fix any final remote-only failures against the true release candidate.
+- Reconcile README, Task Master, and release-status wording to the live GitHub
+  and Render state after the real remote gates rerun.
+- Run one final seeded hosted evaluator walkthrough, merge `development` into
+  `main`, and then finish the post-merge cleanup lane.

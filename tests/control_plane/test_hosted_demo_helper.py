@@ -99,7 +99,11 @@ def test_unreachable_host_returns_structured_failure_json(
     )
 
     class FakeClient:
+        """Minimal hosted-demo client shim for the unreachable-path test."""
+
         def __init__(self, base_url: str, timeout: float) -> None:
+            """Mirror the hosted client constructor for the unreachable-path test."""
+
             assert base_url == "https://offline.example"
             assert timeout == 2.0
 
@@ -111,6 +115,8 @@ def test_unreachable_host_returns_structured_failure_json(
             query: dict[str, str] | None = None,
             referer: str | None = None,
         ) -> Any:
+            """Raise the same shaped request failure the live helper reports."""
+
             _ = (data, query, referer)
             raise RuntimeError("Request to `https://offline.example/` failed: [Errno 111] refused")
 

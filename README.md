@@ -94,41 +94,41 @@ If these conflict, stop and update the higher-priority artifact first. Task Mast
 
 ## Current release status
 
-The current branch is in release convergence. The hosted Render environment is
-seeded with the medium demo corpus, the seeded hosted verifier now passes
-end-to-end, and the provider-enabled login surface is live. The remaining
-external proof gap is real Google/GitHub callback completion, plus final
-release/main closeout work.
+`development` is the current release candidate branch, and draft release PR
+`#29` is the active promotion path into `main`. The hosted Render environment
+is seeded with the medium demo corpus, the seeded hosted verifier passes
+end-to-end, and the provider-enabled login surface is live. The main remaining
+closeout work is truthful remote gate proof, final release-surface
+reconciliation, and the last short hosted evaluator QA pass on the real
+release candidate.
 
 Evaluator-facing expectations:
 
 - use the Render deployment path as the current review target;
 - sign in with the documented demo accounts after seeding or on the refreshed
   live environment;
-- expect password-based demo auth to work first; configured social login
-  remains part of the release-evidence lane while provider-callback proof is
-  captured;
+- expect password-based demo auth to work first; hosted social-login entry
+  points are wired and available, but the release-critical proof path no
+  longer depends on callback-evidence capture in this repo;
 - expect release evidence to come from the server-rendered app, README, the
   demo script, and smoke tests rather than a dedicated API surface.
 
 Known limitations:
 
-- release tagging and the final release PR are still pending;
+- release tagging and merge of draft release PR `#29` are still pending;
 - the evaluator-facing demo script now lives at
   [docs/evaluation/demo-script.md](docs/evaluation/demo-script.md);
 - the smoke surface passes locally, and the live hosted seeded proof now passes
   against the Render review target;
-- real Google/GitHub callback completion still needs browser-backed proof on
-  the live provider-enabled path;
-- GitHub-hosted CI and PR gate workflows are temporarily stubbed to keep
-  iteration fast; restore the full remote workflows before the final
-  release/main pass;
+- the final `development` -> `main` closeout still requires the real
+  GitHub-hosted CI and PR gate workflows to pass on the live release PR, not
+  just local hooks;
 - the deployment contract now targets the Render free-tier path, which means
   migrations must be handled without `preDeployCommand`, and demo seed refresh
   must be run manually via the operator sequence in [SETUP.md](SETUP.md);
 - the repo now includes `scripts/check_hosted_demo.py` so the current live
   state and the post-refresh seeded state can be verified with one repeatable
-  pass/fail helper before treating the host as release evidence;
+  pass/fail helper before treating the deployment as release evidence;
 
 The product work should continue from the canonical graph, while the control-
 plane state remains governed by the PRD, Task Master graph, agent config,

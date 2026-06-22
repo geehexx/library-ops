@@ -2,8 +2,8 @@
 
 Use this matrix as the evaluator-facing route inventory for release evidence.
 It tracks which user-visible surfaces already have browser-backed proof, which
-ones have tracked visual baselines, and which still need follow-up in the
-remaining external social-auth blocker `16.6`.
+ones have tracked visual baselines, and which still need follow-up outside the
+current release-critical path.
 
 ## Status Legend
 
@@ -31,21 +31,21 @@ remaining external social-auth blocker `16.6`.
 | `/circulation/return/` dialog | librarian | `tests/e2e/test_circulation_search.py` covers the return interaction and the post-return dashboard snapshot proves the user-visible outcome | covered | no separate deck artifact needed unless the return dialog UI changes materially |
 | `/admin/` | admin | `tests/e2e/test_navigation.py` browser assertions prove the Django admin index route is reachable for an admin user | covered | keep out of the final evaluator deck unless review specifically asks for Django admin screenshots |
 | `/health/` | evaluator / release operator | `tests/smoke/test_django_bootstrap.py` already proves `/health/` returns `ok`; route is also referenced by README and Render blueprint checks | covered | none unless hosted `/health/` proof drifts |
-| social-auth callback completion | Google and GitHub local + Render | blocked by provider-console / Render / SocialApp state | blocked | close under `16.6` with live callback evidence |
+| social-auth callback completion | Google and GitHub local + Render | hosted redirect flow is wired; full callback capture remains an out-of-band evidence lane | blocked | keep under `16.6` if callback-specific evidence is later required |
 
 ## Runbook: Clear `16.6`
 
 Use this as the shortest repo-side path for the external social-auth blocker. Do not
 rewrite product code for this slice unless the live proof reveals a real defect.
 
-Before treating the host as seeded or provider-ready, run the hosted verification
+Before treating the deployment as seeded or provider-ready, run the hosted verification
 helper so the anonymous and role-aware surfaces fail in one place:
 
 ```bash
 uv run python scripts/check_hosted_demo.py --base-url https://library-ops.onrender.com --mode unseeded
 ```
 
-When provider env vars are active but the host is still unseeded, use:
+When provider env vars are active but the deployment is still unseeded, use:
 
 ```bash
 uv run python scripts/check_hosted_demo.py \
@@ -70,8 +70,8 @@ LIBRARYOPS_DEMO_ACCESS_CODE='<demo access code>' \
 ```
 
 This helper does not prove provider callback completion. Keep browser-backed
-local + Render callback traces/screenshots as the acceptance evidence for the
-actual `16.6` closeout.
+local + Render callback traces/screenshots as optional `16.6` evidence if that
+lane is resumed later.
 
 Add `--expect-provider google --expect-provider github` only after the hosted
 login page is expected to expose the live OAuth links.
@@ -84,9 +84,9 @@ login page is expected to expose the live OAuth links.
 - Current Render state: live demo data has been refreshed to the medium seeded
   corpus, the provider-enabled login surface is live, and the seeded hosted
   verifier now passes end to end.
-- Remaining hosted gap: real Google/GitHub callback proof on the provider-
-  enabled path, plus restoring the full GitHub-hosted CI workflows before the
-  final release/main pass.
+- Remaining hosted gap on the release-critical path: restore the full
+  GitHub-hosted CI workflows, rerun them on the draft release PR, and finish
+  the final seeded evaluator walkthrough.
 - Django site row: `library-ops.onrender.com`
 - OAuth app tables now exist after the full rebuild/deploy:
   `socialaccount_socialaccount`, `socialaccount_socialapp`,
