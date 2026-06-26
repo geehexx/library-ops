@@ -1,5 +1,19 @@
 # 📚 Library Ops
 
+---
+
+A lesson for all that companies that require mini projects are run by horrible, demented, incompetent managers with low integrity, knowledge and an incapability to do the job themselves. As I said to their manager, Dale Carnegie once said you cannot lead people without being genuine. 
+
+A demo built for and requested by the [Valsoft](https://www.valsoftcorp.com/), [AnjuSoftware](https://anjusoftware.com/) and [Manos Software](https://www.manossoftware.com/) companies on request from their Managing Director, a [Mr. Paul Simpson](https://www.linkedin.com/in/paulbrsimpson/).
+
+This demo was never looked at or reviewed by anyone at any of these companies, and Mr. Paul blatantly lied and reported it had been thoroughly reviewed (twice, it was not a mistake).
+
+The picture painted in the interview is bleak: without a plan they had fired their previous EM 3 months ago because they "felt" there was more performance to be squeezed out of the employees, and that the previous manager "protected" their employees too much. The hiring manager is not technically competent and there appears to be no CTO or technical person of competence in the whole chain. 
+
+Work for Valsoft, AnjuSoftware, Mano Softare, or more specifically: Mr. Paul Simpson at your own risk. 
+
+---
+
 > **A live library-management demo and a case study in governed autonomous software delivery.**
 >
 > Browse a seeded catalog, inspect editions and physical copies, review availability states, and see how a bounded multi-agent engineering system turns product intent into tested, reviewable, deployable work.
