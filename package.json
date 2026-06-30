@@ -60,7 +60,7 @@
     "alex": "^11.0.1",
     "cspell": "^10.0.1",
     "husky": "^9.1.7",
-    "repomix": "1.14.1"
+    "repomix": "1.15.0"
   },
   "overrides": {
     "@upstash/context7-mcp": {
