@@ -56,7 +56,7 @@
     "@ast-grep/cli": "0.43.0",
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
-    "@upstash/context7-mcp": "3.2.1",
+    "@upstash/context7-mcp": "3.2.2",
     "alex": "^11.0.1",
     "cspell": "^10.0.1",
     "husky": "^9.1.7",
